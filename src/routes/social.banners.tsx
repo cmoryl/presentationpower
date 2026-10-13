@@ -34,7 +34,7 @@ export const Route = createFileRoute("/social/banners")({
 function BannersView() {
   return (
     <>
-      <header className="full-bleed relative hero-flush overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#C2A3FF22] via-[#A1FBF922] to-white/70 py-8 lg:py-10">
+      <header className="full-bleed relative hero-flush overflow-hidden border-b border-black/5 bg-muted py-8 lg:py-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Link
             to="/social"

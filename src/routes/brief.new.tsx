@@ -1108,12 +1108,12 @@ function BriefCommandCenter() {
       <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] text-white dark:bg-card">
         <div
           aria-hidden
-          className="pointer-events-none absolute -left-32 -top-40 h-[380px] w-[380px] rounded-full opacity-40 blur-[130px]"
+          className="hidden pointer-events-none absolute -left-32 -top-40 h-[380px] w-[380px] rounded-full opacity-40 blur-[130px]"
           style={{ background: brandPrimary }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-40 right-10 h-[320px] w-[320px] rounded-full opacity-25 blur-[140px]"
+          className="hidden pointer-events-none absolute -bottom-40 right-10 h-[320px] w-[320px] rounded-full opacity-25 blur-[140px]"
           style={{ background: brandAccent }}
         />
         <div className="relative mx-auto flex w-full max-w-[1400px] flex-wrap items-end justify-between gap-6 px-6 py-8 lg:px-10">

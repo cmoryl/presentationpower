@@ -206,7 +206,7 @@ function AdminKnowledgeBrowser() {
             to="/knowledge/brand-guides/$slug"
             params={{ slug: guide.slug }}
             target="_blank"
-            className="rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-black/40"
+            className="rounded-md border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-black/40"
           >
             Public view ↗
           </Link>
@@ -258,7 +258,7 @@ function OverviewTab({ guide }: { guide: BrandGuide }) {
   return (
     <div className="space-y-4">
       {guide.tagline && (
-        <div className="rounded-2xl border border-black/10 bg-gradient-to-br from-[#03002C] to-[#003FC7] p-6 text-white">
+        <div className="rounded-2xl border border-black/10 bg-[#03002C] p-6 text-white">
           <div className="text-[10px] uppercase tracking-widest text-white/60">Tagline</div>
           <div className="mt-2 text-2xl font-semibold leading-tight">{guide.tagline}</div>
         </div>
@@ -445,7 +445,7 @@ function LogoTab({ guide }: { guide: BrandGuide }) {
             <li key={r.title + i} className="rounded-lg border border-black/[0.06] bg-white p-3">
               <div className="flex items-center gap-2">
                 <span
-                  className={`inline-flex h-5 items-center rounded-full px-2 text-[10px] font-medium uppercase tracking-widest ${
+                  className={`inline-flex h-5 items-center rounded-md px-2 text-[10px] font-medium uppercase tracking-widest ${
                     r.do === false ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
                   }`}
                 >
@@ -478,7 +478,7 @@ function SubBrandsTab({ guide }: { guide: BrandGuide }) {
             {grp.items.map((it) => (
               <span
                 key={it}
-                className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs text-black/70"
+                className="rounded-md border border-black/10 bg-white px-3 py-1 text-xs text-black/70"
               >
                 {it}
               </span>
@@ -523,7 +523,7 @@ function IntelTab({ slug }: { slug: string }) {
             {tone.map((v) => (
               <span
                 key={"t" + v}
-                className="rounded-full bg-primary/10 px-3 py-1 text-xs text-[#003FC7]"
+                className="rounded-md bg-primary/10 px-3 py-1 text-xs text-[#003FC7]"
               >
                 {v}
               </span>
@@ -531,7 +531,7 @@ function IntelTab({ slug }: { slug: string }) {
             {style.map((v) => (
               <span
                 key={"s" + v}
-                className="rounded-full bg-[#C2A3FF]/20 px-3 py-1 text-xs text-black/80"
+                className="rounded-md bg-[#C2A3FF]/20 px-3 py-1 text-xs text-black/80"
               >
                 {v}
               </span>
@@ -572,7 +572,7 @@ function IntelTab({ slug }: { slug: string }) {
               {intel.competitiveLandscape.competitors.map((c) => (
                 <span
                   key={c}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs text-black/70"
+                  className="rounded-md border border-black/10 bg-white px-3 py-1 text-xs text-black/70"
                 >
                   {c}
                 </span>
@@ -587,7 +587,7 @@ function IntelTab({ slug }: { slug: string }) {
               {intel.culturalInsights.primary_markets.map((m) => (
                 <span
                   key={m}
-                  className="rounded-full bg-[#A1FBF9]/20 px-3 py-1 text-xs text-black/80"
+                  className="rounded-md bg-[#A1FBF9]/20 px-3 py-1 text-xs text-black/80"
                 >
                   {m}
                 </span>
@@ -679,7 +679,7 @@ function SourcesTab({ slug }: { slug: string }) {
                 {r.char_count.toLocaleString()} ch
               </span>
               <span
-                className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest ${
+                className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest ${
                   (r.chunk_count ?? 0) > 0
                     ? "bg-[#003FC7]/10 text-[#003FC7]"
                     : r.status === "ok"
@@ -697,7 +697,7 @@ function SourcesTab({ slug }: { slug: string }) {
                 <button
                   type="button"
                   onClick={() => setOpenId(r.id)}
-                  className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] text-black/70 hover:border-black/40"
+                  className="shrink-0 rounded-md border border-black/15 px-2 py-0.5 text-[10px] text-black/70 hover:border-black/40"
                 >
                   View text
                 </button>
@@ -723,7 +723,7 @@ function SourcesTab({ slug }: { slug: string }) {
               <button
                 type="button"
                 onClick={() => setOpenId(null)}
-                className="rounded-full border border-black/15 px-3 py-1 text-xs text-black/70"
+                className="rounded-md border border-black/15 px-3 py-1 text-xs text-black/70"
               >
                 Close
               </button>
@@ -867,7 +867,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
           Upload a .pptx to store it against <span className="font-medium">{slug}</span>. We extract
           slide text, notes, and theme colors — pixel-perfect visual thumbnails are a later layer.
         </p>
-        <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#003FC7] bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90">
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-[#003FC7] bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90">
           {uploading ? "Uploading…" : "Choose .pptx"}
           <input
             type="file"
@@ -901,11 +901,11 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                     {new Date(r.created_at).toLocaleString()} · {(r.file_size / 1024).toFixed(0)} KB
                   </div>
                 </div>
-                <span className="shrink-0 rounded-full bg-black/[0.06] px-2 py-0.5 font-mono text-[10px] text-black/60">
+                <span className="shrink-0 rounded-md bg-black/[0.06] px-2 py-0.5 font-mono text-[10px] text-black/60">
                   {r.slide_count} slides
                 </span>
                 <span
-                  className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                  className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium ${
                     r.chunk_count > 0
                       ? "bg-emerald-100 text-emerald-800"
                       : "bg-black/[0.06] text-black/50"
@@ -919,7 +919,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                   {r.chunk_count > 0 ? `${r.chunk_count} chunks` : "not embedded"}
                 </span>
                 <span
-                  className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest ${
+                  className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest ${
                     r.status === "parsed"
                       ? "bg-[#003FC7]/10 text-[#003FC7]"
                       : r.status === "failed"
@@ -932,7 +932,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                 <button
                   type="button"
                   onClick={() => setOpenId(r.id)}
-                  className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] text-black/70 hover:border-black/40"
+                  className="shrink-0 rounded-md border border-black/15 px-2 py-0.5 text-[10px] text-black/70 hover:border-black/40"
                 >
                   View
                 </button>
@@ -957,7 +957,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                       setEmbedding(null);
                     }
                   }}
-                  className="shrink-0 rounded-full border border-emerald-300 px-2 py-0.5 text-[10px] text-emerald-800 hover:border-emerald-600 disabled:opacity-50"
+                  className="shrink-0 rounded-md border border-emerald-300 px-2 py-0.5 text-[10px] text-emerald-800 hover:border-emerald-600 disabled:opacity-50"
                 >
                   {embedding === r.id
                     ? "Embedding…"
@@ -968,7 +968,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                 <button
                   type="button"
                   onClick={() => handleDelete(r.id)}
-                  className="shrink-0 rounded-full border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:border-red-500"
+                  className="shrink-0 rounded-md border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:border-red-500"
                 >
                   Delete
                 </button>
@@ -1026,7 +1026,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                 {detail?.downloadUrl && (
                   <a
                     href={detail.downloadUrl}
-                    className="rounded-full border border-black/15 px-3 py-1 text-[11px] text-black/70 hover:border-black/40"
+                    className="rounded-md border border-black/15 px-3 py-1 text-[11px] text-black/70 hover:border-black/40"
                   >
                     Download
                   </a>
@@ -1034,7 +1034,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                 <button
                   type="button"
                   onClick={() => setOpenId(null)}
-                  className="rounded-full border border-black/15 px-3 py-1 text-[11px] text-black/70 hover:border-black/40"
+                  className="rounded-md border border-black/15 px-3 py-1 text-[11px] text-black/70 hover:border-black/40"
                 >
                   Close
                 </button>
@@ -1079,7 +1079,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                                 setSendingKey(null);
                               }
                             }}
-                            className="ml-auto shrink-0 rounded-full border border-[#003FC7]/40 px-2 py-0.5 text-[10px] text-[#003FC7] hover:border-[#003FC7] disabled:opacity-50"
+                            className="ml-auto shrink-0 rounded-md border border-[#003FC7]/40 px-2 py-0.5 text-[10px] text-[#003FC7] hover:border-[#003FC7] disabled:opacity-50"
                           >
                             {sendingKey === key ? "Sending…" : "Send to library"}
                           </button>
@@ -1157,7 +1157,7 @@ function LibrarySubmissionsSection({ slug }: { slug: string }) {
                 <button
                   type="button"
                   onClick={() => handleDelete(r.id)}
-                  className="shrink-0 rounded-full border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:border-red-500"
+                  className="shrink-0 rounded-md border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:border-red-500"
                 >
                   Remove
                 </button>
@@ -1348,16 +1348,16 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
             value={tagsDraft}
             onChange={(e) => setTagsDraft(e.target.value)}
             placeholder="Tags (comma separated)"
-            className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/40"
+            className="rounded-md border border-black/15 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/40"
           />
           <input
             value={noteDraft}
             onChange={(e) => setNoteDraft(e.target.value)}
             placeholder="Note / context (optional)"
-            className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/40"
+            className="rounded-md border border-black/15 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/40"
           />
         </div>
-        <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#003FC7] bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90">
+        <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-md border border-[#003FC7] bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90">
           {busy ? "Uploading…" : "Choose images"}
           <input
             ref={fileRef}
@@ -1394,10 +1394,10 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
                     className="h-full w-full object-cover"
                     loading="lazy"
                   />
-                  <span className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-[9px] uppercase tracking-widest text-primary-foreground">
+                  <span className="absolute left-2 top-2 rounded-md bg-primary px-2 py-0.5 text-[9px] uppercase tracking-widest text-primary-foreground">
                     Built-in
                   </span>
-                  <span className="absolute right-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-[9px] uppercase tracking-widest text-white">
+                  <span className="absolute right-2 top-2 rounded-md bg-black/70 px-2 py-0.5 text-[9px] uppercase tracking-widest text-white">
                     {b.kind}
                   </span>
                 </div>
@@ -1440,7 +1440,7 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
                       preview unavailable
                     </div>
                   )}
-                  <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-[9px] uppercase tracking-widest text-white">
+                  <span className="absolute left-2 top-2 rounded-md bg-black/70 px-2 py-0.5 text-[9px] uppercase tracking-widest text-white">
                     {r.kind}
                   </span>
                 </div>
@@ -1473,14 +1473,14 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
                     <button
                       type="button"
                       onClick={() => openEditor(r)}
-                      className="flex-1 rounded-full border border-black/15 px-2 py-0.5 text-[10px] text-black/70 hover:border-black/40"
+                      className="flex-1 rounded-md border border-black/15 px-2 py-0.5 text-[10px] text-black/70 hover:border-black/40"
                     >
                       Edit
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(r.id)}
-                      className="rounded-full border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:border-red-500"
+                      className="rounded-md border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:border-red-500"
                     >
                       Delete
                     </button>
@@ -1509,7 +1509,7 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
               <button
                 type="button"
                 onClick={() => setEditing(null)}
-                className="rounded-full border border-black/15 px-3 py-1 text-[11px] text-black/70 hover:border-black/40"
+                className="rounded-md border border-black/15 px-3 py-1 text-[11px] text-black/70 hover:border-black/40"
               >
                 Close
               </button>
@@ -1545,14 +1545,14 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
                 <button
                   type="button"
                   onClick={() => setEditing(null)}
-                  className="rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-black/40"
+                  className="rounded-md border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-black/40"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={saveEditor}
-                  className="rounded-full border border-[#003FC7] bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90"
+                  className="rounded-md border border-[#003FC7] bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90"
                 >
                   Save
                 </button>

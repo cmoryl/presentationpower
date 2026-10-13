@@ -150,7 +150,7 @@ function BrandGuideView() {
         )}
         {/* Accent orb — brand secondary color pushed behind glass */}
         <div
-          className="pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full opacity-40 blur-3xl"
+          className="hidden pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full opacity-40 blur-3xl"
           style={{ background: accent }}
           aria-hidden
         />

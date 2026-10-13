@@ -198,7 +198,7 @@ export function ArtDirectorPanel({
   return (
     <section
       id="art-director"
-      className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#1B0033] via-[#2D0059] to-[#5B21B6] text-white shadow-2xl scroll-mt-24"
+      className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-[#03002C] text-white shadow-2xl scroll-mt-24"
     >
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 px-8 py-6">
         <div>

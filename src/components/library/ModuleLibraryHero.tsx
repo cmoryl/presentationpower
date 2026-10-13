@@ -143,7 +143,7 @@ function AuroraBackground() {
         }}
       />
       <div
-        className="absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
+        className="hidden absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
         style={{
           backgroundColor: HERO_ACCENT,
           opacity: 0.42,
@@ -154,7 +154,7 @@ function AuroraBackground() {
         }}
       />
       <div
-        className="absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
+        className="hidden absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
         style={{
           backgroundColor: HERO_GLOW,
           opacity: 0.32,

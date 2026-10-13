@@ -391,7 +391,7 @@ export function PptxPreviewModal({
                         }}
                         className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-black/20 bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-black/80 hover:border-[#003FC7] hover:text-[#003FC7]"
                       >
-                        <span aria-hidden>✨</span>
+                        
                         {c.fix.label}
                       </button>
                     )}

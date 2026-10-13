@@ -80,12 +80,12 @@ export function PersonaHero({
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-24 -top-24 -z-10 size-[26rem] rounded-full blur-3xl"
+        className="hidden pointer-events-none absolute -right-24 -top-24 -z-10 size-[26rem] rounded-full blur-3xl"
         style={{ background: `${theme.accent2}55` }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-32 -left-20 -z-10 size-[22rem] rounded-full blur-3xl"
+        className="hidden pointer-events-none absolute -bottom-32 -left-20 -z-10 size-[22rem] rounded-full blur-3xl"
         style={{ background: `${theme.accent}33` }}
       />
 

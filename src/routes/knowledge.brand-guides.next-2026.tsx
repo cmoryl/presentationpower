@@ -220,12 +220,12 @@ function NextBrandGuide() {
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full opacity-30 blur-3xl"
+          className="hidden pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full opacity-30 blur-3xl"
           style={{ background: "#13B1F3" }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-32 left-1/3 h-80 w-80 rounded-full opacity-20 blur-3xl"
+          className="hidden pointer-events-none absolute -bottom-32 left-1/3 h-80 w-80 rounded-full opacity-20 blur-3xl"
           style={{ background: "#C2A3FF" }}
         />
         <div className="relative">

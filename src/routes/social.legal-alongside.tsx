@@ -140,7 +140,7 @@ function AlongsideView() {
         <span>{LEGAL_ALONGSIDE_CONCEPT.division}</span>
       </div>
 
-      <header className="rounded-3xl border border-black/10 bg-gradient-to-br from-[#003FC714] via-white/70 to-[#C2A3FF1A] p-8">
+      <header className="rounded-3xl border border-black/10 bg-muted p-8">
         <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
           <Share2 size={12} /> Legal · {LEGAL_ALONGSIDE_CONCEPT.channel}
         </div>

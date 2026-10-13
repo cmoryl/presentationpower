@@ -95,11 +95,11 @@ function SocialView() {
   return (
     <>
       {/* Hero */}
-      <header className="full-bleed relative hero-flush overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#FF9B7024] via-white/70 to-[#EC388A22] py-9 lg:py-12">
+      <header className="full-bleed relative hero-flush overflow-hidden border-b border-black/5 bg-muted py-9 lg:py-12">
         <HeroVideoLayer src={heroSocialVideo.url} opacity={0.55} tint="#FFFFFF" />
         <div className="relative z-10 mx-auto max-w-7xl">
           <div className="max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
+            <div className="inline-flex items-center gap-2 rounded-md border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
               <Share2 size={12} /> Element · Social
             </div>
             <h1 className="text-4xl font-semibold tracking-tight text-[#03002C] sm:text-5xl">
@@ -114,31 +114,31 @@ function SocialView() {
             <div className="flex flex-wrap gap-3 pt-2">
               <a
                 href="#playbooks"
-                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
+                className="inline-flex items-center gap-2 rounded-md bg-[#03002C] px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
               >
                 <Sparkles size={14} /> Explore playbooks ↓
               </a>
               <Link
                 to="/social/new"
-                className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
+                className="inline-flex items-center gap-2 rounded-md border border-black/15 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
               >
                 Start from a blank kit <ArrowRight size={14} />
               </Link>
               <Link
                 to="/social/presets"
-                className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
+                className="inline-flex items-center gap-2 rounded-md border border-black/15 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
               >
                 All presets <ArrowRight size={14} />
               </Link>
               <Link
                 to="/social/banners"
-                className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/30 bg-gradient-to-r from-[#C2A3FF33] to-[#A1FBF933] px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/60"
+                className="inline-flex items-center gap-2 rounded-md border border-[#003FC7]/30 bg-muted px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/60"
               >
                 LinkedIn banners <ArrowRight size={14} />
               </Link>
               <Link
                 to="/social/modules"
-                className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/30 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/60"
+                className="inline-flex items-center gap-2 rounded-md border border-[#003FC7]/30 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/60"
               >
                 Module studio <ArrowRight size={14} />
               </Link>
@@ -276,7 +276,7 @@ function SocialView() {
             </div>
             <Link
               to={favoritedVariants.length === 0 ? "/library" : "/social/kit"}
-              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
+              className="inline-flex items-center gap-2 rounded-md bg-[#03002C] px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
             >
               <Sparkles size={12} />
               {favoritedVariants.length === 0 ? "Browse the library →" : "Choose from favorites →"}
@@ -346,7 +346,7 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs transition ${
+      className={`rounded-md border px-3 py-1 text-xs transition ${
         active
           ? "border-[#03002C] bg-[#03002C] text-white"
           : "border-black/10 bg-white/70 text-black/70 hover:border-[#003FC7]/40 hover:text-[#03002C]"

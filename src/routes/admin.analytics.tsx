@@ -84,7 +84,7 @@ function QuickLink({
   return (
     <Link
       to={to as never}
-      className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-medium text-[#03002C] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#003FC7]/40 hover:bg-white dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:border-[#A1FBF9]/40"
+      className="inline-flex items-center gap-2 rounded-md border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-medium text-[#03002C] backdrop-blur transition hover:-translate-y-0.5 hover:border-[#003FC7]/40 hover:bg-white dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:border-[#A1FBF9]/40"
     >
       <Icon size={13} />
       {label}
@@ -137,7 +137,7 @@ function MasterAnalyticsView() {
             <button
               key={d}
               onClick={() => setDays(d)}
-              className={`rounded-full px-3 py-1 transition ${
+              className={`rounded-md px-3 py-1 transition ${
                 days === d
                   ? "bg-[#03002C] text-white dark:bg-white dark:text-[#03002C]"
                   : "text-black/60 hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/10"
@@ -151,7 +151,7 @@ function MasterAnalyticsView() {
           aria-label="Division"
           value={divisionId ?? ""}
           onChange={(e) => setDivisionId(e.target.value || null)}
-          className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs dark:border-white/10 dark:bg-white/[0.06] dark:text-white"
+          className="rounded-md border border-black/10 bg-white px-3 py-1.5 text-xs dark:border-white/10 dark:bg-white/[0.06] dark:text-white"
         >
           <option value="">All divisions</option>
           {divisions.map((d) => (
@@ -163,7 +163,7 @@ function MasterAnalyticsView() {
         <button
           onClick={() => refetch()}
           disabled={isFetching}
-          className="inline-flex items-center gap-1.5 rounded-full border border-black/10 px-3 py-1.5 text-xs font-medium text-black/70 transition hover:bg-black/5 disabled:opacity-50 dark:border-white/10 dark:text-white/70 dark:hover:bg-white/10"
+          className="inline-flex items-center gap-1.5 rounded-md border border-black/10 px-3 py-1.5 text-xs font-medium text-black/70 transition hover:bg-black/5 disabled:opacity-50 dark:border-white/10 dark:text-white/70 dark:hover:bg-white/10"
         >
           <RefreshCw size={12} className={isFetching ? "animate-spin" : ""} /> Refresh
         </button>
@@ -173,13 +173,13 @@ function MasterAnalyticsView() {
             if (!aiSummaryQuery.data)
               toast.loading("Oracle is composing insights…", { id: "ai-summary" });
           }}
-          className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#003FC7] to-[#C2A3FF] px-3 py-1.5 text-xs font-semibold text-white shadow-[0_4px_20px_-6px_rgba(0,63,199,0.55)] transition hover:brightness-110"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-xs font-semibold text-white shadow-[0_4px_20px_-6px_rgba(0,63,199,0.55)] transition hover:brightness-110"
         >
           <Sparkles size={12} /> AI insights
         </button>
         <button
           onClick={() => downloadCsv(data)}
-          className="inline-flex items-center gap-1.5 rounded-full border border-black/10 px-3 py-1.5 text-xs font-medium text-black/70 transition hover:bg-black/5 dark:border-white/10 dark:text-white/70 dark:hover:bg-white/10"
+          className="inline-flex items-center gap-1.5 rounded-md border border-black/10 px-3 py-1.5 text-xs font-medium text-black/70 transition hover:bg-black/5 dark:border-white/10 dark:text-white/70 dark:hover:bg-white/10"
         >
           <Download size={12} /> CSV
         </button>
@@ -187,7 +187,7 @@ function MasterAnalyticsView() {
 
       {/* AI executive summary */}
       {showAiSummary && (
-        <div className="mb-6 rounded-2xl border border-[#003FC7]/30 bg-gradient-to-br from-[#003FC7]/10 via-white to-[#C2A3FF]/10 p-5 dark:from-[#003FC7]/20 dark:via-white/[0.04] dark:to-[#C2A3FF]/20">
+        <div className="mb-6 rounded-2xl border border-[#003FC7]/30 bg-muted p-5 dark:from-[#003FC7]/20 dark:via-white/[0.04] dark:to-[#C2A3FF]/20">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#003FC7] dark:text-[#A1FBF9]">
             <Sparkles size={12} /> Executive brief · last {days} days
           </div>
@@ -550,7 +550,7 @@ function MasterAnalyticsView() {
               data.translation.topTargets.map((t) => (
                 <span
                   key={t.lang}
-                  className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-1 text-xs dark:border-white/10 dark:bg-white/[0.04]"
+                  className="inline-flex items-center gap-2 rounded-md border border-black/10 bg-white/70 px-3 py-1 text-xs dark:border-white/10 dark:bg-white/[0.04]"
                 >
                   <span className="font-semibold text-[#03002C] dark:text-white">
                     {t.lang.toUpperCase()}
@@ -570,7 +570,7 @@ function MasterAnalyticsView() {
               data.print.byKind.map((k) => (
                 <span
                   key={k.kind}
-                  className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-1 text-xs dark:border-white/10 dark:bg-white/[0.04]"
+                  className="inline-flex items-center gap-2 rounded-md border border-black/10 bg-white/70 px-3 py-1 text-xs dark:border-white/10 dark:bg-white/[0.04]"
                 >
                   <FileText size={12} className="opacity-60" />
                   <span className="font-semibold text-[#03002C] dark:text-white">{k.kind}</span>

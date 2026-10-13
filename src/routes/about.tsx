@@ -535,7 +535,7 @@ function AboutPage() {
 
   return (
     <AppShell>
-      <header className="full-bleed relative hero-flush mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-9 lg:py-12">
+      <header className="full-bleed relative hero-flush mb-10 overflow-hidden border-b border-black/5 bg-muted py-9 lg:py-12">
         <div className="mx-auto max-w-6xl">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 sm:flex sm:flex-wrap sm:justify-between sm:gap-6">
             <div className="min-w-0">

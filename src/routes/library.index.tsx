@@ -162,7 +162,7 @@ function ResolutionToggle({
       ? "inline-flex items-center rounded-full border border-black/15 bg-white p-0.5 text-[10px] font-medium uppercase tracking-widest"
       : "inline-flex items-center rounded-full border border-black/20 bg-white p-0.5 text-[11px] font-medium";
   const pill = (active: boolean) =>
-    `rounded-full px-2 py-0.5 transition ${active ? "bg-[#03002C] text-white" : "text-black/60 hover:text-[#003FC7]"}`;
+    `rounded-md px-2 py-0.5 transition ${active ? "bg-[#03002C] text-white" : "text-black/60 hover:text-[#003FC7]"}`;
   return (
     <div className={base} role="group" aria-label="Export resolution">
       <button
@@ -212,7 +212,7 @@ function VectorToggle() {
     import("@/lib/pptx-vector-pref").then((m) => m.setPreferVector(v));
   };
   const pill = (active: boolean) =>
-    `rounded-full px-2 py-0.5 transition ${active ? "bg-[#03002C] text-white" : "text-black/60 hover:text-[#003FC7]"}`;
+    `rounded-md px-2 py-0.5 transition ${active ? "bg-[#03002C] text-white" : "text-black/60 hover:text-[#003FC7]"}`;
   return (
     <div
       className="inline-flex items-center rounded-full border border-black/15 bg-white p-0.5 text-[10px] font-medium uppercase tracking-widest"
@@ -893,7 +893,7 @@ function Library() {
     <LibraryPackProvider packId={packId} recipeId={recipeId}>
       <AppShell>
         <BackToTop />
-        <header className="full-bleed relative hero-flush mb-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
+        <header className="full-bleed relative hero-flush mb-6 overflow-hidden border-b border-black/5 bg-muted py-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
           <HeroVideoLayer src={heroPresentationVideo.url} opacity={0.55} tint="#FFFFFF" />
           <div className="relative z-10 mx-auto max-w-[1400px]">
             <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
@@ -918,7 +918,7 @@ function Library() {
 
             {activePreset && (
               <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[#003FC7]/25 bg-[#003FC7]/5 px-4 py-3 text-sm dark:border-white/15 dark:bg-white/5">
-                <span className="rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold tracking-wide text-primary-foreground uppercase">
+                <span className="rounded-md bg-primary px-2 py-0.5 text-[11px] font-semibold tracking-wide text-primary-foreground uppercase">
                   Preset view
                 </span>
                 <span className="font-semibold">{activePreset.title}</span>
@@ -984,7 +984,7 @@ function Library() {
               onClick={() => setPinnedOnly((v) => !v)}
               aria-pressed={pinnedOnly}
               title={pins.size > 0 ? `${pins.size} pinned` : "No pins yet — star a card"}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ${
+              className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs transition ${
                 pinnedOnly
                   ? "border-amber-500 bg-amber-400/20 text-amber-900"
                   : "border-black/15 bg-white text-black/70 hover:border-amber-400 hover:text-amber-800"
@@ -1005,7 +1005,7 @@ function Library() {
               }}
               aria-pressed={selectMode}
               title="Pick multiple modules, then build a deck from the selection"
-              className={`rounded-full border px-3 py-1.5 text-xs transition ${
+              className={`rounded-md border px-3 py-1.5 text-xs transition ${
                 selectMode
                   ? "border-[#003FC7] bg-[#003FC7] text-white"
                   : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
@@ -1020,7 +1020,7 @@ function Library() {
 
           <details className="group mt-2 border-t border-black/5 pt-2 dark:border-white/10">
             <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 text-xs text-black/60">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 transition group-open:border-[#003FC7] group-open:text-[#003FC7]">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-3 py-1.5 transition group-open:border-[#003FC7] group-open:text-[#003FC7]">
                 Filters &amp; view
                 {familyIds.size + tagIds.size > 0 ? ` · ${familyIds.size + tagIds.size}` : ""}
                 <span aria-hidden className="transition group-open:rotate-180">
@@ -1041,13 +1041,13 @@ function Library() {
                       clearFilters();
                     }
                   }}
-                  className="cursor-pointer rounded-full border border-black/15 bg-white px-3 py-1.5 text-black/70 hover:border-black/30 hover:text-black"
+                  className="cursor-pointer rounded-md border border-black/15 bg-white px-3 py-1.5 text-black/70 hover:border-black/30 hover:text-black"
                 >
                   Clear filters
                 </span>
               )}
               {scopeBrand && (
-                <span className="rounded-full bg-black/5 px-3 py-1 text-[11px] text-black/70">
+                <span className="rounded-md bg-black/5 px-3 py-1 text-[11px] text-black/70">
                   {preferred.size} preferred · {restricted.size} family restrictions
                 </span>
               )}
@@ -1120,7 +1120,7 @@ function Library() {
                       type="button"
                       onClick={() => setFamilyIds((s) => toggle(s, mf.id))}
                       aria-pressed={on}
-                      className={`rounded-full border px-3 py-1 text-xs transition ${
+                      className={`rounded-md border px-3 py-1 text-xs transition ${
                         on
                           ? "border-[#05041A] bg-[#05041A] text-white shadow-sm"
                           : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
@@ -1145,7 +1145,7 @@ function Library() {
                       type="button"
                       onClick={() => setTagIds((s) => toggle(s, t.id))}
                       aria-pressed={on}
-                      className={`rounded-full border px-3 py-1 text-xs transition ${
+                      className={`rounded-md border px-3 py-1 text-xs transition ${
                         on
                           ? "border-[#003FC7] bg-[#003FC7] text-white shadow-sm"
                           : "border-black/15 bg-white text-black/70 hover:border-[#003FC7]/40 hover:text-black"
@@ -1212,7 +1212,7 @@ function Library() {
                                 <span
                                   key={slot}
                                   title={title}
-                                  className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10.5px] font-medium ${cls}`}
+                                  className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10.5px] font-medium ${cls}`}
                                 >
                                   <span aria-hidden>
                                     {state === "ok" ? "✓" : state === "skipped" ? "–" : "!"}
@@ -1310,13 +1310,13 @@ function Library() {
               <div className="flex shrink-0 items-center gap-2">
                 <Link
                   to="/library/overrides"
-                  className="rounded-full border border-[#003FC7]/30 px-3 py-1.5 text-[12px] font-semibold text-primary transition hover:bg-primary/10"
+                  className="rounded-md border border-[#003FC7]/30 px-3 py-1.5 text-[12px] font-semibold text-primary transition hover:bg-primary/10"
                 >
                   Override inspector
                 </Link>
                 <Link
                   to="/library/industry-backgrounds"
-                  className="rounded-full bg-primary px-3 py-1.5 text-[12px] font-semibold text-primary-foreground transition hover:bg-primary/90"
+                  className="rounded-md bg-primary px-3 py-1.5 text-[12px] font-semibold text-primary-foreground transition hover:bg-primary/90"
                 >
                   Open background directory
                 </Link>
@@ -1365,7 +1365,7 @@ function Library() {
                   <button
                     type="button"
                     onClick={() => setQ("")}
-                    className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                    className="rounded-md border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
                   >
                     “{q.trim()}” ✕
                   </button>
@@ -1375,7 +1375,7 @@ function Library() {
                     key={id}
                     type="button"
                     onClick={() => setFamilyIds((s) => toggle(s, id))}
-                    className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                    className="rounded-md border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
                   >
                     {byId(moduleFamilies, id)?.name ?? id} ✕
                   </button>
@@ -1385,7 +1385,7 @@ function Library() {
                     key={t.id}
                     type="button"
                     onClick={() => setTagIds((s) => toggle(s, t.id))}
-                    className="rounded-full border border-[#003FC7]/30 bg-white px-3 py-1 text-xs text-[#003FC7] hover:border-[#003FC7]"
+                    className="rounded-md border border-[#003FC7]/30 bg-white px-3 py-1 text-xs text-[#003FC7] hover:border-[#003FC7]"
                   >
                     {t.label} ✕
                   </button>
@@ -1394,7 +1394,7 @@ function Library() {
                   <button
                     type="button"
                     onClick={() => setPinnedOnly(false)}
-                    className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                    className="rounded-md border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
                   >
                     Pinned only ✕
                   </button>
@@ -1403,7 +1403,7 @@ function Library() {
                   <button
                     type="button"
                     onClick={() => setScopeBrandId("all")}
-                    className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                    className="rounded-md border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
                   >
                     Scope: {brandModes.find((b) => b.id === scopeBrandId)?.name ?? scopeBrandId} ✕
                   </button>
@@ -1426,7 +1426,7 @@ function Library() {
                       className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm text-[#03002C] transition hover:border-[#003FC7]/50 hover:shadow-sm"
                     >
                       <span>{r.label}</span>
-                      <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-[#003FC7]">
+                      <span className="shrink-0 rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-[#003FC7]">
                         {r.count} result{r.count === 1 ? "" : "s"}
                       </span>
                     </button>
@@ -1453,7 +1453,7 @@ function Library() {
                               clearFilters();
                               setQ(term);
                             }}
-                            className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-[#003FC7]/50 hover:text-[#003FC7]"
+                            className="rounded-md border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-[#003FC7]/50 hover:text-[#003FC7]"
                           >
                             {term}
                           </button>
@@ -1475,7 +1475,7 @@ function Library() {
                               clearFilters();
                               setFamilyIds(new Set([mf.id]));
                             }}
-                            className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-[#003FC7]/50 hover:text-[#003FC7]"
+                            className="rounded-md border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-[#003FC7]/50 hover:text-[#003FC7]"
                           >
                             {mf.name}
                             <span className="ml-1 tabular-nums text-black/40">{count}</span>
@@ -1492,7 +1492,7 @@ function Library() {
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="rounded-full bg-[#03002C] px-4 py-2 text-sm text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
+                  className="rounded-md bg-[#03002C] px-4 py-2 text-sm text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground"
                 >
                   Clear all filters
                 </button>
@@ -1552,7 +1552,7 @@ function Library() {
         <div className="mt-10">
           <Link
             to="/brief/new"
-            className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm text-white dark:bg-primary dark:text-primary-foreground"
+            className="rounded-md bg-[#03002C] px-5 py-2.5 text-sm text-white dark:bg-primary dark:text-primary-foreground"
           >
             Start a brief →
           </Link>
@@ -1560,8 +1560,8 @@ function Library() {
 
         {selectMode && selected.length > 0 && (
           <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
-            <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-white/10 bg-[#03002C] px-4 py-2 text-sm text-white shadow-2xl dark:bg-card">
-              <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium">
+            <div className="pointer-events-auto flex items-center gap-3 rounded-md border border-white/10 bg-[#03002C] px-4 py-2 text-sm text-white shadow-2xl dark:bg-card">
+              <span className="rounded-md bg-white/15 px-2.5 py-0.5 text-xs font-medium">
                 {selected.length} selected
               </span>
               <button
@@ -1575,7 +1575,7 @@ function Library() {
               <button
                 type="button"
                 onClick={createDeckFromSelection}
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-xs font-medium hover:bg-[#0053ff]"
+                className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-1.5 text-xs font-medium hover:bg-[#0053ff]"
               >
                 <Plus size={14} /> Create deck from selection →
               </button>
@@ -1961,7 +1961,7 @@ const VariantCard = memo(function VariantCard({
 
               {/* Quick-action overlay */}
               <div className="absolute inset-0 flex items-center justify-center gap-3 bg-[#03002C]/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100 dark:bg-card">
-                <span className="translate-y-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#03002C] shadow-lg transition-transform duration-300 group-hover:translate-y-0">
+                <span className="translate-y-2 rounded-md bg-white px-4 py-2 text-sm font-semibold text-[#03002C] shadow-lg transition-transform duration-300 group-hover:translate-y-0">
                   Preview
                 </span>
                 <span className="translate-y-2 rounded-full border border-white/30 bg-white/20 p-2 text-white backdrop-blur-md transition-transform delay-75 duration-300 group-hover:translate-y-0">
@@ -2162,7 +2162,7 @@ const VariantCard = memo(function VariantCard({
             onImportExample();
           }}
           disabled={importBusy}
-          className="absolute inset-x-6 bottom-6 z-10 inline-flex items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition group-hover:opacity-100 hover:bg-[#003FC7] disabled:opacity-60 dark:bg-card"
+          className="absolute inset-x-6 bottom-6 z-10 inline-flex items-center justify-center gap-2 rounded-md bg-[#03002C] px-4 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition group-hover:opacity-100 hover:bg-[#003FC7] disabled:opacity-60 dark:bg-card"
         >
           {importBusy ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
           {importBusy ? "Importing…" : "Import as starter deck"}
@@ -2245,7 +2245,7 @@ function PreviewSkeleton({ dark = false, label }: { dark?: boolean; label?: stri
       </div>
       {label && (
         <div
-          className="absolute bottom-2 right-2 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+          className="absolute bottom-2 right-2 rounded-md px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
           style={{
             color: dark ? "rgba(255,255,255,0.55)" : "rgba(3,0,44,0.45)",
             background: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
@@ -3070,12 +3070,12 @@ function VariantDetailModal({
             <div className="min-w-0">
               <div className="flex items-center gap-2 font-mono text-xs text-black/50">
                 <span>{variant.id}</span>
-                <span className="rounded-full bg-[#0B2A4A]/10 px-2 py-0.5 text-[10px] text-[#0B2A4A]">
+                <span className="rounded-md bg-[#0B2A4A]/10 px-2 py-0.5 text-[10px] text-[#0B2A4A]">
                   {variant.familyId}
                 </span>
                 {family && (
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] ${
+                    className={`rounded-md px-2 py-0.5 text-[10px] ${
                       family.reviewLevel === "strict"
                         ? "bg-red-100 text-red-800"
                         : family.reviewLevel === "standard"
@@ -3093,7 +3093,7 @@ function VariantDetailModal({
               <button
                 type="button"
                 onClick={copyId}
-                className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+                className="inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7]/40 hover:text-[#003FC7]"
                 title="Copy variant ID to clipboard"
               >
                 {copied ? (
@@ -3107,7 +3107,7 @@ function VariantDetailModal({
                 type="button"
                 onClick={onTogglePin}
                 aria-pressed={pinned}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ${
+                className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs transition ${
                   pinned
                     ? "border-amber-500 bg-amber-400/20 text-amber-900"
                     : "border-black/15 bg-white text-black/70 hover:border-amber-400 hover:text-amber-800"
@@ -3121,7 +3121,7 @@ function VariantDetailModal({
                 <Link
                   to="/social/kit"
                   search={{ source: variant.id }}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary transition hover:bg-primary hover:text-primary-foreground"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-[#003FC7]/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary transition hover:bg-primary hover:text-primary-foreground"
                   title="Generate a social kit from this favorited module"
                 >
                   <Sparkles size={12} /> Create social kit
@@ -3131,7 +3131,7 @@ function VariantDetailModal({
               <button
                 type="button"
                 onClick={() => setSaveOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white"
+                className="inline-flex items-center gap-1.5 rounded-md border border-[#003FC7]/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white"
                 title="Save this variant + content as a reusable module"
               >
                 <Star size={12} /> Save
@@ -3295,7 +3295,7 @@ function VariantDetailModal({
                                 type="button"
                                 aria-pressed={exportTheme === t}
                                 onClick={() => setExportTheme(t)}
-                                className={`flex-1 rounded-full px-2 py-1 text-xs font-semibold capitalize transition ${
+                                className={`flex-1 rounded-md px-2 py-1 text-xs font-semibold capitalize transition ${
                                   exportTheme === t
                                     ? "bg-[#03002C] text-white"
                                     : "text-black/60 hover:text-[#003FC7]"
@@ -3484,7 +3484,7 @@ function VariantDetailModal({
 
               {usageCount > 0 && (
                 <span
-                  className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white dark:bg-card"
+                  className="rounded-md bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white dark:bg-card"
                   title={`Used in ${usageCount} of your slides`}
                 >
                   Used · {usageCount}
@@ -3492,7 +3492,7 @@ function VariantDetailModal({
               )}
               <button
                 onClick={onClose}
-                className="rounded-full border border-black/15 px-3 py-1.5 text-sm hover:bg-black/5"
+                className="rounded-md border border-black/15 px-3 py-1.5 text-sm hover:bg-black/5"
                 aria-label="Close"
               >
                 ✕
@@ -3530,7 +3530,7 @@ function VariantDetailModal({
                     type="button"
                     onClick={() => setShowImagery(!showImagery)}
                     aria-pressed={showImagery}
-                    className={`rounded-full border px-2.5 py-1 text-[11px] ${
+                    className={`rounded-md border px-2.5 py-1 text-[11px] ${
                       showImagery
                         ? "border-[#05041A] bg-[#05041A] text-white"
                         : "border-black/15 bg-white text-black/60"
@@ -3643,7 +3643,7 @@ function VariantDetailModal({
                           {lf.zones.map((z) => (
                             <span
                               key={z}
-                              className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] text-black/70"
+                              className="rounded-md bg-black/5 px-2 py-0.5 text-[10px] text-black/70"
                             >
                               {z}
                             </span>
@@ -3759,7 +3759,7 @@ function VariantDetailModal({
                 <button
                   type="button"
                   onClick={() => downloadPreviewBlob("light")}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:bg-white/90"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-white/20 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:bg-white/90"
                   title={previewUrls.filenameLight}
                 >
                   <Download size={12} /> Download Light ({previewUrls.ratio === 3840 ? "4K" : "HD"})
@@ -3767,7 +3767,7 @@ function VariantDetailModal({
                 <button
                   type="button"
                   onClick={() => downloadPreviewBlob("dark")}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-[#0050ff]"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-[#003FC7] bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-[#0050ff]"
                   title={previewUrls.filenameDark}
                 >
                   <Download size={12} /> Download Dark ({previewUrls.ratio === 3840 ? "4K" : "HD"})
@@ -3776,14 +3776,14 @@ function VariantDetailModal({
                   href={previewUrls.light}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-xs font-medium text-white/80 hover:bg-white/10"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-white/20 px-3 py-1.5 text-xs font-medium text-white/80 hover:bg-white/10"
                 >
                   <Eye size={12} /> Open light PDF
                 </a>
                 <button
                   type="button"
                   onClick={closePdfPreview}
-                  className="rounded-full border border-white/20 px-3 py-1.5 text-sm text-white/80 hover:bg-white/10"
+                  className="rounded-md border border-white/20 px-3 py-1.5 text-sm text-white/80 hover:bg-white/10"
                 >
                   Close ✕
                 </button>
@@ -3959,7 +3959,7 @@ function ModalABPreview({
                   type="button"
                   onClick={() => runImageExport(m, "png")}
                   disabled={imageBusy !== null}
-                  className="rounded-full border border-black/15 bg-white px-2 py-0.5 font-medium uppercase tracking-widest text-black/60 hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-50"
+                  className="rounded-md border border-black/15 bg-white px-2 py-0.5 font-medium uppercase tracking-widest text-black/60 hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-50"
                   title={`Export exact ${m} preview as high-res PNG (pixel-perfect, not editable)`}
                 >
                   {imageBusy === `png-${m}` ? (imageStage ?? "…") : "PNG"}
@@ -3968,7 +3968,7 @@ function ModalABPreview({
                   type="button"
                   onClick={() => runImageExport(m, "pdf")}
                   disabled={imageBusy !== null}
-                  className="rounded-full border border-black/15 bg-white px-2 py-0.5 font-medium uppercase tracking-widest text-black/60 hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-50"
+                  className="rounded-md border border-black/15 bg-white px-2 py-0.5 font-medium uppercase tracking-widest text-black/60 hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-50"
                   title={`Export exact ${m} preview as image PDF (16:9, review copy — not editable)`}
                 >
                   {imageBusy === `pdf-${m}` ? (imageStage ?? "…") : "PDF"}
@@ -4032,7 +4032,7 @@ function ModalABPreview({
                   </ScaledSlide>
                 </LiveEditOverlay>
                 <div className="pointer-events-none absolute inset-0 flex items-end justify-end p-2 opacity-0 transition group-hover:opacity-100">
-                  <span className="rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white">
+                  <span className="rounded-md bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white">
                     ⤢ Zoom
                   </span>
                 </div>
@@ -4177,7 +4177,7 @@ function LightboxPortal({
                 title={
                   modeLocked ? `${activePack?.label} is a ${activePack?.mode}-only look` : undefined
                 }
-                className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition ${
+                className={`rounded-md px-3.5 py-1.5 text-xs font-medium transition ${
                   effMode === m
                     ? "bg-white text-[#03002C] shadow-sm"
                     : modeLocked
@@ -4193,7 +4193,7 @@ function LightboxPortal({
             type="button"
             onClick={() => setIntroNonce((n) => n + 1)}
             title={`Replay intro — ${intro.label}`}
-            className="hidden items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/40 hover:text-white sm:inline-flex"
+            className="hidden items-center gap-1.5 rounded-md border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/40 hover:text-white sm:inline-flex"
           >
             ↻ {intro.label}
           </button>
@@ -4463,7 +4463,7 @@ function AddToDeckPanel({
   }
 
   return (
-    <div className="rounded-xl border border-[#003FC7]/25 bg-gradient-to-br from-[#003FC7]/5 to-transparent p-4">
+    <div className="rounded-xl border border-[#003FC7]/25 bg-muted p-4">
       <div className="flex items-center justify-between gap-2">
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
@@ -4483,7 +4483,7 @@ function AddToDeckPanel({
             <button
               type="button"
               onClick={startDeckHere}
-              className="rounded-full bg-primary px-3 py-1 text-[11px] font-medium text-primary-foreground hover:bg-[#0053ff]"
+              className="rounded-md bg-primary px-3 py-1 text-[11px] font-medium text-primary-foreground hover:bg-[#0053ff]"
             >
               New deck with this module →
             </button>
@@ -4509,7 +4509,7 @@ function AddToDeckPanel({
                 type="button"
                 disabled={busy !== null}
                 onClick={() => addTo(d.id, false)}
-                className="rounded-full border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-50"
+                className="rounded-md border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-50"
               >
                 {busy === d.id ? "…" : "Add"}
               </button>
@@ -4517,7 +4517,7 @@ function AddToDeckPanel({
                 type="button"
                 disabled={busy !== null}
                 onClick={() => addTo(d.id, true)}
-                className="rounded-full bg-[#03002C] px-2.5 py-1 text-[11px] font-medium text-white hover:opacity-90 disabled:opacity-50 dark:bg-card"
+                className="rounded-md bg-[#03002C] px-2.5 py-1 text-[11px] font-medium text-white hover:opacity-90 disabled:opacity-50 dark:bg-card"
               >
                 Add & open
               </button>
@@ -4561,7 +4561,7 @@ function ModulePresetKitsBlock() {
             whole kit into a new editable deck.
           </p>
         </div>
-        <span className="shrink-0 rounded-full bg-black/5 px-3 py-1 text-xs text-black/60">
+        <span className="shrink-0 rounded-md bg-black/5 px-3 py-1 text-xs text-black/60">
           {MODULE_PRESET_KITS.length} kits
         </span>
       </div>
@@ -4586,7 +4586,7 @@ function ModulePresetKitsBlock() {
                   </div>
                   <div className="mt-1 text-lg font-semibold text-[#03002C]">{kit.title}</div>
                 </div>
-                <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-[#003FC7]">
+                <span className="shrink-0 rounded-md bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-[#003FC7]">
                   {kit.payload.slides.length} slides
                 </span>
               </div>
@@ -4600,7 +4600,7 @@ function ModulePresetKitsBlock() {
                   {Object.entries(familyCounts).map(([fam, n]) => (
                     <span
                       key={fam}
-                      className="rounded-full bg-[#0B2A4A]/10 px-2 py-0.5 font-mono text-[10px] text-[#0B2A4A]"
+                      className="rounded-md bg-[#0B2A4A]/10 px-2 py-0.5 font-mono text-[10px] text-[#0B2A4A]"
                     >
                       {fam} · {n}
                     </span>
@@ -4612,7 +4612,7 @@ function ModulePresetKitsBlock() {
                 type="button"
                 onClick={() => importKit(kit)}
                 disabled={busy !== null}
-                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60 dark:bg-card"
+                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#03002C] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60 dark:bg-card"
               >
                 {busy === kit.key ? (
                   <Loader2 size={14} className="animate-spin" />
@@ -4683,7 +4683,7 @@ function UserImportedKitsBlock() {
             alongside the curated collections above.
           </p>
         </div>
-        <span className="shrink-0 rounded-full bg-black/5 px-3 py-1 text-xs text-black/60">
+        <span className="shrink-0 rounded-md bg-black/5 px-3 py-1 text-xs text-black/60">
           {imported.length} deck{imported.length === 1 ? "" : "s"}
         </span>
       </div>
@@ -4710,7 +4710,7 @@ function UserImportedKitsBlock() {
                   </div>
                   <div className="mt-1 text-lg font-semibold text-[#03002C]">{deck.title}</div>
                 </div>
-                <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-[#003FC7]">
+                <span className="shrink-0 rounded-md bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-[#003FC7]">
                   {deck.slides.length} slides
                 </span>
               </div>
@@ -4723,7 +4723,7 @@ function UserImportedKitsBlock() {
                   {Object.entries(familyCounts).map(([fam, n]) => (
                     <span
                       key={fam}
-                      className="rounded-full bg-[#0B2A4A]/10 px-2 py-0.5 font-mono text-[10px] text-[#0B2A4A]"
+                      className="rounded-md bg-[#0B2A4A]/10 px-2 py-0.5 font-mono text-[10px] text-[#0B2A4A]"
                     >
                       {fam} · {n}
                     </span>
@@ -4736,7 +4736,7 @@ function UserImportedKitsBlock() {
                   type="button"
                   onClick={() => importAsKit(deck)}
                   disabled={busy !== null}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60 dark:bg-card"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-[#03002C] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60 dark:bg-card"
                 >
                   {busy === deck.id ? (
                     <Loader2 size={14} className="animate-spin" />
@@ -4749,7 +4749,7 @@ function UserImportedKitsBlock() {
                   <button
                     type="button"
                     onClick={() => setDeckTemplateFlag(deck.id, true)}
-                    className="rounded-full border border-black/15 bg-white px-4 py-2.5 text-xs uppercase tracking-widest text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+                    className="rounded-md border border-black/15 bg-white px-4 py-2.5 text-xs uppercase tracking-widest text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
                   >
                     Pin as template
                   </button>

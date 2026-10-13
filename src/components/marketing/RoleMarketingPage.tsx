@@ -140,12 +140,12 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-40 -top-52 size-[46rem] rounded-full blur-[120px]"
+          className="hidden pointer-events-none absolute -right-40 -top-52 size-[46rem] rounded-full blur-[120px]"
           style={{ background: `${theme.accent}47` }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-56 -left-32 size-[38rem] rounded-full blur-[120px]"
+          className="hidden pointer-events-none absolute -bottom-56 -left-32 size-[38rem] rounded-full blur-[120px]"
           style={{ background: `${theme.accent2}3D` }}
         />
 
@@ -356,7 +356,7 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
               />
               <span
                 aria-hidden
-                className="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
+                className="hidden pointer-events-none absolute -right-16 -top-20 size-56 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
                 style={{ background: `${theme.accent}2E` }}
               />
               <span
@@ -381,7 +381,7 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute -left-40 top-1/2 size-[34rem] -translate-y-1/2 rounded-full blur-[120px]"
+          className="hidden pointer-events-none absolute -left-40 top-1/2 size-[34rem] -translate-y-1/2 rounded-full blur-[120px]"
           style={{ background: `${theme.accent2}33` }}
         />
         <div className="relative mx-auto max-w-[1180px]">
@@ -486,7 +486,7 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-32 left-1/2 size-[30rem] -translate-x-1/2 rounded-full blur-[110px]"
+            className="hidden pointer-events-none absolute -top-32 left-1/2 size-[30rem] -translate-x-1/2 rounded-full blur-[110px]"
             style={{ background: `${theme.accent}3D` }}
           />
           <div className="relative mx-auto max-w-2xl" style={{ color: theme.onHero }}>

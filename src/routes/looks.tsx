@@ -35,7 +35,7 @@ function LooksPage() {
     <AppShell>
       <LookStudio
         heading={
-          <header className="relative overflow-hidden rounded-3xl border border-black/10 bg-gradient-to-br from-[#E0E8F5] via-white to-[#F2F2F2] p-6 dark:border-white/10 dark:from-[#03002C] dark:via-[#050427] dark:to-[#0A0A2E]">
+          <header className="relative overflow-hidden rounded-3xl border border-black/10 bg-muted p-6 dark:border-white/10 dark:from-[#03002C] dark:via-[#050427] dark:to-[#0A0A2E]">
             <div className="text-xs uppercase tracking-[0.25em] text-[#003FC7] dark:text-[#A1FBF9]">
               Design system
             </div>

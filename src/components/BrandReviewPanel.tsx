@@ -186,7 +186,7 @@ export function BrandReviewPanel({
   return (
     <section
       id="brand-review"
-      className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#03002C] via-[#0A1350] to-[#003FC7] text-white shadow-2xl scroll-mt-24"
+      className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-[#03002C] text-white shadow-2xl scroll-mt-24"
     >
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 px-8 py-6">
         <div>

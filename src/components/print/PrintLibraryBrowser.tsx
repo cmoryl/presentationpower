@@ -187,7 +187,7 @@ export function PrintLibraryBrowser({
       {/* Breadcrumb path — sticky so any level is one click away, no scrolling */}
       <nav
         aria-label="Print library path"
-        className="sticky top-2 z-30 flex flex-wrap items-center gap-1.5 rounded-full border border-black/10 bg-white/85 px-2 py-1.5 text-xs shadow-sm backdrop-blur"
+        className="sticky top-2 z-30 flex flex-wrap items-center gap-1.5 rounded-md border border-black/10 bg-white/85 px-2 py-1.5 text-xs shadow-sm backdrop-blur"
       >
         <button
           type="button"
@@ -197,7 +197,7 @@ export function PrintLibraryBrowser({
             setSubId(null);
             setQuery("");
           }}
-          className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 font-medium text-[#03002C] hover:border-black/30"
+          className="inline-flex items-center gap-1.5 rounded-md border border-black/10 bg-white px-3 py-1 font-medium text-[#03002C] hover:border-black/30"
         >
           <FolderOpen size={12} /> Print library
         </button>
@@ -238,7 +238,7 @@ export function PrintLibraryBrowser({
               value={parentSub?.id ?? ""}
               onChange={(e) => setSubId(e.target.value || null)}
               className={
-                "cursor-pointer rounded-full px-3 py-1 text-xs font-medium outline-none " +
+                "cursor-pointer rounded-md px-3 py-1 text-xs font-medium outline-none " +
                 (parentSub
                   ? "bg-[#03002C] text-white"
                   : "border border-black/10 bg-white text-black/60")
@@ -262,7 +262,7 @@ export function PrintLibraryBrowser({
               aria-label="Product"
               value={activeSub && activeSub.id !== parentSub.id ? activeSub.id : ""}
               onChange={(e) => setSubId(e.target.value || parentSub.id)}
-              className="cursor-pointer rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[#03002C] outline-none"
+              className="cursor-pointer rounded-md border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[#03002C] outline-none"
               style={
                 activeSub && activeSub.id !== parentSub.id
                   ? { background: `color-mix(in oklab, ${brand.tokens.accent} 26%, white)` }
@@ -289,7 +289,7 @@ export function PrintLibraryBrowser({
             setCollection("All");
           }}
           className={
-            "cursor-pointer rounded-full px-3 py-1 text-xs font-medium outline-none " +
+            "cursor-pointer rounded-md px-3 py-1 text-xs font-medium outline-none " +
             (typeId ? "bg-[#03002C] text-white" : "border border-black/10 bg-white text-black/60")
           }
         >
@@ -309,7 +309,7 @@ export function PrintLibraryBrowser({
               aria-label="Collection"
               value={collection}
               onChange={(e) => setCollection(e.target.value)}
-              className="cursor-pointer rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/70 outline-none"
+              className="cursor-pointer rounded-md border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/70 outline-none"
             >
               {collections.map((c) => (
                 <option key={c} value={c}>
@@ -332,7 +332,7 @@ export function PrintLibraryBrowser({
               value={value}
               onChange={(e) => set(e.target.value)}
               className={
-                "cursor-pointer rounded-full px-3 py-1 text-xs font-medium outline-none " +
+                "cursor-pointer rounded-md px-3 py-1 text-xs font-medium outline-none " +
                 (value !== "All" ? "bg-[#03002C] text-white" : "border border-black/10 bg-white text-black/60")
               }
             >
@@ -347,12 +347,12 @@ export function PrintLibraryBrowser({
         )}
 
         <span className="ml-auto flex items-center gap-1.5">
-          <span className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] font-medium text-black/55">
+          <span className="rounded-md border border-black/10 bg-white px-2.5 py-1 text-[11px] font-medium text-black/55">
             {items.length} showing
           </span>
           <Link
             to="/library/print/modules"
-            className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1 font-medium text-[#03002C] hover:border-black/40"
+            className="inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-3 py-1 font-medium text-[#03002C] hover:border-black/40"
           >
             <FileText size={12} /> Section modules
           </Link>
@@ -503,13 +503,13 @@ export function PrintLibraryBrowser({
                   setTypeId(null);
                   setCollection("All");
                 }}
-                className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/35"
+                className="rounded-md border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/35"
               >
                 All print types
               </button>
             ) : null}
             <span
-              className="rounded-full px-3 py-1.5 text-xs font-semibold text-white"
+              className="rounded-md px-3 py-1.5 text-xs font-semibold text-white"
               style={{ background: "#03002C" }}
             >
               {items.length} showing
@@ -545,7 +545,7 @@ export function PrintLibraryBrowser({
                     aria-selected={active}
                     title={s.blurb}
                     onClick={() => setSubId(active ? null : s.id)}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                    className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold transition ${
                       active
                         ? "border-transparent bg-[#03002C] text-white"
                         : "border-black/15 bg-white text-[#03002C] hover:border-black/40"
@@ -584,7 +584,7 @@ export function PrintLibraryBrowser({
                       aria-pressed={active}
                       title={c.blurb}
                       onClick={() => setSubId(active ? parentSub.id : c.id)}
-                      className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+                      className={`rounded-md border px-2.5 py-1 text-[11px] font-medium transition ${
                         active
                           ? "border-transparent text-[#03002C]"
                           : "border-black/12 bg-white/70 text-black/65 hover:border-black/30"
@@ -645,7 +645,7 @@ export function PrintLibraryBrowser({
                     <FileText size={12} /> {t.plural}
                   </span>
                   <span
-                    className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-[#03002C]"
+                    className="rounded-md px-2 py-0.5 text-[10px] font-semibold text-[#03002C]"
                     style={{
                       background: `color-mix(in oklab, ${brand.tokens.accent} 18%, white)`,
                     }}
@@ -683,7 +683,7 @@ export function PrintLibraryBrowser({
                     type="button"
                     aria-pressed={active}
                     onClick={() => setCollection(c)}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                    className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition ${
                       active
                         ? "border-transparent bg-[#03002C] text-white"
                         : "border-black/15 bg-white text-[#03002C] hover:border-black/40"
@@ -696,7 +696,7 @@ export function PrintLibraryBrowser({
               })
             : null}
         </div>
-        <label className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white px-3 py-1.5">
+        <label className="inline-flex items-center gap-2 rounded-md border border-black/15 bg-white px-3 py-1.5">
           <Search size={12} className="text-black/40" aria-hidden />
           <input
             value={query}
@@ -854,11 +854,11 @@ function PrintItemCard({
           />
         ) : null}
 
-        <span className="absolute left-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#03002C]">
+        <span className="absolute left-3 top-3 z-20 inline-flex items-center gap-1 rounded-md bg-white/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#03002C]">
           {isTemplate ? "Blank template" : (item.collection ?? "Ready-made")}
         </span>
         {multiPage ? (
-          <span className="absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-[#03002C]/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white">
+          <span className="absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-md bg-[#03002C]/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white">
             {pageCount} pages
           </span>
         ) : null}
@@ -883,7 +883,7 @@ function PrintItemCard({
             {safeList(item.stats).map((s, i) => (
               <span
                 key={`${s.label}-${i}`}
-                className="inline-flex items-baseline gap-1 rounded-full border border-black/10 bg-black/[0.02] px-2 py-0.5 text-[10px] text-black/60"
+                className="inline-flex items-baseline gap-1 rounded-md border border-black/10 bg-black/[0.02] px-2 py-0.5 text-[10px] text-black/60"
               >
                 <strong className="text-[11px] font-semibold text-[#03002C]">
                   {s.value}
@@ -899,7 +899,7 @@ function PrintItemCard({
           <button
             type="button"
             onClick={onPreview}
-            className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
+            className="inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
           >
             Preview
           </button>
@@ -910,7 +910,7 @@ function PrintItemCard({
                 to="/convert"
                 search={{ print: item.id }}
                 title="Use this piece in social posts, other print sizes and a slide deck"
-                className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
+                className="inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
               >
                 Social &amp; slides
               </Link>
@@ -933,7 +933,7 @@ function EditMasterLink({ itemId }: { itemId: string }) {
     <Link
       to="/admin/print-library/$itemId"
       params={{ itemId }}
-      className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/40 bg-white px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/[0.06]"
+      className="inline-flex items-center gap-1.5 rounded-md border border-[#003FC7]/40 bg-white px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/[0.06]"
     >
       <Pencil size={12} /> Edit master
     </Link>
@@ -970,7 +970,7 @@ function UseTemplateAction({ item, brand }: { item: PrintLibraryItem; brand: Bra
     <Link
       to="/asset/new"
       search={{ kind: item.kind, brandModeId: brand.id }}
-      className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
+      className="inline-flex items-center gap-1.5 rounded-md bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
     >
       Use template <ArrowRight size={12} />
     </Link>
@@ -1030,7 +1030,7 @@ function CopyItemButton({ item, label }: { item: PrintLibraryItem; label?: strin
       type="button"
       disabled={busy}
       onClick={() => void makeCopy()}
-      className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85 disabled:opacity-60"
+      className="inline-flex items-center gap-1.5 rounded-md bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85 disabled:opacity-60"
     >
       <Copy size={12} /> {busy ? "Opening…" : (label ?? "Use this template")}
     </button>

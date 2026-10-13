@@ -780,7 +780,7 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
               }}
             />
             <div
-              className="absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
+              className="hidden absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
               style={{
                 backgroundColor: m.accent,
                 opacity: 0.42,
@@ -791,7 +791,7 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
               }}
             />
             <div
-              className="absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
+              className="hidden absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
               style={{
                 backgroundColor: m.glow,
                 opacity: 0.32,
