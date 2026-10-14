@@ -55,6 +55,7 @@ import { Route as AdminKnowledgeHubRouteImport } from './routes/admin.knowledge-
 import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
 import { Route as AdminModuleStudioRouteImport } from './routes/admin.module-studio'
 import { Route as AdminModulesRouteImport } from './routes/admin.modules'
+import { Route as AdminNeedsSourceRouteImport } from './routes/admin.needs-source'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
 import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
 import { Route as AdminPrintColorRouteImport } from './routes/admin.print-color'
@@ -451,6 +452,11 @@ const AdminModuleStudioRoute = AdminModuleStudioRouteImport.update({
 const AdminModulesRoute = AdminModulesRouteImport.update({
   id: '/modules',
   path: '/modules',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNeedsSourceRoute = AdminNeedsSourceRouteImport.update({
+  id: '/needs-source',
+  path: '/needs-source',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminOracleRoute = AdminOracleRouteImport.update({
@@ -1344,6 +1350,7 @@ export interface FileRoutesByFullPath {
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/module-studio': typeof AdminModuleStudioRoute
   '/admin/modules': typeof AdminModulesRoute
+  '/admin/needs-source': typeof AdminNeedsSourceRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-color': typeof AdminPrintColorRoute
@@ -1553,6 +1560,7 @@ export interface FileRoutesByTo {
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/module-studio': typeof AdminModuleStudioRoute
   '/admin/modules': typeof AdminModulesRoute
+  '/admin/needs-source': typeof AdminNeedsSourceRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-color': typeof AdminPrintColorRoute
@@ -1767,6 +1775,7 @@ export interface FileRoutesById {
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/module-studio': typeof AdminModuleStudioRoute
   '/admin/modules': typeof AdminModulesRoute
+  '/admin/needs-source': typeof AdminNeedsSourceRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-color': typeof AdminPrintColorRoute
@@ -1982,6 +1991,7 @@ export interface FileRouteTypes {
     | '/admin/logohub'
     | '/admin/module-studio'
     | '/admin/modules'
+    | '/admin/needs-source'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
     | '/admin/print-color'
@@ -2191,6 +2201,7 @@ export interface FileRouteTypes {
     | '/admin/logohub'
     | '/admin/module-studio'
     | '/admin/modules'
+    | '/admin/needs-source'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
     | '/admin/print-color'
@@ -2404,6 +2415,7 @@ export interface FileRouteTypes {
     | '/admin/logohub'
     | '/admin/module-studio'
     | '/admin/modules'
+    | '/admin/needs-source'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
     | '/admin/print-color'
@@ -3003,6 +3015,13 @@ declare module '@tanstack/react-router' {
       path: '/modules'
       fullPath: '/admin/modules'
       preLoaderRoute: typeof AdminModulesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/needs-source': {
+      id: '/admin/needs-source'
+      path: '/needs-source'
+      fullPath: '/admin/needs-source'
+      preLoaderRoute: typeof AdminNeedsSourceRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/oracle': {
@@ -4184,6 +4203,7 @@ interface AdminRouteChildren {
   AdminLogohubRoute: typeof AdminLogohubRoute
   AdminModuleStudioRoute: typeof AdminModuleStudioRoute
   AdminModulesRoute: typeof AdminModulesRoute
+  AdminNeedsSourceRoute: typeof AdminNeedsSourceRoute
   AdminOracleRoute: typeof AdminOracleRoute
   AdminPdfIngestRoute: typeof AdminPdfIngestRoute
   AdminPrintColorRoute: typeof AdminPrintColorRoute
@@ -4223,6 +4243,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLogohubRoute: AdminLogohubRoute,
   AdminModuleStudioRoute: AdminModuleStudioRoute,
   AdminModulesRoute: AdminModulesRoute,
+  AdminNeedsSourceRoute: AdminNeedsSourceRoute,
   AdminOracleRoute: AdminOracleRoute,
   AdminPdfIngestRoute: AdminPdfIngestRoute,
   AdminPrintColorRoute: AdminPrintColorRoute,

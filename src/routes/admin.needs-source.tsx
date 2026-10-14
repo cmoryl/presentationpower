@@ -51,7 +51,7 @@ async function scan(): Promise<Hit[]> {
   }
   for (const p of prints.data ?? []) {
     const issues = lintContent(p.content);
-    if (issues.length) hits.push({ surface: "Print", id: p.id, title: p.title ?? "Untitled print piece", link: { to: "/asset/$id", params: { id: p.id } }, issues });
+    if (issues.length) hits.push({ surface: "Print", id: p.id, title: p.title ?? "Untitled print piece", link: { to: "/asset/$assetId", params: { assetId: p.id } }, issues });
   }
   for (const k of kits.data ?? []) {
     const issues = lintContent({ copy: k.copy, facts: k.event_facts });
