@@ -270,9 +270,17 @@ export async function generateDeckFromBrief(
         notes.push(`Copy personalization skipped (${res.error}).`);
       } else {
         const byIdMap = new Map(res.slides.map((s) => [s.id, s.content]));
-        deck.slides = deck.slides.map((s) =>
-          byIdMap.has(s.id) ? { ...s, content: { ...s.content, ...byIdMap.get(s.id)! } } : s,
-        );
+        // Every AI-written figure must appear in the grounding; else "[figure needed]".
+        const sources = [brief.clientFacts ?? "", ...snippets.map((s) => `${s.title} ${s.snippet}`)].join("\n");
+        const removed: string[] = [];
+        deck.slides = deck.slides.map((s) => {
+          if (!byIdMap.has(s.id)) return s;
+          const merged = { ...s.content, ...byIdMap.get(s.id)! };
+          return { ...s, content: validateFigures(merged, s.content, sources, removed) as typeof s.content };
+        });
+        if (removed.length) {
+          notes.push(`Replaced ${removed.length} unsourced figure(s) with "[figure needed]": ${[...new Set(removed)].join(", ")}.`);
+        }
         personalized = true;
       }
     } catch (e) {
