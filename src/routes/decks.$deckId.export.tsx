@@ -26,7 +26,7 @@ import type { GeometryRepairReport } from "@/lib/canvas-repair-report";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
 import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { PrintProofMenu } from "@/components/export/PrintProofMenu";
-import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
+import { complianceIssues, runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import { auditExportCoverage, type ExportCoverageReport } from "@/lib/export-coverage";
 import {
@@ -204,6 +204,13 @@ function ExportView() {
   }
 
   async function runPptxExport() {
+    // Banned words / unsourced figures block every PowerPoint path, including
+    // "Export anyway" from the QA hold and auto-export links.
+    const compliance = approvedDemo ? [] : complianceIssues(deck);
+    if (compliance.length) {
+      setPreflightIssues(compliance);
+      return;
+    }
     setExporting(true);
     const { toast } = await import("sonner");
     const progressId = toast.loading("Building your PowerPoint…", {

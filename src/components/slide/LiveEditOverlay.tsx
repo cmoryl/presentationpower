@@ -457,7 +457,7 @@ export function LiveEditOverlay({
           data-export-ignore="true"
           data-editing-chrome="true"
           aria-live="polite"
-          className="pointer-events-none absolute bottom-2 right-2 z-40 rounded-md border border-black/10 bg-white/95 px-2 py-1 text-[11px] font-medium tabular-nums text-[#03002C] shadow print:hidden"
+          className="pointer-events-none absolute bottom-2 left-2 z-40 rounded-md border border-black/10 bg-white/95 px-2 py-1 text-[11px] font-medium tabular-nums text-[#03002C] shadow print:hidden"
         >
           {charCount} {charCount === 1 ? "character" : "characters"}
         </div>
