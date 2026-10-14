@@ -20,15 +20,27 @@ export const SESSION_EXPIRED_MESSAGE = "Your session expired. Please sign in aga
 /** Login route for this app. Single source of truth for sign-out redirects. */
 export const LOGIN_PATH = "/auth";
 
-/** Public sections (the path and everything under it) that never bounce a visitor to sign-in. */
-const PUBLIC_NO_LOGIN_PATHS = ["/events/next/london", "/library"];
-/** Public pages matched exactly (their sub-pages may still need sign-in). */
-const PUBLIC_NO_LOGIN_EXACT = new Set(["/", "/about", "/faq"]);
+/**
+ * Deny by default: every page needs sign-in except these. Open pages are the
+ * sign-in flow itself, machine endpoints, and links handed to outsiders that
+ * carry their own secret token or are the print vendors' sign-out view.
+ */
+const PUBLIC_NO_LOGIN_PATHS = [
+  "/auth",
+  "/reset-password",
+  "/share", // shared decks + partner brand kit (token-gated)
+  "/events/next/london", // print vendors: revision in force
+  "/events/next/kiosk-editor", // opened inside BoothHub
+  "/api",
+  "/mcp",
+  "/.well-known",
+  "/.lovable",
+  "/~oauth",
+];
+const PUBLIC_NO_LOGIN_EXACT = new Set<string>();
 
-/** Sections holding user-specific content: signed-out visitors go to sign-in. */
-const SIGN_IN_REQUIRED_PATHS = ["/decks", "/admin", "/brief", "/knowledge"];
 export function requiresSignInPath(pathname: string): boolean {
-  return SIGN_IN_REQUIRED_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+  return !isPublicNoLoginPath(pathname);
 }
 
 export function isPublicNoLoginPath(pathname: string): boolean {
