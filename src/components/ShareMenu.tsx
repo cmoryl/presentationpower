@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { describeExportError } from "@/lib/export-feedback";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 import { toastExportWarnings } from "@/lib/export-warning-toast";
-import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
+import { complianceIssues, runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
@@ -211,6 +211,12 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   const runPptxExport = async () => {
     if (!deck) {
       toast.error("This deck is still loading — try again in a moment.");
+      return;
+    }
+    const compliance = complianceIssues(deck);
+    if (compliance.length) {
+      setOpen(false);
+      setPreflightIssues(compliance);
       return;
     }
     setBusy(true);
