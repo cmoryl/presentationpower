@@ -2115,7 +2115,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       };
     case "MV-OP-COVER-GRADIENT":
       return {
-        title: brief.meetingObjective || clientName,
+        title: clientName,
         subtitle: `A strategic conversation with ${clientName}.`,
         clientName,
         date: new Date().toLocaleDateString(),
@@ -2123,14 +2123,14 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-OP-COVER-MONOGRAM":
       return {
         monogram: clientName.slice(0, 2).toUpperCase(),
-        title: brief.meetingObjective || clientName,
+        title: clientName,
         subtitle: `Prepared for ${clientName}`,
         date: new Date().toLocaleDateString(),
       };
     case "MV-OP-COVER-STACKED":
       return {
         kicker: `A proposal for ${clientName}`,
-        title: brief.meetingObjective || "The path forward",
+        title: "The path forward",
         subtitle: "Prepared by TransPerfect",
         date: new Date().toLocaleDateString(),
         mediaSeed: `${clientName}-stacked`,
