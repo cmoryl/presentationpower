@@ -1,4 +1,5 @@
 import { useRequireSignIn } from "@/hooks/use-require-sign-in";
+import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 import { ApprovalGate } from "@/components/approvals/ApprovalGate";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
