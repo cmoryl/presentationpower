@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // NEXT pillar signs — fully vector, layered press PDF / Illustrator artwork.
 //
@@ -921,7 +922,7 @@ export async function buildPillarVectorPdf(
 
   // ── 07 Guides + marks ──────────────────────────────────────────────────────
   beginLayer(page, layer("07 Guides + marks"));
-  const guideInk = paint(face === "light" ? "#03002C" : "#FFFFFF");
+  const guideInk = paint(face === "light" ? BRAND.ink : "#FFFFFF");
   page.drawRectangle({
     x: trimX,
     y: trimY,

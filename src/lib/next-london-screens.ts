@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Live displays inside the London in-situ scene plates.
 //
 // Several plates are real event photographs or live visualisations that contain
@@ -169,7 +170,7 @@ export function screenAspect(screen: LondonSceneScreen, plate: { w: number; h: n
 /** Approved gradient stops for the frame this display is showing. */
 export function screenStops(screen: LondonSceneScreen): string[] {
   const stops = LONDON_STYLES[screen.styleId]?.stops;
-  return stops && stops.length > 0 ? stops : ["#03002C", "#003FC7", "#A1FBF9"];
+  return stops && stops.length > 0 ? stops : [BRAND.ink, BRAND.blue, BRAND.aqua];
 }
 
 /** One-line read for a caption: what the display is and what it is showing. */

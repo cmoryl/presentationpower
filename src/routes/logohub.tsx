@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -241,7 +242,7 @@ function LogoCard({ row }: { row: ClientLogoRow }) {
     <div className="rounded-2xl border border-black/10 bg-white p-4">
       <div
         className="flex h-28 w-full items-center justify-center rounded-lg transition-colors"
-        style={{ backgroundColor: isDark ? "#03002C" : "#F5F7FB" }}
+        style={{ backgroundColor: isDark ? BRAND.ink : "#F5F7FB" }}
       >
         {activeUrl ? (
           <img

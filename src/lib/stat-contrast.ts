@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Automatic contrast guard for statistic figures (gradient text + glow).
 //
 // Division accents are chosen for brand pop, not readability. On dark artwork
@@ -10,7 +11,7 @@
 const AA_LARGE = 3;
 const TARGET = 4.5;
 
-export const DARK_STAT_BG = "#03002C";
+export const DARK_STAT_BG = BRAND.ink;
 export const LIGHT_STAT_BG = "#FFFFFF";
 
 type RGB = [number, number, number];
@@ -99,11 +100,11 @@ export function statColors(
   const bg = parseHex(opts.bg ?? (mode === "dark" ? DARK_STAT_BG : LIGHT_STAT_BG)) ?? [3, 0, 44];
   const raw = parseHex(accent);
   if (!raw) {
-    const fallback = mode === "dark" ? "#FFFFFF" : "#03002C";
+    const fallback = mode === "dark" ? "#FFFFFF" : BRAND.ink;
     return { base: fallback, bright: fallback, contrast: 21, passedRaw: false };
   }
   const toward: RGB =
-    mode === "dark" ? [255, 255, 255] : (parseHex(opts.ink ?? "#03002C") ?? [3, 0, 44]);
+    mode === "dark" ? [255, 255, 255] : (parseHex(opts.ink ?? BRAND.ink) ?? [3, 0, 44]);
 
   let base = raw;
   let c = ratio(raw, bg);

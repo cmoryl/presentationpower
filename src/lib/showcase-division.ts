@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // ---------------------------------------------------------------------------
 // Division retargeting for the homepage demo decks.
 //
@@ -33,7 +34,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "GlobalLink",
     label: "GlobalLink",
     slug: "globallink",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     industry: "Enterprise localization",
   },
   {
@@ -41,7 +42,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "TransPerfect",
     label: "TransPerfect",
     slug: "enterprise",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     industry: "Enterprise",
   },
   {
@@ -49,7 +50,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "TransPerfect Life Sciences",
     label: "Life Sciences",
     slug: "lifesci",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     industry: "Life Sciences",
   },
   {
@@ -57,7 +58,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "TransPerfect Legal",
     label: "Legal",
     slug: "legal",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     industry: "Legal",
   },
   {
@@ -65,7 +66,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "TransPerfect Media",
     label: "Media",
     slug: "media",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     industry: "Media & Entertainment",
   },
   {
@@ -73,7 +74,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "TransPerfect Gaming",
     label: "Gaming",
     slug: "gaming",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     industry: "Gaming",
   },
   {
@@ -81,7 +82,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "TransPerfect Digital",
     label: "Digital",
     slug: "digital",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     industry: "Digital marketing",
   },
   {
@@ -89,7 +90,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "Trial Interactive",
     label: "Trial Interactive",
     slug: "trial-interactive",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     industry: "eClinical",
   },
   {

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Rendered slide gallery for the demo landing pages.
 //
 // Demos are finished, approved builds — so every demo page shows an actual
@@ -175,7 +176,7 @@ export function ShowcaseSlideGallery({
                 </LazyMount>
                 <span
                   className="absolute left-2 top-2 grid h-6 w-6 place-items-center rounded-lg text-[11px] font-semibold text-white"
-                  style={{ background: accent ?? "#003FC7" }}
+                  style={{ background: accent ?? BRAND.blue }}
                 >
                   {i + 1}
                 </span>

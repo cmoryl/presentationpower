@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Per-slide override of the deck-wide reinterpretation controls.
 //
 // Deck-wide style / typography / colour locks steer every slide; this panel
@@ -10,14 +11,14 @@ import { DESIGN_STYLES, TYPE_RHYTHMS, type SlideStyleOverride } from "@/lib/rein
 
 /** Same brand accents offered by the deck-wide colour lock. */
 const ACCENTS: Array<{ hex: string; label: string }> = [
-  { hex: "#003fc7", label: "Blue 500" },
-  { hex: "#a1fbf9", label: "Aqua" },
-  { hex: "#c2a3ff", label: "Lavender" },
-  { hex: "#ffeb66", label: "Yellow" },
-  { hex: "#a6fa87", label: "Green" },
-  { hex: "#ff9b70", label: "Peach" },
-  { hex: "#ec388a", label: "Pink" },
-  { hex: "#e53d2e", label: "Red" },
+  { hex: BRAND.blue, label: "Blue 500" },
+  { hex: BRAND.aqua, label: "Aqua" },
+  { hex: BRAND.lavender, label: "Lavender" },
+  { hex: BRAND.yellow, label: "Yellow" },
+  { hex: BRAND.green, label: "Green" },
+  { hex: BRAND.peach, label: "Peach" },
+  { hex: BRAND.pink, label: "Pink" },
+  { hex: BRAND.red, label: "Red" },
 ];
 
 export function hasSlideOverride(o: SlideStyleOverride | undefined): boolean {

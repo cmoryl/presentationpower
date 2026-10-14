@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * Division branding for solution proposals.
  *
@@ -20,8 +21,8 @@ import { PROPOSAL_ART } from "@/lib/print-library/proposal-art";
 import { useDivisionSeed, type DivisionSeed } from "@/lib/division-seeds";
 
 /** TransPerfect master defaults — also the fallback for unmapped brands. */
-const TP_NAVY = "#03002C";
-const TP_BLUE = "#003FC7";
+const TP_NAVY = BRAND.ink;
+const TP_BLUE = BRAND.blue;
 const TP_LAV = "#A9A3FD";
 const TP_AQUA = "#A1F8F9";
 

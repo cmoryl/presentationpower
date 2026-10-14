@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * DEVICE SCREEN PICKER — authoring affordance for the laptop / monitor
  * showcase modules in print layouts.
@@ -62,7 +63,7 @@ export function DeviceScreenPicker({
           background: "rgba(255,255,255,0.95)",
           border: "1px solid rgba(3,0,44,0.18)",
           borderRadius: 999,
-          color: "#03002C",
+          color: BRAND.ink,
           fontSize: 9,
           fontWeight: 600,
           letterSpacing: "0.12em",
@@ -148,7 +149,7 @@ export function DeviceScreenPicker({
               marginTop: 10,
               width: "100%",
               borderRadius: 999,
-              background: "#003FC7",
+              background: BRAND.blue,
               color: "#fff",
               fontSize: 11,
               fontWeight: 600,
@@ -188,14 +189,14 @@ export function DeviceScreenPicker({
                 padding: "6px 9px",
                 fontSize: 11,
                 fontWeight: 600,
-                color: "#03002C",
+                color: BRAND.ink,
               }}
             >
               Use
             </button>
           </div>
 
-          {error && <div style={{ marginTop: 6, fontSize: 10, color: "#E53D2E" }}>{error}</div>}
+          {error && <div style={{ marginTop: 6, fontSize: 10, color: BRAND.red }}>{error}</div>}
 
           <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between", gap: 8 }}>
             {current && ctx.onClear ? (

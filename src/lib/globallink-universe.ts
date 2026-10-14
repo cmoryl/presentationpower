@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // The GlobalLink Universe — the recorded product ecosystem, as issued in the
 // GlobalLink brand kit.
 //
@@ -29,13 +30,13 @@ export type GlobalLinkProduct = {
 
 /** Category tag colours, all drawn from the approved enterprise ramp. */
 export const GLOBALLINK_CATEGORY_TAG: Record<GlobalLinkCategory, { bg: string; ink: string }> = {
-  "Core Platform": { bg: "#03002C", ink: "#FFFFFF" },
-  Web: { bg: "#003FC7", ink: "#FFFFFF" },
-  "AI-Powered": { bg: "#E0E8F5", ink: "#03002C" },
-  Media: { bg: "#EEF1F7", ink: "#03002C" },
-  Live: { bg: "#C2A3FF", ink: "#03002C" },
-  Development: { bg: "#A1FBF9", ink: "#03002C" },
-  Collaboration: { bg: "#F2F2F2", ink: "#03002C" },
+  "Core Platform": { bg: BRAND.ink, ink: "#FFFFFF" },
+  Web: { bg: BRAND.blue, ink: "#FFFFFF" },
+  "AI-Powered": { bg: "#E0E8F5", ink: BRAND.ink },
+  Media: { bg: BRAND.surface, ink: BRAND.ink },
+  Live: { bg: BRAND.lavender, ink: BRAND.ink },
+  Development: { bg: BRAND.aqua, ink: BRAND.ink },
+  Collaboration: { bg: "#F2F2F2", ink: BRAND.ink },
 };
 
 export const GLOBALLINK_UNIVERSE: GlobalLinkProduct[] = [

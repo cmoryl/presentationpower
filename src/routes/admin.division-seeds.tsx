@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // DIVISION SEEDS (master admin)
 // ---------------------------------------------------------------------------
 // Lockups, accent + deep ink, gradient fields and the "Why <division>" copy
@@ -255,13 +256,13 @@ function DivisionSeedsPage() {
               <Field
                 label="Accent colour"
                 value={draft.accent}
-                placeholder={brand?.tokens.accent ?? "#003FC7"}
+                placeholder={brand?.tokens.accent ?? BRAND.blue}
                 onChange={(v) => setDraft({ ...draft, accent: v })}
               />
               <Field
                 label="Deep ink colour"
                 value={draft.deep}
-                placeholder={brand?.tokens.primary ?? "#03002C"}
+                placeholder={brand?.tokens.primary ?? BRAND.ink}
                 onChange={(v) => setDraft({ ...draft, deep: v })}
               />
             </div>

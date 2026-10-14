@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Colouring individual rooms on the natively rebuilt QEII floor plans.
 //
 // The issued artwork draws rooms as filled polygons. To colour one room we have
@@ -28,15 +29,15 @@ import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
 
 /** Approved colours a room may be filled with. */
 export const QEII_ROOM_PALETTE = [
-  { id: "blue", label: "Blue 500", hex: "#003FC7" },
-  { id: "ink", label: "Blue 800", hex: "#03002C" },
-  { id: "aqua", label: "Aqua", hex: "#A1FBF9" },
-  { id: "lavender", label: "Lavender", hex: "#C2A3FF" },
-  { id: "yellow", label: "Yellow", hex: "#FFEB66" },
-  { id: "green", label: "Green", hex: "#A6FA87" },
-  { id: "peach", label: "Peach", hex: "#FF9B70" },
-  { id: "pink", label: "Pink", hex: "#EC388A" },
-  { id: "red", label: "Red", hex: "#E53D2E" },
+  { id: "blue", label: "Blue 500", hex: BRAND.blue },
+  { id: "ink", label: "Blue 800", hex: BRAND.ink },
+  { id: "aqua", label: "Aqua", hex: BRAND.aqua },
+  { id: "lavender", label: "Lavender", hex: BRAND.lavender },
+  { id: "yellow", label: "Yellow", hex: BRAND.yellow },
+  { id: "green", label: "Green", hex: BRAND.green },
+  { id: "peach", label: "Peach", hex: BRAND.peach },
+  { id: "pink", label: "Pink", hex: BRAND.pink },
+  { id: "red", label: "Red", hex: BRAND.red },
 ] as const;
 
 export type QeiiRoomColours = Record<string, string>;
@@ -56,12 +57,12 @@ export function qeiiRoomGradientTo(colours: QeiiRoomColours, room: string): stri
 
 /** Approved two-colour gradients offered in the colour panel. */
 export const QEII_ROOM_GRADIENTS = [
-  { id: "aqua-lavender", label: "Aqua → Lavender", from: "#A1FBF9", to: "#C2A3FF" },
-  { id: "blue-aqua", label: "Blue → Aqua", from: "#003FC7", to: "#A1FBF9" },
-  { id: "lavender-blue", label: "Lavender → Blue", from: "#C2A3FF", to: "#003FC7" },
-  { id: "aqua-green", label: "Aqua → Green", from: "#A1FBF9", to: "#A6FA87" },
-  { id: "yellow-peach", label: "Yellow → Peach", from: "#FFEB66", to: "#FF9B70" },
-  { id: "peach-pink", label: "Peach → Pink", from: "#FF9B70", to: "#EC388A" },
+  { id: "aqua-lavender", label: "Aqua → Lavender", from: BRAND.aqua, to: BRAND.lavender },
+  { id: "blue-aqua", label: "Blue → Aqua", from: BRAND.blue, to: BRAND.aqua },
+  { id: "lavender-blue", label: "Lavender → Blue", from: BRAND.lavender, to: BRAND.blue },
+  { id: "aqua-green", label: "Aqua → Green", from: BRAND.aqua, to: BRAND.green },
+  { id: "yellow-peach", label: "Yellow → Peach", from: BRAND.yellow, to: BRAND.peach },
+  { id: "peach-pink", label: "Peach → Pink", from: BRAND.peach, to: BRAND.pink },
 ] as const;
 
 /** Luminance of a hex colour, 0–1. */
@@ -80,7 +81,7 @@ function luminance(hex: string): number {
  */
 export function qeiiRoomTextInk(fill?: string): string {
   if (!fill) return "#FFFFFF";
-  return luminance(fill) > 0.55 ? "#03002C" : "#FFFFFF";
+  return luminance(fill) > 0.55 ? BRAND.ink : "#FFFFFF";
 }
 
 const shapeHolds = qeiiShapeHolds;
@@ -279,7 +280,7 @@ export const QEII_ADDED_ROOMS: Record<
   string,
   { room: string; x: number; y: number; hex: string; to?: string }[]
 > = {
-  sixth: [{ room: "General area", x: 520, y: 280, hex: "#A1FBF9", to: "#C2A3FF" }],
+  sixth: [{ room: "General area", x: 520, y: 280, hex: BRAND.aqua, to: BRAND.lavender }],
 };
 
 /** How far a reviewer divider has to run to cross the block holding a point. */
@@ -399,14 +400,14 @@ export function qeiiRoomFunction(room: string, sheetId: string): string | undefi
 
 /** Approved colour per recorded function, for a one-click starting point. */
 export const QEII_FUNCTION_COLOURS: Record<string, string> = {
-  Plenary: "#003FC7",
-  "Keynote Room": "#C2A3FF",
-  Breakout: "#A1FBF9",
-  Foyer: "#FFEB66",
-  "Meeting Room": "#A6FA87",
-  Mart: "#FF9B70",
-  Café: "#EC388A",
-  Registration: "#E53D2E",
+  Plenary: BRAND.blue,
+  "Keynote Room": BRAND.lavender,
+  Breakout: BRAND.aqua,
+  Foyer: BRAND.yellow,
+  "Meeting Room": BRAND.green,
+  Mart: BRAND.peach,
+  Café: BRAND.pink,
+  Registration: BRAND.red,
 };
 
 /** Colour every recorded space by what it holds. */
@@ -443,7 +444,7 @@ export function qeiiColourByDivision(floor: QeiiFloorVector): QeiiRoomColours {
  * House spaces — registration, the mart, the café, circulation in use — carry
  * the enterprise accent, so the set still reads as one system.
  */
-export const QEII_ROOM_ACCENT = "#003FC7";
+export const QEII_ROOM_ACCENT = BRAND.blue;
 
 /**
  * Rooms the reviewer asked to open in a different approved colour.
@@ -453,7 +454,7 @@ export const QEII_ROOM_ACCENT = "#003FC7";
  * every format we write, so a lilac-to-blue gradient is not drawn here.
  */
 export const QEII_DEFAULT_ROOM_COLOUR_OVERRIDES: Record<string, string> = {
-  Churchill: "#C2A3FF",
+  Churchill: BRAND.lavender,
 };
 
 /** Rooms the reviewer asked to keep without a background colour. */

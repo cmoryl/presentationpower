@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // The master style sheet for every QEII floor plan.
 //
@@ -75,7 +76,7 @@ export const QEII_MAP_LOOKS: Record<QeiiPlanFace, QeiiMapLook> = {
     ground: "#FFFFFF",
     room: "#E0E8F5",
     circulation: "#F7F9FC",
-    wall: "#03002C",
+    wall: BRAND.ink,
     wallScale: 0.62,
     tint: 0.62,
   },
@@ -97,7 +98,7 @@ export const QEII_MAP_LOOKS: Record<QeiiPlanFace, QeiiMapLook> = {
     ground: "#FFFFFF",
     room: "#FFFFFF",
     circulation: "#FFFFFF",
-    wall: "#03002C",
+    wall: BRAND.ink,
     wallScale: 1.15,
     tint: 0.42,
   },
@@ -106,7 +107,7 @@ export const QEII_MAP_LOOKS: Record<QeiiPlanFace, QeiiMapLook> = {
     name: "Wayfinder",
     note: "Rooms in Blue White against white walkways — an attendee-facing directory look.",
     ground: "#FFFFFF",
-    room: "#003FC7",
+    room: BRAND.blue,
     circulation: "#E0E8F5",
     wall: "#FFFFFF",
     wallScale: 0.9,
@@ -116,10 +117,10 @@ export const QEII_MAP_LOOKS: Record<QeiiPlanFace, QeiiMapLook> = {
     id: "blueprint",
     name: "Blueprint",
     note: "Reversed onto Blue 800 with aqua wall lines — for dark slides and signage.",
-    ground: "#03002C",
-    room: "#003FC7",
-    circulation: "#03002C",
-    wall: "#A1FBF9",
+    ground: BRAND.ink,
+    room: BRAND.blue,
+    circulation: BRAND.ink,
+    wall: BRAND.aqua,
     wallScale: 0.8,
     tint: 0,
   },
@@ -127,9 +128,9 @@ export const QEII_MAP_LOOKS: Record<QeiiPlanFace, QeiiMapLook> = {
     id: "element",
     name: "Enterprise inks",
     note: "The venue's three tones mapped onto the approved enterprise palette.",
-    ground: "#EEF1F7",
-    room: "#03002C",
-    circulation: "#003FC7",
+    ground: BRAND.surface,
+    room: BRAND.ink,
+    circulation: BRAND.blue,
     wall: "#FFFFFF",
     wallScale: 1,
     tint: 0,
@@ -138,7 +139,7 @@ export const QEII_MAP_LOOKS: Record<QeiiPlanFace, QeiiMapLook> = {
     id: "issued",
     name: "Issued inks",
     note: "Exactly as the venue issued the sheet, for checking against their file.",
-    ground: "#EEF1F7",
+    ground: BRAND.surface,
     wallScale: 1,
     tint: 0,
   },
@@ -170,7 +171,7 @@ export function qeiiPlanGround(face: QeiiPlanFace = "issued"): string {
  * Blue 800, so that text has to set white or it would print invisibly.
  */
 export function qeiiGroundInk(face: QeiiPlanFace = "issued"): string {
-  return qeiiLuminance(qeiiLook(face).ground) > 0.55 ? "#03002C" : "#FFFFFF";
+  return qeiiLuminance(qeiiLook(face).ground) > 0.55 ? BRAND.ink : "#FFFFFF";
 }
 
 function channels(hex: string): [number, number, number] | undefined {
@@ -259,7 +260,7 @@ export function qeiiLookWallWeight(face: QeiiPlanFace = "issued", wallWeight?: n
  * colour, in the "signage" look only. Both stops are approved palette colours.
  */
 export const QEII_SIGNAGE_GRADIENTS: Record<string, [string, string]> = {
-  Churchill: ["#A1FBF9", "#C2A3FF"],
+  Churchill: [BRAND.aqua, BRAND.lavender],
 };
 
 export function qeiiGradientId(room: string): string {

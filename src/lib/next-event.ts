@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // TransPerfect NEXT 2026 — event registry.
 //
 // Source of truth: the NEXT 2026 Canva master reference. Everything here is
@@ -92,7 +93,7 @@ export const NEXT_DIVISIONS: NextDivision[] = [
     id: "games",
     name: "Games",
     eventName: "GamesNEXT",
-    accent: "#A6FA87",
+    accent: BRAND.green,
     pantone: "7487 C",
     headlineSuffix: "GAMES",
     brandModeId: "bm-tp-games",
@@ -134,7 +135,7 @@ export const NEXT_DIVISIONS: NextDivision[] = [
     id: "finance",
     name: "Finance",
     eventName: "FinanceNEXT",
-    accent: "#FF9B70",
+    accent: BRAND.peach,
     pantone: "1635 C",
     headlineSuffix: "FINANCE",
     brandModeId: "bm-cobrand",
@@ -218,7 +219,7 @@ export const NEXT_DIVISIONS: NextDivision[] = [
     id: "learn",
     name: "Learn",
     eventName: "LearnNEXT",
-    accent: "#FFEB66",
+    accent: BRAND.yellow,
     pantone: "100 C",
     headlineSuffix: "LEARN",
     brandModeId: "bm-subcompany",
@@ -239,7 +240,7 @@ export const NEXT_DIVISIONS: NextDivision[] = [
     id: "media",
     name: "Media",
     eventName: "MediaNEXT",
-    accent: "#EC388A",
+    accent: BRAND.pink,
     pantone: "205 C",
     headlineSuffix: "MEDIA",
     brandModeId: "bm-tp-media",
@@ -260,7 +261,7 @@ export const NEXT_DIVISIONS: NextDivision[] = [
     id: "digital",
     name: "Digital",
     eventName: "DigitalNEXT",
-    accent: "#C2A3FF",
+    accent: BRAND.lavender,
     pantone: "2645 C",
     headlineSuffix: "DIGITAL",
     brandModeId: "bm-tp-digital",

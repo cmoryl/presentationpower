@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * Slide Image Export — rasterize a live slide preview to PNG or image-PDF
  * using html-to-image. Companion to `pptx-export.ts`; use this when fidelity
@@ -253,7 +254,7 @@ export interface SlideCaptureOptions {
 
 const MODE_BG: Record<SlideExportMode, string> = {
   light: "#F2F2F2",
-  dark: "#03002C",
+  dark: BRAND.ink,
 };
 
 /** Absolute-minimum pixel ratio the exporter will honor. */

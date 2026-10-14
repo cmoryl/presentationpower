@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // PRINT SECTION MODULE STUDIO (master admin)
 // ---------------------------------------------------------------------------
 // Full studio editor for one print section module (`pm-*`). Unlike the list
@@ -42,7 +43,7 @@ export const Route = createFileRoute("/admin/modules_/print/$moduleId")({
   component: PrintModuleStudioPage,
 });
 
-const ACCENT = "#003FC7";
+const ACCENT = BRAND.blue;
 const PAGE_SIZES: PrintPageSize[] = ["Letter", "A4", "HalfLetter", "A5"];
 const MARGINS: PrintMarginPreset[] = ["tight", "standard", "wide"];
 

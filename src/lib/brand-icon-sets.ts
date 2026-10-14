@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * APPROVED ICON SETS — per brand guide, per sub-area.
  *
@@ -64,8 +65,8 @@ export function iconColorOptions(slugOrGuide: string | BrandGuide): IconColorOpt
   }
   const guide = typeof slugOrGuide === "string" ? getBrandGuide(slugOrGuide) : slugOrGuide;
   const out: IconColorOption[] = [
-    { name: "Blue 800", hex: "#03002C", note: "Default on light surfaces" },
-    { name: "Blue 500", hex: "#003FC7", note: "Primary brand blue" },
+    { name: "Blue 800", hex: BRAND.ink, note: "Default on light surfaces" },
+    { name: "Blue 500", hex: BRAND.blue, note: "Primary brand blue" },
   ];
   const push = (name: string, hex: string, note: string, onDark?: boolean) => {
     if (!hex || out.some((o) => o.hex.toLowerCase() === hex.toLowerCase())) return;

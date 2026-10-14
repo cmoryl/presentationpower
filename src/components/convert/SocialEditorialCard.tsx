@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // SocialEditorialCard — "Editorial" layout for converted social cards.
 // Designed for the social size, not a cut-down slide: navy ground, a solid
@@ -13,8 +14,8 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import type { SocialFormat } from "@/lib/social-formats";
 import { socialCaption, type AdaptResult } from "@/lib/cross-format-adapt";
 
-const INK = "#03002C";
-const BLUE = "#003FC7";
+const INK = BRAND.ink;
+const BLUE = BRAND.blue;
 
 export type SocialEditorialCardProps = {
   format: SocialFormat;

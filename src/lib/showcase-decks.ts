@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // ---------------------------------------------------------------------------
 // Homepage showcase decks.
 //
@@ -460,7 +461,7 @@ export const SHOWCASE_DECKS: ShowcaseDeckDef[] = [
     eyebrow: "GlobalLink",
     blurb:
       "Eleven-slide executive pitch: cost of the status quo, before/after hub, benchmark stats, 90-day runway and a single commercial slide.",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     divisionLabel: "GlobalLink Enterprise",
     deckTitle: "GlobalLink · Enterprise localization pitch (demo)",
     highlights: [
@@ -477,7 +478,7 @@ export const SHOWCASE_DECKS: ShowcaseDeckDef[] = [
     eyebrow: "Life Sciences",
     blurb:
       "Nine-slide regulatory program review built for inspection: locked sources, two-stage QC, submission runway and audit-trail evidence.",
-    accent: "#EC388A",
+    accent: BRAND.pink,
     divisionLabel: "TransPerfect Life Sciences",
     deckTitle: "Life Sciences · Regulated content program (demo)",
     highlights: [

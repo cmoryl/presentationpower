@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // PRINT DEMO STUDIO PANEL
 // ---------------------------------------------------------------------------
 // The demo print pages ship a live copy editor; this panel adds the *layout*
@@ -73,7 +74,7 @@ export function PrintDemoStudioPanel({
   look,
   onLook,
   onResetLayout,
-  accent = "#003FC7",
+  accent = BRAND.blue,
 }: Props) {
   const bag = useMemo(() => (content ?? {}) as Record<string, unknown>, [content]);
   const hero = bag["heroMedia"] as PrintHeroMedia | undefined;
@@ -316,7 +317,7 @@ export function PrintDemoStudioPanel({
                 className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums"
                 style={
                   over
-                    ? { background: "#E53D2E", color: "#fff" }
+                    ? { background: BRAND.red, color: "#fff" }
                     : { background: "rgba(0,0,0,0.06)", color: "rgba(3,0,44,0.7)" }
                 }
                 data-testid="demo-capacity-badge"
@@ -379,7 +380,7 @@ export function PrintDemoStudioPanel({
                   <span
                     aria-hidden
                     className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-[2px]"
-                    style={{ background: issue.level === "block" ? "#E53D2E" : "#FFEB66" }}
+                    style={{ background: issue.level === "block" ? BRAND.red : BRAND.yellow }}
                   />
                   <span>{issue.message}</span>
                 </li>

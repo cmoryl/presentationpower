@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // ---------------------------------------------------------------------------
 // Homepage print demos.
 //
@@ -47,7 +48,7 @@ export const PRINT_DEMOS: PrintDemoDef[] = [
     eyebrow: "Life Sciences",
     blurb:
       "Regulated-content brief with locked source callouts, integration diagram and a compliance-safe stat band.",
-    accent: "#EC388A",
+    accent: BRAND.pink,
     divisionLabel: "TransPerfect Life Sciences",
     pills: ["PDF/X-4", "100K body text", "Editable"],
     highlights: [
@@ -64,7 +65,7 @@ export const PRINT_DEMOS: PrintDemoDef[] = [
     eyebrow: "Media",
     blurb:
       "Two-page broadcast case study: challenge, approach, measured outcome and a client quote — ready to leave behind.",
-    accent: "#EC388A",
+    accent: BRAND.pink,
     divisionLabel: "TransPerfect Media",
     pills: ["Leave-behind", "Client-logo slot", "Editable"],
     highlights: [
@@ -81,7 +82,7 @@ export const PRINT_DEMOS: PrintDemoDef[] = [
     eyebrow: "Proposal",
     blurb:
       "Full multi-page proposal: cover, why-us, scope, locations map, cost summary with live math, and signature page.",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     divisionLabel: "TransPerfect Legal",
     pills: ["Multi-page", "Live cost math", "PDF + PPTX"],
     highlights: [

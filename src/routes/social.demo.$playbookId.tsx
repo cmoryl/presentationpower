@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // /social/demo/$playbookId — live division-scoped social campaign preview.
 //
 // Mirrors /events/demo/$playbookId but sources from src/lib/social-playbooks.ts
@@ -557,9 +558,9 @@ function SectionHead({ eyebrow, title, desc }: { eyebrow: string; title: string;
 }
 
 const SURFACE_STYLE: Record<string, { bg: string; ink: string; label: string }> = {
-  digital: { bg: "#003FC71a", ink: "#003FC7", label: "Digital" },
+  digital: { bg: "#003FC71a", ink: BRAND.blue, label: "Digital" },
   signage: { bg: "#FF9B7022", ink: "#B04A20", label: "Signage" },
-  print: { bg: "#03002C10", ink: "#03002C", label: "Print" },
+  print: { bg: "#03002C10", ink: BRAND.ink, label: "Print" },
   video: { bg: "#EC388a22", ink: "#B01E60", label: "Video" },
   email: { bg: "#A1FBF933", ink: "#0A6666", label: "Email" },
 };

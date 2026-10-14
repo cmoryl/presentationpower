@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Clickable preview card for the /social/demo and /events/demo "Live preview"
 // galleries. Each card renders a scaled SocialRenderer; clicking (or Enter)
 // opens a modal that displays the same asset at a much larger size so the
@@ -19,7 +20,7 @@ import { PrintProofMenu } from "@/components/export/PrintProofMenu";
 
 /** Division accent for the card aura — falls back to TransPerfect blue. */
 function divisionAccent(brandId: string): string {
-  return BRAND_MODES.find((b) => b.id === brandId)?.tokens.accent ?? "#003FC7";
+  return BRAND_MODES.find((b) => b.id === brandId)?.tokens.accent ?? BRAND.blue;
 }
 
 type Props = {

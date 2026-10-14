@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * DESIGN SKIN CATALOG (OnDeck v2) — the master skin system used by the
  * Presentation Agent.
@@ -459,7 +460,7 @@ export const DESIGN_SKINS: DesignSkin[] = [
       "Soft-focus cobalt, aqua and lavender fields support modern luxury without competing with content or photography.",
     bestFit: "Corporate innovation \u00b7 global services \u00b7 brand stories",
     mode: "light",
-    palette: ["#F6F8FF", "#0150EF", "#5CE1E6", "#C2A3FF", "#0C2145"],
+    palette: ["#F6F8FF", "#0150EF", "#5CE1E6", BRAND.lavender, "#0C2145"],
     typography: "Airy scale \u00b7 clear hierarchy",
     surfaceNote: "Translucent wash \u00b7 outline-free color",
     imagery: "Soft focus \u00b7 tonal photography",
@@ -474,7 +475,7 @@ export const DESIGN_SKINS: DesignSkin[] = [
       "Overlapping imagery, statistics, charts and glass create a sophisticated executive canvas with controlled visual density.",
     bestFit: "Executive summaries \u00b7 KPI stories \u00b7 transformation",
     mode: "light",
-    palette: ["#F4F6F8", "#0E1A2B", "#0150EF", "#5CE1E6", "#C2A3FF"],
+    palette: ["#F4F6F8", "#0E1A2B", "#0150EF", "#5CE1E6", BRAND.lavender],
     typography: "Metric scale \u00b7 editorial labels",
     surfaceNote: "Layered mosaic \u00b7 selective glass",
     imagery: "Image-data overlap \u00b7 transparent layers",
@@ -663,7 +664,7 @@ export const INDUSTRY_RECIPES: IndustryRecipe[] = [
     ],
     profile: "L09 SYSTEM ARCHITECTURE  \u00b7  G04  \u00b7  O08\u201364  \u00b7  IP09/I03",
     tone: "SCIENTIFIC / CREDIBLE",
-    palette: ["#F4F8F7", "#0A6070", "#5CE1E6", "#C2A3FF"],
+    palette: ["#F4F8F7", "#0A6070", "#5CE1E6", BRAND.lavender],
     keywords: ["BIOLOGY", "RESEARCH", "TRIAL", "THERAPY"],
   },
   {
@@ -768,7 +769,7 @@ export const INDUSTRY_RECIPES: IndustryRecipe[] = [
     ],
     profile: "L09 SYSTEM ARCHITECTURE  \u00b7  G01  \u00b7  O16\u201380  \u00b7  IP16/I03",
     tone: "CONNECTED / PROGRESSIVE",
-    palette: ["#091833", "#0150EF", "#5CE1E6", "#C2A3FF"],
+    palette: ["#091833", "#0150EF", "#5CE1E6", BRAND.lavender],
     keywords: ["NETWORK", "WIRELESS", "COVERAGE", "NODES", "TELECOM"],
   },
   {

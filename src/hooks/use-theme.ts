@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useState } from "react";
 
 export type ThemeMode = "light" | "dark";
@@ -53,7 +54,7 @@ export function useTheme(): [ThemeMode, (next: ThemeMode) => void] {
       meta.name = "theme-color";
       document.head.appendChild(meta);
     }
-    meta.content = next === "dark" ? "#03002C" : "#FFFFFF";
+    meta.content = next === "dark" ? BRAND.ink : "#FFFFFF";
   };
 
   useEffect(() => {

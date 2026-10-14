@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // LinkedIn banner gradient engine.
 //
 // Recreates the approved TransPerfect corporate/enterprise social banner
@@ -123,10 +124,10 @@ export const BANNER_FAMILIES: { id: BannerFamily; label: string; blurb: string }
 
 // Approved palette (brand v3.0).
 export const P = {
-  blue500: "#003FC7",
-  blue800: "#03002C",
-  aqua: "#A1FBF9",
-  lavender: "#C2A3FF",
+  blue500: BRAND.blue,
+  blue800: BRAND.ink,
+  aqua: BRAND.aqua,
+  lavender: BRAND.lavender,
   sky: "#5BA8F7",
   paper: "#F4F4F6",
   white: "#FFFFFF",

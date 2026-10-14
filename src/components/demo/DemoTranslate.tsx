@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Languages, Loader2, AlertTriangle, RotateCcw } from "lucide-react";
@@ -158,7 +159,7 @@ export function DemoTranslateBar({
         ) : isTranslated ? (
           <span
             className="inline-flex items-center gap-2 font-medium"
-            style={{ color: accent ?? "#003FC7" }}
+            style={{ color: accent ?? BRAND.blue }}
           >
             Showing {current?.label ?? lang}
             {current?.rtl ? " · right-to-left" : ""}

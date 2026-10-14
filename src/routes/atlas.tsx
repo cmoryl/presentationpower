@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -81,8 +82,8 @@ export const Route = createFileRoute("/atlas")({
 });
 
 // Brand palette (v3.0)
-const BLUE = "#003FC7";
-const NAVY = "#03002C";
+const BLUE = BRAND.blue;
+const NAVY = BRAND.ink;
 
 type SegmentId = "presentation" | "print" | "social" | "events" | "style" | "systems";
 
@@ -283,7 +284,7 @@ function PresentationSegment() {
               fi.emphasis === "primary"
                 ? BLUE
                 : fi.emphasis === "accent"
-                  ? "#EC388A"
+                  ? BRAND.pink
                   : fi.emphasis === "success"
                     ? "#0F5C1A"
                     : fi.emphasis === "warning"
@@ -736,7 +737,7 @@ function StyleLibrarySegment() {
 
 // Shared brand for the swatches — TransPerfect v3.0 palette.
 const DEMO_BRAND = {
-  tokens: { primary: BLUE, accent: "#EC388A" },
+  tokens: { primary: BLUE, accent: BRAND.pink },
 } as const;
 
 function IconTile({
@@ -985,10 +986,10 @@ function LogoZoneDiagram({ position }: { position: import("@/lib/logo-placement"
                   name: "TransPerfect",
                   description: "TransPerfect master brand",
                   tokens: {
-                    primary: "#003FC7",
-                    accent: "#A1FBF9",
+                    primary: BRAND.blue,
+                    accent: BRAND.aqua,
                     surface: "#FFFFFF",
-                    ink: "#03002C",
+                    ink: BRAND.ink,
                   },
                   logo: { mark: "TP", wordmark: "TransPerfect" },
                 } satisfies BrandMode

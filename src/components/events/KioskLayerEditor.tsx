@@ -1123,7 +1123,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                 ))}
                 {pickedT.length + picked.length > 1 ? pickedT.map((id) => {
                   const b = selBounds({ kind: "text", id });
-                  return b ? <rect key={`pt-${id}`} data-export-ignore="true" pointerEvents="none" x={b.x0} y={b.y0} width={b.x1 - b.x0} height={b.y1 - b.y0} fill="none" stroke="#003FC7" strokeWidth={2 * rs} /> : null;
+                  return b ? <rect key={`pt-${id}`} data-export-ignore="true" pointerEvents="none" x={b.x0} y={b.y0} width={b.x1 - b.x0} height={b.y1 - b.y0} fill="none" stroke={BRAND.blue} strokeWidth={2 * rs} /> : null;
                 }) : null}
                 {/* Selection frame with corner handles (visual) and live size tag. */}
                 {bounds && sel?.kind !== "block" ? (
@@ -1139,20 +1139,20 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                   </g>
                 ) : null}
                 {guide !== null ? (
-                  <line data-export-ignore="true" pointerEvents="none" x1={guide} x2={guide} y1={0} y2={KIOSK_H} stroke="#EC388A" strokeWidth={1.5 * rs} strokeDasharray={`${6 * rs} ${4 * rs}`} />
+                  <line data-export-ignore="true" pointerEvents="none" x1={guide} x2={guide} y1={0} y2={KIOSK_H} stroke={BRAND.pink} strokeWidth={1.5 * rs} strokeDasharray={`${6 * rs} ${4 * rs}`} />
                 ) : null}
                 <g data-export-ignore="true" pointerEvents="none">
                   {guides.tv && kioskHasTv(L.id) ? (
                     <>
-                      <rect x={TV.x} y={TV.y} width={TV.w} height={TV.h} fill="#03002C" fillOpacity={0.55} stroke="#FFEB66" strokeDasharray={`${8 * rs} ${5 * rs}`} strokeWidth={1.5 * rs} />
+                      <rect x={TV.x} y={TV.y} width={TV.w} height={TV.h} fill={BRAND.ink} fillOpacity={0.55} stroke={BRAND.yellow} strokeDasharray={`${8 * rs} ${5 * rs}`} strokeWidth={1.5 * rs} />
                       <text x={TV.x + TV.w / 2} y={TV.y + TV.h / 2} textAnchor="middle" fontSize={12 * rs} fill={BRAND.yellow} fontFamily="Geist Mono, monospace">TV KEEP-CLEAR · NOT PRINTED</text>
                     </>
                   ) : null}
-                  {guides.safe ? <rect x={KIOSK_MARGIN} y={KIOSK_MARGIN} width={KIOSK_W - 2 * KIOSK_MARGIN} height={KIOSK_H - 2 * KIOSK_MARGIN} fill="none" stroke="#A1FBF9" strokeOpacity={0.8} strokeDasharray={`${4 * rs} ${4 * rs}`} strokeWidth={rs} /> : null}
-                  {guides.steps && L.stepGuides ? L.stepGuides.map(([x1, y1, x2, y2], i) => <line key={`st${i}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#FFEB66" strokeOpacity={0.9} strokeWidth={1.5 * rs} strokeDasharray={`${6 * rs} ${4 * rs}`} />) : null}
+                  {guides.safe ? <rect x={KIOSK_MARGIN} y={KIOSK_MARGIN} width={KIOSK_W - 2 * KIOSK_MARGIN} height={KIOSK_H - 2 * KIOSK_MARGIN} fill="none" stroke={BRAND.aqua} strokeOpacity={0.8} strokeDasharray={`${4 * rs} ${4 * rs}`} strokeWidth={rs} /> : null}
+                  {guides.steps && L.stepGuides ? L.stepGuides.map(([x1, y1, x2, y2], i) => <line key={`st${i}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke={BRAND.yellow} strokeOpacity={0.9} strokeWidth={1.5 * rs} strokeDasharray={`${6 * rs} ${4 * rs}`} />) : null}
                   {isLiftLayout(L.id) ? liftDoors(KIOSK_W, KIOSK_H).map((d) => (
                     <g key={d.side}>
-                      <rect x={d.x0} y={0} width={d.x1 - d.x0} height={KIOSK_H} fill="none" stroke={d.side === "left" ? "#A6FA87" : "#FFEB66"} strokeWidth={1.5 * rs} strokeDasharray={`${8 * rs} ${5 * rs}`} />
+                      <rect x={d.x0} y={0} width={d.x1 - d.x0} height={KIOSK_H} fill="none" stroke={d.side === "left" ? BRAND.green : BRAND.yellow} strokeWidth={1.5 * rs} strokeDasharray={`${8 * rs} ${5 * rs}`} />
                       <text x={(d.x0 + d.x1) / 2} y={KIOSK_H - (d.side === "left" ? 24 : 36) * rs} textAnchor="middle" fontSize={9 * rs} fill={d.side === "left" ? BRAND.green : BRAND.yellow} fontFamily="Geist Mono, monospace">{d.side === "left" ? "L" : "R"} {+((d.x1 - d.x0) / 72).toFixed(1)}″</text>
                     </g>
                   )) : null}

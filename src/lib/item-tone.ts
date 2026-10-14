@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Per-item accent tone overrides.
 //
 // Some modules (layer stacks, pillar rows) colour each row/lane from a fixed
@@ -10,14 +11,14 @@ import { FADE_STOPS } from "@/lib/surface-tokens";
 
 /** Brand-safe swatches offered in the tone picker. */
 export const TONE_SWATCHES: Array<{ label: string; hex: string }> = [
-  { label: "Blue", hex: "#003FC7" },
-  { label: "Aqua", hex: "#A1FBF9" },
-  { label: "Lavender", hex: "#C2A3FF" },
-  { label: "Pink", hex: "#EC388A" },
-  { label: "Green", hex: "#A6FA87" },
-  { label: "Yellow", hex: "#FFEB66" },
-  { label: "Peach", hex: "#FF9B70" },
-  { label: "Red", hex: "#E53D2E" },
+  { label: "Blue", hex: BRAND.blue },
+  { label: "Aqua", hex: BRAND.aqua },
+  { label: "Lavender", hex: BRAND.lavender },
+  { label: "Pink", hex: BRAND.pink },
+  { label: "Green", hex: BRAND.green },
+  { label: "Yellow", hex: BRAND.yellow },
+  { label: "Peach", hex: BRAND.peach },
+  { label: "Red", hex: BRAND.red },
   { label: "Teal", hex: "#0E7A86" },
   // DataForce product accents (approved DataForce identity).
   { label: "DataForce Green", hex: "#7BCD3A" },

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Shared QA gate logic used by editor and export.
 // Blocking issues (severity: "block") halt export until resolved.
 // Warnings (severity: "warn") are surfaced but non-blocking.
@@ -17,7 +18,7 @@ export type QaIssue = {
 };
 
 /** Aqua, Lavender, Yellow, Green, Peach — fail on white, approved on navy. */
-export const DARK_ONLY_ACCENTS = new Set(["#A1FBF9", "#C2A3FF", "#FFEB66", "#A6FA87", "#FF9B70"]);
+export const DARK_ONLY_ACCENTS = new Set([BRAND.aqua, BRAND.lavender, BRAND.yellow, BRAND.green, BRAND.peach]);
 
 export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
   const issues: QaIssue[] = [];

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // KitWizard — self-contained 5-step blank kit builder.
 //
 // Extracted from /admin/campaigns/kit so it can render on public /social/new
@@ -73,27 +74,27 @@ const FORMAT_GROUPS: { id: string; label: string; accent: string; platforms: For
     {
       id: "meta",
       label: "Instagram & Facebook",
-      accent: "#EC388A",
+      accent: BRAND.pink,
       platforms: ["instagram", "facebook"],
     },
-    { id: "linkedin", label: "LinkedIn", accent: "#003FC7", platforms: ["linkedin"] },
+    { id: "linkedin", label: "LinkedIn", accent: BRAND.blue, platforms: ["linkedin"] },
     {
       id: "short",
       label: "Short-form video",
-      accent: "#03002C",
+      accent: BRAND.ink,
       platforms: ["tiktok", "snapchat", "whatsapp"],
     },
-    { id: "google", label: "YouTube", accent: "#E53D2E", platforms: ["youtube"] },
+    { id: "google", label: "YouTube", accent: BRAND.red, platforms: ["youtube"] },
     {
       id: "social",
       label: "More social",
-      accent: "#C2A3FF",
+      accent: BRAND.lavender,
       platforms: ["x", "threads", "bluesky", "pinterest"],
     },
     {
       id: "other",
       label: "Email & other",
-      accent: "#A1FBF9",
+      accent: BRAND.aqua,
       platforms: ["email", "generic", "signage"],
     },
   ];

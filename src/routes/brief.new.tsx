@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { condenseObjective, inferIndustry, inferProspectLabel, NEUTRAL_INDUSTRY } from "@/lib/brief-infer";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
@@ -165,8 +166,8 @@ function BriefCommandCenter() {
     () => brandModes.find((b) => b.id === brandModeId) ?? brandModes[0],
     [brandModes, brandModeId],
   );
-  const brandPrimary = brand?.tokens?.primary || "#003FC7";
-  const brandAccent = brand?.tokens?.accent || "#A1FBF9";
+  const brandPrimary = brand?.tokens?.primary || BRAND.blue;
+  const brandAccent = brand?.tokens?.accent || BRAND.aqua;
 
   type Destination =
     | "presentation"
@@ -1348,7 +1349,7 @@ function BriefCommandCenter() {
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {list.map((b) => {
                           const active = b.id === brandModeId;
-                          const c = b.tokens?.primary || "#003FC7";
+                          const c = b.tokens?.primary || BRAND.blue;
                           return (
                             <button
                               key={b.id}

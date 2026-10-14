@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Turn Asset Inspector entries into PNGs that can be filed into a division's
 // imagery library.
 //
@@ -7,9 +8,9 @@
 // reference card built ONLY from the values PPTX extraction actually captured
 // (titles, series labels, header cells, node text, frames). Nothing is invented.
 
-const BRAND_INK = "#03002C";
-const BRAND_BLUE = "#003FC7";
-const BRAND_AQUA = "#A1FBF9";
+const BRAND_INK = BRAND.ink;
+const BRAND_BLUE = BRAND.blue;
+const BRAND_AQUA = BRAND.aqua;
 
 export type SpecCard = {
   kind: string;

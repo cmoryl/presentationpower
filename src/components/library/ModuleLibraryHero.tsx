@@ -1,16 +1,17 @@
+import { BRAND } from "@/lib/brand-colors";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Bot, Download, LayoutGrid, Sparkles, Wand2 } from "lucide-react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
-const HERO_ACCENT = "#003FC7";
-const HERO_GLOW = "#A1FBF9";
+const HERO_ACCENT = BRAND.blue;
+const HERO_GLOW = BRAND.aqua;
 
 const CAPABILITIES = [
-  { label: "Browse every module", icon: LayoutGrid, color: "#A1FBF9" },
-  { label: "Apply brand layouts", icon: Wand2, color: "#EC388A" },
-  { label: "Export stills & PPTX", icon: Download, color: "#A6FA87" },
-  { label: "Build full decks with AI", icon: Bot, color: "#FF9B70" },
+  { label: "Browse every module", icon: LayoutGrid, color: BRAND.aqua },
+  { label: "Apply brand layouts", icon: Wand2, color: BRAND.pink },
+  { label: "Export stills & PPTX", icon: Download, color: BRAND.green },
+  { label: "Build full decks with AI", icon: Bot, color: BRAND.peach },
 ] as const;
 
 function ParallaxWatermark({ text }: { text: string }) {

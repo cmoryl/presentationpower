@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowLeft, Search, Copy as CopyIcon, Pencil } from "lucide-react";
@@ -52,7 +53,7 @@ export const Route = createFileRoute("/library/print_/modules")({
   }),
 });
 
-const ACCENT = "#003FC7";
+const ACCENT = BRAND.blue;
 
 const DENSITY_LABEL: Record<PrintSectionModule["density"], string> = {
   compact: "Compact",
@@ -430,13 +431,13 @@ function ModuleCard({
 
 const ICON_ACCENTS: { label: string; value?: string }[] = [
   { label: "Section accent", value: undefined },
-  { label: "Blue 500", value: "#003FC7" },
-  { label: "Blue 800", value: "#03002C" },
+  { label: "Blue 500", value: BRAND.blue },
+  { label: "Blue 800", value: BRAND.ink },
   { label: "Dark gray", value: "#666666" },
-  { label: "Aqua", value: "#A1FBF9" },
-  { label: "Lavender", value: "#C2A3FF" },
-  { label: "Pink", value: "#EC388A" },
-  { label: "Green", value: "#A6FA87" },
+  { label: "Aqua", value: BRAND.aqua },
+  { label: "Lavender", value: BRAND.lavender },
+  { label: "Pink", value: BRAND.pink },
+  { label: "Green", value: BRAND.green },
 ];
 
 function IconStyleControls({

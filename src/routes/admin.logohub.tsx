@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { checkUploadSize, UPLOAD_ARTWORK_MAX_BYTES } from "@/lib/upload-limits";
 import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -408,7 +409,7 @@ function AdminLogoCard({
     <div className="rounded-2xl border border-black/10 bg-white p-4">
       <div
         className="flex h-24 w-full items-center justify-center rounded-lg transition-colors"
-        style={{ backgroundColor: isDark ? "#03002C" : "#F5F7FB" }}
+        style={{ backgroundColor: isDark ? BRAND.ink : "#F5F7FB" }}
       >
         {activeUrl ? (
           <img

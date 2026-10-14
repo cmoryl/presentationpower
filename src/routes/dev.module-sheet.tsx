@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Dev-only contact sheet used by the master-PDF export script.
 // Renders a paginated run of module variants at full 1920×1080 stage scale,
 // one page per (variant × mode), so a headless browser can screenshot each
@@ -115,7 +116,7 @@ function SheetPage({
       <div
         ref={ref}
         className="absolute inset-0"
-        style={{ background: mode === "dark" ? "#03002C" : "#F2F2F2" }}
+        style={{ background: mode === "dark" ? BRAND.ink : "#F2F2F2" }}
       >
         <ScaledSlide stageW={stage.w} stageH={stage.h}>
           <SlideBackdropContext.Provider value={backdropForVariant(variant, brand.id, mode)}>

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // ---------------------------------------------------------------------------
 // LEGAL CAMPAIGN — "You're not on it alone."
 //
@@ -800,10 +801,10 @@ export type AlongsideSizeId = (typeof LEGAL_ALONGSIDE_SIZES)[number]["id"];
 
 /** Palette used by every frame — enterprise tokens only. */
 export const LEGAL_ALONGSIDE_PALETTE = {
-  ground: "#03002C",
+  ground: BRAND.ink,
   ink: "#FFFFFF",
-  accent: "#003FC7",
-  light: "#EEF1F7",
+  accent: BRAND.blue,
+  light: BRAND.surface,
 } as const;
 
 /** Opposite side helper, used to place a copy panel on the clear side. */

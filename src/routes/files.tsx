@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // My Files — one place where a user finds everything they saved, edited, or
 // created: presentation decks, print assets, saved modules, and social/email
 // surfaces. Owner-scoped server side; this page only filters and sorts.
@@ -65,7 +66,7 @@ const KIND_META: Record<
     icon: Presentation,
     tint: "bg-[#003FC7]/10 text-[#003FC7]",
     group: "Decks",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     blurb: "Full presentations",
   },
   print: {
@@ -73,7 +74,7 @@ const KIND_META: Record<
     icon: FileText,
     tint: "bg-[#EC388A]/10 text-[#EC388A]",
     group: "Print",
-    accent: "#EC388A",
+    accent: BRAND.pink,
     blurb: "Brochures & case studies",
   },
   module: {
@@ -109,7 +110,7 @@ const STARTERS = [
   {
     to: "/brief/new" as const,
     icon: Rocket,
-    accent: "#003FC7",
+    accent: BRAND.blue,
     title: "Start a deck brief",
     body: "Six questions in, a governed presentation out.",
     cta: "New brief",
@@ -117,7 +118,7 @@ const STARTERS = [
   {
     to: "/library/print" as const,
     icon: FileText,
-    accent: "#EC388A",
+    accent: BRAND.pink,
     title: "Build a print asset",
     body: "Brochures, case studies and solution proposals.",
     cta: "Print library",
@@ -241,19 +242,19 @@ function MyFilesPage() {
           <span
             aria-hidden
             className="hidden pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full opacity-25 blur-3xl"
-            style={{ backgroundColor: "#003FC7" }}
+            style={{ backgroundColor: BRAND.blue }}
           />
           <span
             aria-hidden
             className="hidden pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full opacity-20 blur-3xl"
-            style={{ backgroundColor: "#C2A3FF" }}
+            style={{ backgroundColor: BRAND.lavender }}
           />
           {/* Element brick rail */}
           <span
             aria-hidden
             className="pointer-events-none absolute left-0 top-0 flex h-full w-2 flex-col"
           >
-            {["#003FC7", "#A1FBF9", "#03002C", "#FF9B70", "#C2A3FF"].map((c) => (
+            {[BRAND.blue, BRAND.aqua, BRAND.ink, BRAND.peach, BRAND.lavender].map((c) => (
               <span key={c} className="flex-1" style={{ backgroundColor: c }} />
             ))}
           </span>
@@ -280,7 +281,7 @@ function MyFilesPage() {
           {(["all", "deck", "slide", "print", "module", "surface"] as const).map((k) => {
             const active = kind === k;
             const meta = k === "all" ? null : KIND_META[k];
-            const accent = meta?.accent ?? "#03002C";
+            const accent = meta?.accent ?? BRAND.ink;
             const Icon = meta?.icon ?? FolderOpen;
             return (
               <button

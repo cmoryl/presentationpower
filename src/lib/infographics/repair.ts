@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Deterministic auto-repair for InfographicSpecs.
 //
 // The auditor (./audit.ts) reports what is wrong; this module fixes everything
@@ -162,7 +163,7 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
 
   // 5 — contrast-guard the palette against the surface it actually lands on.
   const theme = { ...spec.theme };
-  const surfaceHex = theme.surface || (theme.mode === "dark" ? "#03002C" : "#FFFFFF");
+  const surfaceHex = theme.surface || (theme.mode === "dark" ? BRAND.ink : "#FFFFFF");
   const guard = (hex: string, min: number) => ensureVizContrast(hex, surfaceHex, min);
   let recolored = 0;
   const nextPalette = (theme.palette ?? []).map((c) => {
@@ -172,9 +173,9 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
   });
   if (nextPalette.length)
     theme.palette = separatePalette(Array.from(new Set(nextPalette)), surfaceHex);
-  const accent = guard(theme.accent ?? "#003FC7", 3);
-  const primary = guard(theme.primary ?? "#003FC7", 3);
-  const ink = guard(theme.ink ?? "#03002C", 4.5);
+  const accent = guard(theme.accent ?? BRAND.blue, 3);
+  const primary = guard(theme.primary ?? BRAND.blue, 3);
+  const ink = guard(theme.ink ?? BRAND.ink, 4.5);
   if (accent !== theme.accent || primary !== theme.primary || ink !== theme.ink) recolored += 1;
   theme.accent = accent;
   theme.primary = primary;

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // KitQrCreator — the QR creator that ships inside every event kit.
 //
 // Uses exactly the same QR engine and option set as the pillar / signage
@@ -39,8 +40,8 @@ export type KitQrCreatorProps = {
 const CAPTION_ALIGNS: PillarCaptionAlign[] = ["left", "center", "right"];
 
 const INKS = [
-  { id: "#03002C", label: "Blue 800" },
-  { id: "#003FC7", label: "Blue 500" },
+  { id: BRAND.ink, label: "Blue 800" },
+  { id: BRAND.blue, label: "Blue 500" },
   { id: "#FFFFFF", label: "White" },
 ];
 
@@ -48,7 +49,7 @@ const PLATES = [
   { id: "#FFFFFF", label: "White" },
   { id: "#E0E8F5", label: "Blue white" },
   { id: "#F2F2F2", label: "Light gray" },
-  { id: "#03002C", label: "Blue 800" },
+  { id: BRAND.ink, label: "Blue 800" },
 ];
 
 /** Build the printable SVG for a code — the single source for preview + export. */
@@ -138,7 +139,7 @@ export function KitQrCreator({
   const trackId = kitId || fileStem;
   const [data, setData] = useState(defaultData);
   const [style, setStyle] = useState<PillarQrStyleId>("block");
-  const [ink, setInk] = useState("#03002C");
+  const [ink, setInk] = useState(BRAND.ink);
   const [plate, setPlate] = useState("#FFFFFF");
   const [transparent, setTransparent] = useState(false);
   const [sizeMm, setSizeMm] = useState(60);
@@ -491,7 +492,7 @@ export function KitQrCreator({
             <button
               type="button"
               onClick={() => {
-                setInk("#03002C");
+                setInk(BRAND.ink);
                 setPlate("#FFFFFF");
                 setTransparent(false);
               }}

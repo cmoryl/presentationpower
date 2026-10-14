@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Renders a single Open Canvas Studio item inside the 1920×1080 stage.
 // Module items mount the canonical ExactSlideStage — the same tree the deck
 // cards, library and PPTX export use — so a dropped module keeps its surface,
@@ -91,8 +92,8 @@ export function CanvasItemView({
   brand: BrandMode;
   mode: "light" | "dark";
 }) {
-  const ink = mode === "dark" ? "#FFFFFF" : (brand.tokens.ink ?? "#03002C");
-  const accent = brand.tokens.accent ?? "#003FC7";
+  const ink = mode === "dark" ? "#FFFFFF" : (brand.tokens.ink ?? BRAND.ink);
+  const accent = brand.tokens.accent ?? BRAND.blue;
 
   if (item.type === "module") return <ModuleItemView item={item} brand={brand} mode={mode} />;
 

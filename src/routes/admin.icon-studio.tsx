@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Sparkles } from "lucide-react";
@@ -275,7 +276,7 @@ function SystemTab() {
               key={t.id}
               className="rounded-2xl border border-black/10 bg-white/70 p-4 backdrop-blur dark:border-white/10 dark:bg-white/5"
               style={{
-                background: t.id === "on-dark" ? "#03002C" : undefined,
+                background: t.id === "on-dark" ? BRAND.ink : undefined,
                 color: t.id === "on-dark" ? "white" : undefined,
               }}
             >
@@ -374,7 +375,7 @@ function ApprovedSetsTab() {
   const guide = getBrandGuide(slug);
   const hero = slug.startsWith("next-2026")
     ? (iconColorOptions(slug)[1]?.hex ?? "#1B3E6F")
-    : (guide?.secondaryColors?.[0]?.hex ?? "#003FC7");
+    : (guide?.secondaryColors?.[0]?.hex ?? BRAND.blue);
 
   return (
     <section className="space-y-4">
@@ -468,7 +469,7 @@ function CuratedTab() {
               <div className="grid aspect-square place-items-center rounded-xl border border-black/10 bg-white dark:border-white/10 dark:bg-white/5">
                 {(() => {
                   const Ic = ICON_LIBRARY.find((e) => e.name === selected)!.Icon;
-                  return <Ic size={80} color="#003FC7" />;
+                  return <Ic size={80} color={BRAND.blue} />;
                 })()}
               </div>
               <div className="font-mono text-xs">{selected}</div>
@@ -816,7 +817,7 @@ function PreviewPanel({
   selected: string | null;
 }) {
   const [size, setSize] = useState(48);
-  const [color, setColor] = useState("#003FC7");
+  const [color, setColor] = useState(BRAND.blue);
   const [copied, setCopied] = useState<"svg" | "ref" | "name" | null>(null);
 
   const doCopy = (kind: "svg" | "ref" | "name", value: string) => {

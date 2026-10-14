@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Live slide preview for the PowerPoint agent page: reads the deck the agent is
 // building and renders real slides with the same renderer the editor uses.
 //
@@ -211,7 +212,7 @@ export function AgentDeckPreview({
     () => (pack ? (packToneBrand(baseBrand as never, pack) as unknown as BrandMode) : baseBrand),
     [baseBrand, pack],
   );
-  const frame = pack ? pack.tokens.surface : "#03002C";
+  const frame = pack ? pack.tokens.surface : BRAND.ink;
 
   const slides: DeckSlide[] = useMemo(
     () =>
@@ -634,7 +635,7 @@ function EnlargedSlideModal({
 
         <div
           className="relative w-full overflow-hidden rounded-xl shadow-2xl"
-          style={{ aspectRatio: "16 / 9", background: pack ? pack.tokens.surface : "#03002C" }}
+          style={{ aspectRatio: "16 / 9", background: pack ? pack.tokens.surface : BRAND.ink }}
         >
           <ScaledSlide>
             <SkinScope pack={pack}>

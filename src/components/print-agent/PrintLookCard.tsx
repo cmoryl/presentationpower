@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Visual look-and-feel card: the palette, page mode/format, hero imagery
 // candidates and the ordered module plan the print agent intends to use.
 import { Palette } from "lucide-react";
@@ -106,8 +107,8 @@ export function PrintLookCard({
                     aria-hidden
                     className="h-20 w-full"
                     style={{
-                      background: `linear-gradient(135deg, ${look.palette?.primary ?? "#03002C"}, ${
-                        look.palette?.accent ?? "#003FC7"
+                      background: `linear-gradient(135deg, ${look.palette?.primary ?? BRAND.ink}, ${
+                        look.palette?.accent ?? BRAND.blue
                       })`,
                     }}
                   />

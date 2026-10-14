@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * ELEMENT brick motif — the system's signature graphic device.
  *
@@ -72,7 +73,7 @@ export function ElementBrickRow({
   unit,
   gap,
   tone = "spectrum",
-  accent = "#003FC7",
+  accent = BRAND.blue,
   style,
   count = 5,
 }: RowProps) {
@@ -100,7 +101,7 @@ export function ElementBrickRail({
   unit,
   gap,
   tone = "spectrum",
-  accent = "#003FC7",
+  accent = BRAND.blue,
   style,
   count = 5,
 }: RowProps) {

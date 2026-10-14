@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // TransPerfect Element System — taxonomy seed
 // Derived from: Master Template Framework v0.2 + Master Wireframe Atlas v0.1.
 // This is the source of truth until Lovable Cloud is enabled and these move to
@@ -120,7 +121,7 @@ export const BRAND_MODES: BrandMode[] = [
     name: "TransPerfect",
     description: "TransPerfect master brand",
     // Master brand — TP Blue 800 ink field, Blue 500 accent, neutral cool surface.
-    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
+    tokens: { primary: BRAND.ink, accent: BRAND.blue, surface: BRAND.surface, ink: BRAND.ink },
   },
   {
     id: "bm-subcompany",
@@ -128,14 +129,14 @@ export const BRAND_MODES: BrandMode[] = [
     description: "Named subcompany within TransPerfect",
     // Approved brand system — same enterprise palette as the master brand.
     // Division scope differs by logo and info only, never by accent colour.
-    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
+    tokens: { primary: BRAND.ink, accent: BRAND.blue, surface: BRAND.surface, ink: BRAND.ink },
   },
   {
     id: "bm-division",
     name: "Division",
     description: "Business division brand mode",
     // Approved brand system — enterprise palette, logo/info carry the division.
-    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
+    tokens: { primary: BRAND.ink, accent: BRAND.blue, surface: BRAND.surface, ink: BRAND.ink },
   },
   {
     id: "bm-element",
@@ -153,55 +154,55 @@ export const BRAND_MODES: BrandMode[] = [
     // DataForce product identity: DataForce Green leads the structure (card top
     // rules, edges, emphasis bands); DataForce Blue stays on the iconography
     // (see ICON_BRAND_COLOR in iconography.ts).
-    tokens: { primary: "#7BCD3A", accent: "#7BCD3A", surface: "#EEF1F7", ink: "#03002C" },
+    tokens: { primary: "#7BCD3A", accent: "#7BCD3A", surface: BRAND.surface, ink: BRAND.ink },
   },
   {
     id: "bm-tp-media",
     name: "TransPerfect Media",
     description: "Media localization: dubbing, subtitling, access services",
     // Approved brand system — enterprise palette; Media shows via lockup + copy.
-    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
+    tokens: { primary: BRAND.ink, accent: BRAND.blue, surface: BRAND.surface, ink: BRAND.ink },
   },
   {
     id: "bm-tp-legal",
     name: "TransPerfect Legal",
     description: "Legal solutions: eDiscovery, litigation, IP, legal translation",
     // Approved brand system — enterprise palette; Legal shows via lockup + copy.
-    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
+    tokens: { primary: BRAND.ink, accent: BRAND.blue, surface: BRAND.surface, ink: BRAND.ink },
   },
   {
     id: "bm-tp-games",
     name: "TransPerfect Gaming",
     description: "Game localization, LQA, audio & community services",
     // Approved brand system — enterprise palette; Gaming shows via lockup + copy.
-    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
+    tokens: { primary: BRAND.ink, accent: BRAND.blue, surface: BRAND.surface, ink: BRAND.ink },
   },
   {
     id: "bm-tp-digital",
     name: "TransPerfect Digital",
     description: "Digital marketing, web localization & experience",
     // Approved brand system — enterprise palette; Digital shows via lockup + copy.
-    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
+    tokens: { primary: BRAND.ink, accent: BRAND.blue, surface: BRAND.surface, ink: BRAND.ink },
   },
   {
     id: "bm-tp-lifesci",
     name: "TransPerfect Life Sciences",
     description: "Life sciences: regulatory, clinical, medical translation",
     // Approved brand system — enterprise palette; Life Sciences shows via lockup + copy.
-    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
+    tokens: { primary: BRAND.ink, accent: BRAND.blue, surface: BRAND.surface, ink: BRAND.ink },
   },
   {
     id: "bm-trial-interactive",
     name: "Trial Interactive",
     description: "eClinical platform for eTMF, study start-up and investigator portals",
     // Approved brand system — enterprise palette (TI lockup still ships its own mark).
-    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
+    tokens: { primary: BRAND.ink, accent: BRAND.blue, surface: BRAND.surface, ink: BRAND.ink },
   },
   {
     id: "bm-cobrand",
     name: "Co-brand",
     description: "Co-branded with client or partner",
-    tokens: { primary: "#03002C", accent: "#FF9B70", surface: "#FCEBE2", ink: "#03002C" },
+    tokens: { primary: BRAND.ink, accent: BRAND.peach, surface: "#FCEBE2", ink: BRAND.ink },
   },
 ];
 

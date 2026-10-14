@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // WCAG contrast audit for reinterpretation colour choices.
 //
 // The reinterpretation controls let a reviewer lock an accent and a light/dark
@@ -33,7 +34,7 @@ export function targetThresholds(target: WcagTarget = DEFAULT_WCAG_TARGET) {
 }
 
 /** Accent used when a slide has no lock and no division override. */
-export const DEFAULT_ACCENT = "#003fc7";
+export const DEFAULT_ACCENT = BRAND.blue.toLowerCase();
 
 export type ContrastLevel = "pass" | "warn" | "fail";
 
@@ -156,7 +157,7 @@ export function auditSlideColors(input: {
   const target = input.target ?? DEFAULT_WCAG_TARGET;
   const t = targetThresholds(target);
   const bg = normalizeHex(input.bg, mode === "dark" ? DARK_STAT_BG : LIGHT_STAT_BG);
-  const ink = mode === "dark" ? "#ffffff" : "#03002c";
+  const ink = mode === "dark" ? "#ffffff" : BRAND.ink;
   const accent = normalizeHex(input.accent);
   const largeLabel = target === "AAA" ? "AAA-Large" : "AA-Large";
 
@@ -184,8 +185,8 @@ export function auditSlideColors(input: {
     // a light accent for failing against white.
     (() => {
       const best =
-        contrastRatio("#03002c", accent) >= contrastRatio("#ffffff", accent)
-          ? "#03002c"
+        contrastRatio(BRAND.ink, accent) >= contrastRatio("#ffffff", accent)
+          ? BRAND.ink
           : "#ffffff";
       return checkPair({
         id: "accent-fill",

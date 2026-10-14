@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // TransPerfect NEXT 2026 — London signage SPEC REVISION ENGINE.
 //
 // The venue team re-issues panel measurements during build-up: a column grows a
@@ -741,7 +742,7 @@ export function buildLondonPanelSvg(panelIn: LondonPanel, options: LondonArtOpti
   ].join("");
 
   const inkOnLight = brand.colourway === "dblue";
-  const copyHex = inkOnLight ? "#03002C" : "#FFFFFF";
+  const copyHex = inkOnLight ? BRAND.ink : "#FFFFFF";
   const copyPaint = paintFor(copyHex);
   // Copy is OUTLINED, never live text: a vendor machine without Geist would
   // substitute a face and move the headline. Centring uses the font's real
@@ -1059,7 +1060,7 @@ export function buildLondonPanelAi(
     ? cmykFillOp(
         brand.colourway === "dblue" ? { c: 0, m: 0, y: 0, k: 1 } : { c: 0, m: 0, y: 0, k: 0 },
       )
-    : fillOp(brand.colourway === "dblue" ? "#03002C" : "#FFFFFF");
+    : fillOp(brand.colourway === "dblue" ? BRAND.ink : "#FFFFFF");
 
   // Copy is OUTLINED into filled path objects — no /Font resource, no Tj, so a
   // RIP cannot substitute a face. Centring uses the font's true advance.

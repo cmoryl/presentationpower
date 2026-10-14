@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { QEII_SIGNAGE_GRADIENTS } from "@/lib/next-london-qeii-style";
 // Rendering rules for the natively rebuilt QEII Centre floor plans.
 //
@@ -76,7 +77,7 @@ export function qeiiMarkInk(variant: QeiiMarkVariant = "white"): string | undefi
 }
 
 /** Blue 800 — the one ink an all-black lockup prints in. */
-export const QEII_MARK_BLACK = "#03002C";
+export const QEII_MARK_BLACK = BRAND.ink;
 
 export const QEII_MARK_BLACK_FILTER_ID = "qeii-mark-black";
 
@@ -95,9 +96,9 @@ export function qeiiMarkBlackFilter(): string {
 
 /** Approved enterprise values used when a plan is inked on our side. */
 export const QEII_PLAN_TOKENS = {
-  ink: "#03002C",
-  accent: "#003FC7",
-  surface: "#EEF1F7",
+  ink: BRAND.ink,
+  accent: BRAND.blue,
+  surface: BRAND.surface,
   white: "#FFFFFF",
 } as const;
 
@@ -372,7 +373,7 @@ export function qeiiPlanSvg(sourceFloor: QeiiFloorVector, options: QeiiPlanOptio
           // A light room fill would swallow the reverse lockup, so that one falls
           // back to the colour file. An explicit all-white or colour choice stands.
           const variant =
-            ink === "#03002C" &&
+            ink === BRAND.ink &&
             ["reverse", "white"].includes(options.markVariant ?? "reverse")
               ? ("colour" as QeiiMarkVariant)
               : options.markVariant;
@@ -519,7 +520,7 @@ function qeiiSignageSheet(
   const chevrons = Array.from({ length: n }, (_, i) => {
     const x = i * step;
     const k = bandH * 0.42;
-    const colour = qeiiMixToWhite("#003FC7", 0.9 - (0.9 * i) / (n - 1));
+    const colour = qeiiMixToWhite(BRAND.blue, 0.9 - (0.9 * i) / (n - 1));
     return `<path d="M${x} ${bandY} L${x + step * 0.55} ${bandY} L${x + step * 0.55 + k} ${bandY + bandH / 2} L${x + step * 0.55} ${bandY + bandH} L${x} ${bandY + bandH} L${x + k} ${bandY + bandH / 2} Z" fill="${colour}"/>`;
   }).join("");
   const lockup = `<image href="${NEXT_APP_ORIGIN}/next-2026/logos/transperfect-side-by-side-color.svg" x="${SW - m - lockW}" y="${bandY}" width="${lockW}" height="${bandH}" preserveAspectRatio="xMidYMid meet"/>`;
@@ -532,7 +533,7 @@ function qeiiSignageSheet(
     const y = tabTop + i * tabH;
     const lit = t.id === floor.id;
     return (
-      `<rect x="${SW - tabW}" y="${y}" width="${tabW}" height="${tabH}" fill="${lit ? "#003FC7" : "#03002C"}"/>` +
+      `<rect x="${SW - tabW}" y="${y}" width="${tabW}" height="${tabH}" fill="${lit ? BRAND.blue : BRAND.ink}"/>` +
       (i ? `<rect x="${SW - tabW}" y="${y - SW * 0.0015}" width="${tabW}" height="${SW * 0.003}" fill="#FFFFFF"/>` : "") +
       (showText
         ? `<text x="${SW - tabW / 2}" y="${y + tabH / 2}" text-anchor="middle" dominant-baseline="middle" ${font} font-weight="400" font-size="${tabW * 0.5}" fill="#FFFFFF">${t.label}</text>`
@@ -544,11 +545,11 @@ function qeiiSignageSheet(
     const cw = footH * 0.55;
     const x = SW - tabW - m - (6 - i) * cw * 1.1;
     const kk = footH * 0.3;
-    const c = qeiiMixToWhite("#003FC7", 0.15 + i * 0.06);
+    const c = qeiiMixToWhite(BRAND.blue, 0.15 + i * 0.06);
     return `<path d="M${x} ${footY} L${x + cw * 0.55} ${footY} L${x + cw * 0.55 + kk} ${footY + footH / 2} L${x + cw * 0.55} ${footY + footH} L${x} ${footY + footH} L${x + kk} ${footY + footH / 2} Z" fill="${c}"/>`;
   }).join("");
   const foot =
-    `<rect x="0" y="${footY}" width="${SW - tabW}" height="${footH}" fill="#003FC7"/>` + footChevrons +
+    `<rect x="0" y="${footY}" width="${SW - tabW}" height="${footH}" fill={BRAND.blue}/>` + footChevrons +
     (showText
       ? `<text x="${m}" y="${footY + footH / 2}" dominant-baseline="middle" ${font} font-weight="700" font-size="${footH * 0.34}" letter-spacing="${footH * 0.03}" fill="#FFFFFF">${venueBar}</text>`
       : "");
@@ -560,7 +561,7 @@ function qeiiSignageSheet(
   const px = areaX + (areaW - W * k) / 2;
   const py = areaY + (areaH - H * k) / 2;
   const heading = showText
-    ? `<text x="${m}" y="${m + titleSize * 0.8}" ${font} font-weight="400" font-size="${titleSize}" fill="#03002C">${floor.title.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text>`
+    ? `<text x="${m}" y="${m + titleSize * 0.8}" ${font} font-weight="400" font-size="${titleSize}" fill={BRAND.ink}>${floor.title.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text>`
     : "";
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${SW}" height="${SH}" viewBox="0 0 ${SW} ${SH}">`,

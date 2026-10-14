@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // NEXT event booklet — press PDF.
 //
@@ -33,8 +34,8 @@ import {
 const MM_TO_PT = 72 / 25.4;
 const SLUG_PT = 0.4 * 72;
 
-const INK = "#03002C";
-const ACCENT = "#003FC7";
+const INK = BRAND.ink;
+const ACCENT = BRAND.blue;
 const PAPER = "#FFFFFF";
 
 export type BookletPdfResult = {

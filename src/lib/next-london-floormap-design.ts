@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Map design controls — the one place that decides how a London floor map LOOKS.
 //
 // The geometry lives in next-london-floorplan.ts and the drawing in
@@ -153,25 +154,25 @@ export const DEFAULT_MAP_DESIGN: MapDesign = {
 };
 
 /** The approved TransPerfect strip printed under the header rule. */
-export const MAP_BRAND_BAR = ["#003FC7", "#A1FBF9", "#C2A3FF", "#FFEB66", "#A6FA87"] as const;
+export const MAP_BRAND_BAR = [BRAND.blue, BRAND.aqua, BRAND.lavender, BRAND.yellow, BRAND.green] as const;
 
 /** Brand accent swatches offered in the design panel. */
 export const MAP_ACCENT_SWATCHES: { name: string; hex: string }[] = [
-  { name: "Blue 500", hex: "#003FC7" },
-  { name: "Blue 800", hex: "#03002C" },
-  { name: "Aqua", hex: "#A1FBF9" },
-  { name: "Lavender", hex: "#C2A3FF" },
-  { name: "Yellow", hex: "#FFEB66" },
-  { name: "Green", hex: "#A6FA87" },
-  { name: "Peach", hex: "#FF9B70" },
-  { name: "Pink", hex: "#EC388A" },
+  { name: "Blue 500", hex: BRAND.blue },
+  { name: "Blue 800", hex: BRAND.ink },
+  { name: "Aqua", hex: BRAND.aqua },
+  { name: "Lavender", hex: BRAND.lavender },
+  { name: "Yellow", hex: BRAND.yellow },
+  { name: "Green", hex: BRAND.green },
+  { name: "Peach", hex: BRAND.peach },
+  { name: "Pink", hex: BRAND.pink },
 ];
 
 const THEMES: Record<MapThemeId, MapPalette> = {
   directory: {
     paper: "#FFFFFF",
-    ink: "#03002C",
-    accent: "#003FC7",
+    ink: BRAND.ink,
+    accent: BRAND.blue,
     walkway: "#EDF1F7",
     tile: "#FFFFFF",
     line: "#D3DCEA",
@@ -210,9 +211,9 @@ const THEMES: Record<MapThemeId, MapPalette> = {
     dark: true,
   },
   night: {
-    paper: "#03002C",
+    paper: BRAND.ink,
     ink: "#EEF2FA",
-    accent: "#A1FBF9",
+    accent: BRAND.aqua,
     walkway: "#0B1043",
     tile: "#141A55",
     line: "#2A3277",
@@ -237,8 +238,8 @@ const THEMES: Record<MapThemeId, MapPalette> = {
   },
   brand: {
     paper: "#FFFFFF",
-    ink: "#03002C",
-    accent: "#003FC7",
+    ink: BRAND.ink,
+    accent: BRAND.blue,
     walkway: "#E0E8F5",
     tile: "#FFFFFF",
     line: "#C6D4EA",
@@ -277,7 +278,7 @@ export function mapPalette(design: MapDesign): MapPalette {
 }
 
 const ZONE_ACCENT: Record<MapAreaKind, string> = {
-  auditorium: "#003FC7",
+  auditorium: BRAND.blue,
   room: "#2C6FD1",
   foyer: "#0E7C8C",
   circulation: "#A6B1C4",
@@ -286,7 +287,7 @@ const ZONE_ACCENT: Record<MapAreaKind, string> = {
   exhibition: "#6A54C9",
   terrace: "#2E8B57",
   exterior: "#8593A8",
-  stage: "#EC388A",
+  stage: BRAND.pink,
   catering: "#D2733F",
   meeting: "#2C6FD1",
   demo: "#0E7C8C",
@@ -297,14 +298,14 @@ const ZONE_ACCENT: Record<MapAreaKind, string> = {
 };
 
 const KIND_INK: Record<LondonAssetKind, string> = {
-  wall: "#003FC7",
+  wall: BRAND.blue,
   banner: "#0E7C8C",
   set: "#5A3FC0",
   floor: "#B27000",
   door: "#C4306E",
   lift: "#7358E0",
   table: "#2E8B57",
-  pillar: "#03002C",
+  pillar: BRAND.ink,
   "step-repeat": "#6A54C9",
   stair: "#6C7B92",
   booth: "#2C6FD1",

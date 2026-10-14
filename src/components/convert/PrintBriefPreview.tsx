@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // PrintBriefPreview — the print side of the cross-format adapter.
 //
@@ -42,7 +43,7 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
   function PrintBriefPreview({ result, brandId, displayWidth = 420, ground }, ref) {
     const brand = BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0];
     const accent = brand.tokens.accent;
-    const ink = "#03002C";
+    const ink = BRAND.ink;
     const trim = result.target.trimIn ?? { width: 8.268, height: 11.693 };
     const pageW = Math.round(trim.width * CSS_DPI);
     const pageH = Math.round(trim.height * CSS_DPI);

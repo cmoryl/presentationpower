@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // SocialFullBleedShell — the designed full-bleed portrait composition.
 //
 // Photo Fade hero and Desktop Monitor showcase are the two library modules whose
@@ -41,7 +42,7 @@ export function SocialFullBleedShell({
   children,
 }: SocialFullBleedShellProps) {
   const photo = geometry.kind === "photo";
-  const ink = "#03002C";
+  const ink = BRAND.ink;
   const ground = photo
     ? `linear-gradient(180deg, ${accent} 0%, ${ink} 100%)`
     : mode === "dark"

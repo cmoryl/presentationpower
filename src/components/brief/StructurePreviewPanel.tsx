@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Live structure preview for Step 3 of the brief command center.
 // Shows the exact block-by-block structure each selected artifact will be
 // generated with, updating as brand mode / prospect / selections change.
@@ -9,7 +10,7 @@ import type { BriefValidation } from "@/lib/brief-validation";
 
 export function StructurePreviewPanel({
   previews,
-  accent = "#003FC7",
+  accent = BRAND.blue,
   validation,
 }: {
   previews: StructurePreview[];

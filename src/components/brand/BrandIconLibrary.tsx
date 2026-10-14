@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Approved icon library for a brand guide.
 //
 // Browse a division's approved glyphs by sub-area, preview them at the chosen
@@ -35,7 +36,7 @@ export function BrandIconLibrary({ slug, hero }: Props) {
   const [areaId, setAreaId] = useState<string>(set.subAreas[0]?.id ?? "");
   const [size, setSize] = useState<IconDownloadSize>(48);
   const [format, setFormat] = useState<"svg" | "png">("svg");
-  const [colorHex, setColorHex] = useState<string>(colors[0]?.hex ?? "#03002C");
+  const [colorHex, setColorHex] = useState<string>(colors[0]?.hex ?? BRAND.ink);
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -252,7 +253,7 @@ export function BrandIconLibrary({ slug, hero }: Props) {
             >
               <div
                 className="flex h-24 w-full items-center justify-center rounded-xl"
-                style={{ background: swatchDark ? "#03002C" : "#F2F2F2" }}
+                style={{ background: swatchDark ? BRAND.ink : "#F2F2F2" }}
               >
                 {Icon && (
                   <Icon

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Public, no-login APPROVED ICON LIBRARY.
 //
 // Share-safe surface for the Icon Studio: only the approved brand icon sets and
@@ -22,7 +23,7 @@ import { iconByName } from "@/lib/icon-library";
 /** Accent used to colour a division's card — its own guide accent, brand blue otherwise. */
 function setAccent(slug: string): string {
   if (slug.startsWith("next-2026")) return iconColorOptions(slug)[1]?.hex ?? "#1B3E6F";
-  return getBrandGuide(slug)?.secondaryColors?.[0]?.hex ?? "#003FC7";
+  return getBrandGuide(slug)?.secondaryColors?.[0]?.hex ?? BRAND.blue;
 }
 
 /** sRGB relative luminance (0 = black, 1 = white). */
@@ -53,7 +54,7 @@ function mix(hex: string, target: string, amount: number): string {
  */
 function accentInk(hex: string): string {
   let out = hex;
-  for (let i = 0; i < 8 && luminance(out) > 0.22; i++) out = mix(out, "#03002C", 0.22);
+  for (let i = 0; i < 8 && luminance(out) > 0.22; i++) out = mix(out, BRAND.ink, 0.22);
   return out;
 }
 
@@ -89,7 +90,7 @@ function PublicIconLibrary() {
     // Readable ink, not the raw guide accent: pale division colours (aqua,
     // lavender, yellow) are unreadable on the white listing surface below.
     if (slug.startsWith("next-2026")) return accentInk(iconColorOptions(slug)[1]?.hex ?? "#1B3E6F");
-    return accentInk(guide?.secondaryColors?.[0]?.hex ?? "#003FC7");
+    return accentInk(guide?.secondaryColors?.[0]?.hex ?? BRAND.blue);
   }, [slug, guide]);
 
   const GROUPS = useMemo(() => iconSetGroups(), []);

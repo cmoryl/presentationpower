@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
@@ -170,7 +171,7 @@ function BrandGuidesIndex() {
       <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         {filtered.map((g) => {
           const division = BRAND_MODES.find((b) => b.id === g.divisionId);
-          const swatch = g.primaryColors[0]?.hex ?? "#03002C";
+          const swatch = g.primaryColors[0]?.hex ?? BRAND.ink;
           const eyebrow =
             g.category === "master"
               ? "Master brand"

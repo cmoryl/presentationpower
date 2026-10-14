@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * Tiny schematic previews of a layout, so the design picker can be scanned
  * visually (funnel vs timeline vs stat wall) instead of read word by word.
@@ -66,7 +67,7 @@ export function LayoutThumb({
   variantId,
   kind,
   className,
-  accent = "#003FC7",
+  accent = BRAND.blue,
 }: {
   variantId?: string;
   kind?: ThumbKind;

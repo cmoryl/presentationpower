@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * ALTERNATE-LOOK INTAKE — the guided path from "here are our brand files" to a
  * published template, with an admin sign-off at every gate.
@@ -467,8 +468,8 @@ export interface DerivedPalette {
   filled: boolean;
 }
 
-const LIGHT_FALLBACK = ["#f7f7f5", "#111214", "#003fc7", "#a1fbf9", "#e0e8f5"];
-const DARK_FALLBACK = ["#0b1020", "#f4f6fb", "#a1fbf9", "#c2a3ff", "#1b2440"];
+const LIGHT_FALLBACK = ["#f7f7f5", "#111214", BRAND.blue, BRAND.aqua, "#e0e8f5"];
+const DARK_FALLBACK = ["#0b1020", "#f4f6fb", BRAND.aqua, BRAND.lavender, "#1b2440"];
 
 /**
  * Order the sampled colours into the five-stop palette.

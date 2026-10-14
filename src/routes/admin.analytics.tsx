@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Master Analytics — command center for admins. Aggregates every signal
 // the platform emits: unified usage_events, ai_events, imagery, share
 // views, decks, briefs, print, and translations. Ships an AI-authored
@@ -264,21 +265,21 @@ function MasterAnalyticsView() {
           title="Daily activity"
           series={data.series.activity}
           days={data.series.days}
-          accent="#003FC7"
+          accent={BRAND.blue}
           total={data.overview.totalEvents}
         />
         <TrendCard
           title="Daily active users"
           series={data.series.dau}
           days={data.series.days}
-          accent="#A1FBF9"
+          accent={BRAND.aqua}
           total={data.overview.activeUsers}
         />
         <TrendCard
           title="AI cost / day"
           series={data.series.aiCost}
           days={data.series.days}
-          accent="#C2A3FF"
+          accent={BRAND.lavender}
           total={data.overview.aiCost}
           formatValue={(v) => v.toFixed(1)}
         />
@@ -710,11 +711,11 @@ function FunnelBar({
   };
 }) {
   const stages = [
-    { label: "Briefs", value: funnel.briefs, color: "#003FC7" },
-    { label: "Decks created", value: funnel.decksCreated, color: "#003FC7" },
-    { label: "Exported", value: funnel.decksExported, color: "#C2A3FF" },
-    { label: "Share views", value: funnel.shareViews, color: "#A1FBF9" },
-    { label: "Unique viewers", value: funnel.uniqueShareSessions, color: "#A6FA87" },
+    { label: "Briefs", value: funnel.briefs, color: BRAND.blue },
+    { label: "Decks created", value: funnel.decksCreated, color: BRAND.blue },
+    { label: "Exported", value: funnel.decksExported, color: BRAND.lavender },
+    { label: "Share views", value: funnel.shareViews, color: BRAND.aqua },
+    { label: "Unique viewers", value: funnel.uniqueShareSessions, color: BRAND.green },
   ];
   const max = Math.max(1, ...stages.map((s) => s.value));
   return (

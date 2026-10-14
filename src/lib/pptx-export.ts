@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { packIdForBrandMode } from "./look-brand";
 // Client-side PPTX export using pptxgenjs.
 // Family/variant-aware renderers so exported decks look intentional, not
@@ -1090,7 +1091,7 @@ export async function exportDeckToPptx(
       if (backdrop.aurora) {
         const seed = backdrop.auroraSeed ?? variant.id;
         const tint = (
-          backdrop.tint ?? (backdrop.darkChrome ? "#03002C" : renderBrand.tokens.surface)
+          backdrop.tint ?? (backdrop.darkChrome ? BRAND.ink : renderBrand.tokens.surface)
         ).replace(/^#/, "");
         const svgUrl = auroraSvgDataUrl(
           seed,
@@ -1121,7 +1122,7 @@ export async function exportDeckToPptx(
       if (!backdrop.url) return;
       const data = await fetchAsDataUrl(backdrop.url, `slide ${i + 1} variant backdrop`);
       if (!data) return;
-      const tint = (backdrop.tint ?? "#03002C").replace("#", "");
+      const tint = (backdrop.tint ?? BRAND.ink).replace("#", "");
       const strength = typeof backdrop.scrimStrength === "number" ? backdrop.scrimStrength : 0.6;
       backgroundPlans[i] = {
         kind: "image",

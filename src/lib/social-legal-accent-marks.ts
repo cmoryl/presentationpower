@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Hand-drawn accent marks for the "You're not on it alone." Legal set.
 //
 // The set used to resolve on a straight gradient hairline. Straight, evenly
@@ -24,10 +25,10 @@ export type AccentMarkTint = "accent" | "aqua" | "lavender" | "chalk" | "ink";
 
 /** Brand-legal colours a mark may be drawn in. Accents are marks, never text. */
 export const ACCENT_MARK_COLORS: Record<AccentMarkTint, string> = {
-  accent: "#003FC7",
-  aqua: "#A1FBF9",
-  lavender: "#C2A3FF",
-  chalk: "#EEF1F7",
+  accent: BRAND.blue,
+  aqua: BRAND.aqua,
+  lavender: BRAND.lavender,
+  chalk: BRAND.surface,
   ink: "#FFFFFF",
 };
 

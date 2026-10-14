@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -129,8 +130,8 @@ function BriefOutputHub() {
     );
   }
 
-  const accent = brand?.tokens?.accent || "#A1FBF9";
-  const primary = brand?.tokens?.primary || "#003FC7";
+  const accent = brand?.tokens?.accent || BRAND.aqua;
+  const primary = brand?.tokens?.primary || BRAND.blue;
 
   const totalAssets =
     (hasDeck ? 1 : 0) +
@@ -423,7 +424,7 @@ function BriefOutputHub() {
                     <li key={i} className="flex gap-3">
                       <span
                         className="mt-0.5 inline-flex h-5 min-w-[2.2rem] items-center justify-center rounded-full px-2 text-[10px] font-semibold uppercase tracking-wide"
-                        style={{ background: `${socialPb.accent}2E`, color: "#03002C" }}
+                        style={{ background: `${socialPb.accent}2E`, color: BRAND.ink }}
                       >
                         {ph.label}
                       </span>

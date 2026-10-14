@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * Location Maps — stylized SVG world/region maps + division-specific
  * office/hub location data for the `MV-LOC-*` slide module family.
@@ -1321,7 +1322,7 @@ export function WorldMap({
   const graticule = isDark ? "rgba(255,255,255,0.05)" : "rgba(3,0,44,0.05)";
   const dotFill = isDark ? "rgba(255,255,255,0.40)" : "rgba(3,0,44,0.28)";
   const pinCore = accent;
-  const pinRing = isDark ? "#ffffff" : "#03002C";
+  const pinRing = isDark ? "#ffffff" : BRAND.ink;
   const labelColor = isDark ? "rgba(255,255,255,0.86)" : "rgba(3,0,44,0.78)";
   const labelHalo = isDark ? "rgba(3,0,44,0.6)" : "rgba(255,255,255,0.85)";
   const uid = React.useId().replace(/[^a-zA-Z0-9]/g, "");

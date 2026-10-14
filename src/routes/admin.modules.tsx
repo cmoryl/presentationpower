@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Master-admin editor for library modules — print section modules (pm-*) and
 // presentation module variants (MV-*). Edits are stored as overrides so the
 // code registries stay intact and every change is reversible.
@@ -41,7 +42,7 @@ export const Route = createFileRoute("/admin/modules")({
   component: ModuleEditorPage,
 });
 
-const ACCENT = "#003FC7";
+const ACCENT = BRAND.blue;
 const DENSITIES = ["compact", "standard", "tall"] as const;
 
 type Draft = {

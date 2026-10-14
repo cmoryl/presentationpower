@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // NEXT 2026 London signage — CMYK output path with vibrant correction.
 //
@@ -49,24 +50,24 @@ const APPROVED: Record<string, Cmyk> = {
   // them verbatim instead of converting a screen colour back into ink.
   ...LONDON_PACK_BUILDS,
   // Master brand core
-  "#003fc7": { c: 1, m: 0.83, y: 0, k: 0.06 },
-  "#03002c": { c: 1, m: 1, y: 0.4, k: 0.6 },
+  [BRAND.blue.toLowerCase()]: { c: 1, m: 0.83, y: 0, k: 0.06 },
+  [BRAND.ink.toLowerCase()]: { c: 1, m: 1, y: 0.4, k: 0.6 },
   "#ffffff": { c: 0, m: 0, y: 0, k: 0 },
   "#000000": { c: 0, m: 0, y: 0, k: 1 },
   // NEXT 2026 division registry
   "#13b1f3": { c: 0.92, m: 0.27, y: 0, k: 0.05 },
-  "#a6fa87": { c: 0.34, m: 0, y: 0.46, k: 0.02 },
-  "#ff9b70": { c: 0, m: 0.39, y: 0.56, k: 0 },
+  [BRAND.green.toLowerCase()]: { c: 0.34, m: 0, y: 0.46, k: 0.02 },
+  [BRAND.peach.toLowerCase()]: { c: 0, m: 0.39, y: 0.56, k: 0 },
   "#3bbeb6": { c: 0.69, m: 0, y: 0.04, k: 0.25 },
   "#58ed21": { c: 0.63, m: 0, y: 0.86, k: 0.07 },
   "#ff5757": { c: 0, m: 0.66, y: 0.66, k: 0 },
-  "#ffeb66": { c: 0, m: 0.08, y: 0.6, k: 0 },
-  "#ec388a": { c: 0, m: 0.76, y: 0.42, k: 0.07 },
-  "#c2a3ff": { c: 0.24, m: 0.36, y: 0, k: 0 },
+  [BRAND.yellow.toLowerCase()]: { c: 0, m: 0.08, y: 0.6, k: 0 },
+  [BRAND.pink.toLowerCase()]: { c: 0, m: 0.76, y: 0.42, k: 0.07 },
+  [BRAND.lavender.toLowerCase()]: { c: 0.24, m: 0.36, y: 0, k: 0 },
   "#5ce1e6": { c: 0.6, m: 0.02, y: 0, k: 0.1 },
   // Secondary accents
-  "#a1fbf9": { c: 0.33, m: 0, y: 0.06, k: 0 },
-  "#e53d2e": { c: 0, m: 0.83, y: 0.85, k: 0 },
+  [BRAND.aqua.toLowerCase()]: { c: 0.33, m: 0, y: 0.06, k: 0 },
+  [BRAND.red.toLowerCase()]: { c: 0, m: 0.83, y: 0.85, k: 0 },
 };
 
 function clamp01(n: number): number {

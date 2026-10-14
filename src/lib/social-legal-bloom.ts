@@ -41,10 +41,10 @@ export type BloomColour = {
 
 export const LEGAL_BLOOM_COLOURS: Record<string, BloomColour> = {
   ember: { id: "ember", label: "Ember", glow: "#FF7A1A", type: "#E2560B" },
-  lavender: { id: "lavender", label: "Lavender", glow: "#C2A3FF", type: "#7C4DEF" },
+  lavender: { id: "lavender", label: "Lavender", glow: BRAND.lavender, type: "#7C4DEF" },
   aqua: { id: "aqua", label: "Aqua", glow: "#2CC4E8", type: "#0C93B8" },
   green: { id: "green", label: "Green", glow: "#4FD483", type: "#0E9455" },
-  pink: { id: "pink", label: "Pink", glow: "#EC388A", type: "#C81E6E" },
+  pink: { id: "pink", label: "Pink", glow: BRAND.pink, type: "#C81E6E" },
   blue: { id: "blue", label: "Brand blue", glow: "#3C6BFF", type: BRAND.blue },
 };
 

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * NEXTbrew signage theming.
  *
@@ -119,7 +120,7 @@ export function brewMotifPlan(panel: LondonPanel, light = false): BrewMotifPlan 
   // The brew grounds are now clean gradient only: no lattice, no scallops, no
   // clip art. Kept as an empty plan so every caller (preview, .svg, .ai) keeps
   // its shape while emitting nothing.
-  return { ink: light ? "#03002C" : "#FFFFFF", marks: [] };
+  return { ink: light ? BRAND.ink : "#FFFFFF", marks: [] };
 }
 
 /** SVG layer for the motif. Painted between ground and copy. */

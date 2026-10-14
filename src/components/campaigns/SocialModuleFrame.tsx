@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // SocialModuleFrame — renders any print section module inside a social format.
 //
 // Print modules are authored at page width with `cqw` typography. This frame
@@ -81,7 +82,7 @@ export type SocialModuleFrameProps = {
 };
 
 function accentFor(brandId: string): string {
-  return BRAND_MODES.find((b) => b.id === brandId)?.tokens.accent ?? "#003FC7";
+  return BRAND_MODES.find((b) => b.id === brandId)?.tokens.accent ?? BRAND.blue;
 }
 
 export function SocialModuleFrame({
@@ -351,8 +352,8 @@ export function SocialModuleFrame({
   const ink =
     bleedPlan?.kind === "photo" || (plate ? plate.mode === "dark" : mode === "dark")
       ? "#FFFFFF"
-      : "#03002C";
-  const paper = plate ? plate.surface : mode === "dark" ? "#03002C" : "#FFFFFF";
+      : BRAND.ink;
+  const paper = plate ? plate.surface : mode === "dark" ? BRAND.ink : "#FFFFFF";
 
   // Center the module inside the safe rect so short modules never leave a
   // lopsided band at one edge.
@@ -505,7 +506,7 @@ export function SocialModuleFrame({
                   top: safe.top,
                   width: safe.width,
                   height: safe.height,
-                  outline: `2px dashed ${fit.ok ? "#2563EB" : "#E53D2E"}`,
+                  outline: `2px dashed ${fit.ok ? "#2563EB" : BRAND.red}`,
                   outlineOffset: -1,
                 }}
               />

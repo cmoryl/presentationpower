@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Top-down map artwork for the London signage kit.
 //
 // Two products, one geometry source (next-london-floorplan.ts):
@@ -54,8 +55,8 @@ import { LONDON_VENUE, type LondonFloorId, type LondonPanel } from "@/lib/next-l
 // afterwards — every helper below therefore draws in the requested style without
 // threading a palette argument through a dozen signatures.
 let DESIGN: MapDesign = DEFAULT_MAP_DESIGN;
-let NAVY = "#03002C";
-let BLUE = "#003FC7";
+let NAVY = BRAND.ink;
+let BLUE = BRAND.blue;
 let LINE = "#D3DCEA";
 let HAIR = "#E4EAF3";
 let PAPER = "#FFFFFF";
@@ -103,7 +104,7 @@ export type LondonZoneStyle = { fill: string; accent: string };
  * static palette (the interactive map reads the design-aware helpers instead).
  */
 export const LONDON_ZONE_STYLE: Record<LondonZone["kind"], LondonZoneStyle> = {
-  auditorium: { fill: "#FFFFFF", accent: "#003FC7" },
+  auditorium: { fill: "#FFFFFF", accent: BRAND.blue },
   room: { fill: "#FFFFFF", accent: "#2C6FD1" },
   foyer: { fill: "#FFFFFF", accent: "#0E7C8C" },
   circulation: { fill: "#E6EBF4", accent: "#A6B1C4" },
@@ -116,14 +117,14 @@ export const LONDON_ZONE_STYLE: Record<LondonZone["kind"], LondonZoneStyle> = {
 
 /** One ink per asset kind so a crowded floor reads at a glance. */
 export const LONDON_KIND_INK: Record<LondonAssetKind, string> = {
-  wall: "#003FC7",
+  wall: BRAND.blue,
   banner: "#0E7C8C",
   set: "#5A3FC0",
   floor: "#B27000",
   door: "#C4306E",
   lift: "#7358E0",
   table: "#2E8B57",
-  pillar: "#03002C",
+  pillar: BRAND.ink,
   "step-repeat": "#6A54C9",
   stair: "#6C7B92",
   booth: "#2C6FD1",

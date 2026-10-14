@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SkinBackdropLibrary } from "@/components/slide/SkinBackdropContext";
 import { ClientLogoPoolProvider } from "@/lib/client-logo-pool";
@@ -106,7 +107,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Governed deck assembly, brand intelligence, and AI-powered enablement for TransPerfect sales teams.",
       },
-      { name: "theme-color", content: "#003FC7" },
+      { name: "theme-color", content: BRAND.blue },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "Element" },

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * GAMES SCENE ART — the authored Games (bm-tp-games) plate kit.
  *
@@ -24,10 +25,10 @@ import type { StylePack } from "./style-packs";
 const CDN = "/__l5e/assets-v1";
 
 export const GAMES_PALETTE = {
-  accent: "#A6FA87",
+  accent: BRAND.green,
   accentPantone: "7487 C",
-  base: "#03002C",
-  bridge: "#003FC7",
+  base: BRAND.ink,
+  bridge: BRAND.blue,
 } as const;
 
 export type GamesArtMode = "light" | "dark";

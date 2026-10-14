@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // NEXT division agenda — fully vector, layered press PDF / Illustrator artwork.
 //
@@ -1291,7 +1292,7 @@ export async function buildAgendaVectorPdf(
     if (!drawGuides) continue;
     beginLayer(page, layer("07 Guides + marks"));
 
-    const guideInk = rgb(...hexRgb(face === "light" ? "#03002C" : "#FFFFFF"));
+    const guideInk = rgb(...hexRgb(face === "light" ? BRAND.ink : "#FFFFFF"));
     page.drawRectangle({
       x: trimX,
       y: trimY,

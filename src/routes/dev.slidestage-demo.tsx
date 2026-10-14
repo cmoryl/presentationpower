@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
@@ -13,9 +14,9 @@ export const Route = createFileRoute("/dev/slidestage-demo")({
 });
 
 const DEMO = [
-  { id: "d-1", label: "Slide 1", color: "#003FC7" },
-  { id: "d-2", label: "Slide 2", color: "#A1FBF9" },
-  { id: "d-3", label: "Slide 3", color: "#FFEB66" },
+  { id: "d-1", label: "Slide 1", color: BRAND.blue },
+  { id: "d-2", label: "Slide 2", color: BRAND.aqua },
+  { id: "d-3", label: "Slide 3", color: BRAND.yellow },
 ];
 
 const TYPES: TransitionType[] = ["none", "fade", "push-left", "push-right", "zoom", "cut"];
@@ -91,7 +92,7 @@ function DemoView() {
             <div
               data-testid={`demo-slide-${slide.id}`}
               className="flex h-full w-full items-center justify-center text-6xl font-bold"
-              style={{ background: slide.color, color: "#03002C" }}
+              style={{ background: slide.color, color: BRAND.ink }}
             >
               {slide.label}
             </div>

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // BRAND SWATCH SPEC
 // ---------------------------------------------------------------------------
 // A brand color is never just a hex. Designers need the screen value (HEX +
@@ -30,15 +31,15 @@ export type BrandSwatchSpec = {
 
 /** Pantone matches signed off for the TransPerfect master palette. */
 const PANTONE_BY_HEX: Record<string, string> = {
-  "#003FC7": "PMS 2728 C",
-  "#03002C": "PMS 2767 C",
-  "#A1FBF9": "PMS 317 C",
-  "#C2A3FF": "PMS 264 C",
-  "#FFEB66": "PMS 121 C",
-  "#A6FA87": "PMS 358 C",
-  "#FF9B70": "PMS 163 C",
-  "#EC388A": "PMS 2395 C",
-  "#E53D2E": "PMS 1788 C",
+  [BRAND.blue]: "PMS 2728 C",
+  [BRAND.ink]: "PMS 2767 C",
+  [BRAND.aqua]: "PMS 317 C",
+  [BRAND.lavender]: "PMS 264 C",
+  [BRAND.yellow]: "PMS 121 C",
+  [BRAND.green]: "PMS 358 C",
+  [BRAND.peach]: "PMS 163 C",
+  [BRAND.pink]: "PMS 2395 C",
+  [BRAND.red]: "PMS 1788 C",
   "#666666": "Cool Gray 10 C",
   "#F2F2F2": "Cool Gray 1 C",
   "#E0E8F5": "PMS 656 C",
@@ -46,15 +47,15 @@ const PANTONE_BY_HEX: Record<string, string> = {
 
 /** Approved process builds (coated) for the master palette. */
 const CMYK_BY_HEX: Record<string, string> = {
-  "#003FC7": "100 68 0 22",
-  "#03002C": "93 100 0 83",
-  "#A1FBF9": "33 0 8 0",
-  "#C2A3FF": "26 39 0 0",
-  "#FFEB66": "1 2 70 0",
-  "#A6FA87": "36 0 66 0",
-  "#FF9B70": "0 51 56 0",
-  "#EC388A": "0 85 26 0",
-  "#E53D2E": "0 84 84 0",
+  [BRAND.blue]: "100 68 0 22",
+  [BRAND.ink]: "93 100 0 83",
+  [BRAND.aqua]: "33 0 8 0",
+  [BRAND.lavender]: "26 39 0 0",
+  [BRAND.yellow]: "1 2 70 0",
+  [BRAND.green]: "36 0 66 0",
+  [BRAND.peach]: "0 51 56 0",
+  [BRAND.pink]: "0 85 26 0",
+  [BRAND.red]: "0 84 84 0",
   "#666666": "0 0 0 70",
   "#F2F2F2": "0 0 0 5",
   "#E0E8F5": "9 4 0 0",

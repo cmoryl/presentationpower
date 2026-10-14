@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * Agenda copy legibility.
  *
@@ -99,7 +100,7 @@ export function agendaWorstOnGround(
   ink: string,
   stops: string[],
 ): { ratio: number; stop: string } {
-  let stop = stops[0] ?? "#003FC7";
+  let stop = stops[0] ?? BRAND.blue;
   let ratio = Number.POSITIVE_INFINITY;
   for (const s of stops) {
     const r = agendaContrastRatio(ink, s);

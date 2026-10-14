@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // Export audit (/admin/export-audit)
 //
@@ -230,7 +231,7 @@ async function iconBlobs(): Promise<{ svg: Blob; png: Blob }> {
   const first = BRAND_ICON_SETS.flatMap((set) => set.subAreas.flatMap((a) => a.icons))[0];
   const name = first?.name;
   if (!name) throw new Error("no approved icons registered");
-  const svg = iconSvgString(name, { color: "#003FC7", strokeWidth: 1.5 });
+  const svg = iconSvgString(name, { color: BRAND.blue, strokeWidth: 1.5 });
   if (!svg) throw new Error(`icon "${name}" did not render`);
   return {
     svg: new Blob([svg], { type: "image/svg+xml" }),
@@ -535,7 +536,7 @@ function ExportAuditPage() {
             width: 816,
             height: 1056,
             background: "#ffffff",
-            color: "#03002C",
+            color: BRAND.ink,
             padding: 64,
             fontFamily: "Geist, system-ui, sans-serif",
           }}
@@ -545,7 +546,7 @@ function ExportAuditPage() {
               fontSize: 11,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#003FC7",
+              color: BRAND.blue,
             }}
           >
             Export audit
@@ -593,7 +594,7 @@ function ExportAuditPage() {
             width: 1200,
             height: 628,
             background: "linear-gradient(120deg, #A1FBF9, #C2A3FF)",
-            color: "#03002C",
+            color: BRAND.ink,
             display: "flex",
             alignItems: "center",
             padding: 64,

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * DEVICE FRAME — laptop screen / desktop monitor chassis
  * ---------------------------------------------------------------------------
@@ -91,7 +92,7 @@ export function DeviceFrame({
   kind = "laptop",
   tone = "graphite",
   children,
-  accent = "#003FC7",
+  accent = BRAND.blue,
   shadow = true,
   glare = true,
   className,
@@ -393,7 +394,7 @@ export function DeviceFrame({
  * software screen in the library without shipping fake data.
  */
 export function DeviceScreenPlaceholder({
-  accent = "#003FC7",
+  accent = BRAND.blue,
   label,
   kind = "laptop",
 }: {

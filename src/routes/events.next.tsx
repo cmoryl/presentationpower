@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // /events/next — TransPerfect NEXT 2026 hub.
 //
 // Indexes the full NEXT design system: 11 divisions × 56 formats (616 Canva
@@ -491,7 +492,7 @@ function NextAurora({ division }: { division: NextDivision }) {
             <div
               className="hidden absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
               style={{
-                backgroundColor: "#003FC7",
+                backgroundColor: BRAND.blue,
                 opacity: 0.34,
                 bottom: bBottom,
                 right: bRight,

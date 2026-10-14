@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Demo fast-path for the Presentation agent: a curated, QA-clean GlobalLink Q3
 // business-review deck plus the trigger-prompt matcher and the staged build
 // script that simulates a live generation in ~13 seconds. Used only when the
@@ -59,7 +60,7 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
       mode: "dark",
       content: {
         // Brand aqua clears WCAG AA on the dark ground.
-        accentOverride: "#A1FBF9",
+        accentOverride: BRAND.aqua,
         authorizedAccentOverride: true,
         reference: "GLOBALLINK · Q3 FY26",
         title: "GlobalLink Q3 business review",
@@ -150,7 +151,7 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
       layoutId: "LF-15",
       mode: "dark",
       content: {
-        accentOverride: "#A1FBF9",
+        accentOverride: BRAND.aqua,
         authorizedAccentOverride: true,
         title: "AI hub connects the program",
         hub: { title: "GlobalLink AI", subtitle: "Governed orchestration" },
@@ -281,7 +282,7 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
       mode: "dark",
       content: {
         // Brand aqua clears WCAG AA on the dark ground.
-        accentOverride: "#A1FBF9",
+        accentOverride: BRAND.aqua,
         authorizedAccentOverride: true,
         title: "Approve the Q4 scale plan",
         body: "Repeat the retail case-study result — three weeks to four days across 14 markets — by expanding AI-assisted workflows to the next wave of priority accounts.",

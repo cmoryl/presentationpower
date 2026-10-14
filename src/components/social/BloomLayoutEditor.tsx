@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // The live layout handles for one Legal bloom ad at one size.
 //
 // It draws over the artwork at the same coordinate space (the board scales the
@@ -157,8 +158,8 @@ export function BloomLayoutEditor({ layout, w, h, scale, onChange, crop = false 
               top: -22 / scale,
               fontSize: 12 / scale,
               fontFamily: "system-ui, sans-serif",
-              color: "#03002C",
-              background: "#A6FA87",
+              color: BRAND.ink,
+              background: BRAND.green,
               padding: `${2 / scale}px ${6 / scale}px`,
               borderRadius: 4 / scale,
               whiteSpace: "nowrap",
@@ -178,7 +179,7 @@ export function BloomLayoutEditor({ layout, w, h, scale, onChange, crop = false 
     >
       {(["picture", "copy"] as Part[]).map((part) => {
         const box = layout[part];
-        const tint = part === "picture" ? "#003FC7" : "#EC388A";
+        const tint = part === "picture" ? BRAND.blue : BRAND.pink;
         return (
           <div
             key={part}

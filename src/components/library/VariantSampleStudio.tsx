@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Full-screen slide studio for library module samples.
 //
 // Gives master admins the same editing surface the deck editor has:
@@ -562,7 +563,7 @@ export function VariantSampleStudio({
             h: 120,
             text: "Double-click to edit",
             size: 56,
-            ink: mode === "dark" ? "#FFFFFF" : "#03002C",
+            ink: mode === "dark" ? "#FFFFFF" : BRAND.ink,
           }
         : {
             id,

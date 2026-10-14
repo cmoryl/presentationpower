@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Shared print-quality QR raster + PNG encoder.
 //
 // The preview and the press PDF draw the code as vector geometry. PowerPoint and
@@ -198,7 +199,7 @@ export function qrPng(
 ): QrPng | null {
   const raster = qrRaster(payload, { style: opts.style, modulePx: opts.modulePx });
   if (!raster) return null;
-  const ink = hexRgb(opts.ink ?? "#03002C", [3, 0, 44]);
+  const ink = hexRgb(opts.ink ?? BRAND.ink, [3, 0, 44]);
   const ground = hexRgb(opts.ground ?? "#FFFFFF", [255, 255, 255]);
   const w = raster.width;
   const alpha = opts.transparent === true;

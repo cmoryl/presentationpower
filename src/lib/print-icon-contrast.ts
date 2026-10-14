@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * Contrast checking for print module iconography.
  *
@@ -118,7 +119,7 @@ export function suggestIconAccent(
 
 /** Background a print page renders icons on, given the editor/print mode. */
 export function iconPageBackground(mode: string | undefined): string {
-  return mode === "dark" ? "#03002C" : "#FFFFFF";
+  return mode === "dark" ? BRAND.ink : "#FFFFFF";
 }
 
 /**

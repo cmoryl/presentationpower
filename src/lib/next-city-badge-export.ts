@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // City Series badge — production export.
 //
@@ -66,7 +67,7 @@ async function plate(node: HTMLElement, nativeW: number, nativeH: number, dpi: n
   const scale = Math.max(0.5, wantPx / nativeW);
   const canvas = await captureAssetCanvas(
     { node, width: nativeW, height: nativeH, label: "City Series badge" },
-    { scale, background: "#03002C" },
+    { scale, background: BRAND.ink },
   );
   if (!(canvas.width > 0 && canvas.height > 0)) throw new Error("badge capture produced no pixels");
   return canvas;

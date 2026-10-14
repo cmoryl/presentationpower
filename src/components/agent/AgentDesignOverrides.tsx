@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // One-off overrides for a single deck run: palette, box/card layout and
 // backdrop. These outrank the imported knowledge map and the chosen skin.
 import { useState } from "react";
@@ -21,10 +22,10 @@ const SWATCH_FIELDS: {
   label: string;
   fallback: string;
 }[] = [
-  { key: "background", label: "Background", fallback: "#03002C" },
+  { key: "background", label: "Background", fallback: BRAND.ink },
   { key: "ink", label: "Text", fallback: "#FFFFFF" },
-  { key: "accent", label: "Accent", fallback: "#003FC7" },
-  { key: "accent2", label: "Pop", fallback: "#A1FBF9" },
+  { key: "accent", label: "Accent", fallback: BRAND.blue },
+  { key: "accent2", label: "Pop", fallback: BRAND.aqua },
 ];
 
 export function AgentDesignOverrides({

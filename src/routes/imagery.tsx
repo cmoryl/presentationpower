@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { checkUploadSize, UPLOAD_IMAGE_MAX_BYTES } from "@/lib/upload-limits";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, useRef } from "react";
@@ -346,7 +347,7 @@ function ImageryPage() {
                 onClick={handleGenerate}
                 disabled={busy || !prompt.trim()}
                 className="rounded-full px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50"
-                style={{ background: strongMatch ? "#03002C" : primary }}
+                style={{ background: strongMatch ? BRAND.ink : primary }}
               >
                 {busy ? "Generating…" : strongMatch ? "Generate anyway" : "Generate image"}
               </button>
@@ -629,9 +630,9 @@ function AnalyticsPanel({
         {[
           { label: "Active", value: totals.active, color: primary },
           { label: "Muted", value: totals.muted, color: "#666" },
-          { label: "Built-in", value: totals.builtin, color: "#03002C" },
+          { label: "Built-in", value: totals.builtin, color: BRAND.ink },
           { label: "Uploads", value: totals.uploads, color: accent },
-          { label: "AI generated", value: totals.generated, color: "#003FC7" },
+          { label: "AI generated", value: totals.generated, color: BRAND.blue },
         ].map((s) => (
           <div key={s.label} className="rounded-xl border border-black/5 bg-[#F7F5F0] p-3">
             <div className="text-[10px] uppercase tracking-wider text-black/50">{s.label}</div>

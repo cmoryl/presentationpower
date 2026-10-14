@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // TransPerfect NEXT — master pillar signs.
 //
@@ -262,12 +263,12 @@ export const PILLAR_HEADLINE_OFFSET = { min: 0, max: 900, step: 10 };
 /** Approved ink options for pillar copy. */
 export const PILLAR_TEXT_COLORS: { id: string; label: string; hex: string }[] = [
   { id: "white", label: "White", hex: "#FFFFFF" },
-  { id: "blue-800", label: "Blue 800", hex: "#03002C" },
-  { id: "blue-500", label: "Blue 500", hex: "#003FC7" },
+  { id: "blue-800", label: "Blue 800", hex: BRAND.ink },
+  { id: "blue-500", label: "Blue 500", hex: BRAND.blue },
   { id: "blue-white", label: "Blue White", hex: "#E0E8F5" },
-  { id: "aqua", label: "Aqua", hex: "#A1FBF9" },
-  { id: "lavender", label: "Lavender", hex: "#C2A3FF" },
-  { id: "yellow", label: "Yellow", hex: "#FFEB66" },
+  { id: "aqua", label: "Aqua", hex: BRAND.aqua },
+  { id: "lavender", label: "Lavender", hex: BRAND.lavender },
+  { id: "yellow", label: "Yellow", hex: BRAND.yellow },
 ];
 
 export function pillarKind(id: string | undefined): PillarKind {
@@ -339,7 +340,7 @@ export function pillarStops(styleId: string, face: PillarFaceId = "dark"): strin
 
 /** Copy / lockup ink for a face. */
 export function pillarInk(face: PillarFaceId): string {
-  return face === "light" ? "#03002C" : "#FFFFFF";
+  return face === "light" ? BRAND.ink : "#FFFFFF";
 }
 
 export function pillarFace(id: string | undefined) {
@@ -612,7 +613,7 @@ export function pillarQrStyle(config: PillarConfig): PillarQrStyleId {
 /** QR ink: the approved Blue 800 unless the user picked another ink. */
 export function pillarQrForeground(config: PillarConfig): string {
   const v = (config.qrForeground ?? "").trim();
-  return /^#[0-9a-f]{6}$/i.test(v) ? v.toUpperCase() : "#03002C";
+  return /^#[0-9a-f]{6}$/i.test(v) ? v.toUpperCase() : BRAND.ink;
 }
 
 /** QR plate: white unless the user picked another colour. */
@@ -648,7 +649,7 @@ export function pillarQrTransparent(config: PillarConfig): boolean {
 export function pillarQrPlateColor(config: PillarConfig): string {
   if (!pillarQrTransparent(config)) return pillarQrBackground(config);
   const stops = pillarStops(config.styleId, pillarFace(config.face).id);
-  let best = stops[0] ?? "#003FC7";
+  let best = stops[0] ?? BRAND.blue;
   let bestRatio = Number.POSITIVE_INFINITY;
   for (const s of stops) {
     const r = pillarContrastRatio(pillarQrForeground(config), s);

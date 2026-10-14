@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,10 +39,10 @@ const SEVERITY_META: Record<Severity, { label: string; ring: string; chip: strin
   };
 
 function scoreBand(score: number) {
-  if (score >= 85) return { label: "On-brand", color: "#A6FA87", ring: "ring-emerald-400/40" };
-  if (score >= 70) return { label: "Mostly aligned", color: "#FFEB66", ring: "ring-amber-300/40" };
-  if (score >= 50) return { label: "Needs polish", color: "#FF9B70", ring: "ring-orange-300/40" };
-  return { label: "Off-brand", color: "#EC388A", ring: "ring-rose-400/40" };
+  if (score >= 85) return { label: "On-brand", color: BRAND.green, ring: "ring-emerald-400/40" };
+  if (score >= 70) return { label: "Mostly aligned", color: BRAND.yellow, ring: "ring-amber-300/40" };
+  if (score >= 50) return { label: "Needs polish", color: BRAND.peach, ring: "ring-orange-300/40" };
+  return { label: "Off-brand", color: BRAND.pink, ring: "ring-rose-400/40" };
 }
 
 type HistoryRow = {

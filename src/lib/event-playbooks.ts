@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Event playbooks — industry-standard event archetypes with everything the
 // user needs to spin up a full asset kit: brand, kit profile, timeline
 // phases, deliverable checklist, KPI targets, sample EventFacts, and a
@@ -109,7 +110,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
     subBrand: "bm-tp-digital",
     kitProfileId: "event-kit",
     seedVariantId: "MV-INS-BIG-IDEA",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     chip: "Launch",
     facts: {
       name: "GlobalLink AI 2.0",
@@ -379,7 +380,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
     subBrand: "bm-tp-legal",
     kitProfileId: "email-set",
     seedVariantId: "MV-INS-QUOTE",
-    accent: "#03002C",
+    accent: BRAND.ink,
     chip: "Legal",
     facts: {
       name: "GC Insight Day",
@@ -448,7 +449,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
     subBrand: "bm-tp-master",
     kitProfileId: "social-essentials",
     seedVariantId: "MV-INS-CALLOUT",
-    accent: "#A1FBF9",
+    accent: BRAND.aqua,
     chip: "Webinar",
     facts: {
       name: "AI in translation ops",
@@ -503,7 +504,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
     subBrand: "bm-enterprise",
     kitProfileId: "email-set",
     seedVariantId: "MV-INS-SO-WHAT",
-    accent: "#03002C",
+    accent: BRAND.ink,
     chip: "Executive",
     facts: {
       name: "Board briefing · Q4",
@@ -557,7 +558,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
     subBrand: "bm-tp-master",
     kitProfileId: "full-launch",
     seedVariantId: "MV-CTX-STAT-GRID",
-    accent: "#FF9B70",
+    accent: BRAND.peach,
     chip: "Roadshow",
     facts: {
       name: "Localization on Tour",
@@ -622,7 +623,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
     subBrand: "bm-tp-media",
     kitProfileId: "full-launch",
     seedVariantId: "MV-INS-QUOTE",
-    accent: "#EC388A",
+    accent: BRAND.pink,
     chip: "Awards",
     facts: {
       name: "Localization Impact Awards",
@@ -694,7 +695,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       cta: "Book a booth meeting",
       stat: { value: "E42", label: "ExCeL London · Hall N" },
     },
-    accent: "#003FC7",
+    accent: BRAND.blue,
     chip: "Trade show",
     facts: {
       name: "SaaStr Europa · TransPerfect Booth",
@@ -756,7 +757,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
     subBrand: "bm-tp-digital",
     kitProfileId: "full-launch",
     seedVariantId: "MV-ED-HERO-ORB",
-    accent: "#A1FBF9",
+    accent: BRAND.aqua,
     chip: "Hackathon",
     facts: {
       name: "GlobalLink Devathon 2026",
@@ -821,7 +822,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
     subBrand: "bm-tp-lifesci",
     kitProfileId: "full-launch",
     seedVariantId: "MV-OP-AGENDA",
-    accent: "#A6FA87",
+    accent: BRAND.green,
     chip: "Summit",
     facts: {
       name: "TransPerfect Life Sciences Summit",
@@ -886,7 +887,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
     subBrand: "bm-enterprise",
     kitProfileId: "email-set",
     seedVariantId: "MV-CTX-CARDS-3",
-    accent: "#03002C",
+    accent: BRAND.ink,
     chip: "Field day",
     facts: {
       name: "TransPerfect Enterprise Field Day",
@@ -941,7 +942,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
     subBrand: "bm-tp-legal",
     kitProfileId: "email-set",
     seedVariantId: "MV-INS-QUOTE",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     chip: "Roundtable",
     facts: {
       name: "Cross-Border Discovery Roundtable",
@@ -996,7 +997,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
     subBrand: "bm-tp-games",
     kitProfileId: "full-launch",
     seedVariantId: "MV-ED-HERO-BLEED",
-    accent: "#EC388A",
+    accent: BRAND.pink,
     chip: "Launch party",
     facts: {
       name: "TransPerfect Gaming · Launch Party",
