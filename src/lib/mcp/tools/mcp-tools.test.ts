@@ -19,7 +19,7 @@ const DECK_ID = "11111111-2222-4333-8444-555555555555";
 /** Minimal PostgREST-shaped query builder over FakeDb. */
 function fakeClient() {
   const from = (table: "decks" | "deck_slides") => {
-    const rows = () => db[table];
+    const rows = () => ((db as Record<string, Row[]>)[table] ??= []);
     const state: { filters: [string, unknown][]; order?: string } = { filters: [] };
     const match = (r: Row) => state.filters.every(([k, v]) => r[k] === v);
 
