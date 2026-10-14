@@ -34,3 +34,7 @@
 - The Master NEXT brand kit (`src/lib/next-brand-kit.ts`, `/events/next/brand-kit`, partner view `/share/next-brand-kit/$token` gated by `get_next_brand_kit_share`) is assembled from existing registries only — why: page, share view and download pack must never drift from the templates and brand guide.
 - Cross-surface cascade: curated print-library e-brochures/case studies feed social + print sizes (`/convert?print=<id>`) and slide decks only through `src/lib/print-cascade.ts`, which reads the piece's own copy/figures/hero and never adds numbers — why: one master piece, every surface, no drift or invented figures.
 - Print library rules live in `src/lib/print-library/AGENTS.md`.
+- Sign-in is deny-by-default: every page needs a session except the open list in `src/lib/sign-out.ts` (sign-in flow, token share links, London vendor view, BoothHub kiosk editor, machine endpoints); gated pages render nothing until the browser confirms a session — why: the published audience is public on Pro.
+- Sign-up is limited to @transperfect.com (plus the shared team account) by the `enforce_signup_domain` trigger on auth.users — why: the UI alone can be bypassed.
+- `generate_deck` is retry-safe through `deck_jobs` (idempotency key = hash of user + inputs; status via `get_deck_job`) — why: MCP clients time out and retried calls made duplicate decks.
+- Unsourced figures and banned words are found by `src/lib/compliance-check.ts`, listed (never edited) on `/admin/needs-source` — why: prompt-only rules didn't stop invented stats.
