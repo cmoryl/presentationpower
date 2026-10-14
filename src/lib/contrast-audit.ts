@@ -34,7 +34,7 @@ export function targetThresholds(target: WcagTarget = DEFAULT_WCAG_TARGET) {
 }
 
 /** Accent used when a slide has no lock and no division override. */
-export const DEFAULT_ACCENT = BRAND.blue;
+export const DEFAULT_ACCENT = BRAND.blue.toLowerCase();
 
 export type ContrastLevel = "pass" | "warn" | "fail";
 
