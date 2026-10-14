@@ -32,7 +32,7 @@ def main(pdf, out):
     os.makedirs(out, exist_ok=True)
     tmp = tempfile.mktemp(suffix=".svg")
     subprocess.run(["pdftocairo", "-svg", "-f", "2", "-l", "2", pdf, tmp], check=True)
-    doc = SVG.parse(tmp, reify=True)
+    doc = SVG.parse(tmp, reify=True, ppi=72.0)
     shapes = [e for e in doc.elements() if isinstance(e, Shape)]
     for floor, (x, y, w, h) in FLOORS.items():
         parts = []
