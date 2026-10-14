@@ -10,7 +10,7 @@
  *    format feeders drift from this file.
  */
 
-export const BRAND = {
+const BRAND_HEX = {
   /** Blue 800 — dark ground, body ink. */
   ink: "#03002C",
   /** Blue 500 — principal action / accent. */
@@ -32,6 +32,9 @@ export const BRAND = {
   lightGray: "#F2F2F2",
   blueWhite: "#E0E8F5",
 } as const;
+
+/** Values typed as plain strings so they can seed editable colour state. */
+export const BRAND: { readonly [K in keyof typeof BRAND_HEX]: string } = BRAND_HEX;
 
 export type BrandColor = keyof typeof BRAND;
 
