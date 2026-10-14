@@ -18,9 +18,9 @@
 - [ ] P5. Live brand checks panel (contrast, safe area, banned words, overflow, off-palette)
 - [ ] M3. Accent-on-dark-only usage rule enforced by the linter
 - [ ] M5. Provenance fields (source file/page, verified by/at) + "unverified" badge on venue rooms and print pieces
-- [ ] L2. division_imagery null columns backfill
+- [x] L2. Abstract backgrounds added for divisions with none (Legal, Digital, Trial Interactive, Games, Division, Sub-company) — awaiting approval
 - [ ] H2b. Background generation (queue + worker + stuck-job cron)
 - [ ] C1. Cited two-pass generation with server-side figure validator
 - [ ] C2. One token file → generated outputs (scoped by the retired-division-colours rule)
 - [ ] H4 / Quarter items (.potx masters, Office add-in, Canva autofill, C2PA, role-split nav) — larger projects
-- [ ] H5. GitHub sync + protected main — owner action in Lovable settings
+- [x] H5. GitHub sync — owner connected
