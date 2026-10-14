@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { scorePrintPreflight } from "./print-preflight";
+import { scorePrintPreflight } from "./press-preflight";
 
 const base = { format: "press" as const, trimWidthIn: 8.5, trimHeightIn: 11, bleedIn: 0.125, images: [], missingFonts: [] };
 

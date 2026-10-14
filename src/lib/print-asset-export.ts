@@ -25,7 +25,7 @@ import {
   scorePrintPreflight,
   PrintPreflightError,
   type PrintPreflightIssue,
-} from "./print-preflight";
+} from "./press-preflight";
 import { checkExportAspect, logAspectReport, type AspectCheckReport } from "./export-aspect-check";
 import {
   captureVectorText,
