@@ -16,7 +16,7 @@
 - [x] P7. Print preflight: press PDFs blocked on low-res images (<150 ppi), missing bleed, unloaded fonts; warns thin strokes + RGB (src/lib/press-preflight.ts)
 - [x] P6. "Show alternatives" in the deck Swap panel: 3 section layouts with content flowed in + Shuffle
 - [x] P5. Live "Checks" tab in the deck inspector: banned words, unsourced figures + this slide's QA (contrast, capacity)
-- [ ] M3. Accent-on-dark-only usage rule enforced by the linter
+- [x] M3. Accent-on-dark-only: Aqua/Lavender/Yellow/Green/Peach on a light slide warn "dark backgrounds only" (qa.ts)
 - [ ] M5. Provenance fields (source file/page, verified by/at) + "unverified" badge on venue rooms and print pieces
 - [x] L2. Abstract backgrounds added for divisions with none (Legal, Digital, Trial Interactive, Games, Division, Sub-company) — awaiting approval
 - [ ] H2b. Background generation (queue + worker + stuck-job cron)
