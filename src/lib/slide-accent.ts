@@ -7,6 +7,7 @@
 
 import type { BrandMode } from "@/lib/taxonomy";
 import { isTransPerfectBrandScope } from "@/lib/brand-profiles";
+import { BRAND } from "@/lib/brand-colors";
 
 export const ACCENT_HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
@@ -92,8 +93,8 @@ export function hexContrast(a: string, b: string): number {
 }
 
 /** Slide backdrop a mode resolves to, for contrast measurement. */
-export const SLIDE_BG_DARK = "#03002C";
-export const SLIDE_BG_LIGHT = "#FFFFFF";
+export const SLIDE_BG_DARK = BRAND.ink;
+export const SLIDE_BG_LIGHT = BRAND.white;
 
 export function slideBackgroundForMode(mode: "light" | "dark" | undefined): string {
   return mode === "dark" ? SLIDE_BG_DARK : SLIDE_BG_LIGHT;

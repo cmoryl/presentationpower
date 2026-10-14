@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // ---------------------------------------------------------------------------
 // LEGAL CREATIVE REFRESH — "We're here for the thorny work."
 //
@@ -189,7 +190,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
       "Copy held in the left third with a wide margin, art running out to the right edge. Eyebrow top left, CTA and lockup on one baseline.",
     type: "Heritage serif headline, sentence case. Small caps eyebrow. Generous leading.",
 
-    palette: { ground: "#F4EFE6", ink: "#03002C", accent: "#003FC7", second: "#C2A3FF" },
+    palette: { ground: "#F4EFE6", ink: BRAND.ink, accent: BRAND.blue, second: BRAND.lavender },
     lockup: "color",
     headlineFont: "serif",
     headlineCase: "sentence",
@@ -198,7 +199,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
       focus: "72% 55%",
       focusSquare: "68% 62%",
       scrim: 0.72,
-      ink: "#03002C",
+      ink: BRAND.ink,
     },
     copyBacking: "curtain",
   },
@@ -218,7 +219,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
       "Poster build: the headline fills the top two thirds edge to edge, a hairline rule cuts the frame, and the support line, CTA and lockup sit in one tight footer row.",
     type: "Tight sans, all caps headline. Mono eyebrow and footer for the document reference.",
 
-    palette: { ground: "#03002C", ink: "#FFFFFF", accent: "#003FC7", second: "#A1FBF9" },
+    palette: { ground: BRAND.ink, ink: BRAND.white, accent: BRAND.blue, second: BRAND.aqua },
     lockup: "white",
     headlineFont: "sans",
     headlineCase: "caps",
@@ -227,7 +228,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
       focus: "58% 55%",
       focusSquare: "62% 58%",
       scrim: 0.62,
-      ink: "#FFFFFF",
+      ink: BRAND.white,
     },
     copyBacking: "curtain",
   },
@@ -247,7 +248,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
       "Art runs full bleed across the top, then a solid ground band holds every word along the bottom — the whole message reads in one horizontal line of sight.",
     type: "Condensed sans, sentence case, one size only. Copy sits under the resolved end of the line.",
 
-    palette: { ground: "#E0E8F5", ink: "#03002C", accent: "#003FC7", second: "#FFEB66" },
+    palette: { ground: BRAND.blueWhite, ink: BRAND.ink, accent: BRAND.blue, second: BRAND.yellow },
     lockup: "color",
     headlineFont: "sans",
     headlineCase: "sentence",
@@ -256,7 +257,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
       focus: "50% 92%",
       focusSquare: "50% 96%",
       scrim: 0.3,
-      ink: "#03002C",
+      ink: BRAND.ink,
     },
     copyBacking: "panel",
   },
@@ -276,7 +277,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
       "Everything centred on the optical axis, symmetrical margins, CTA centred under the support line. The most poster-like, most shareable build in the set.",
     type: "Sans, mixed weights, heavy overlap. Outline strokes for the buried repeats.",
 
-    palette: { ground: "#FFFFFF", ink: "#03002C", accent: "#003FC7", second: "#EC388A" },
+    palette: { ground: BRAND.white, ink: BRAND.ink, accent: BRAND.blue, second: BRAND.pink },
     lockup: "color",
     headlineFont: "sans",
     headlineCase: "sentence",
@@ -285,7 +286,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
       focus: "78% 55%",
       focusSquare: "70% 55%",
       scrim: 0.3,
-      ink: "#03002C",
+      ink: BRAND.ink,
     },
     copyBacking: "plate",
   },
@@ -304,7 +305,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     layoutNote:
       "Hard vertical split at 46%: solid copy panel on the left, art on the right. No overlap at all between type and image.",
     type: "Sans, sentence case, one weight. Mono eyebrow. Copy set flush left in a narrow measure.",
-    palette: { ground: "#F2F2F2", ink: "#03002C", accent: "#003FC7", second: "#A6FA87" },
+    palette: { ground: BRAND.lightGray, ink: BRAND.ink, accent: BRAND.blue, second: BRAND.green },
     lockup: "color",
     headlineFont: "sans",
     headlineCase: "sentence",
@@ -313,7 +314,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
       focus: "18% 50%",
       focusSquare: "30% 70%",
       scrim: 0.2,
-      ink: "#03002C",
+      ink: BRAND.ink,
     },
     copyBacking: "panel",
   },
@@ -332,7 +333,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     layoutNote:
       "A skewed accent band crossing the frame low to high, headline riding on it, everything else pushed to the corners.",
     type: "Sans, all caps, tight tracking, set on the angle of the band.",
-    palette: { ground: "#03002C", ink: "#FFFFFF", accent: "#003FC7", second: "#FF9B70" },
+    palette: { ground: BRAND.ink, ink: BRAND.white, accent: BRAND.blue, second: BRAND.peach },
     lockup: "white",
     headlineFont: "sans",
     headlineCase: "caps",
@@ -341,7 +342,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
       focus: "50% 30%",
       focusSquare: "50% 28%",
       scrim: 0.55,
-      ink: "#FFFFFF",
+      ink: BRAND.white,
     },
     copyBacking: "curtain",
   },
@@ -360,7 +361,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     layoutNote:
       "Headline anchored at the bottom left with a lot of air above it, and a narrow fine-print column running down the right edge.",
     type: "Sans, sentence case, modest size. Small mono caption above the rule.",
-    palette: { ground: "#FFFFFF", ink: "#03002C", accent: "#003FC7", second: "#E53D2E" },
+    palette: { ground: BRAND.white, ink: BRAND.ink, accent: BRAND.blue, second: BRAND.red },
     lockup: "color",
     headlineFont: "sans",
     headlineCase: "sentence",
@@ -369,7 +370,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
       focus: "66% 40%",
       focusSquare: "72% 45%",
       scrim: 0.6,
-      ink: "#03002C",
+      ink: BRAND.ink,
     },
     copyBacking: "curtain",
   },
@@ -388,7 +389,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
     layoutNote:
       "Art full bleed with no scrim across the frame; all copy sits inside a floating solid plate in the lower left, so nothing is ever laid over detail.",
     type: "Sans, sentence case, compact. Everything inside the plate on a tight grid.",
-    palette: { ground: "#E0E8F5", ink: "#03002C", accent: "#003FC7", second: "#A1FBF9" },
+    palette: { ground: BRAND.blueWhite, ink: BRAND.ink, accent: BRAND.blue, second: BRAND.aqua },
     lockup: "color",
     headlineFont: "sans",
     headlineCase: "sentence",
@@ -397,7 +398,7 @@ export const LEGAL_REFRESH_DIRECTIONS: LegalRefreshDirection[] = [
       focus: "62% 35%",
       focusSquare: "70% 35%",
       scrim: 0.0,
-      ink: "#03002C",
+      ink: BRAND.ink,
     },
     copyBacking: "panel",
   },

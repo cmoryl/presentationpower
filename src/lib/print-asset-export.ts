@@ -28,6 +28,7 @@ import {
 } from "./press-preflight";
 import { checkExportAspect, logAspectReport, type AspectCheckReport } from "./export-aspect-check";
 import {
+import { BRAND } from "@/lib/brand-colors";
   captureVectorText,
   enableHideTextForCapture,
   overlayVectorText,
@@ -521,7 +522,7 @@ async function pngDataUrlToJpeg(
   canvas.height = img.naturalHeight;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("2D canvas unavailable for JPEG conversion.");
-  ctx.fillStyle = mode === "dark" ? "#03002C" : "#ffffff";
+  ctx.fillStyle = mode === "dark" ? BRAND.ink : BRAND.white;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0);
   return canvas.toDataURL("image/jpeg", quality);

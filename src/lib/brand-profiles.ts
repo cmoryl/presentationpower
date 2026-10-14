@@ -6,13 +6,9 @@
 
 import type { BrandLogoLockup, BrandContentScope, BrandRole, BrandMode } from "@/lib/taxonomy";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
+import { ENTERPRISE_TOKENS } from "@/lib/brand-colors";
 
-export const ENTERPRISE_BRAND_TOKENS: BrandMode["tokens"] = {
-  primary: "#03002C",
-  accent: "#003FC7",
-  surface: "#EEF1F7",
-  ink: "#03002C",
-};
+export const ENTERPRISE_BRAND_TOKENS: BrandMode["tokens"] = { ...ENTERPRISE_TOKENS };
 
 // DataForce (`bm-product`) is a product brand, not a TransPerfect division, so
 // it keeps its own green/blue accents instead of the enterprise palette.

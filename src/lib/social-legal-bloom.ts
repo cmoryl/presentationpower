@@ -19,13 +19,14 @@ import bloomIce from "@/assets/legal-bloom/bloom-ice-fall.jpg";
 import bloomRally from "@/assets/legal-bloom/bloom-rally-rut.jpg";
 import bloomCave from "@/assets/legal-bloom/bloom-cave-haul.jpg";
 import bloomDeep from "@/assets/legal-bloom/bloom-deep-line.jpg";
+import { BRAND } from "@/lib/brand-colors";
 
 /** The ground the whole set is printed on. */
 export const LEGAL_BLOOM_PALETTE = {
   ground: "#FBFBFD",
-  ink: "#03002C",
-  quiet: "#03002C",
-  blue: "#003FC7",
+  ink: BRAND.ink,
+  quiet: BRAND.ink,
+  blue: BRAND.blue,
 } as const;
 
 /** A bloom colour: the soft glow behind the picture, and the type colour. */
@@ -44,7 +45,7 @@ export const LEGAL_BLOOM_COLOURS: Record<string, BloomColour> = {
   aqua: { id: "aqua", label: "Aqua", glow: "#2CC4E8", type: "#0C93B8" },
   green: { id: "green", label: "Green", glow: "#4FD483", type: "#0E9455" },
   pink: { id: "pink", label: "Pink", glow: "#EC388A", type: "#C81E6E" },
-  blue: { id: "blue", label: "Brand blue", glow: "#3C6BFF", type: "#003FC7" },
+  blue: { id: "blue", label: "Brand blue", glow: "#3C6BFF", type: BRAND.blue },
 };
 
 /**

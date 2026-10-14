@@ -8,11 +8,12 @@
  * the active division re-colours every module page identically.
  */
 import type { CSSProperties } from "react";
+import { BRAND } from "@/lib/brand-colors";
 
 export type AccentMode = "light" | "dark" | string | undefined;
 
 /** Fallback accent when no division accent is resolved (TransPerfect Blue 500). */
-export const FALLBACK_ACCENT = "#003FC7";
+export const FALLBACK_ACCENT = BRAND.blue;
 
 /** hex (#rgb / #rrggbb) -> rgba() string. */
 export function hexA(hex: string, alpha: number): string {
