@@ -18,6 +18,7 @@
 //  4. Spill — the display throws its own light into the room around it, which is
 //     the cue that stops a screen looking like a sticker.
 
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { NEXT_EVENT } from "@/lib/next-event";
@@ -83,7 +84,7 @@ function Lockup({ aspect, height }: { aspect: number; height: string }) {
 function ScreenFrame({ screen }: { screen: LondonSceneScreen }) {
   const stops = screenStops(screen);
   const ground = `linear-gradient(118deg, ${stops.join(", ")})`;
-  const ink = "#03002C";
+  const ink = BRAND.ink;
 
   return (
     <div
@@ -114,7 +115,7 @@ function ScreenFrame({ screen }: { screen: LondonSceneScreen }) {
           </div>
           <div
             style={{
-              color: "#A1FBF9",
+              color: BRAND.aqua,
               fontSize: "5.4cqh",
               lineHeight: 1.3,
               letterSpacing: "0.16em",
@@ -132,7 +133,7 @@ function ScreenFrame({ screen }: { screen: LondonSceneScreen }) {
           <div className="flex items-baseline gap-[3cqw]">
             <span
               style={{
-                background: "#A1FBF9",
+                background: BRAND.aqua,
                 color: ink,
                 fontSize: "6cqh",
                 letterSpacing: "0.14em",
@@ -180,7 +181,7 @@ function ScreenFrame({ screen }: { screen: LondonSceneScreen }) {
           <Lockup aspect={3.2} height="26cqh" />
           <div
             style={{
-              color: "#A1FBF9",
+              color: BRAND.aqua,
               fontSize: "6cqh",
               letterSpacing: "0.2em",
               textTransform: "uppercase",

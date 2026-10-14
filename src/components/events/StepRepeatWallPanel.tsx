@@ -10,6 +10,7 @@
 // blocks with one control per row and the readout under the slider — long dual-unit
 // readouts used to be clipped off the edge of the rail.
 
+import { BRAND } from "@/lib/brand-colors";
 import { useMemo } from "react";
 import { Grid3X3, QrCode, RotateCcw, Ruler, AlertTriangle, CheckCircle2 } from "lucide-react";
 
@@ -525,7 +526,7 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
             className="mt-2 h-7 text-[11px]"
             onClick={() =>
               set({
-                qrInkHex: "#03002C",
+                qrInkHex: BRAND.ink,
                 qrPlateHex: "#FFFFFF",
                 qrPlateShape: "rounded",
                 qrModuleShape: "square",

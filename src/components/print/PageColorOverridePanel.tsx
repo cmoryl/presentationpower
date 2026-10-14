@@ -7,23 +7,24 @@
  * context as `accentOverride` / `primaryOverride`.
  */
 
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useState } from "react";
 
 const BRAND_SWATCHES: { label: string; hex: string }[] = [
-  { label: "Blue 500", hex: "#003FC7" },
-  { label: "Blue 800", hex: "#03002C" },
-  { label: "Aqua", hex: "#A1FBF9" },
-  { label: "Lavender", hex: "#C2A3FF" },
-  { label: "Yellow", hex: "#FFEB66" },
-  { label: "Green", hex: "#A6FA87" },
-  { label: "Peach", hex: "#FF9B70" },
-  { label: "Pink", hex: "#EC388A" },
-  { label: "Red", hex: "#E53D2E" },
+  { label: "Blue 500", hex: BRAND.blue },
+  { label: "Blue 800", hex: BRAND.ink },
+  { label: "Aqua", hex: BRAND.aqua },
+  { label: "Lavender", hex: BRAND.lavender },
+  { label: "Yellow", hex: BRAND.yellow },
+  { label: "Green", hex: BRAND.green },
+  { label: "Peach", hex: BRAND.peach },
+  { label: "Pink", hex: BRAND.pink },
+  { label: "Red", hex: BRAND.red },
 ];
 
 const HEX6 = /^#[0-9a-fA-F]{6}$/;
 
-/** Accepts "003FC7" or "#003fc7"; returns a normalized #rrggbb or null. */
+/** Accepts "003FC7" or BRAND.blue; returns a normalized #rrggbb or null. */
 export function normalizeHex(raw: string): string | null {
   const v = raw.trim();
   const withHash = v.startsWith("#") ? v : `#${v}`;
@@ -121,7 +122,7 @@ function ColorRow({
             if (e.key === "Enter") commitDraft((e.target as HTMLInputElement).value);
             if (e.key === "Escape") setDraft(effective);
           }}
-          placeholder="#003FC7"
+          placeholder={BRAND.blue}
           className="w-24 rounded-md border border-black/10 bg-white px-2 py-1 font-mono text-[11px] uppercase text-black/80 outline-none focus:border-[#003FC7] dark:border-white/15 dark:bg-white/[0.06] dark:text-white/80"
         />
       </div>

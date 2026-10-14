@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { statUnitParts } from "@/lib/print-stat-unit";
 import { safeList } from "@/components/print/sections/shared";
 import { useRef, type CSSProperties } from "react";
@@ -86,7 +87,7 @@ export function SolutionProposalLayout({
 }) {
   const accent = brand.tokens.accent || brand.tokens.primary;
   const primary = brand.tokens.primary;
-  const ink = mode === "dark" ? "#F5F4FF" : "#03002C";
+  const ink = mode === "dark" ? "#F5F4FF" : BRAND.ink;
   const inkSoft = mode === "dark" ? "rgba(245,244,255,0.74)" : "rgba(85,85,85,0.94)";
   const pageBg = mode === "dark" ? "#111114" : "#FFFFFF";
   const line = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)";

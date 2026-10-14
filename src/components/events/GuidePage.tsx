@@ -3,6 +3,7 @@
 // and photograph placements — so what the operator types here is what the
 // printed page does. It is still a screen proof, not the press artwork.
 
+import { BRAND } from "@/lib/brand-colors";
 import type { GuideBlock, GuideConfig } from "@/lib/next-guide";
 import {
   guideAccent,
@@ -106,7 +107,7 @@ export function GuidePage({
         {block.disc ? (
           <div
             className="absolute right-[7%] top-[6%] flex items-center justify-center rounded-full text-center"
-            style={{ width: "26%", aspectRatio: "1 / 1", background: accent, color: "#03002C" }}
+            style={{ width: "26%", aspectRatio: "1 / 1", background: accent, color: BRAND.ink }}
           >
             <span className="px-[8%] text-[2.6cqw] font-bold uppercase leading-[1.15]">{block.disc}</span>
           </div>
@@ -326,7 +327,7 @@ export function GuidePage({
 
         {block.qrLabel && block.qrUrl ? (
           <div className="mt-[4%] w-[52%]">
-            <QrCard label={block.qrLabel} url={block.qrUrl} ink="#03002C" />
+            <QrCard label={block.qrLabel} url={block.qrUrl} ink={BRAND.ink} />
           </div>
         ) : null}
       </div>

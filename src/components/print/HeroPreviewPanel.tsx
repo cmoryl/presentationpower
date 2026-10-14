@@ -1,6 +1,7 @@
 // Compact hero preview shown in the print asset inspector. Lets the user
 // preview the current `heroMedia` or the plain page-base hero state that
 // renders when heroMedia is empty.
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useState } from "react";
 import type { PrintHeroMedia } from "@/lib/print-assets.types";
 import { heroImageStyle } from "@/lib/print-hero-transform";
@@ -25,7 +26,7 @@ export function HeroPreviewPanel({ media, brand }: Props) {
   }, [hasMedia]);
   const active = view === "media" && !hasMedia ? "base" : view;
 
-  const accent = brand?.tokens?.accent ?? "#003FC7";
+  const accent = brand?.tokens?.accent ?? BRAND.blue;
   const primary = brand?.tokens?.primary ?? accent;
   const isDark = mode === "dark";
   const pageBg = isDark ? "#111114" : "#FFFFFF";
@@ -220,7 +221,7 @@ function CenteringGuides({
   const centerY = heightPct / 2;
   const offsetY = centerY + (clampedOffset / 100) * heightPct;
   const guideColor = isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.25)";
-  const accent = "#003FC7";
+  const accent = BRAND.blue;
   const nudged = clampedOffset !== 0;
   return (
     <div className="pointer-events-none absolute inset-0" aria-hidden>

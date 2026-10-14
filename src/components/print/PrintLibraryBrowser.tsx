@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { companyOf, productOf, tagCounts } from "@/lib/print-library/item-tags";
@@ -510,7 +511,7 @@ export function PrintLibraryBrowser({
             ) : null}
             <span
               className="rounded-md px-3 py-1.5 text-xs font-semibold text-white"
-              style={{ background: "#03002C" }}
+              style={{ background: BRAND.ink }}
             >
               {items.length} showing
             </span>

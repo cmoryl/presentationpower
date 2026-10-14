@@ -12,6 +12,7 @@
 // A visualisation, never a survey photograph and never a dimensional reference:
 // the trim and bleed geometry on the panel card remains the authority.
 
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useRef, useState } from "react";
 
 // Screen content is real NEXT 2026 London event imagery from the Element
@@ -86,7 +87,7 @@ async function downloadStagePng(node: HTMLElement, filename: string) {
     includeQueryParams: true,
     pixelRatio: 2,
     cacheBust: true,
-    backgroundColor: "#E0E8F5",
+    backgroundColor: BRAND.blueWhite,
     filter: (el) =>
       !(el instanceof HTMLElement) || el.getAttribute("data-export-ignore") !== "true",
   });

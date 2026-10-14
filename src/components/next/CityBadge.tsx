@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import type { CSSProperties } from "react";
 
 import {
@@ -198,7 +199,7 @@ function BadgeGuides({ ppi }: { ppi: number }) {
         width={w - 1}
         height={h - 1}
         fill="none"
-        stroke="#EC388A"
+        stroke={BRAND.pink}
         strokeDasharray="4 3"
       />
       <rect
@@ -207,7 +208,7 @@ function BadgeGuides({ ppi }: { ppi: number }) {
         width={w - trimX * 2}
         height={h - trimY * 2}
         fill="none"
-        stroke="#FFEB66"
+        stroke={BRAND.yellow}
       />
       <rect
         x={px(SAFE_INSET_X)}
@@ -215,7 +216,7 @@ function BadgeGuides({ ppi }: { ppi: number }) {
         width={px(BADGE_SPEC.safeW)}
         height={px(BADGE_SPEC.safeH)}
         fill="none"
-        stroke="#A6FA87"
+        stroke={BRAND.green}
         strokeDasharray="6 4"
       />
       {[px(slot.fromSide), w - px(slot.fromSide + slot.w)].map((x, i) => (
@@ -227,7 +228,7 @@ function BadgeGuides({ ppi }: { ppi: number }) {
           height={px(slot.h)}
           rx={px(slot.radius)}
           fill="none"
-          stroke="#A1FBF9"
+          stroke={BRAND.aqua}
         />
       ))}
       <rect
@@ -237,7 +238,7 @@ function BadgeGuides({ ppi }: { ppi: number }) {
         height={px(klik.h)}
         rx={px(klik.radius)}
         fill="none"
-        stroke="#A1FBF9"
+        stroke={BRAND.aqua}
       />
     </svg>
   );

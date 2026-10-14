@@ -9,6 +9,7 @@
 // paper: page-width white (or ink) stock, real 0.7in side margins, hairline
 // page edge and a soft drop shadow — the same "look at the document" framing
 // the presentation library uses for slides.
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useRef, useState } from "react";
 
 import { PAGE_W } from "@/components/print/print-primitives";
@@ -25,7 +26,7 @@ import type { PrintPageSize, PrintSection } from "@/lib/print-assets.types";
 export function PrintSectionPreviewFrame({
   section,
   mode = "light",
-  accent = "#003FC7",
+  accent = BRAND.blue,
   /** Page format the section is being laid out on. Drives the margin preset
    *  and the masthead band height. */
   pageSize = "Letter",
@@ -57,7 +58,7 @@ export function PrintSectionPreviewFrame({
   const [scale, setScale] = useState(0.6);
   const [height, setHeight] = useState(0);
 
-  const paper = mode === "dark" ? "#03002C" : "#ffffff";
+  const paper = mode === "dark" ? BRAND.ink : "#ffffff";
   const pad = padX ?? pageSideMarginPx(pageSize, "standard", marginPreset);
   const padTop = sheet ? 28 : 0;
 

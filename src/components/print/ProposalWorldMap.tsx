@@ -9,6 +9,7 @@
  * vector for PDF/print output.
  */
 
+import { BRAND } from "@/lib/brand-colors";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   WORLD_MAP_LAND,
@@ -255,7 +256,7 @@ export function ProposalWorldMap({
         ))}
         {/* Authoring-only guide: the export-safe pin zone. Never captured. */}
         {editable && onChange ? (
-          <g data-export-ignore="true" fill="none" stroke="#A1FBF9" strokeDasharray="3 3">
+          <g data-export-ignore="true" fill="none" stroke={BRAND.aqua} strokeDasharray="3 3">
             <rect
               x={BASE.x + PIN_INSET}
               y={BASE.y + TOP_CLEARANCE}
@@ -367,7 +368,7 @@ export function ProposalWorldMap({
               textAlign: "center",
               fontSize: 10,
               fontWeight: 700,
-              color: "#03002C",
+              color: BRAND.ink,
             }}
           >
             {Math.round(zoom * 100)}%
@@ -414,7 +415,7 @@ export function ProposalWorldMap({
             padding: "4px 8px",
             fontSize: 10,
             fontWeight: 600,
-            color: "#03002C",
+            color: BRAND.ink,
             boxShadow: "0 1px 4px rgba(3,0,44,0.25)",
           }}
         >
@@ -463,7 +464,7 @@ function zoomBtn(disabled: boolean): React.CSSProperties {
     borderRadius: 999,
     border: "1px solid rgba(3,0,44,0.18)",
     background: disabled ? "rgba(3,0,44,0.04)" : "#FFFFFF",
-    color: "#03002C",
+    color: BRAND.ink,
     fontSize: 14,
     fontWeight: 700,
     lineHeight: 1,

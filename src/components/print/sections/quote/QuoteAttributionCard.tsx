@@ -1,4 +1,5 @@
 // Glass card with quote body left, author lockup right.
+import { BRAND } from "@/lib/brand-colors";
 import type { PrintQuoteSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
@@ -99,7 +100,7 @@ export function QuoteAttributionCard({
               height: cq(52),
               borderRadius: "50%",
               background: `color-mix(in srgb, ${accent} 30%, transparent)`,
-              color: mode === "dark" ? "#F5F4FF" : "#03002C",
+              color: mode === "dark" ? "#F5F4FF" : BRAND.ink,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

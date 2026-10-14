@@ -6,6 +6,7 @@
  * edge, this paints a red clip line at the trim, hatches the lost area and
  * shows a badge with a one-click fix.
  */
+import { BRAND } from "@/lib/brand-colors";
 import { AlertOctagon, Wand2 } from "lucide-react";
 import type { PrintOverflowState } from "@/hooks/use-print-overflow";
 
@@ -45,8 +46,8 @@ export function PrintOverflowOverlay({
         className="pointer-events-auto absolute left-1/2 -translate-x-1/2 flex max-w-[92%] items-center gap-2 rounded-full border px-3 py-1.5 shadow-lg"
         style={{
           bottom: 12,
-          background: "#E53D2E",
-          borderColor: "#E53D2E",
+          background: BRAND.red,
+          borderColor: BRAND.red,
           color: "#FFFFFF",
         }}
       >

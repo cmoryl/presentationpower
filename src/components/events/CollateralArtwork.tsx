@@ -7,6 +7,7 @@
 // Everything is vector/CSS so it stays crisp at any preview size and can be
 // re-skinned per event by swapping the logo + tokens passed in.
 
+import { BRAND } from "@/lib/brand-colors";
 import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
 import { eventLookById, type EventLook } from "@/lib/event-looks";
 import { resolveSocialStyle, type SocialStyle } from "@/lib/social-styles";
@@ -757,7 +758,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
       const track = label.toLowerCase().includes("speaker")
         ? { name: "SPEAKER", color: "#FFD166" }
         : label.toLowerCase().includes("sponsor") || label.toLowerCase().includes("staff")
-          ? { name: "SPONSOR · STAFF", color: "#A6FA87" }
+          ? { name: "SPONSOR · STAFF", color: BRAND.green }
           : { name: "ATTENDEE", color: BLUE };
       return (
         <Field light chevron={0.07}>

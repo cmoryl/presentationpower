@@ -2,6 +2,7 @@
 // modal. Renders two miniature page tiles side-by-side so the user can eyeball
 // focal / scrim / wash behavior for each row before confirming — including
 // skipped (customized) rows where they can verify nothing changes.
+import { BRAND } from "@/lib/brand-colors";
 import type { PrintHeroMedia } from "@/lib/print-assets.types";
 
 type Props = {
@@ -11,7 +12,7 @@ type Props = {
   accent?: string;
 };
 
-export function HeroDiffTile({ before, after, status, accent = "#003FC7" }: Props) {
+export function HeroDiffTile({ before, after, status, accent = BRAND.blue }: Props) {
   const rhs = status === "skip" ? before : after;
   const beforeH = Math.round(before?.heightPct ?? 46);
   const afterH = Math.round(rhs?.heightPct ?? 46);

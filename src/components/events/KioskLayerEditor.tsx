@@ -1,4 +1,5 @@
 // Layer editor for a California kiosk rebuilt from the partner's live London
+import { BRAND } from "@/lib/brand-colors";
 import { isLiftLayout, liftDoors } from "@/lib/lift-doors";
 // file: every text line and graphic piece is a layer you can retype, move,
 // resize, hide or show; the background ramp can be changed; edits save per
@@ -66,11 +67,11 @@ type Sel = { kind: "block" | "text" | "part" | "divider"; id: string } | null;
 
 /** Approved TransPerfect accent rules (brand v3.0): Blue 500, Aqua, Lavender, white, Blue 800. */
 const ACCENTS = [
-  { name: "Blue", color: "#003FC7" },
-  { name: "Aqua", color: "#A1FBF9" },
-  { name: "Lavender", color: "#C2A3FF" },
+  { name: "Blue", color: BRAND.blue },
+  { name: "Aqua", color: BRAND.aqua },
+  { name: "Lavender", color: BRAND.lavender },
   { name: "White", color: "#FFFFFF" },
-  { name: "Ink", color: "#03002C" },
+  { name: "Ink", color: BRAND.ink },
 ] as const;
 
 const btn =
@@ -1037,8 +1038,8 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                     ))}
                     {bounds ? (
                       <>
-                        <rect x={bounds.x0} y={-B - G} width={bounds.x1 - bounds.x0} height={G} fill="#003FC7" fillOpacity={0.45} />
-                        <rect y={bounds.y0} x={-B - G} height={bounds.y1 - bounds.y0} width={G} fill="#003FC7" fillOpacity={0.45} />
+                        <rect x={bounds.x0} y={-B - G} width={bounds.x1 - bounds.x0} height={G} fill={BRAND.blue} fillOpacity={0.45} />
+                        <rect y={bounds.y0} x={-B - G} height={bounds.y1 - bounds.y0} width={G} fill={BRAND.blue} fillOpacity={0.45} />
                       </>
                     ) : null}
                   </g>
@@ -1056,7 +1057,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                       <g clipPath={`url(#kc-${L.id}-${p.block.id})`}>
                         <use href={`#${symId}`} x={-L.originX} y={-(L.originY + p.clipTop)} width={vw} height={vh} />
                       </g>
-                      {on ? <rect x={0} y={0} width={L.trimW} height={p.clipBottom - p.clipTop} fill="none" stroke="#003FC7" strokeWidth={2 * rs / p.scale} /> : null}
+                      {on ? <rect x={0} y={0} width={L.trimW} height={p.clipBottom - p.clipTop} fill="none" stroke={BRAND.blue} strokeWidth={2 * rs / p.scale} /> : null}
                     </g>
                   );
                 })}
@@ -1074,7 +1075,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                             <use href={`#${symId}`} x={-L.originX} y={-L.originY} width={vw} height={vh} />
                           </g>
                         )}
-                        <rect x={q.src.x0} y={q.src.y0} width={q.src.x1 - q.src.x0} height={q.src.y1 - q.src.y0} fill="transparent" stroke={on ? "#003FC7" : "none"} strokeWidth={2 * rs / q.scale} />
+                        <rect x={q.src.x0} y={q.src.y0} width={q.src.x1 - q.src.x0} height={q.src.y1 - q.src.y0} fill="transparent" stroke={on ? BRAND.blue : "none"} strokeWidth={2 * rs / q.scale} />
                       </g>
                     </g>
                   );
@@ -1093,7 +1094,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                     <g key={m.id} className="cursor-move" opacity={(m.opacity ?? 1) < 1 ? m.opacity : undefined}
                       onPointerDown={(e) => { e.stopPropagation(); setMarkSel(m.id); const p = toSvg(e); markDrag.current = { id: m.id, x: p.x, y: p.y, x0: m.x, y0: m.y }; setHistory((h) => [...h.slice(-49), edits]); setFuture([]); svgRef.current?.setPointerCapture?.(e.pointerId); }}>
                       <g transform={markTransform(m, a)}>
-                        <rect x={a.ox} y={a.oy} width={a.w} height={a.h} fill="transparent" stroke={markSel === m.id ? "#003FC7" : "none"} strokeWidth={(2 * rs * a.w) / m.w} />
+                        <rect x={a.ox} y={a.oy} width={a.w} height={a.h} fill="transparent" stroke={markSel === m.id ? BRAND.blue : "none"} strokeWidth={(2 * rs * a.w) / m.w} />
                         {a.paths.map((p, i) => <path key={i} d={p.d} fill={m.kind === "chevrons" && m.color ? m.color : p.fill} fillRule={p.evenOdd ? "evenodd" : undefined} />)}
                       </g>
                     </g>
@@ -1127,12 +1128,12 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                 {/* Selection frame with corner handles (visual) and live size tag. */}
                 {bounds && sel?.kind !== "block" ? (
                   <g data-export-ignore="true" pointerEvents="none">
-                    <rect x={bounds.x0} y={bounds.y0} width={bounds.x1 - bounds.x0} height={bounds.y1 - bounds.y0} fill="none" stroke="#003FC7" strokeWidth={1.5 * rs} />
+                    <rect x={bounds.x0} y={bounds.y0} width={bounds.x1 - bounds.x0} height={bounds.y1 - bounds.y0} fill="none" stroke={BRAND.blue} strokeWidth={1.5 * rs} />
                     {[[bounds.x0, bounds.y0], [bounds.x1, bounds.y0], [bounds.x0, bounds.y1], [bounds.x1, bounds.y1]].map(([x, y], i) => (
-                      <rect key={i} x={x! - 3.5 * rs} y={y! - 3.5 * rs} width={7 * rs} height={7 * rs} fill="#FFFFFF" stroke="#003FC7" strokeWidth={1.5 * rs} />
+                      <rect key={i} x={x! - 3.5 * rs} y={y! - 3.5 * rs} width={7 * rs} height={7 * rs} fill="#FFFFFF" stroke={BRAND.blue} strokeWidth={1.5 * rs} />
                     ))}
                     <g transform={`translate(${(bounds.x0 + bounds.x1) / 2} ${bounds.y1 + 8 * rs})`}>
-                      <rect x={-46 * rs} y={0} width={92 * rs} height={17 * rs} rx={2 * rs} fill="#003FC7" />
+                      <rect x={-46 * rs} y={0} width={92 * rs} height={17 * rs} rx={2 * rs} fill={BRAND.blue} />
                       <text x={0} y={12 * rs} textAnchor="middle" fontSize={10 * rs} fill="#FFFFFF" fontFamily="Geist Mono, monospace">{fmtU(bounds.x1 - bounds.x0)} × {fmtU(bounds.y1 - bounds.y0)}</text>
                     </g>
                   </g>
@@ -1144,7 +1145,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                   {guides.tv && kioskHasTv(L.id) ? (
                     <>
                       <rect x={TV.x} y={TV.y} width={TV.w} height={TV.h} fill="#03002C" fillOpacity={0.55} stroke="#FFEB66" strokeDasharray={`${8 * rs} ${5 * rs}`} strokeWidth={1.5 * rs} />
-                      <text x={TV.x + TV.w / 2} y={TV.y + TV.h / 2} textAnchor="middle" fontSize={12 * rs} fill="#FFEB66" fontFamily="Geist Mono, monospace">TV KEEP-CLEAR · NOT PRINTED</text>
+                      <text x={TV.x + TV.w / 2} y={TV.y + TV.h / 2} textAnchor="middle" fontSize={12 * rs} fill={BRAND.yellow} fontFamily="Geist Mono, monospace">TV KEEP-CLEAR · NOT PRINTED</text>
                     </>
                   ) : null}
                   {guides.safe ? <rect x={KIOSK_MARGIN} y={KIOSK_MARGIN} width={KIOSK_W - 2 * KIOSK_MARGIN} height={KIOSK_H - 2 * KIOSK_MARGIN} fill="none" stroke="#A1FBF9" strokeOpacity={0.8} strokeDasharray={`${4 * rs} ${4 * rs}`} strokeWidth={rs} /> : null}
@@ -1152,10 +1153,10 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                   {isLiftLayout(L.id) ? liftDoors(KIOSK_W, KIOSK_H).map((d) => (
                     <g key={d.side}>
                       <rect x={d.x0} y={0} width={d.x1 - d.x0} height={KIOSK_H} fill="none" stroke={d.side === "left" ? "#A6FA87" : "#FFEB66"} strokeWidth={1.5 * rs} strokeDasharray={`${8 * rs} ${5 * rs}`} />
-                      <text x={(d.x0 + d.x1) / 2} y={KIOSK_H - (d.side === "left" ? 24 : 36) * rs} textAnchor="middle" fontSize={9 * rs} fill={d.side === "left" ? "#A6FA87" : "#FFEB66"} fontFamily="Geist Mono, monospace">{d.side === "left" ? "L" : "R"} {+((d.x1 - d.x0) / 72).toFixed(1)}″</text>
+                      <text x={(d.x0 + d.x1) / 2} y={KIOSK_H - (d.side === "left" ? 24 : 36) * rs} textAnchor="middle" fontSize={9 * rs} fill={d.side === "left" ? BRAND.green : BRAND.yellow} fontFamily="Geist Mono, monospace">{d.side === "left" ? "L" : "R"} {+((d.x1 - d.x0) / 72).toFixed(1)}″</text>
                     </g>
                   )) : null}
-                  {guides.bleed ? <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="none" stroke="#E53D2E" strokeWidth={rs} /> : null}
+                  {guides.bleed ? <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="none" stroke={BRAND.red} strokeWidth={rs} /> : null}
                   <rect x={0} y={0} width={KIOSK_W} height={KIOSK_H} fill="none" stroke="#EC008C" strokeWidth={1.5 * rs} />
                 </g>
               </svg>
