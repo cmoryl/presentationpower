@@ -5,6 +5,7 @@
 // through the real layout at a tiny width — the layouts are container-query
 // based, so they scale down faithfully with no separate preview code path.
 
+import { BRAND } from "@/lib/brand-colors";
 import { MultiProposalLayout, multiPageLabel } from "@/components/print/MultiProposalLayout";
 import type { SolutionProposalContent } from "@/lib/print-assets.types";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -48,7 +49,7 @@ export function MultiPageThumbRail({
                 <div
                   className="overflow-hidden rounded-lg border bg-white transition"
                   style={{
-                    borderColor: on ? "#003FC7" : "rgba(3,0,44,0.12)",
+                    borderColor: on ? BRAND.blue : "rgba(3,0,44,0.12)",
                     boxShadow: on ? "0 0 0 2px rgba(0,63,199,0.28)" : "0 1px 4px rgba(3,0,44,0.08)",
                   }}
                 >
@@ -63,7 +64,7 @@ export function MultiPageThumbRail({
                 </div>
                 <span
                   className="mt-1 block truncate text-[10px] font-medium"
-                  style={{ color: on ? "#003FC7" : "rgba(3,0,44,0.6)" }}
+                  style={{ color: on ? BRAND.blue : "rgba(3,0,44,0.6)" }}
                 >
                   {i + 1}. {multiPageLabel(page, i)}
                 </span>

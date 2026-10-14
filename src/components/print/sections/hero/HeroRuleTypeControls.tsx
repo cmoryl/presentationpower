@@ -2,6 +2,7 @@
 // These map 1:1 onto `section.rule` and `section.titleType`, which the hero
 // renderers read — so what the panel shows is what prints and exports.
 
+import { BRAND } from "@/lib/brand-colors";
 import type { PrintHeroRule, PrintHeroSection, PrintHeroTitleType } from "@/lib/print-assets.types";
 
 const box =
@@ -141,7 +142,7 @@ export function MastheadRuleTypeControls({
             <input
               type="color"
               aria-label="Rule colour"
-              value={rule.color ?? "#003FC7"}
+              value={rule.color ?? BRAND.blue}
               onChange={(e) => patchRule({ color: e.target.value })}
               className="h-6 w-8 shrink-0 cursor-pointer rounded border border-black/10 bg-transparent dark:border-white/10"
             />

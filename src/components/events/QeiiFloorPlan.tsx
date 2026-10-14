@@ -5,6 +5,7 @@
 // qeiiPlanLayout, so the page, the SVG download and the tests agree exactly. The
 // ground is a solid brand token; no artwork is used as a background.
 
+import { BRAND } from "@/lib/brand-colors";
 import { Fragment, useMemo, useRef, type CSSProperties } from "react";
 
 import {
@@ -224,7 +225,7 @@ export function QeiiFloorPlan({
             // A light room colour swallows the reverse lockup, so that one falls back
             // to the colour file. An explicit all-white or colour choice is kept.
             const variant =
-              ink === "#03002C" && ["reverse", "white"].includes(markVariant)
+              ink === BRAND.ink && ["reverse", "white"].includes(markVariant)
                 ? "colour"
                 : markVariant;
             const pad = block.size * 0.32;

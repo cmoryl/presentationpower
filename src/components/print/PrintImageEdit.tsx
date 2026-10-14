@@ -13,6 +13,7 @@
  * non-interactive image — exports never see authoring chrome.
  */
 
+import { BRAND } from "@/lib/brand-colors";
 import { createContext, useContext, useId, useRef, useState } from "react";
 
 export type PrintImageOverrides = Record<string, string>;
@@ -142,7 +143,7 @@ export function EditableImage({
           // Slots stay visible while editing so every replaceable logo/photo
           // reads as a drop target without hunting for it on hover.
           border: over ? "2px dashed #003FC7" : "1px dashed rgba(0,63,199,0.38)",
-          color: "#03002C",
+          color: BRAND.ink,
         }}
       >
         <span
@@ -170,7 +171,7 @@ export function EditableImage({
           className="absolute right-0 top-0 rounded-full opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100"
           style={{
             background: "rgba(255,255,255,0.94)",
-            color: "#03002C",
+            color: BRAND.ink,
             fontSize: 9,
             lineHeight: 1,
             padding: "3px 6px",

@@ -3,6 +3,7 @@
 // sub-line copy, real printable QR codes, saved versions and high-resolution
 // print export.
 
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -695,7 +696,7 @@ export function PillarStudio({
                         top: 0,
                         bottom: 0,
                         width: 1,
-                        background: "#EC388A",
+                        background: BRAND.pink,
                         pointerEvents: "none",
                       }}
                     />
@@ -708,7 +709,7 @@ export function PillarStudio({
                         left: 0,
                         right: 0,
                         height: 1,
-                        background: "#EC388A",
+                        background: BRAND.pink,
                         pointerEvents: "none",
                       }}
                     />
@@ -1131,7 +1132,7 @@ export function PillarStudio({
                         }`}
                       >
                         <svg viewBox="0 0 100 100" className="mx-auto h-7 w-7" aria-hidden>
-                          <path d={pillarArrowPath(a.id)} fill="#03002C" />
+                          <path d={pillarArrowPath(a.id)} fill={BRAND.ink} />
                         </svg>
                         <div className="mt-1 text-[10px] leading-tight text-black/65">
                           {a.label}

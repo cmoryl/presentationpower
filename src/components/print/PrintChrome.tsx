@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { BRAND_MODES } from "@/lib/taxonomy";
@@ -197,7 +198,7 @@ export function PrintFooterLockup({
   const isEnterprise = brand.id === "bm-enterprise";
   // Enterprise = the plain TransPerfect wordmark in pure black on white / white
   // on dark — no navy tint, no division mark, no color logo variant.
-  const ink = mode === "dark" ? "#FFFFFF" : "#03002C";
+  const ink = mode === "dark" ? "#FFFFFF" : BRAND.ink;
   const inkSoft = mode === "dark" ? "#FFFFFF" : "rgba(85,85,85,0.9)";
   const dividerCol = mode === "dark" ? "rgba(255,255,255,0.24)" : "rgba(3,0,44,0.14)";
   const accentInk = mode === "dark" ? "#FFFFFF" : primary;

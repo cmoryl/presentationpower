@@ -6,6 +6,7 @@
 // remain faithful to their own port; only tokens, glass, chips, icons, and the
 // page/aurora geometry live here.
 
+import { BRAND } from "@/lib/brand-colors";
 import type { CSSProperties } from "react";
 import { printIconInk } from "@/lib/print-icon-contrast";
 import { printCardSurface, type PrintCardSurfaceOptions } from "@/lib/print-card-surface";
@@ -77,7 +78,7 @@ export function PrintEyebrow({
           fontSize: cqFn(8.5),
           fontWeight: 700,
           letterSpacing: "0.16em",
-          color: dark ? "#F5F4FF" : "#03002C",
+          color: dark ? "#F5F4FF" : BRAND.ink,
           lineHeight: 1,
         }}
       >

@@ -5,6 +5,7 @@
 // band, split photo, typographic stack, accent band, stat lockup, and the
 // case-study client lockup.
 
+import { BRAND } from "@/lib/brand-colors";
 import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import { heroImageStyle } from "@/lib/print-hero-transform";
 import { printCardSurface } from "@/lib/print-card-surface";
@@ -108,7 +109,7 @@ function MetaRail({ section, mode, accent, onDark }: Props & { onDark?: boolean 
 function bg(_section: PrintHeroSection) {
   return {
     overflow: "hidden",
-    backgroundColor: "#03002C",
+    backgroundColor: BRAND.ink,
   } as const;
 }
 
@@ -630,7 +631,7 @@ export function HeroClientLockup({ section, mode, accent }: Props) {
  */
 export function HeroPhotoFade({ section, mode, accent }: Props) {
   const ink = sectionInk(mode);
-  const page = mode === "dark" ? "#03002C" : "#FFFFFF";
+  const page = mode === "dark" ? BRAND.ink : "#FFFFFF";
   const bandH = useBandHeight(section.heightPct, 1);
   return (
     <section aria-label="Hero" style={{ ...pageBleed(), marginBottom: cq(18) }}>

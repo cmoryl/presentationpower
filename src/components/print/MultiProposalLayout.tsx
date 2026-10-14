@@ -15,6 +15,7 @@
 // stack them and exportPrintAssetAsPdf() can emit a real multi-page PDF. All
 // visible strings come from `content.pages[i]`, which keeps them live-editable.
 
+import { BRAND } from "@/lib/brand-colors";
 import { statUnitParts } from "@/lib/print-stat-unit";
 import { safeList } from "@/components/print/sections/shared";
 import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
@@ -79,8 +80,8 @@ const u = (inches: number) => `${((inches / PAGE_W_IN) * 100).toFixed(4)}cqw`;
 /** points → container unit. */
 const fs = (points: number) => u(points / 72);
 
-const NAVY = "#03002C";
-const BLUE = "#003FC7";
+const NAVY = BRAND.ink;
+const BLUE = BRAND.blue;
 const LAV = "#A9A3FD";
 const AQUA_FIELD = "#A1F8F9";
 
@@ -920,7 +921,7 @@ function HeadlineFitBadge({
   onSet: (pt: number) => void;
   onReset: () => void;
 }) {
-  const tone = fit.clipped ? "#FF9B70" : fit.shrunk ? "#FFEB66" : "#A1FBF9";
+  const tone = fit.clipped ? BRAND.peach : fit.shrunk ? BRAND.yellow : BRAND.aqua;
   const label = fit.clipped
     ? "Headline is too long for the bubble — it will clip on export"
     : fit.shrunk
@@ -996,7 +997,7 @@ function FitBtn({
         fontFamily: FONT,
         fontSize: fs(8.5),
         fontWeight: 600,
-        color: "#03002C",
+        color: BRAND.ink,
         background: disabled ? "rgba(255,255,255,0.35)" : "#FFFFFF",
         opacity: disabled ? 0.5 : 1,
         border: "none",

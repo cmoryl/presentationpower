@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import { hiddenSectionSet } from "@/lib/print-hidden-sections";
 import { useRef, type CSSProperties } from "react";
@@ -74,7 +75,7 @@ export function CaseStudyLayout({
 }) {
   const accent = brand.tokens.accent || brand.tokens.primary;
   const primary = brand.tokens.primary;
-  const ink = mode === "dark" ? "#F5F4FF" : "#03002C";
+  const ink = mode === "dark" ? "#F5F4FF" : BRAND.ink;
   const inkSoft = mode === "dark" ? "rgba(245,244,255,0.72)" : "rgba(68,68,68,0.95)";
   const inkFaint = mode === "dark" ? "rgba(245,244,255,0.55)" : "rgba(102,102,102,0.92)";
   const dividerCol = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.10)";

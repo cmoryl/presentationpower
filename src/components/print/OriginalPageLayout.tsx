@@ -5,6 +5,7 @@
 // real, editable text. In an editor (PrintLogoListContext active) an
 // "Arrange" mode lets every piece and text box be moved, resized, recoloured,
 // restacked or hidden; outside arrange mode text is edited in place as before.
+import { BRAND } from "@/lib/brand-colors";
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent } from "react";
 
 import { usePrintLogoList } from "@/components/print/PrintLogoList";
@@ -74,11 +75,11 @@ function PieceView({ k }: { k: OriginalPiece }) {
 }
 
 const APPROVED_INKS: { label: string; hex: string }[] = [
-  { label: "Ink", hex: "#03002C" },
-  { label: "Blue", hex: "#003FC7" },
+  { label: "Ink", hex: BRAND.ink },
+  { label: "Blue", hex: BRAND.blue },
   { label: "White", hex: "#FFFFFF" },
-  { label: "Aqua", hex: "#A1FBF9" },
-  { label: "Lavender", hex: "#C2A3FF" },
+  { label: "Aqua", hex: BRAND.aqua },
+  { label: "Lavender", hex: BRAND.lavender },
   { label: "Dark gray", hex: "#666666" },
 ];
 
@@ -200,7 +201,7 @@ function TextView({ t, editable, onCommit, onFocusText }: {
 
 /** Lucide glyph as a self-contained SVG data URL (recolourable via tint). */
 function iconSrc(name: string): string | null {
-  const svg = canvaSvgString(name, { color: "#03002C", strokeWidth: 1.75 });
+  const svg = canvaSvgString(name, { color: BRAND.ink, strokeWidth: 1.75 });
   return svg ? `data:image/svg+xml;utf8,${encodeURIComponent(svg)}` : null;
 }
 
@@ -429,7 +430,7 @@ export function OriginalPageLayout({ layout: rawLayout, pageIndex }: { layout: O
                       <input
                         type="color"
                         aria-label="Recolour piece"
-                        value={(selected as OriginalPiece).tint ?? "#003FC7"}
+                        value={(selected as OriginalPiece).tint ?? BRAND.blue}
                         onChange={(e) => patchItem(sel.page, "piece", sel.id, { tint: e.target.value })}
                       />
                       {(selected as OriginalPiece).tint ? (
@@ -458,7 +459,7 @@ export function OriginalPageLayout({ layout: rawLayout, pageIndex }: { layout: O
                     <IconSwap
                       onPick={(name) => {
                         const src = iconSrc(name);
-                        if (src) patchItem(sel.page, "piece", sel.id, { src, icon: name, tint: (selected as OriginalPiece).tint ?? "#003FC7" });
+                        if (src) patchItem(sel.page, "piece", sel.id, { src, icon: name, tint: (selected as OriginalPiece).tint ?? BRAND.blue });
                       }}
                     />
                   ) : null}
@@ -574,7 +575,7 @@ export function OriginalPageLayout({ layout: rawLayout, pageIndex }: { layout: O
                                 bottom: -7,
                                 width: 14,
                                 height: 14,
-                                background: "#003FC7",
+                                background: BRAND.blue,
                                 border: "2px solid #fff",
                                 borderRadius: 2,
                                 cursor: "nwse-resize",

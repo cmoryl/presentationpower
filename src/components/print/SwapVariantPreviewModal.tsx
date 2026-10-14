@@ -5,6 +5,7 @@
  * applying. Read-only; delegates the mutation back to the caller via onConfirm.
  */
 
+import { BRAND } from "@/lib/brand-colors";
 import { X, ArrowRight, Wand2 } from "lucide-react";
 import type { PrintSection, PrintStatsSection, PrintStatsVariant } from "@/lib/print-assets.types";
 import { PRINT_STATS_VARIANTS } from "./sections/PrintSectionRenderer";
@@ -39,7 +40,7 @@ export function SwapVariantPreviewModal({
   frees,
   section,
   mode,
-  accent = "#003FC7",
+  accent = BRAND.blue,
   onCancel,
   onConfirm,
 }: Props) {

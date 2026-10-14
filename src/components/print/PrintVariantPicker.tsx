@@ -8,6 +8,7 @@
  * chips behave the same way wherever a surface is edited.
  */
 
+import { BRAND } from "@/lib/brand-colors";
 import type {
   PrintHeroModuleVariant,
   PrintHeroRule,
@@ -119,7 +120,7 @@ export function PrintVariantPicker({
   rule,
   onChange,
   surfaceLabel = "This surface",
-  accent = "#003FC7",
+  accent = BRAND.blue,
   copyFocus,
   onCopyFocus,
   copyFocusAmount,

@@ -7,6 +7,7 @@
 // `usedModuleUnits` + `kind` unlocks the ceiling computation via
 // maxHeroHeightPct(); when omitted, it falls back to the hard [MIN, MAX]
 // clamp only.
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PrintHeroMedia } from "@/lib/print-assets.types";
 import {
@@ -101,11 +102,11 @@ export function HeroResizeHandle({
   };
 
   const rimColor = capped
-    ? "#E53D2E"
+    ? BRAND.red
     : nearCap
       ? "#FFB020"
       : dragging || hover
-        ? "#003FC7"
+        ? BRAND.blue
         : "rgba(0,63,199,0.35)";
 
   return (
@@ -187,7 +188,7 @@ export function HeroResizeHandle({
           style={{
             fontSize: 11,
             fontWeight: 600,
-            color: capped ? "#E53D2E" : nearCap ? "#8A5B00" : "#03002C",
+            color: capped ? BRAND.red : nearCap ? "#8A5B00" : BRAND.ink,
             letterSpacing: "0.04em",
           }}
         >
@@ -201,12 +202,12 @@ export function HeroResizeHandle({
 function GripDots() {
   return (
     <svg width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden>
-      <circle cx="3" cy="3" r="1.2" fill="#003FC7" />
-      <circle cx="7" cy="3" r="1.2" fill="#003FC7" />
-      <circle cx="11" cy="3" r="1.2" fill="#003FC7" />
-      <circle cx="3" cy="7" r="1.2" fill="#003FC7" />
-      <circle cx="7" cy="7" r="1.2" fill="#003FC7" />
-      <circle cx="11" cy="7" r="1.2" fill="#003FC7" />
+      <circle cx="3" cy="3" r="1.2" fill={BRAND.blue} />
+      <circle cx="7" cy="3" r="1.2" fill={BRAND.blue} />
+      <circle cx="11" cy="3" r="1.2" fill={BRAND.blue} />
+      <circle cx="3" cy="7" r="1.2" fill={BRAND.blue} />
+      <circle cx="7" cy="7" r="1.2" fill={BRAND.blue} />
+      <circle cx="11" cy="7" r="1.2" fill={BRAND.blue} />
     </svg>
   );
 }

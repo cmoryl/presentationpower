@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
@@ -124,8 +125,8 @@ export function PrintAssetDirectory({
         <div className="space-y-4">
           {folders.map((folder) => {
             const isCollapsed = collapsed[folder.id] ?? false;
-            const accent = folder.brand?.tokens.accent ?? "#003FC7";
-            const primary = folder.brand?.tokens.primary ?? "#03002C";
+            const accent = folder.brand?.tokens.accent ?? BRAND.blue;
+            const primary = folder.brand?.tokens.primary ?? BRAND.ink;
             return (
               <section
                 key={folder.id}
