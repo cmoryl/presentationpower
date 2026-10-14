@@ -27,8 +27,8 @@ import {
   type PrintPreflightIssue,
 } from "./press-preflight";
 import { checkExportAspect, logAspectReport, type AspectCheckReport } from "./export-aspect-check";
-import {
 import { BRAND } from "@/lib/brand-colors";
+import {
   captureVectorText,
   enableHideTextForCapture,
   overlayVectorText,
