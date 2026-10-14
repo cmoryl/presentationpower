@@ -778,14 +778,14 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-OP-COVER":
       return {
         title: clientName,
-        subtitle: brief.meetingObjective,
+        subtitle: `Prepared for ${clientName}`,
         clientName,
         presenter: "TransPerfect",
         date: new Date().toLocaleDateString(),
       };
     case "MV-OP-COVER-MEDIA":
       return {
-        title: brief.meetingObjective || `${clientName} × TransPerfect`,
+        title: `${clientName} × TransPerfect`,
         subtitle: `A strategic partnership review`,
         clientName,
         date: new Date().toLocaleDateString(),
@@ -793,7 +793,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-OP-COVER-MINIMAL":
       return {
         title: clientName,
-        subtitle: brief.meetingObjective,
+        subtitle: `Prepared for ${clientName}`,
         date: new Date().toLocaleDateString(),
       };
     case "MV-OP-AGENDA":
@@ -2073,7 +2073,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-OP-COVER-EDITORIAL":
       return {
         kicker: `Vol. 01 · ${brief.industry || "Enterprise"}`,
-        title: brief.meetingObjective || `A conversation with ${clientName}`,
+        title: `A conversation with ${clientName}`,
         subtitle: `An editorial briefing for ${clientName}.`,
         clientName,
         date: new Date().toLocaleDateString(),
@@ -2082,7 +2082,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-OP-COVER-SPLIT":
       return {
         title: `${clientName} × TransPerfect`,
-        subtitle: brief.meetingObjective || "A partnership review.",
+        subtitle: "A partnership review.",
         clientName,
         date: new Date().toLocaleDateString(),
         mediaSeed: `${clientName}-split`,
@@ -2090,13 +2090,13 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-OP-COVER-POSTER":
       return {
         kicker: `A briefing for ${clientName}`,
-        title: (brief.meetingObjective || "Signal").split(" ").slice(0, 2).join(" ") || "Signal",
+        title: "Signal",
         meta: `${brief.industry || "Global"} · Confidential`,
       };
     case "MV-OP-COVER-GRID":
       return {
         title: `${clientName}`,
-        subtitle: brief.meetingObjective,
+        subtitle: `Prepared for ${clientName}`,
         date: new Date().toLocaleDateString(),
         items: [
           { seed: `${clientName}-a` },
@@ -2108,14 +2108,14 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-OP-COVER-DOSSIER":
       return {
         reference: `TP-${Date.now().toString().slice(-4)}`,
-        title: brief.meetingObjective || `${clientName} engagement dossier`,
+        title: `${clientName} engagement dossier`,
         clientName,
         prepared: "TransPerfect",
         date: new Date().toLocaleDateString(),
       };
     case "MV-OP-COVER-GRADIENT":
       return {
-        title: brief.meetingObjective || clientName,
+        title: clientName,
         subtitle: `A strategic conversation with ${clientName}.`,
         clientName,
         date: new Date().toLocaleDateString(),
@@ -2123,14 +2123,14 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-OP-COVER-MONOGRAM":
       return {
         monogram: clientName.slice(0, 2).toUpperCase(),
-        title: brief.meetingObjective || clientName,
+        title: clientName,
         subtitle: `Prepared for ${clientName}`,
         date: new Date().toLocaleDateString(),
       };
     case "MV-OP-COVER-STACKED":
       return {
         kicker: `A proposal for ${clientName}`,
-        title: brief.meetingObjective || "The path forward",
+        title: "The path forward",
         subtitle: "Prepared by TransPerfect",
         date: new Date().toLocaleDateString(),
         mediaSeed: `${clientName}-stacked`,

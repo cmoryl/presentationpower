@@ -7,7 +7,7 @@
 // same `mode: "cors"` fetch, same failure mode. If our probe fails, the
 // exporter's fetch will fail too.
 
-import type { Deck, DeckSlide } from "./deck-store";
+import { useDeckStore, type Deck, type DeckSlide } from "./deck-store";
 import { variantSupportsImagery } from "./variant-media";
 import { lintContent } from "./compliance-check";
 
@@ -15,7 +15,7 @@ export type PreflightIssue = {
   slideId: string;
   slideIndex: number;
   variantId: string;
-  kind: "cors-image" | "empty-title" | "banned-word" | "needs-source";
+  kind: "cors-image" | "empty-title" | "banned-word" | "needs-source" | "brief-leak";
   /** Blocking issues stop the download; "Export anyway" is not offered. */
   blocking?: boolean;
   message: string;
@@ -85,8 +85,43 @@ export async function runExportPreflight(deck: Deck): Promise<PreflightIssue[]> 
 }
 
 /** Banned words and unsourced figures, one blocking issue per slide and kind. */
-export function complianceIssues(deck: Deck): PreflightIssue[] {
+export function complianceIssues(
+  deck: Deck,
+  brief?: { meetingObjective?: string; audience?: string; clientFacts?: string } | null,
+): PreflightIssue[] {
   const out: PreflightIssue[] = [];
+  const b =
+    brief === undefined
+      ? (() => {
+          try {
+            return useDeckStore.getState().briefs[deck.briefId] ?? null;
+          } catch {
+            return null;
+          }
+        })()
+      : brief;
+  const norm = (t: string) => t.toLowerCase().replace(/\s+/g, " ").trim();
+  // Internal brief wording must never appear on the cover or closing slide.
+  const internal = [b?.meetingObjective, b?.audience, b?.clientFacts]
+    .map((t) => norm(t ?? ""))
+    .filter((t) => t.length >= 12);
+  if (internal.length && deck.slides.length) {
+    const ends = [0, deck.slides.length - 1].filter((v, i, a) => a.indexOf(v) === i);
+    for (const index of ends) {
+      const slide = deck.slides[index];
+      const text = norm(JSON.stringify(slide.content ?? {}));
+      if (internal.some((t) => text.includes(t))) {
+        out.push({
+          slideId: slide.id,
+          slideIndex: index,
+          variantId: slide.variantId,
+          kind: "brief-leak",
+          blocking: true,
+          message: `Slide ${index + 1}: internal brief wording is showing on the ${index === 0 ? "cover" : "closing slide"} — rewrite it for the client`,
+        });
+      }
+    }
+  }
   deck.slides.forEach((slide, index) => {
     const found = lintContent(slide.content);
     for (const kind of ["banned-word", "needs-source"] as const) {
