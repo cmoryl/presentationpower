@@ -82,6 +82,7 @@ import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { BulkSlideActions } from "@/components/BulkSlideActions";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
 import { SlideAlternatives } from "@/components/SlideAlternatives";
+import { SlideBrandChecks } from "@/components/SlideBrandChecks";
 import { TemplateOverridePanel } from "@/components/slide/TemplateOverridePanel";
 import {
   useDeckStore,
@@ -2162,7 +2163,7 @@ function DeckEditor() {
                             <SlideBrandChecks
                               slide={active}
                               qa={qa}
-                              extraBanned={brief?.wordsToAvoid ?? []}
+                              extraBanned={[]}
                             />
                           </InspectorSection>
                         )}
