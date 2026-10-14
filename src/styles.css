@@ -654,6 +654,21 @@ body.export-mode [data-print-surface] {
    Mirrors src/lib/accent-ramp.ts (DIVISION_ACCENT_RAMP + ACCENT_RAMP_INTENSITY).
    Never inline these hexes elsewhere — reference the tokens below. */
 :root {
+  /* Brand palette — mirrors src/lib/brand-colors.ts (parity-tested). */
+  --tp-ink: #03002c;
+  --tp-blue: #003fc7;
+  --tp-surface: #eef1f7;
+  --tp-white: #ffffff;
+  --tp-aqua: #a1fbf9;
+  --tp-lavender: #c2a3ff;
+  --tp-yellow: #ffeb66;
+  --tp-green: #a6fa87;
+  --tp-peach: #ff9b70;
+  --tp-pink: #ec388a;
+  --tp-red: #e53d2e;
+  --tp-dark-gray: #666666;
+  --tp-light-gray: #f2f2f2;
+  --tp-blue-white: #e0e8f5;
   --tp-accent-1: #13b1f3;
   --tp-accent-2: #5ce1e6;
   --tp-accent-3: #a6fa87;
