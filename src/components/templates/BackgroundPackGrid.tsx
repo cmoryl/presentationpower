@@ -97,7 +97,7 @@ export function BackgroundPackGrid({
   });
   const [form, setForm] = useState({
     intensity: 1,
-    tint: BRAND.blue,
+    tint: BRAND.blue as string,
     tintStrength: 0.18,
     imageUrl: null as string | null,
     imagePriority: "front" as "front" | "behind",
