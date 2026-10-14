@@ -19,3 +19,18 @@ describe("figure validator", () => {
     expect(validateFigures(t, { ...t }, "")).toEqual(t);
   });
 });
+
+describe("figure validator — template mode", () => {
+  it("checks sample copy, plain counts and sample sources", () => {
+    const removed: string[] = [];
+    const t = { stat: "38% ↓ time to market", body: "Live in 28 markets", source: "Client rollout, 2024" };
+    const out = validateFigures(t, { ...t }, "", removed, { checkTemplate: true }) as typeof t;
+    expect(out.stat).toBe(`${FIGURE_NEEDED} ↓ time to market`);
+    expect(out.body).toBe(`Live in ${FIGURE_NEEDED} markets`);
+    expect(out.source).toBe("");
+  });
+  it("keeps grounded counts", () => {
+    const out = validateFigures({ b: "14 markets a year" }, {}, "14 markets/year", [], { checkTemplate: true });
+    expect(out).toEqual({ b: "14 markets a year" });
+  });
+});
