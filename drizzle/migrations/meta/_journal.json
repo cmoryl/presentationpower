@@ -43,6 +43,13 @@
       "when": 1791814635209,
       "tag": "0005_event_photos_marketing_clearance",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791980611644,
+      "tag": "0006_restrict_signup_domain",
+      "breakpoints": true
     }
   ]
 }
