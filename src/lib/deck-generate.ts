@@ -1,3 +1,4 @@
+import { validateFigures } from "./figure-validator";
 // Brief → deck generation pipeline, transport-free.
 //
 // One implementation, two callers: `deck-generate.functions.ts` wraps it in a
