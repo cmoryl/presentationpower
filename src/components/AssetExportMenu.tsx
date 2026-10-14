@@ -20,6 +20,7 @@ import {
   type AssetCaptureTarget,
   type AssetImageFormat,
 } from "@/lib/asset-export";
+import { lintText } from "@/lib/compliance-check";
 import { verifyExportBlob, type ExportKind } from "@/lib/export-verify-bytes";
 
 export type AssetExportMenuProps = {
@@ -79,6 +80,20 @@ export function AssetExportMenu({
     const targets = resolveTargets().filter((t) => t?.node && t.width > 0 && t.height > 0);
     if (targets.length === 0) {
       toast.error("Nothing to export — the asset has not finished rendering.");
+      return;
+    }
+    // Banned words and unsourced figures block the download (same rule as decks).
+    const hits = targets.flatMap((t) => lintText(t.node.innerText ?? t.node.textContent ?? ""));
+    if (hits.length) {
+      const words = [...new Set(hits.filter((h) => h.kind === "banned-word").map((h) => h.match))];
+      const figs = [...new Set(hits.filter((h) => h.kind === "needs-source").map((h) => h.match))];
+      toast.error(
+        [
+          "Download blocked — fix these first.",
+          words.length ? `Banned words: ${words.join(", ")}.` : "",
+          figs.length ? `Figures with no source: ${figs.join(", ")}.` : "",
+        ].filter(Boolean).join(" "),
+      );
       return;
     }
     const base = assetFileSlug(filename, "asset");

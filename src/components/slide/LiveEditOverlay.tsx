@@ -166,6 +166,8 @@ export function LiveEditOverlay({
   // relying on React re-render timing.
   const [tick, setTick] = useState(0);
   const [activePath, setActivePath] = useState<string | null>(null);
+  // Live character count of the field being typed in (shown while editing).
+  const [charCount, setCharCount] = useState<number | null>(null);
   const [inkTarget, setInkTarget] = useState<InkTarget>("block");
 
   // Precompute path → value map for the tag pass; unique-by-value only.
@@ -290,7 +292,14 @@ export function LiveEditOverlay({
     function onFocusIn(e: FocusEvent) {
       const t = e.target as HTMLElement | null;
       const p = t?.getAttribute?.("data-live-path");
-      if (p) setActivePath(p);
+      if (p) {
+        setActivePath(p);
+        setCharCount((t!.innerText ?? "").trim().length);
+      }
+    }
+    function onInput(e: Event) {
+      const t = e.target as HTMLElement | null;
+      if (t?.hasAttribute?.("data-live-path")) setCharCount((t.innerText ?? "").trim().length);
     }
     function onFocusOut(e: FocusEvent) {
       const t = e.target as HTMLElement | null;
@@ -352,12 +361,14 @@ export function LiveEditOverlay({
     }
 
     root.addEventListener("focusin", onFocusIn, true);
+    root.addEventListener("input", onInput, true);
     root.addEventListener("focusout", onFocusOut, true);
     root.addEventListener("keydown", onKeyDown, true);
     root.addEventListener("paste", onPaste, true);
     root.addEventListener("click", onClick, true);
     return () => {
       root.removeEventListener("focusin", onFocusIn, true);
+      root.removeEventListener("input", onInput, true);
       root.removeEventListener("focusout", onFocusOut, true);
       root.removeEventListener("keydown", onKeyDown, true);
       root.removeEventListener("paste", onPaste, true);
@@ -441,6 +452,16 @@ export function LiveEditOverlay({
     >
       <style>{`[data-live-path]{white-space:pre-wrap;}\n${overrideCss}`}</style>
       {children}
+      {enabled && activePath && charCount !== null ? (
+        <div
+          data-export-ignore="true"
+          data-editing-chrome="true"
+          aria-live="polite"
+          className="pointer-events-none absolute bottom-2 right-2 z-40 rounded-md border border-black/10 bg-white/95 px-2 py-1 text-[11px] font-medium tabular-nums text-[#03002C] shadow print:hidden"
+        >
+          {charCount} {charCount === 1 ? "character" : "characters"}
+        </div>
+      ) : null}
       {canPickColor ? (
         <div
           data-live-color-picker
