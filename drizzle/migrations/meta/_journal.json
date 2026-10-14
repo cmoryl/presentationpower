@@ -50,6 +50,13 @@
       "when": 1791980611644,
       "tag": "0006_restrict_signup_domain",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791980748025,
+      "tag": "0007_deck_generation_jobs",
+      "breakpoints": true
     }
   ]
 }
