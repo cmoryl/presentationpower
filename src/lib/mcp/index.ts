@@ -17,6 +17,7 @@ import searchIcons from "./tools/search-icons";
 import searchKnowledge from "./tools/search-knowledge";
 import createShareLink from "./tools/create-share-link";
 import generateDeck from "./tools/generate-deck";
+import getDeckJob from "./tools/get-deck-job";
 import getTaxonomy from "./tools/get-taxonomy";
 import listVariants from "./tools/list-variants";
 import createDeck from "./tools/create-deck";
@@ -61,6 +62,7 @@ export default defineMcp({
     listVariants,
     getTaxonomy,
     generateDeck,
+    getDeckJob,
     createDeck,
     buildDeck,
     searchIcons,

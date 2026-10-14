@@ -11,7 +11,7 @@ import {
   Scripts,
   useRouterState,
 } from "@tanstack/react-router";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -236,16 +236,21 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [queryClient, router]);
 
-  // Sections with user-specific content send signed-out visitors to sign-in.
+  // Every page except the open list needs sign-in. Gated pages render nothing
+  // (on the server too) until a session is confirmed in the browser.
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const gated = requiresSignInPath(pathname);
+  const [signedIn, setSignedIn] = useState(false);
   useEffect(() => {
-    if (!requiresSignInPath(pathname)) return;
+    if (!gated || signedIn) return;
     let live = true;
     void confirmSignedOut().then((out) => {
-      if (live && out) window.location.replace(loginUrl());
+      if (!live) return;
+      if (out) window.location.replace(loginUrl());
+      else setSignedIn(true);
     });
     return () => { live = false; };
-  }, [pathname]);
+  }, [gated, signedIn]);
 
   useEffect(() => {
     installToastA11y();

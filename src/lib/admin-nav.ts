@@ -19,6 +19,7 @@ export const ADMIN_NAV_GROUPS: ReadonlyArray<AdminNavGroup> = [
       { to: "/admin/campaigns", label: "Campaigns" },
       { to: "/admin/audit", label: "Audit log" },
       { to: "/admin/export-audit", label: "Export audit" },
+      { to: "/admin/needs-source", label: "Needs source" },
     ],
   },
   {

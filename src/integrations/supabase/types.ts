@@ -1474,6 +1474,45 @@ export type Database = {
           },
         ]
       }
+      deck_jobs: {
+        Row: {
+          created_at: string
+          created_by: string
+          deck_id: string | null
+          error: string | null
+          id: string
+          idempotency_key: string
+          result: string | null
+          status: string
+          steps: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          deck_id?: string | null
+          error?: string | null
+          id?: string
+          idempotency_key: string
+          result?: string | null
+          status?: string
+          steps?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          deck_id?: string | null
+          error?: string | null
+          id?: string
+          idempotency_key?: string
+          result?: string | null
+          status?: string
+          steps?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       deck_reviews: {
         Row: {
           created_at: string

@@ -328,6 +328,30 @@
         "outputSchema": null
       },
       {
+        "name": "get_deck_job",
+        "title": "Check a deck generation job",
+        "description": "Status of a generate_deck run (running, done or failed), with the deck id and summary once done. Poll this instead of calling generate_deck again.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "job_id": {
+              "type": "string",
+              "description": "Job id returned by generate_deck."
+            }
+          },
+          "required": [
+            "job_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
         "name": "create_deck",
         "title": "Create deck",
         "description": "Create a deck deterministically (no AI call) by expanding a narrative archetype's section recipe into empty slides, or from an explicit ordered slide list. Validates the brand mode, archetype, and every section/variant pairing before writing anything. Returns the deck id, the ordered slide summary and the editor URL — then fill slides with update_slide_content.",
