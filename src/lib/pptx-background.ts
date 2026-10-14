@@ -149,7 +149,7 @@ export async function planPptxBackground(
 
   // ── Everything else (library preset, gradient, pattern): rasterize CSS.
   const css = bg.css ?? "";
-  const solid = bg.solid ?? bg.color ?? "#FFFFFF";
+  const solid = bg.solid ?? bg.color ?? BRAND.white;
   if (css) {
     const data = await rasterizeCss(css, solid, quality);
     if (data) {
