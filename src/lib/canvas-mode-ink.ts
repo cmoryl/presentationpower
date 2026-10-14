@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Appearance-aware re-inking for canvas compositions.
 //
 // Open Canvas Studio / Module Studio compositions carry two kinds of colour:
@@ -18,7 +19,7 @@ import type { CanvasItem } from "./canvas-studio";
 
 export type SlideAppearance = "light" | "dark";
 
-const LIGHT_INK = "#03002C";
+const LIGHT_INK = BRAND.ink;
 const DARK_INK = "#FFFFFF";
 
 type Rgba = { r: number; g: number; b: number; a: number };

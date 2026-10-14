@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * CUSTOM TEMPLATES — admin-authored looks that render through the exact same
  * pipeline as the catalog skins.
@@ -68,11 +69,11 @@ function isDarkField(hex: string): boolean {
  */
 function legiblePalette(t: CustomTemplate): { palette: string[]; mode: "light" | "dark" } {
   const palette = [...t.palette];
-  const field = palette[0] ?? (t.mode === "dark" ? "#03002c" : "#ffffff");
+  const field = palette[0] ?? (t.mode === "dark" ? BRAND.ink : "#ffffff");
   const dark = isDarkField(field);
-  const ink = palette[1] ?? (dark ? "#ffffff" : "#03002c");
+  const ink = palette[1] ?? (dark ? "#ffffff" : BRAND.ink);
   if (contrastRatio(ink, field) < MIN_INK_CONTRAST) {
-    palette[1] = dark ? "#ffffff" : "#03002c";
+    palette[1] = dark ? "#ffffff" : BRAND.ink;
   }
   return { palette, mode: dark ? "dark" : "light" };
 }

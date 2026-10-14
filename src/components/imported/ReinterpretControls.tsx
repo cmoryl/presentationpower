@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Deck-wide reinterpretation controls: design style, typography rhythm and a
 // colour lock applied to every slide. Presentational only — the parent owns the
 // state and re-runs the design pass when it changes. Named presets are stored
@@ -23,14 +24,14 @@ export type ReinterpretControlsValue = {
 
 /** Accent choices — the brand palette, so a lock can never leave the system. */
 const ACCENTS: Array<{ hex: string; label: string }> = [
-  { hex: "#003fc7", label: "Blue 500" },
-  { hex: "#a1fbf9", label: "Aqua" },
-  { hex: "#c2a3ff", label: "Lavender" },
-  { hex: "#ffeb66", label: "Yellow" },
-  { hex: "#a6fa87", label: "Green" },
-  { hex: "#ff9b70", label: "Peach" },
-  { hex: "#ec388a", label: "Pink" },
-  { hex: "#e53d2e", label: "Red" },
+  { hex: BRAND.blue, label: "Blue 500" },
+  { hex: BRAND.aqua, label: "Aqua" },
+  { hex: BRAND.lavender, label: "Lavender" },
+  { hex: BRAND.yellow, label: "Yellow" },
+  { hex: BRAND.green, label: "Green" },
+  { hex: BRAND.peach, label: "Peach" },
+  { hex: BRAND.pink, label: "Pink" },
+  { hex: BRAND.red, label: "Red" },
 ];
 
 export function ReinterpretControls({

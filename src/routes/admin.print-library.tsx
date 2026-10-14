@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -364,7 +365,7 @@ function PrintLibraryCurator() {
                         <span
                           aria-hidden
                           className="mt-1 inline-block h-3 w-3 shrink-0 rounded-full ring-1 ring-black/10"
-                          style={{ background: brand?.tokens.accent ?? "#003FC7" }}
+                          style={{ background: brand?.tokens.accent ?? BRAND.blue }}
                         />
                       </div>
                       {v.description ? (

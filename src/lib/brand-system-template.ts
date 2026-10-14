@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * DEFAULT BRAND SYSTEM TEMPLATE — the look a deck gets when no alternate style
  * pack is chosen (Enterprise White light page / brand navy dark page).
@@ -100,7 +101,7 @@ export function brandSystemDarkGroundIsReplaced(seed: string): boolean {
 }
 
 /** Page field of the master's dark face. */
-export const BRAND_SYSTEM_DARK_SURFACE = "#03002C";
+export const BRAND_SYSTEM_DARK_SURFACE = BRAND.ink;
 
 /**
  * HOUSE DEPTH ON THE LIGHT PAGE — the approved white page kept reading as a
@@ -127,9 +128,9 @@ export function brandSystemLightDepthLayers(accentHex?: string, seed = ""): stri
   const a = (c: string, v: number) => withAlpha(c, v);
   return [
     `radial-gradient(112% 86% at ${x("92% 4%", "8% 4%")}, ${a(accent, 0.13)} 0%, ${a(accent, 0.05)} 38%, transparent 66%)`,
-    `radial-gradient(96% 78% at ${x("4% 96%", "96% 96%")}, ${a("#A1FBF9", 0.26)} 0%, transparent 58%)`,
-    `radial-gradient(74% 66% at ${x("10% 12%", "90% 12%")}, ${a("#C2A3FF", 0.2)} 0%, transparent 56%)`,
-    `linear-gradient(176deg, ${a("#E0E8F5", 0.68)} 0%, ${a("#EEF1F7", 0.32)} 42%, ${a("#FFFFFF", 0)} 62%, ${a("#E0E8F5", 0.58)} 100%)`,
+    `radial-gradient(96% 78% at ${x("4% 96%", "96% 96%")}, ${a(BRAND.aqua, 0.26)} 0%, transparent 58%)`,
+    `radial-gradient(74% 66% at ${x("10% 12%", "90% 12%")}, ${a(BRAND.lavender, 0.2)} 0%, transparent 56%)`,
+    `linear-gradient(176deg, ${a("#E0E8F5", 0.68)} 0%, ${a(BRAND.surface, 0.32)} 42%, ${a("#FFFFFF", 0)} 62%, ${a("#E0E8F5", 0.58)} 100%)`,
   ];
 }
 

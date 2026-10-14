@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // PRINT LIBRARY MASTER ITEM EDITOR (master admin)
 // ---------------------------------------------------------------------------
 // Full editing rights over every print library entry — the blank templates and
@@ -726,7 +727,7 @@ function MasterItemEditorPage() {
                 <input
                   type="color"
                   className="h-8 w-full cursor-pointer rounded-lg border border-black/15 bg-white"
-                  value={draft.look.accentOverride ?? "#003FC7"}
+                  value={draft.look.accentOverride ?? BRAND.blue}
                   onChange={(e) => patchLook({ accentOverride: e.target.value })}
                 />
               </Field>
@@ -734,7 +735,7 @@ function MasterItemEditorPage() {
                 <input
                   type="color"
                   className="h-8 w-full cursor-pointer rounded-lg border border-black/15 bg-white"
-                  value={draft.look.primaryOverride ?? "#03002C"}
+                  value={draft.look.primaryOverride ?? BRAND.ink}
                   onChange={(e) => patchLook({ primaryOverride: e.target.value })}
                 />
               </Field>

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Homepage "Finished examples" gallery.
 //
 // Renders fully-built demo setups across all four Elements — Presentation,
@@ -96,8 +97,8 @@ const SHOWCASE: ShowcaseEntry[] = [
 ];
 
 const SURFACE_META = {
-  social: { label: "Social kit", icon: Share2, accent: "#FF9B70" },
-  event: { label: "Event kit", icon: CalendarDays, accent: "#A6FA87" },
+  social: { label: "Social kit", icon: Share2, accent: BRAND.peach },
+  event: { label: "Event kit", icon: CalendarDays, accent: BRAND.green },
 } as const;
 
 /* ---------------- on-the-fly translation ---------------- */

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // SocialTallShell — the designed tall composition for thin strip modules.
 //
 // An inline quote, a credential pill row, an icon strip, a CTA band or a
@@ -43,7 +44,7 @@ export function SocialTallShell({
   children,
 }: SocialTallShellProps) {
   const dark = mode === "dark";
-  const ink = dark ? "#FFFFFF" : "#03002C";
+  const ink = dark ? "#FFFFFF" : BRAND.ink;
   const gap = Math.round(safe.height * 0.025);
   const panelSurface = dark ? "rgba(255,255,255,0.07)" : "#FFFFFF";
   const panelEdge = dark ? "rgba(255,255,255,0.16)" : "rgba(3,0,44,0.08)";

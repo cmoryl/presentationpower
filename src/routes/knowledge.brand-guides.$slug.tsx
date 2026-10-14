@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { GuideGrounds, guideHasGrounds, GUIDE_GROUND_FAMILY } from "@/components/brand/GuideGrounds";
 import { DivisionSignageKit } from "@/components/events/DivisionSignageKit";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
@@ -89,8 +90,8 @@ export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
 function BrandGuideView() {
   const { guide, edited } = Route.useLoaderData() as { guide: BrandGuide; edited: boolean };
   const division = BRAND_MODES.find((b) => b.id === guide.divisionId);
-  const hero = guide.primaryColors[0]?.hex ?? "#03002C";
-  const accent = guide.secondaryColors[0]?.hex ?? "#A1FBF9";
+  const hero = guide.primaryColors[0]?.hex ?? BRAND.ink;
+  const accent = guide.secondaryColors[0]?.hex ?? BRAND.aqua;
   const intel = getBrandhubIntel(guide.slug);
   const logos = getDivisionLogos(guide.divisionId) ?? getDivisionLogos(guide.slug);
   const heroImagery = getDivisionImagery(guide.divisionId);
@@ -270,7 +271,7 @@ function BrandGuideView() {
             >
               <div
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                style={{ background: r.do ? "#0A660A" : "#E53D2E" }}
+                style={{ background: r.do ? "#0A660A" : BRAND.red }}
               >
                 {r.do ? "DO" : "×"}
               </div>
@@ -415,7 +416,7 @@ function BrandGuideView() {
                       <li key={r} className="flex gap-2">
                         <span
                           className="mt-2 h-1 w-1 shrink-0 rounded-full"
-                          style={{ background: label === "Do" ? hero : "#E53D2E" }}
+                          style={{ background: label === "Do" ? hero : BRAND.red }}
                         />
                         <span>{r}</span>
                       </li>
@@ -701,7 +702,7 @@ function SwatchCard({ swatch, large }: { swatch: ColorSwatch; large?: boolean })
     <div className="overflow-hidden rounded-xl border border-border bg-card">
       <div
         className={`flex items-end p-4 ${large ? "h-32" : "h-20"}`}
-        style={{ background: spec.hex, color: swatch.onDark ? "#fff" : "#03002C" }}
+        style={{ background: spec.hex, color: swatch.onDark ? "#fff" : BRAND.ink }}
       >
         <div className="font-mono text-xs opacity-80">{spec.hex}</div>
       </div>
@@ -976,7 +977,7 @@ function BrandhubIntelSections({
                       style={{
                         background:
                           g.priority === "high"
-                            ? "#E53D2E"
+                            ? BRAND.red
                             : g.priority === "medium"
                               ? hero
                               : "#666",
@@ -1103,7 +1104,7 @@ function LogoTile({
         className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] opacity-0 ring-1 transition group-hover:opacity-100"
         style={{
           background: onDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.06)",
-          color: onDark ? "#fff" : "#03002C",
+          color: onDark ? "#fff" : BRAND.ink,
           borderColor: onDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.12)",
         }}
         aria-label={`Download ${label} logo`}

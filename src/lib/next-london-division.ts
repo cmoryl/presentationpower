@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * TransPerfect NEXT 2026 — London signage DIVISION LAYER.
  *
@@ -25,14 +26,14 @@ import type { NextLogoColourway } from "@/lib/next-logo-vectors";
 /** NEXT 2026 division accents, keyed by lockup family id. */
 export const LONDON_DIVISION_ACCENTS: Record<string, { label: string; hex: string }> = {
   globallink: { label: "GlobalLink", hex: "#13B1F3" },
-  games: { label: "Games", hex: "#A6FA87" },
-  finance: { label: "Finance", hex: "#FF9B70" },
+  games: { label: "Games", hex: BRAND.green },
+  finance: { label: "Finance", hex: BRAND.peach },
   legal: { label: "Legal", hex: "#3BBEB6" },
   lifesci: { label: "Life Sciences", hex: "#58ED21" },
   experience: { label: "Experience", hex: "#FF5757" },
-  learn: { label: "Learn", hex: "#FFEB66" },
-  media: { label: "Media", hex: "#EC388A" },
-  digital: { label: "Digital", hex: "#C2A3FF" },
+  learn: { label: "Learn", hex: BRAND.yellow },
+  media: { label: "Media", hex: BRAND.pink },
+  digital: { label: "Digital", hex: BRAND.lavender },
   dataforce: { label: "DataForce", hex: "#5CE1E6" },
 };
 

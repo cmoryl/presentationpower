@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Per-persona visual identity for the workspace dashboards.
 //
 // Each persona gets its own accent pair drawn from the TransPerfect brand
@@ -30,32 +31,32 @@ export const PERSONA_THEME: Record<PersonaId, PersonaTheme> = {
   admin: {
     kicker: "System ownership",
     blurb: "Templates, modules and guardrails — everything downstream inherits what you set here.",
-    base: "#03002C",
-    accent: "#C2A3FF",
-    accent2: "#003FC7",
-    ink: "#003FC7",
+    base: BRAND.ink,
+    accent: BRAND.lavender,
+    accent2: BRAND.blue,
+    ink: BRAND.blue,
     onHero: "#FFFFFF",
-    bricks: ["#C2A3FF", "#A1FBF9", "#003FC7", "#FFEB66", "#E0E8F5"],
+    bricks: [BRAND.lavender, BRAND.aqua, BRAND.blue, BRAND.yellow, "#E0E8F5"],
   },
   marketing: {
     kicker: "Campaign production",
     blurb: "Brief in, on-brand campaign out — decks, print and social from one look.",
     base: "#1A0B2E",
-    accent: "#FF9B70",
-    accent2: "#EC388A",
+    accent: BRAND.peach,
+    accent2: BRAND.pink,
     ink: "#B3216B",
     onHero: "#FFFFFF",
-    bricks: ["#FF9B70", "#EC388A", "#FFEB66", "#C2A3FF", "#F2F2F2"],
+    bricks: [BRAND.peach, BRAND.pink, BRAND.yellow, BRAND.lavender, "#F2F2F2"],
   },
   sales: {
     kicker: "Sales",
     blurb: "Client-ready in minutes — pitch decks and leave-behinds that pass brand review.",
     base: "#00203A",
-    accent: "#A1FBF9",
-    accent2: "#A6FA87",
+    accent: BRAND.aqua,
+    accent2: BRAND.green,
     ink: "#0F6B3C",
     onHero: "#FFFFFF",
-    bricks: ["#A1FBF9", "#A6FA87", "#003FC7", "#FFEB66", "#E0E8F5"],
+    bricks: [BRAND.aqua, BRAND.green, BRAND.blue, BRAND.yellow, "#E0E8F5"],
   },
 };
 

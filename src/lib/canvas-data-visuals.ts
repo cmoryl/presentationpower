@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Data visuals for the Open Canvas Studio.
 //
 // Every chart is built from the studio's own primitives (surface / text / stat)
@@ -30,12 +31,12 @@ export const DATA_VISUAL_TYPES: Array<{ id: DataVisualType; label: string; hint:
   { id: "matrix", label: "Value matrix", hint: "Grid of weighted plates" },
 ];
 
-const INK = "#03002C";
-const ACCENT = "#003FC7";
+const INK = BRAND.ink;
+const ACCENT = BRAND.blue;
 const TRACK = "#E0E8F5";
 
 /** Tertiary pops used for share/composition series (10% accent rule). */
-const SERIES = ["#003FC7", "#A1FBF9", "#C2A3FF", "#FFEB66", "#A6FA87", "#FF9B70"];
+const SERIES = [BRAND.blue, BRAND.aqua, BRAND.lavender, BRAND.yellow, BRAND.green, BRAND.peach];
 
 const fmt = (v: number, unit?: string) => {
   const n = Number.isInteger(v) ? String(v) : String(Math.round(v * 10) / 10);

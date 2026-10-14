@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // /social/presets — folder-style gallery of all social presets grouped by angle.
 
 import { AppShell } from "@/components/AppShell";
@@ -100,7 +101,7 @@ function PresetsView() {
                     <div className="flex items-center justify-between">
                       <span
                         className="inline-flex h-7 items-center gap-1.5 rounded-full px-2 text-[10px] font-semibold uppercase tracking-widest"
-                        style={{ backgroundColor: `${p.accent}22`, color: "#03002C" }}
+                        style={{ backgroundColor: `${p.accent}22`, color: BRAND.ink }}
                       >
                         <Share2 size={12} /> {p.chip}
                       </span>

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useMemo, useState } from "react";
 import { Check, ChevronsUpDown, Filter, Pin, PinOff, Search } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -72,7 +73,7 @@ function searchHaystack(d: DesignCatalogEntry) {
 export function DesignPicker({
   value,
   onChange,
-  accent = "#003FC7",
+  accent = BRAND.blue,
 }: {
   value: string;
   onChange: (variantId: string) => void;

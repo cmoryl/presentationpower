@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Download, Ruler, Store } from "lucide-react";
 
@@ -224,7 +225,7 @@ function MartPage() {
               >
                 <div
                   className="flex items-center justify-center p-8"
-                  style={{ background: logo.face === "dark" ? "#03002C" : "#E0E8F5" }}
+                  style={{ background: logo.face === "dark" ? BRAND.ink : "#E0E8F5" }}
                 >
                   <img
                     src={logo.previewUrl}

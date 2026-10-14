@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // QEII Centre floor plan — division lockups as live vector artwork.
 //
@@ -97,7 +98,7 @@ export function qeiiMarkBoxes(
         : qeiiLabelInk(qeiiToneUnder(floor, block.x, block.y, face), face);
     // A light room fill would swallow the reverse lockup, exactly as on screen.
     const variant: QeiiMarkVariant =
-      ink === "#03002C" &&
+      ink === BRAND.ink &&
       ["reverse", "white"].includes(options.markVariant ?? "reverse")
         ? "colour"
         : (options.markVariant ?? "reverse");

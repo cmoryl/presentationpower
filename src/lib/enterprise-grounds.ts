@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * Enterprise White — the saved ground set.
  *
@@ -68,7 +69,7 @@ function rgba(hex: string, alpha: number): string {
 }
 
 const P = "#0150EF";
-const LAV = "#C2A3FF";
+const LAV = BRAND.lavender;
 
 /** Shared page field — identical on every ground, which is what makes the set
  *  feel continuous rather than like fifteen unrelated backgrounds. */

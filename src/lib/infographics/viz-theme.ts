@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Mode- and pack-aware chart theme resolution.
 //
 // Why this exists: every BrandMode in taxonomy.ts carries a single
@@ -18,7 +19,7 @@ import type { StylePack } from "@/lib/style-packs";
 import type { InfographicTheme } from "./spec";
 import { paletteFromTheme } from "./echarts-theme";
 
-const DARK_SURFACE = "#03002C";
+const DARK_SURFACE = BRAND.ink;
 const DARK_INK = "#EAF0FF";
 
 /** Minimum contrast a series colour must have against the chart surface. */

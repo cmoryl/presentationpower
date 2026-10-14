@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { HeroVideoLayer } from "@/components/hero/HeroVideoLayer";
 import heroPresentationVideo from "@/assets/hero-presentation.mp4.asset.json";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -2226,7 +2227,7 @@ const VariantCard = memo(function VariantCard({
 });
 
 function PreviewSkeleton({ dark = false, label }: { dark?: boolean; label?: string }) {
-  const bg = dark ? "#03002C" : "#F2F2F2";
+  const bg = dark ? BRAND.ink : "#F2F2F2";
   const line = dark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.06)";
   return (
     <div

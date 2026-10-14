@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // TransPerfect NEXT — attendee badge (single approved template).
 //
@@ -63,8 +64,8 @@ export const CITY_BADGE_FACE: CityBadgeFace = {
   ink: "#FFFFFF",
   panel: "rgba(3,0,44,0.58)",
   panelInk: "#FFFFFF",
-  band: "#A1FBF9",
-  bandInk: "#03002C",
+  band: BRAND.aqua,
+  bandInk: BRAND.ink,
 };
 
 /** Kept as a one-entry list so existing callers keep working. */

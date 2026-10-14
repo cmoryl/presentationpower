@@ -43,7 +43,7 @@ function QrCard({ label, url, ink }: { label: string; url: string; ink: string }
           {Array.from({ length: Math.floor(raster.width / 2) }).flatMap((_, ry) =>
             Array.from({ length: Math.floor(raster.width / 2) }).map((__, rx) =>
               raster.ink[ry * 2 * raster.width + rx * 2] === 1 ? (
-                <rect key={`${rx}-${ry}`} x={rx * 2} y={ry * 2} width={2} height={2} fill="#03002C" />
+                <rect key={`${rx}-${ry}`} x={rx * 2} y={ry * 2} width={2} height={2} fill={BRAND.ink} />
               ) : null,
             ),
           )}

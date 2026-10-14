@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Public, no-login module variant library.
 import { BackToTop } from "@/components/BackToTop";
 import { moduleCopy } from "@/lib/module-copy";
@@ -169,7 +170,7 @@ function VariantStage({
       {...attr}
       className="absolute inset-0"
       style={{
-        background: pack ? pack.tokens.surface : effMode === "dark" ? "#03002C" : "#F2F2F2",
+        background: pack ? pack.tokens.surface : effMode === "dark" ? BRAND.ink : "#F2F2F2",
       }}
     >
       <ScaledSlide>

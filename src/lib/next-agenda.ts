@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // TransPerfect NEXT — division agenda asset.
 //
@@ -305,7 +306,7 @@ export function agendaDivisionDayAccent(
   if (!div?.accent) return null;
   // Copy on the accent takes whichever brand ink clears AA on it — Learn yellow
   // and Life Sci green carry Blue 800, deep accents carry white.
-  const ink = agendaContrastRatio("#FFFFFF", div.accent) >= 4.5 ? "#FFFFFF" : "#03002C";
+  const ink = agendaContrastRatio("#FFFFFF", div.accent) >= 4.5 ? "#FFFFFF" : BRAND.ink;
   return { hex: div.accent, ink };
 }
 
@@ -362,17 +363,17 @@ export function agendaGroundHexAt(
 
 /** Copy ink for a face. */
 export function agendaInk(face: AgendaFaceId): string {
-  return face === "light" ? "#03002C" : "#FFFFFF";
+  return face === "light" ? BRAND.ink : "#FFFFFF";
 }
 
 /** Approved ink options for the agenda headline. */
 export const AGENDA_TEXT_COLORS: { id: string; label: string; hex: string }[] = [
   { id: "white", label: "White", hex: "#FFFFFF" },
-  { id: "blue-800", label: "Blue 800", hex: "#03002C" },
+  { id: "blue-800", label: "Blue 800", hex: BRAND.ink },
   { id: "blue-white", label: "Blue White", hex: "#E0E8F5" },
-  { id: "aqua", label: "Aqua", hex: "#A1FBF9" },
-  { id: "lavender", label: "Lavender", hex: "#C2A3FF" },
-  { id: "yellow", label: "Yellow", hex: "#FFEB66" },
+  { id: "aqua", label: "Aqua", hex: BRAND.aqua },
+  { id: "lavender", label: "Lavender", hex: BRAND.lavender },
+  { id: "yellow", label: "Yellow", hex: BRAND.yellow },
 ];
 
 // ── row treatment ────────────────────────────────────────────────────────────
@@ -406,10 +407,10 @@ export const AGENDA_ROW_STYLES: { id: AgendaRowStyleId; name: string; note: stri
 export const AGENDA_BAND = {
   fillA: "#FFFFFF",
   fillB: "#EFE0FA",
-  parallel: "#A1FBF9",
-  ink: "#03002C",
-  pin: "#FF9B70",
-  footerBand: "#003FC7",
+  parallel: BRAND.aqua,
+  ink: BRAND.ink,
+  pin: BRAND.peach,
+  footerBand: BRAND.blue,
   footerInk: "#FFFFFF",
 } as const;
 
@@ -649,8 +650,8 @@ function agendaBandPaletteBase(config: {
     case "ink":
       return {
         ...base,
-        fillA: "#03002C",
-        fillB: "#003FC7",
+        fillA: BRAND.ink,
+        fillB: BRAND.blue,
         ink: "#FFFFFF",
         rail: AGENDA_BAND.parallel,
         // Dark bands carry white copy, so they hold a little more body.
@@ -683,7 +684,7 @@ function agendaBandPaletteBase(config: {
       return {
         ...base,
         fillA: AGENDA_BAND.fillA,
-        fillB: "#FFEB66",
+        fillB: BRAND.yellow,
         ink: AGENDA_BAND.ink,
         rail: AGENDA_BAND.footerBand,
         fillAlpha: 0.94,
@@ -703,8 +704,8 @@ function agendaBandPaletteBase(config: {
     case "veil-ink":
       return {
         ...base,
-        fillA: "#03002C",
-        fillB: "#03002C",
+        fillA: BRAND.ink,
+        fillB: BRAND.ink,
         ink: "#FFFFFF",
         rail: AGENDA_BAND.parallel,
         fillAlpha: 0.78,
@@ -775,7 +776,7 @@ export function agendaAccentRail(accent: string, fillA: string, fillB: string): 
       .join("")}`.toUpperCase();
     if (seen(hex)) return hex;
   }
-  return "#03002C";
+  return BRAND.ink;
 }
 
 
@@ -815,12 +816,12 @@ export const AGENDA_FOOTER_FILLS: {
   fill: string;
   ink: string;
 }[] = [
-  { id: "blue", name: "Blue 500", fill: "#003FC7", ink: "#FFFFFF" },
-  { id: "ink", name: "Blue 800", fill: "#03002C", ink: "#FFFFFF" },
-  { id: "aqua", name: "Aqua", fill: "#A1FBF9", ink: "#03002C" },
-  { id: "lavender", name: "Lavender", fill: "#EFE0FA", ink: "#03002C" },
-  { id: "white", name: "White", fill: "#FFFFFF", ink: "#03002C" },
-  { id: "gray", name: "Light gray", fill: "#F2F2F2", ink: "#03002C" },
+  { id: "blue", name: "Blue 500", fill: BRAND.blue, ink: "#FFFFFF" },
+  { id: "ink", name: "Blue 800", fill: BRAND.ink, ink: "#FFFFFF" },
+  { id: "aqua", name: "Aqua", fill: BRAND.aqua, ink: BRAND.ink },
+  { id: "lavender", name: "Lavender", fill: "#EFE0FA", ink: BRAND.ink },
+  { id: "white", name: "White", fill: "#FFFFFF", ink: BRAND.ink },
+  { id: "gray", name: "Light gray", fill: "#F2F2F2", ink: BRAND.ink },
 ];
 
 export const AGENDA_FOOTER_HEIGHTS: {
@@ -974,12 +975,12 @@ export type AgendaLocationInkId =
 /** Approved copy / mark colours for the room line. `auto` follows the board ink. */
 export const AGENDA_LOCATION_INKS: { id: AgendaLocationInkId; name: string; hex: string | null }[] = [
   { id: "auto", name: "Board ink", hex: null },
-  { id: "ink", name: "Blue 800", hex: "#03002C" },
+  { id: "ink", name: "Blue 800", hex: BRAND.ink },
   { id: "white", name: "White", hex: "#FFFFFF" },
-  { id: "peach", name: "Peach", hex: "#FF9B70" },
-  { id: "aqua", name: "Aqua", hex: "#A1FBF9" },
-  { id: "lavender", name: "Lavender", hex: "#C2A3FF" },
-  { id: "yellow", name: "Yellow", hex: "#FFEB66" },
+  { id: "peach", name: "Peach", hex: BRAND.peach },
+  { id: "aqua", name: "Aqua", hex: BRAND.aqua },
+  { id: "lavender", name: "Lavender", hex: BRAND.lavender },
+  { id: "yellow", name: "Yellow", hex: BRAND.yellow },
 ];
 
 export type AgendaLocationSizeId = "compact" | "standard" | "large" | "hero";
@@ -1998,7 +1999,7 @@ export function agendaQrStyle(config: AgendaConfig): PillarQrStyleId {
 /** QR ink: approved Blue 800 unless another ink was picked. */
 export function agendaQrForeground(config: AgendaConfig): string {
   const v = (config.qrForeground ?? "").trim();
-  return /^#[0-9a-f]{6}$/i.test(v) ? v.toUpperCase() : "#03002C";
+  return /^#[0-9a-f]{6}$/i.test(v) ? v.toUpperCase() : BRAND.ink;
 }
 
 /** QR plate: white unless another colour was picked. */
@@ -2026,7 +2027,7 @@ export function agendaQrCaptionAlign(config: AgendaConfig): PillarCaptionAlign {
 export function agendaQrPlateColor(config: AgendaConfig): string {
   if (!agendaQrTransparent(config)) return agendaQrBackground(config);
   const stops = agendaStops(config.styleId, config.face ?? "dark", config.divisionId);
-  let worst = stops[0] ?? "#003FC7";
+  let worst = stops[0] ?? BRAND.blue;
   let ratio = Number.POSITIVE_INFINITY;
   for (const stop of stops) {
     const r = agendaContrastRatio(agendaQrForeground(config), stop);
@@ -2112,7 +2113,7 @@ export function agendaLockupUrl(config: AgendaConfig): string {
  * in black on the dark gradient.
  */
 export function agendaLockupInk(config: AgendaConfig): string {
-  return (config.face ?? "dark") === "light" ? "#03002C" : "#FFFFFF";
+  return (config.face ?? "dark") === "light" ? BRAND.ink : "#FFFFFF";
 }
 
 /**

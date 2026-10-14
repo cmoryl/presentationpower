@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // "Find your way" — the front page of the London QEII map set.
 //
@@ -154,11 +155,11 @@ export function qeiiDirectorySvg(options: QeiiDirectoryOptions = {}): string {
     ? ramp.reduce((a, b) => (qeiiLuminance(b) < qeiiLuminance(a) ? b : a))
     : ground;
   const dark = qeiiLuminance(ramp.length ? deepest : ground) <= 0.55;
-  const ink = ramp.length ? (dark ? "#FFFFFF" : "#03002C") : qeiiGroundInk(face);
+  const ink = ramp.length ? (dark ? "#FFFFFF" : BRAND.ink) : qeiiGroundInk(face);
   // A reversed ground takes the all-white lockup; a light one takes the colour
   // file, so no lockup is ever printed into a ground it cannot be read on.
   const variant: QeiiMarkVariant = options.markVariant ?? (dark ? "white" : "colour");
-  const rule = dark ? "#A1FBF9" : "#003FC7";
+  const rule = dark ? BRAND.aqua : BRAND.blue;
   const gradientId = "qeii-directory-ground";
   const groundPaint = ramp.length ? `url(#${gradientId})` : ground;
   const defs = ramp.length

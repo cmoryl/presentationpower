@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * TransPerfect NEXT 2026 — palette showcase deck.
  *
@@ -49,7 +50,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   {
     name: "Finance",
     headline: "Warm peach on navy",
-    accent: "#FF9B70",
+    accent: BRAND.peach,
     tagline: "Warm peach against navy — measured, human, precise.",
     pillars: [
       { title: "Peach accent", body: "#FF9B70 warms an otherwise cool corporate field." },
@@ -60,7 +61,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   {
     name: "Games",
     headline: "High-energy green",
-    accent: "#A6FA87",
+    accent: BRAND.green,
     tagline: "High-energy green for player-facing work.",
     pillars: [
       { title: "Green accent", body: "#A6FA87 is the brightest step on the ramp." },
@@ -104,7 +105,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   {
     name: "Learn",
     headline: "Enablement yellow",
-    accent: "#FFEB66",
+    accent: BRAND.yellow,
     tagline: "Yellow — enablement, training, knowledge transfer.",
     pillars: [
       { title: "Yellow accent", body: "#FFEB66 is the highest-luminance step on navy." },
@@ -115,7 +116,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   {
     name: "Media",
     headline: "Entertainment pink",
-    accent: "#EC388A",
+    accent: BRAND.pink,
     tagline: "Pink — dubbing, subtitling, access services.",
     pillars: [
       { title: "Pink accent", body: "#EC388A anchors the entertainment side of the portfolio." },
@@ -126,7 +127,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   {
     name: "Digital",
     headline: "Editorial lavender",
-    accent: "#C2A3FF",
+    accent: BRAND.lavender,
     tagline: "Lavender — marketing, web and experience localization.",
     pillars: [
       { title: "Lavender accent", body: "#C2A3FF softens the field without losing contrast." },

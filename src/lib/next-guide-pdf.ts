@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // NEXT delegate guide — press PDF.
 //
@@ -47,10 +48,10 @@ import { qrRaster } from "./qr-print";
 
 const MM_TO_PT = 72 / 25.4;
 
-const INK = "#03002C";
-const ACCENT = "#003FC7";
+const INK = BRAND.ink;
+const ACCENT = BRAND.blue;
 const PAPER = "#FFFFFF";
-const SURFACE = "#EEF1F7";
+const SURFACE = BRAND.surface;
 
 export type GuidePdfResult = {
   bytes: Uint8Array<ArrayBuffer>;

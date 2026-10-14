@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Rendered page gallery for the print demo landing pages.
 //
 // Print layouts are container-query based, so rendering the real layout inside
@@ -153,7 +154,7 @@ export function ShowcasePrintGallery(props: Props) {
               <span
                 // Bottom-left: the page number must never cover the piece's headline.
                 className="absolute bottom-2 left-2 grid h-6 w-6 place-items-center rounded-lg text-[11px] font-semibold text-white shadow-sm"
-                style={{ background: accent ?? "#003FC7" }}
+                style={{ background: accent ?? BRAND.blue }}
               >
                 {i + 1}
               </span>

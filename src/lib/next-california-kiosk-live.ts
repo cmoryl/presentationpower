@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import GEIST_ADV from "./geist-advances.json";
 // TransPerfect NEXT — CALIFORNIA KIOSKS REBUILT FROM THE LIVE LONDON FILES.
 //
@@ -179,7 +180,7 @@ export const liveLayoutById = (id: string): LiveLayout | undefined => {
 };
 
 /** Staircase ramp: bottom tier → top tier, enterprise palette. */
-export const STAIR_RAMP = [{ offset: 0, color: "#03002C" }, { offset: 1, color: "#003FC7" }];
+export const STAIR_RAMP = [{ offset: 0, color: BRAND.ink }, { offset: 1, color: BRAND.blue }];
 const toHex = (c: [number, number, number]) => `#${c.map((v) => Math.round(v * 255).toString(16).padStart(2, "0")).join("")}`.toUpperCase();
 
 /** One tier of a multi-artboard venue spot: its slice of the shared ramp, plus the file's step lines. */

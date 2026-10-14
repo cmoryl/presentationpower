@@ -1,8 +1,9 @@
+import { BRAND } from "@/lib/brand-colors";
 // Native vector rebuild of a module's chart for the cross-format adaptor.
 import type { AdaptChart } from "@/lib/cross-format-adapt";
 
-const INK = "#03002C";
-const BLUE = "#003FC7";
+const INK = BRAND.ink;
+const BLUE = BRAND.blue;
 
 /** Approx. Geist advance width per character, as a fraction of font size. */
 const CHAR_W = 0.56;
@@ -32,7 +33,7 @@ export function AdaptChartBlock({
   const max = Math.max(...d.map((x) => x.value), 1);
   const fmt = (v: number) => `${Number.isInteger(v) ? v : v.toFixed(1)}${chart.unit ?? ""}`;
   const labelH = fontPx * 1.8;
-  const PAL = dark ? ["#FFFFFF", "#8FA8E0", "#A1FBF9", "#C2A3FF"] : [BLUE, INK, "#8FA8E0", "#C2A3FF"];
+  const PAL = dark ? ["#FFFFFF", "#8FA8E0", BRAND.aqua, BRAND.lavender] : [BLUE, INK, "#8FA8E0", BRAND.lavender];
   const svg = (kind: string, children: React.ReactNode) => (
     <svg data-adapt-chart={kind} width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Chart">{children}</svg>
   );

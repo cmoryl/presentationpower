@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // NEXT delegate guide — the look.
 //
@@ -21,7 +22,7 @@ import plenary from "@/assets/london-scenes/photo-plenary-fascia.jpg";
 import cafe from "@/assets/london-scenes/photo-cafe-tabletop.jpg";
 import thirdFloor from "@/assets/london-scenes/photo-thirdfloor-wall.jpg";
 
-export const GUIDE_INK = "#03002C";
+export const GUIDE_INK = BRAND.ink;
 export const GUIDE_PAPER = "#FFFFFF";
 
 /** The ground ramp, corner to corner: violet edges through a blue heart. */
@@ -34,7 +35,7 @@ export type GuideAccentId = "yellow" | "green" | "lavender" | "white";
 
 export const GUIDE_ACCENTS: Record<GuideAccentId, { label: string; hex: string }> = {
   yellow: { label: "Yellow", hex: "#FFDE59" },
-  green: { label: "Green", hex: "#A6FA87" },
+  green: { label: "Green", hex: BRAND.green },
   lavender: { label: "Lavender", hex: "#D6A8F0" },
   white: { label: "White", hex: "#FFFFFF" },
 };

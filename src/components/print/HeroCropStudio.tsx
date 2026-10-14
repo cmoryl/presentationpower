@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * Hero crop studio — the photo-editor surface every print hero now gets.
  *
@@ -246,7 +247,7 @@ export function HeroCropStudio({
         <span
           aria-hidden
           className="pointer-events-none absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow"
-          style={{ left: `${fx}%`, top: `${fy}%`, background: "#003FC7" }}
+          style={{ left: `${fx}%`, top: `${fy}%`, background: BRAND.blue }}
         />
         <span className="pointer-events-none absolute bottom-1 right-1 rounded bg-black/55 px-1.5 py-0.5 text-[9px] font-semibold tabular-nums text-white">
           {Math.round(r.zoom * 100)}%

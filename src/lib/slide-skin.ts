@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { enterpriseGroundFor } from "@/lib/enterprise-grounds";
 import type { BrandMode } from "@/lib/taxonomy";
 
@@ -56,7 +57,7 @@ export const ENTERPRISE_WHITE = {
   /** Signature accent — aqua hairlines and card top edges. */
   accent: "#5CE1E6",
   /** Secondary accent used in the pastel wash. */
-  accentAlt: "#C2A3FF",
+  accentAlt: BRAND.lavender,
   /** Hairline rules. */
   hairline: "rgba(11, 22, 63, 0.12)",
   /** Card fill. */
@@ -69,12 +70,12 @@ export const ENTERPRISE_WHITE = {
  * dark did nothing on an Enterprise deck. The template now has both grounds.
  */
 export const ENTERPRISE_DARK = {
-  surface: "#03002C",
+  surface: BRAND.ink,
   ink: "#FFFFFF",
   inkMuted: "rgba(255, 255, 255, 0.72)",
   inkFaint: "rgba(255, 255, 255, 0.5)",
   primary: "#4D88FF",
-  accent: "#A1FBF9",
+  accent: BRAND.aqua,
   hairline: "rgba(255, 255, 255, 0.16)",
   card: "rgba(20, 20, 53, 0.55)",
 } as const;

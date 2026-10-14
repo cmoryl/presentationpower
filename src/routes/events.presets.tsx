@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // /events/presets — folder-style gallery of every event preset grouped by kind.
 
 import { AppShell } from "@/components/AppShell";
@@ -108,7 +109,7 @@ function PresetsView() {
                     <div className="flex items-center justify-between">
                       <span
                         className="inline-flex h-7 items-center gap-1.5 rounded-full px-2 text-[10px] font-semibold uppercase tracking-widest"
-                        style={{ backgroundColor: `${p.accent}22`, color: "#03002C" }}
+                        style={{ backgroundColor: `${p.accent}22`, color: BRAND.ink }}
                       >
                         <CalendarDays size={12} /> {p.chip}
                       </span>

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Arrange layer for Slide Studio.
 //
 // Two responsibilities, both living on top of the scaled slide stage:
@@ -365,7 +366,7 @@ export function StudioLayoutLayer({
                 );
               }}
               style={{
-                color: layer.ink ?? "#03002C",
+                color: layer.ink ?? BRAND.ink,
                 lineHeight: 1.15,
                 fontWeight: 600,
                 letterSpacing: "-0.02em",

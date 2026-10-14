@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import type { PrintHeroAdjust } from "@/lib/print-hero-transform";
 // Typed content payloads for print assets. Shared between server functions and
 // the editor UI so the shape stays honest end-to-end.
@@ -8,7 +9,7 @@ import type { PrintHeroAdjust } from "@/lib/print-hero-transform";
 export type PrintLogoColor = "auto" | "black" | "white";
 
 export const PRINT_LOGO_INK: Record<Exclude<PrintLogoColor, "auto">, string> = {
-  black: "#03002C",
+  black: BRAND.ink,
   white: "#FFFFFF",
 };
 

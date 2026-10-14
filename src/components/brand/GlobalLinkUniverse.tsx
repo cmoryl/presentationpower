@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // The GlobalLink Universe on the GlobalLink brand guide page.
 //
 // Products sit on orbits around the platform hub, joined by their recorded
@@ -88,7 +89,7 @@ export function GlobalLinkUniverse() {
                 cy={C}
                 r={r}
                 fill="none"
-                stroke="#03002C"
+                stroke={BRAND.ink}
                 strokeOpacity={0.08}
                 strokeDasharray="3 6"
               />
@@ -102,7 +103,7 @@ export function GlobalLinkUniverse() {
                   y1={at(a).y}
                   x2={at(b).x}
                   y2={at(b).y}
-                  stroke={on ? "#003FC7" : "#03002C"}
+                  stroke={on ? BRAND.blue : BRAND.ink}
                   strokeOpacity={on ? 0.8 : 0.12}
                   strokeWidth={on ? 2 : 1}
                 />
@@ -124,7 +125,7 @@ export function GlobalLinkUniverse() {
                     cy={n.y}
                     r={n.hub ? 40 : 30}
                     fill={tag.bg}
-                    stroke={isSel ? "#003FC7" : "#FFFFFF"}
+                    stroke={isSel ? BRAND.blue : "#FFFFFF"}
                     strokeWidth={isSel ? 3 : 2}
                   />
                   <text
@@ -158,7 +159,7 @@ export function GlobalLinkUniverse() {
                     style={
                       isSel
                         ? { background: tag.bg, color: tag.ink }
-                        : { background: "#FFFFFF", color: "#03002C" }
+                        : { background: "#FFFFFF", color: BRAND.ink }
                     }
                   >
                     {p.name}

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Minimal WCAG 2.1 contrast utilities + DOM auditor.
 
 /** True when the element lives on a light slide surface. */
@@ -24,8 +25,8 @@ function isDecorative(el: HTMLElement): boolean {
 
 // Ink tokens used by the auto-fix. On light slides only these two are allowed:
 // brand navy for body/heading ink, brand blue for stats/figures.
-const LIGHT_INK = "#03002C";
-const LIGHT_STAT_INK = "#003FC7";
+const LIGHT_INK = BRAND.ink;
+const LIGHT_STAT_INK = BRAND.blue;
 
 /**
  * Copy layered over photography, a gradient scrim or a solid accent fill must
@@ -202,7 +203,7 @@ export function auditNode(root: HTMLElement): WcagReport {
         return;
       }
       const LIGHT_ON_DARK = "#FFFFFF";
-      const DARK_ON_LIGHT = "#03002C";
+      const DARK_ON_LIGHT = BRAND.ink;
       const rDark = contrastRatio(DARK_ON_LIGHT, bg);
       const rLight = contrastRatio(LIGHT_ON_DARK, bg);
       const useLight = rLight >= rDark;
@@ -297,7 +298,7 @@ export function clearApproval(variantId: string, mode: "light" | "dark") {
  */
 export function applyAutoFix(root: HTMLElement): number {
   const LIGHT_ON_DARK = "#FFFFFF";
-  const DARK_ON_LIGHT = "#03002C";
+  const DARK_ON_LIGHT = BRAND.ink;
   let fixed = 0;
   const nodes = root.querySelectorAll<HTMLElement>("*");
   nodes.forEach((el) => {
@@ -376,7 +377,7 @@ export function applyAutoFix(root: HTMLElement): number {
 /** Same as applyAutoFix but skips (re)installing the MutationObserver. */
 function applyAutoFixInternal(root: HTMLElement) {
   const LIGHT_ON_DARK = "#FFFFFF";
-  const DARK_ON_LIGHT = "#03002C";
+  const DARK_ON_LIGHT = BRAND.ink;
   const nodes = root.querySelectorAll<HTMLElement>("*");
   nodes.forEach((el) => {
     const ownText = Array.from(el.childNodes).some(

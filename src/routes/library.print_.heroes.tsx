@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Hero gallery — a dedicated shelf for the print Hero module family.
 //
 // The general module library lists all 40+ families in one column; picking an
@@ -51,7 +52,7 @@ export const Route = createFileRoute("/library/print_/heroes")({
   }),
 });
 
-const ACCENT = "#003FC7";
+const ACCENT = BRAND.blue;
 
 function PrintHeroGalleryPage() {
   const [mode, setMode] = useState<"light" | "dark">("light");

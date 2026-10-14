@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // ---------------------------------------------------------------------------
 // Additional homepage showcase decks (Legal, Gaming, Digital).
 //
@@ -689,7 +690,7 @@ export const EXTRA_SHOWCASE_DECKS: ShowcaseDeckDef[] = [
     eyebrow: "Digital",
     blurb:
       "Ten-slide growth pitch: where paid spend leaks, market-aware copy, multilingual SEO and a measured two-market pilot.",
-    accent: "#C2A3FF",
+    accent: BRAND.lavender,
     divisionLabel: "TransPerfect Digital",
     deckTitle: "Digital · Web and campaign localization (demo)",
     highlights: [

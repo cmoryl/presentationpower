@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useRequireSignIn } from "@/hooks/use-require-sign-in";
 import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 import { ApprovalGate } from "@/components/approvals/ApprovalGate";
@@ -2334,7 +2335,7 @@ function AssetEditor() {
                     <input
                       type="color"
                       aria-label="Icon accent color"
-                      value={iconTreatment.iconStyle.accent ?? "#003FC7"}
+                      value={iconTreatment.iconStyle.accent ?? BRAND.blue}
                       onChange={(e) =>
                         patchCtx({
                           iconStyle: { ...iconTreatment.iconStyle, accent: e.target.value },
@@ -3283,7 +3284,7 @@ function ModuleCard({
             {showPreview && (
               <div className="overflow-hidden rounded border border-black/10 dark:border-white/10">
                 <div style={{ pointerEvents: "none" }}>
-                  <PrintSectionPreviewFrame section={m} mode={editorMode} accent="#003FC7" />
+                  <PrintSectionPreviewFrame section={m} mode={editorMode} accent={BRAND.blue} />
                 </div>
               </div>
             )}
@@ -4206,7 +4207,7 @@ function HeroMediaPanel({
           <input
             type="color"
             className="h-7 w-full rounded-md border border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.03]"
-            value={media.overlayColor ?? "#003FC7"}
+            value={media.overlayColor ?? BRAND.blue}
             onChange={(e) => patch({ overlayColor: e.target.value })}
           />
         </div>

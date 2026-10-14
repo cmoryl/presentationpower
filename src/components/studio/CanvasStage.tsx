@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // The 1920×1080 composition stage for the Open Canvas Studio.
 // Handles drop-to-place, drag-to-move (single or whole selection), corner
 // resize, shift-click AND drag-marquee multi-select, grid snapping and
@@ -109,7 +110,7 @@ export function CanvasStage({
 
   const items = [...comp.items].filter((i) => !i.hidden).sort((a, b) => a.z - b.z);
   const bg =
-    comp.background ?? (comp.mode === "dark" ? "#03002C" : (brand.tokens.surface ?? "#FFFFFF"));
+    comp.background ?? (comp.mode === "dark" ? BRAND.ink : (brand.tokens.surface ?? "#FFFFFF"));
 
   return (
     <div

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // Icon downloads — SVG + PNG, single glyph or zipped set.
 //
@@ -24,7 +25,7 @@ export interface IconRenderOptions {
   strokeWidth?: number;
 }
 
-const DEFAULTS = { size: 512, color: "#03002C", strokeWidth: 1.75 } as const;
+const DEFAULTS = { size: 512, color: BRAND.ink, strokeWidth: 1.75 } as const;
 
 /** Standalone, spec-clean SVG markup for one approved glyph. */
 export function iconSvgString(name: string, opts: IconRenderOptions = {}): string | null {

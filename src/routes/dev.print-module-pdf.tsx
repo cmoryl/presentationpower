@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Dev-only harness for the print-module PDF snapshot gate.
 //
 // It renders one Letter-sized page per print section module (816 × 1056 CSS px
@@ -45,7 +46,7 @@ export const Route = createFileRoute("/dev/print-module-pdf")({
     icons: raw.icons === "0" || raw.icons === 0 ? 0 : 1,
     iconScale: Number(raw.iconScale ?? PRINT_ICON_STYLE_DEFAULT.scale) || 1,
     iconStroke: Number(raw.iconStroke ?? PRINT_ICON_STYLE_DEFAULT.stroke) || 1.6,
-    accent: typeof raw.accent === "string" && raw.accent ? raw.accent : "#003FC7",
+    accent: typeof raw.accent === "string" && raw.accent ? raw.accent : BRAND.blue,
   }),
   head: () => ({
     meta: [
@@ -136,7 +137,7 @@ function PrintModulePdfHarness() {
     };
   }, [sections]);
 
-  const paper = search.mode === "dark" ? "#03002C" : "#ffffff";
+  const paper = search.mode === "dark" ? BRAND.ink : "#ffffff";
 
   return (
     <main className="min-h-screen bg-[#f4f5f8] p-6" data-testid="print-module-pdf-harness">

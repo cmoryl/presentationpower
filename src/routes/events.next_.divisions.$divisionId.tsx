@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
@@ -64,7 +65,7 @@ function DivisionSignagePage() {
         <div className="mt-8">
           <DivisionSignageKit divisionId={id} />
         </div>
-        <DivisionSuppliedTemplates divisionId={id} accent="#003FC7" />
+        <DivisionSuppliedTemplates divisionId={id} accent={BRAND.blue} />
         {id === "legal" ? <LegalNextSignage /> : null}
       </div>
     </AppShell>

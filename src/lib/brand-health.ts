@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Brand health & contrast pre-flight scoring.
 //
 // Pure module: no React, no DOM, no network. The DOM collector lives in
@@ -29,7 +30,7 @@ export const BH_AA_NORMAL = 4.5;
 export const BH_AA_LARGE = 3;
 
 /** Ink colours that are always legitimate text colours in this system. */
-export const APPROVED_TEXT_INK = ["#03002c", "#003fc7", "#ffffff", "#666666"] as const;
+export const APPROVED_TEXT_INK = [BRAND.ink, BRAND.blue, "#ffffff", "#666666"] as const;
 
 export type BrandHealthSeverity = "pass" | "warn" | "fail";
 
@@ -203,14 +204,14 @@ export function scoreBrandHealth(
     } else if (fg && bg) {
       const ratio = Math.round(contrastRatio(fg, bg) * 100) / 100;
       if (ratio < required) {
-        const onDarkSurface = contrastRatio("#ffffff", bg) >= contrastRatio("#03002c", bg);
+        const onDarkSurface = contrastRatio("#ffffff", bg) >= contrastRatio(BRAND.ink, bg);
         findings.push({
           id: `${s.id}-contrast`,
           check: "contrast",
           severity: ratio < required - 1 ? "fail" : "warn",
           label: s.label,
           detail: `${fg} on ${bg} measures ${ratio}:1 — AA needs ${required}:1 at ${Math.round(s.fontSizePx)}px.`,
-          fix: `Set this text to ${onDarkSurface ? "#FFFFFF" : "#03002C"} on this surface.`,
+          fix: `Set this text to ${onDarkSurface ? "#FFFFFF" : BRAND.ink} on this surface.`,
           ratio,
           required,
           text: truncate(s.text),

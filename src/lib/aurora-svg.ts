@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Serializes the AuroraLayer visual as a standalone SVG data URL so PPTX/PDF
 // exports can embed the exact same brand-accented atmospheric backdrop that
 // the on-screen AuroraLayer paints. Mirrors the math in
@@ -16,7 +17,7 @@ export function auroraSvgDataUrl(
   baseTint?: string,
   aspect?: { w: number; h: number },
 ): string {
-  const base = baseTint ?? (mode === "dark" ? "#03002C" : (brand.tokens.surface ?? "#FFFFFF"));
+  const base = baseTint ?? (mode === "dark" ? BRAND.ink : (brand.tokens.surface ?? "#FFFFFF"));
   const orbs = auroraOrbs(seed, brand, mode, aspect);
   const layerOpacity = auroraLayerOpacity(mode);
   const orbR = mode === "dark" ? "90%" : "95%";
@@ -44,7 +45,7 @@ export function auroraSvgDataUrl(
   // overlay gradients over the orbs on light slides (a faint accent bleed from
   // the right plus a white veil top→bottom). Omitting them here was why an
   // exported light slide came out visibly more saturated than the build.
-  const accent = brand.tokens.accent ?? "#003FC7";
+  const accent = brand.tokens.accent ?? BRAND.blue;
   const lightScrim =
     mode === "light"
       ? `
@@ -134,7 +135,7 @@ export function auroraOrbs(
     return ((h >>> 0) % 10000) / 10000;
   };
   const sibling = shiftHue(brand.tokens.accent, 28, 0.08);
-  const isCorporate = brand.tokens.primary.toLowerCase() === "#003fc7";
+  const isCorporate = brand.tokens.primary.toLowerCase() === BRAND.blue;
   const darkFirst = isCorporate ? brand.tokens.primary : shiftHue(brand.tokens.accent, -14, 0.04);
   const lightPrimary = mixHex(brand.tokens.accent, brand.tokens.surface, 0.78);
   const lightAccent = mixHex(brand.tokens.accent, brand.tokens.surface, 0.62);
@@ -205,7 +206,7 @@ export function auroraOrbs(
 
 /** Canonical surface tint used behind AuroraLayer for a given mode. */
 export function auroraBaseTint(brand: BrandMode, mode: "dark" | "light"): string {
-  return mode === "dark" ? "#03002C" : (brand.tokens.surface ?? "#FFFFFF");
+  return mode === "dark" ? BRAND.ink : (brand.tokens.surface ?? "#FFFFFF");
 }
 
 /** Layer opacity applied to the orb <g> in both renderer and exporter.

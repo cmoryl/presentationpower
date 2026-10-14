@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // NEXT MART — price list signage (A4 portrait).
 //
 // Rebuilt natively from the issued Canva master "NEXTMART price list" (page 1,
@@ -94,11 +95,11 @@ export type MartPriceListConfig = {
 
 /** Approved category-bar colours (brand tertiary pops plus brand blue). */
 export const MART_PRICE_BAR_COLOURS: { hex: string; label: string }[] = [
-  { hex: "#EC388A", label: "Pink (issued master)" },
-  { hex: "#003FC7", label: "Blue 500" },
-  { hex: "#03002C", label: "Blue 800" },
-  { hex: "#E53D2E", label: "Red" },
-  { hex: "#FF9B70", label: "Peach" },
+  { hex: BRAND.pink, label: "Pink (issued master)" },
+  { hex: BRAND.blue, label: "Blue 500" },
+  { hex: BRAND.ink, label: "Blue 800" },
+  { hex: BRAND.red, label: "Red" },
+  { hex: BRAND.peach, label: "Peach" },
 ];
 
 /* ── issued London master ─────────────────────────────────────────────────── */
@@ -166,7 +167,7 @@ export function londonPriceList(): MartPriceListConfig {
     heading: "PRICE LIST",
     styleId: "07-prism-sweep",
     face: "dark",
-    barHex: "#EC388A",
+    barHex: BRAND.pink,
     currencyId: "gbp",
     footer: "",
     categories: LONDON_PRICE_LIST_CATEGORIES.map((c) => ({ ...c, items: c.items.map((i) => ({ ...i })) })),
@@ -409,7 +410,7 @@ export function martPriceListSvg(
   const h = S.trimH + bleed * 2;
   const stops = pillarStops(config.styleId, config.face);
   const dark = config.face === "dark";
-  const cardInk = "#03002C";
+  const cardInk = BRAND.ink;
   const cardGround = "#FFFFFF";
 
   const gradient = `<linearGradient id="mart-ground" x1="0" y1="0" x2="1" y2="1">${stops
@@ -506,7 +507,7 @@ export function martPriceListSvg(
     : "";
 
   const guides = options.withBleed
-    ? `<g id="07_GUIDES" data-export-ignore="true"><rect x="${bleed}" y="${bleed}" width="${S.trimW}" height="${S.trimH}" fill="none" stroke="#EC388A" stroke-width="0.2" stroke-dasharray="2 2"/></g>`
+    ? `<g id="07_GUIDES" data-export-ignore="true"><rect x="${bleed}" y="${bleed}" width="${S.trimW}" height="${S.trimH}" fill="none" stroke={BRAND.pink} stroke-width="0.2" stroke-dasharray="2 2"/></g>`
     : "";
 
   return [

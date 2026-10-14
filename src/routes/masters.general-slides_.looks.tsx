@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import lightCoverThumb from "@/assets/looks/lines-glass-sky-1.jpg";
 import darkCoverThumb from "@/assets/backdrops/corporate-dark/bg-02.webp";
@@ -86,14 +87,14 @@ const LOOKS: Look[] = [
   { id: "spring-mist", name: "Spring Mist", mode: "light", note: "Aqua, green and blue light blooms in two corners.", url: lightSpringMist, isNew: true },
   { id: "pearl-holo", name: "Pearl Holo", mode: "light", note: "Pearly soft-focus lavender, aqua and coral.", url: lightPearlHolo, isNew: true },
   { id: "fluted-frost", name: "Golden Hour", mode: "light", note: "Blue, lavender and yellow light blooms.", url: lightFlutedFrost, isNew: true },
-  { id: "prism-lines", name: "Prism Lines", mode: "dark", note: "Six soft layouts: veils, horizon glow, light sweep, aurora, wash and fine grid.", url: "", urls: lineSet("prism-lines"), palette: { base: "#03002C", colours: ["#003FC7", "#C2A3FF", "#A1FBF9"] }, isNew: true },
-  { id: "cobalt-rail", name: "Cobalt Rail", mode: "dark", note: "Cobalt and aqua blooms with straight light rails.", url: "", urls: lineSet("cobalt-rail"), palette: { base: "#03002C", colours: ["#003FC7", "#2F6BFF", "#A1FBF9"], thick: true }, isNew: true },
-  { id: "violet-beam", name: "Violet Beam", mode: "dark", note: "Violet, lavender and pink blooms through angled lines.", url: "", urls: lineSet("violet-beam"), palette: { base: "#05012E", colours: ["#6B3DF0", "#C2A3FF", "#EC388A"] }, isNew: true },
-  { id: "aqua-shift", name: "Aqua Shift", mode: "dark", note: "Teal, aqua and blue blooms with soft line bands.", url: "", urls: lineSet("aqua-shift"), palette: { base: "#020B2E", colours: ["#00A6C7", "#A1FBF9", "#003FC7"] }, isNew: true },
-  { id: "glass-sky", name: "Glass Sky", mode: "light", note: "Sky blue, aqua and lavender blooms behind frosted lines.", url: "", urls: lineSet("glass-sky"), palette: { base: "#F7F9FD", colours: ["#7FA8FF", "#A1FBF9", "#C2A3FF"] }, isNew: true },
-  { id: "lilac-rail", name: "Lilac Rail", mode: "light", note: "Lilac, blue and blush blooms with fine rails.", url: "", urls: lineSet("lilac-rail"), palette: { base: "#FAF8FE", colours: ["#C2A3FF", "#9DB8FF", "#FFC9DD"], thick: true }, isNew: true },
-  { id: "mint-beam", name: "Mint Beam", mode: "light", note: "Aqua, mint and blue blooms through light lines.", url: "", urls: lineSet("mint-beam"), palette: { base: "#F6FBFA", colours: ["#A1FBF9", "#A6FA87", "#8FB3FF"] }, isNew: true },
-  { id: "dawn-lines", name: "Dawn Lines", mode: "light", note: "Peach, lavender and blue blooms with soft line bands.", url: "", urls: lineSet("dawn-lines"), palette: { base: "#FDF9F6", colours: ["#FFB896", "#C2A3FF", "#8FB3FF"] }, isNew: true },
+  { id: "prism-lines", name: "Prism Lines", mode: "dark", note: "Six soft layouts: veils, horizon glow, light sweep, aurora, wash and fine grid.", url: "", urls: lineSet("prism-lines"), palette: { base: BRAND.ink, colours: [BRAND.blue, BRAND.lavender, BRAND.aqua] }, isNew: true },
+  { id: "cobalt-rail", name: "Cobalt Rail", mode: "dark", note: "Cobalt and aqua blooms with straight light rails.", url: "", urls: lineSet("cobalt-rail"), palette: { base: BRAND.ink, colours: [BRAND.blue, "#2F6BFF", BRAND.aqua], thick: true }, isNew: true },
+  { id: "violet-beam", name: "Violet Beam", mode: "dark", note: "Violet, lavender and pink blooms through angled lines.", url: "", urls: lineSet("violet-beam"), palette: { base: "#05012E", colours: ["#6B3DF0", BRAND.lavender, BRAND.pink] }, isNew: true },
+  { id: "aqua-shift", name: "Aqua Shift", mode: "dark", note: "Teal, aqua and blue blooms with soft line bands.", url: "", urls: lineSet("aqua-shift"), palette: { base: "#020B2E", colours: ["#00A6C7", BRAND.aqua, BRAND.blue] }, isNew: true },
+  { id: "glass-sky", name: "Glass Sky", mode: "light", note: "Sky blue, aqua and lavender blooms behind frosted lines.", url: "", urls: lineSet("glass-sky"), palette: { base: "#F7F9FD", colours: ["#7FA8FF", BRAND.aqua, BRAND.lavender] }, isNew: true },
+  { id: "lilac-rail", name: "Lilac Rail", mode: "light", note: "Lilac, blue and blush blooms with fine rails.", url: "", urls: lineSet("lilac-rail"), palette: { base: "#FAF8FE", colours: [BRAND.lavender, "#9DB8FF", "#FFC9DD"], thick: true }, isNew: true },
+  { id: "mint-beam", name: "Mint Beam", mode: "light", note: "Aqua, mint and blue blooms through light lines.", url: "", urls: lineSet("mint-beam"), palette: { base: "#F6FBFA", colours: [BRAND.aqua, BRAND.green, "#8FB3FF"] }, isNew: true },
+  { id: "dawn-lines", name: "Dawn Lines", mode: "light", note: "Peach, lavender and blue blooms with soft line bands.", url: "", urls: lineSet("dawn-lines"), palette: { base: "#FDF9F6", colours: ["#FFB896", BRAND.lavender, "#8FB3FF"] }, isNew: true },
 ];
 
 // Trimmed: keep only a few orb looks so the line-and-veil families lead.

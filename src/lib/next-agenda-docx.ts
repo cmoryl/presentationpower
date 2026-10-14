@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // NEXT division agenda — editable Microsoft Word export.
 //
@@ -158,7 +159,7 @@ async function drawLockup(
 }
 
 function agendaFaceGround(config: AgendaConfig): string {
-  return (config.face ?? "dark") === "light" ? "#EEF1F7" : "#03002C";
+  return (config.face ?? "dark") === "light" ? BRAND.surface : BRAND.ink;
 }
 
 /**

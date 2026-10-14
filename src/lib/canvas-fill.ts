@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Shared advanced-fill model for canvas surfaces / shape blocks.
 //
 // A surface can be painted three ways: a flat colour, a two-stop gradient
@@ -26,8 +27,8 @@ export type CanvasFillSpec = {
 export const DEFAULT_CANVAS_GRADIENT: CanvasGradientFill = {
   kind: "linear",
   angleDeg: 135,
-  from: "#003FC7",
-  to: "#A1FBF9",
+  from: BRAND.blue,
+  to: BRAND.aqua,
 };
 
 export function canvasFillKind(spec: CanvasFillSpec): CanvasFillKind {

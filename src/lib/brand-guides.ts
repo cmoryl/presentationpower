@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Digital brand guides registry. Each guide is scoped to a division (or "master"
 // for the enterprise TransPerfect brand). New divisions add an entry here.
 
@@ -177,7 +178,7 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
   primaryColors: [
     {
       name: "Blue 500",
-      hex: "#003FC7",
+      hex: BRAND.blue,
       role: "primary",
       pantone: "PMS 2728 C",
       rgb: "0 63 199",
@@ -186,7 +187,7 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
     },
     {
       name: "Blue 800",
-      hex: "#03002C",
+      hex: BRAND.ink,
       role: "primary",
       pantone: "PMS 2767 C",
       rgb: "3 0 44",
@@ -195,15 +196,15 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
     },
   ],
   secondaryColors: [
-    { name: "Aqua", hex: "#A1FBF9", role: "accent · 10% max", pantone: "PMS 317 C" },
-    { name: "Lavender", hex: "#C2A3FF", role: "accent · 10% max", pantone: "PMS 264 C" },
+    { name: "Aqua", hex: BRAND.aqua, role: "accent · 10% max", pantone: "PMS 317 C" },
+    { name: "Lavender", hex: BRAND.lavender, role: "accent · 10% max", pantone: "PMS 264 C" },
   ],
   tertiaryColors: [
-    { name: "Yellow", hex: "#FFEB66", role: "pop", pantone: "PMS 121 C" },
-    { name: "Green", hex: "#A6FA87", role: "pop", pantone: "PMS 358 C" },
-    { name: "Peach", hex: "#FF9B70", role: "pop", pantone: "PMS 163 C" },
-    { name: "Pink", hex: "#EC388A", role: "pop", pantone: "PMS 2395 C" },
-    { name: "Red", hex: "#E53D2E", role: "UI / destructive", pantone: "PMS 1788 C" },
+    { name: "Yellow", hex: BRAND.yellow, role: "pop", pantone: "PMS 121 C" },
+    { name: "Green", hex: BRAND.green, role: "pop", pantone: "PMS 358 C" },
+    { name: "Peach", hex: BRAND.peach, role: "pop", pantone: "PMS 163 C" },
+    { name: "Pink", hex: BRAND.pink, role: "pop", pantone: "PMS 2395 C" },
+    { name: "Red", hex: BRAND.red, role: "UI / destructive", pantone: "PMS 1788 C" },
   ],
   neutrals: [
     { name: "Dark Gray", hex: "#666666", role: "neutral", onDark: true },
@@ -217,19 +218,19 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
         "#F0F4FA",
         "#D2E6FA",
         "#4D88FF",
-        "#003FC7",
+        BRAND.blue,
         "#002673",
         "#130F4D",
-        "#03002C",
+        BRAND.ink,
         "#02001E",
       ],
     },
-    { name: "Lavender", stops: ["#EBE0FF", "#C2A3FF", "#8A5CE5", "#6531CC"] },
-    { name: "Turquoise", stops: ["#D3FBFA", "#A1FBF9"] },
-    { name: "Yellow", stops: ["#FAF8BE", "#FFEB66", "#FFCC00"] },
-    { name: "Orange", stops: ["#FCD8C0", "#FF9B70", "#FA6419"] },
-    { name: "Red (UI)", stops: ["#FACCC8", "#E53D2E"] },
-    { name: "Green (UI)", stops: ["#DDFAD2", "#A6FA87", "#3EB236", "#0A660A"] },
+    { name: "Lavender", stops: ["#EBE0FF", BRAND.lavender, "#8A5CE5", "#6531CC"] },
+    { name: "Turquoise", stops: ["#D3FBFA", BRAND.aqua] },
+    { name: "Yellow", stops: ["#FAF8BE", BRAND.yellow, "#FFCC00"] },
+    { name: "Orange", stops: ["#FCD8C0", BRAND.peach, "#FA6419"] },
+    { name: "Red (UI)", stops: ["#FACCC8", BRAND.red] },
+    { name: "Green (UI)", stops: ["#DDFAD2", BRAND.green, "#3EB236", "#0A660A"] },
   ],
   typefacePrimary: "Geist Sans",
   typefaceWeb: "Verdana",
@@ -440,10 +441,10 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     tagline: "Continuous localization, engineered.",
     intro:
       "GlobalLink is TransPerfect's translation-technology platform: connectors, workflow automation and continuous localization for product, marketing and support content. The visual system leans into the product side of the master brand — cleaner surfaces, more Aqua and Lavender, and diagrammatic visuals that read as software rather than campaign.",
-    accent: { name: "Aqua", hex: "#A1FBF9", role: "primary accent", pantone: "PMS 317 C" },
+    accent: { name: "Aqua", hex: BRAND.aqua, role: "primary accent", pantone: "PMS 317 C" },
     pops: [
-      { name: "Lavender", hex: "#C2A3FF", role: "secondary accent", pantone: "PMS 264 C" },
-      { name: "Green", hex: "#A6FA87", role: "success pop", pantone: "PMS 358 C" },
+      { name: "Lavender", hex: BRAND.lavender, role: "secondary accent", pantone: "PMS 264 C" },
+      { name: "Green", hex: BRAND.green, role: "success pop", pantone: "PMS 358 C" },
     ],
     subBrandGroup: {
       group: "GlobalLink Products",
@@ -492,10 +493,10 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     tagline: "Global content for every trial, submission and patient.",
     intro:
       "TransPerfect Life Sciences supports pharma, medtech and clinical research with regulated content services — from eCTD submissions to patient-facing recruitment. The tone is measured, evidence-led and precise; the visual system favors calm neutrals with occasional Green pops that signal accuracy and forward motion.",
-    accent: { name: "Blue 500", hex: "#003FC7", role: "primary accent" },
+    accent: { name: "Blue 500", hex: BRAND.blue, role: "primary accent" },
     pops: [
-      { name: "Green", hex: "#A6FA87", role: "accuracy pop", pantone: "PMS 358 C" },
-      { name: "Aqua", hex: "#A1FBF9", role: "clarity pop", pantone: "PMS 317 C" },
+      { name: "Green", hex: BRAND.green, role: "accuracy pop", pantone: "PMS 358 C" },
+      { name: "Aqua", hex: BRAND.aqua, role: "clarity pop", pantone: "PMS 317 C" },
     ],
     subBrandGroup: {
       group: "Life Sciences Practice",
@@ -551,8 +552,8 @@ const DIVISION_SEEDS: DivisionSeed[] = [
       "TransPerfect Legal serves law firms and corporate legal teams with eDiscovery, managed review, litigation support and legal translation. The palette runs deeper (Blue 002673) with a controlled Yellow pop reserved for callouts and decision points — never as a background.",
     accent: { name: "Blue 002673", hex: "#002673", role: "primary accent" },
     pops: [
-      { name: "Yellow", hex: "#FFEB66", role: "decision pop", pantone: "PMS 121 C" },
-      { name: "Red", hex: "#E53D2E", role: "risk / UI", pantone: "PMS 1788 C" },
+      { name: "Yellow", hex: BRAND.yellow, role: "decision pop", pantone: "PMS 121 C" },
+      { name: "Red", hex: BRAND.red, role: "risk / UI", pantone: "PMS 1788 C" },
     ],
     subBrandGroup: {
       group: "Legal Technologies",
@@ -582,10 +583,10 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     tagline: "Every story, every language, every screen.",
     intro:
       "TransPerfect Media localizes film, television, streaming and advertising content — dubbing, subtitling, audio description and access services. The system is the most expressive of the divisions: darker canvases, Pink pops, and cinematic imagery that leans into craft and performance.",
-    accent: { name: "Pink", hex: "#EC388A", role: "primary accent", pantone: "PMS 2395 C" },
+    accent: { name: "Pink", hex: BRAND.pink, role: "primary accent", pantone: "PMS 2395 C" },
     pops: [
-      { name: "Lavender", hex: "#C2A3FF", role: "ambient pop", pantone: "PMS 264 C" },
-      { name: "Peach", hex: "#FF9B70", role: "warm pop", pantone: "PMS 163 C" },
+      { name: "Lavender", hex: BRAND.lavender, role: "ambient pop", pantone: "PMS 264 C" },
+      { name: "Peach", hex: BRAND.peach, role: "warm pop", pantone: "PMS 163 C" },
     ],
     subBrandGroup: {
       group: "Media Technologies",
@@ -604,10 +605,10 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     tagline: "Ship worldwide. Sound native.",
     intro:
       "TransPerfect Gaming delivers game localization, LQA, audio and community services for AAA, mobile and live-service titles. The visual language is bolder and more playful — Lavender leads, with Green and Yellow pops used for status, achievement and progression cues.",
-    accent: { name: "Lavender", hex: "#C2A3FF", role: "primary accent", pantone: "PMS 264 C" },
+    accent: { name: "Lavender", hex: BRAND.lavender, role: "primary accent", pantone: "PMS 264 C" },
     pops: [
-      { name: "Green", hex: "#A6FA87", role: "achievement pop", pantone: "PMS 358 C" },
-      { name: "Yellow", hex: "#FFEB66", role: "progression pop", pantone: "PMS 121 C" },
+      { name: "Green", hex: BRAND.green, role: "achievement pop", pantone: "PMS 358 C" },
+      { name: "Yellow", hex: BRAND.yellow, role: "progression pop", pantone: "PMS 121 C" },
     ],
     subBrandGroup: {
       group: "Gaming Services",
@@ -633,10 +634,10 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     tagline: "Global brands, local relevance, measurable growth.",
     intro:
       "TransPerfect Digital blends web localization, multilingual SEO, creative production and analytics into full digital-experience programs. The palette stays closest to the master corporate identity — Blue 500 dominant, Aqua for surfaces — with tight, campaign-ready compositions.",
-    accent: { name: "Aqua", hex: "#A1FBF9", role: "primary accent", pantone: "PMS 317 C" },
+    accent: { name: "Aqua", hex: BRAND.aqua, role: "primary accent", pantone: "PMS 317 C" },
     pops: [
-      { name: "Peach", hex: "#FF9B70", role: "campaign pop", pantone: "PMS 163 C" },
-      { name: "Yellow", hex: "#FFEB66", role: "metric pop", pantone: "PMS 121 C" },
+      { name: "Peach", hex: BRAND.peach, role: "campaign pop", pantone: "PMS 163 C" },
+      { name: "Yellow", hex: BRAND.yellow, role: "metric pop", pantone: "PMS 121 C" },
     ],
     subBrandGroup: {
       group: "Digital & Agency",
@@ -655,10 +656,10 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     tagline: "Human intelligence for machine learning.",
     intro:
       "DataForce is TransPerfect's AI data business: data collection, annotation, model evaluation and human-in-the-loop services for LLMs, computer vision and speech. The system is the most technical of the divisions — dense stat grids, monospaced numerals, Green and Aqua pops that signal precision.",
-    accent: { name: "Aqua", hex: "#A1FBF9", role: "primary accent", pantone: "PMS 317 C" },
+    accent: { name: "Aqua", hex: BRAND.aqua, role: "primary accent", pantone: "PMS 317 C" },
     pops: [
-      { name: "Green", hex: "#A6FA87", role: "accuracy pop", pantone: "PMS 358 C" },
-      { name: "Lavender", hex: "#C2A3FF", role: "model pop", pantone: "PMS 264 C" },
+      { name: "Green", hex: BRAND.green, role: "accuracy pop", pantone: "PMS 358 C" },
+      { name: "Lavender", hex: BRAND.lavender, role: "model pop", pantone: "PMS 264 C" },
     ],
     subBrandGroup: {
       group: "AI Data Services",
@@ -712,10 +713,10 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     tagline: "One system, two names, shared outcomes.",
     intro:
       "The co-brand system governs how TransPerfect appears alongside a named client or strategic partner. It preserves the master identity while allowing the client mark equal weight in the lockup. Keep pops muted; the client brand color should be the loudest element on the page.",
-    accent: { name: "Peach", hex: "#FF9B70", role: "primary accent", pantone: "PMS 163 C" },
+    accent: { name: "Peach", hex: BRAND.peach, role: "primary accent", pantone: "PMS 163 C" },
     pops: [
-      { name: "Aqua", hex: "#A1FBF9", role: "surface pop", pantone: "PMS 317 C" },
-      { name: "Lavender", hex: "#C2A3FF", role: "surface pop", pantone: "PMS 264 C" },
+      { name: "Aqua", hex: BRAND.aqua, role: "surface pop", pantone: "PMS 317 C" },
+      { name: "Lavender", hex: BRAND.lavender, role: "surface pop", pantone: "PMS 264 C" },
     ],
     subBrandGroup: {
       group: "Co-brand Uses",
@@ -737,10 +738,10 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     tagline: "The eTMF that runs the trial, not the other way around.",
     intro:
       "Trial Interactive is the eClinical platform for eTMF, study start-up and investigator portals used by sponsors and CROs. Housed under TransPerfect Life Sciences, its brand system carries the clinical calm of the master identity with tighter, product-first typography and data-forward compositions.",
-    accent: { name: "Blue 500", hex: "#003FC7", role: "primary accent" },
+    accent: { name: "Blue 500", hex: BRAND.blue, role: "primary accent" },
     pops: [
-      { name: "Green", hex: "#A6FA87", role: "compliance pop", pantone: "PMS 358 C" },
-      { name: "Aqua", hex: "#A1FBF9", role: "surface pop", pantone: "PMS 317 C" },
+      { name: "Green", hex: BRAND.green, role: "compliance pop", pantone: "PMS 358 C" },
+      { name: "Aqua", hex: BRAND.aqua, role: "surface pop", pantone: "PMS 317 C" },
     ],
     subBrandGroup: {
       group: "Trial Interactive Modules",

@@ -430,7 +430,7 @@ export function ProposalWorldMap({
                 alignItems: "center",
                 gap: 4,
                 borderRadius: 999,
-                border: `1px solid ${kind === k ? "#003FC7" : "rgba(3,0,44,0.2)"}`,
+                border: `1px solid ${kind === k ? BRAND.blue : "rgba(3,0,44,0.2)"}`,
                 background: kind === k ? "rgba(0,63,199,0.08)" : "transparent",
                 padding: "2px 6px",
               }}

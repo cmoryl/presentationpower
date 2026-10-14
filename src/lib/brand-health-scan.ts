@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // DOM collector for the brand-health pre-flight.
 //
 // Reads what a rendered slide or social layout actually paints — resolved text
@@ -92,7 +93,7 @@ function surfaceFor(el: Element, root: HTMLElement): Surface {
     cur = cur.parentElement;
   }
   const mode = el.closest("[data-slide-mode]") as HTMLElement | null;
-  return { bg: mode?.dataset.slideMode === "dark" ? "#03002c" : "#ffffff", onMedia };
+  return { bg: mode?.dataset.slideMode === "dark" ? BRAND.ink : "#ffffff", onMedia };
 }
 
 /** Collect every scorable run of text inside one rendered surface. */

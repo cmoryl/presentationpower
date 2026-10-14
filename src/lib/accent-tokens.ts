@@ -54,7 +54,7 @@ export const ACCENT_ALPHA = {
 // bloom behind module cards — accent ink must clear contrast against the
 // BRIGHTEST plate, otherwise step numbers and stat figures disappear wherever
 // an orb sits behind them (very visible once flattened to PDF).
-const DARK_SURFACES = ["#03002C", "#0A1230", "#12225E", "#1B3A8C"];
+const DARK_SURFACES = [BRAND.ink, "#0A1230", "#12225E", "#1B3A8C"];
 const LIGHT_SURFACES = ["#FFFFFF", "#F2F2F2"];
 
 function rgbOf(hex: string): { r: number; g: number; b: number } | null {
@@ -126,7 +126,7 @@ export function accentInk(
   const surfaces = dark ? DARK_SURFACES : LIGHT_SURFACES;
   const a = accentHex || FALLBACK_ACCENT;
   const rgb = rgbOf(a);
-  if (!rgb) return dark ? "#FFFFFF" : "#03002C";
+  if (!rgb) return dark ? "#FFFFFF" : BRAND.ink;
   // On dark slides, contrast against the flat plates is not enough: the violet/
   // blue aurora orbs that bloom behind module cards are far brighter than any
   // fixed surface, so a deep accent (Blue 500, Pink, Red) still sinks into the
@@ -147,7 +147,7 @@ export function accentInk(
     });
     if (surfaces.every((bg) => ratio(candidate, bg) >= target)) return candidate;
   }
-  return dark ? "#FFFFFF" : "#03002C";
+  return dark ? "#FFFFFF" : BRAND.ink;
 }
 
 /** Convenience: accent ink for large display figures (AA large = 3:1). */

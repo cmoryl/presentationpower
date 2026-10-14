@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // TransPerfect NEXT 2026 — master brand guide data.
 // Source of truth: the NEXT 2026 logo Dropbox (EPS / AI / SVG / PNG masters)
 // plus "GL NEXT 26 Color Palette for logos.pdf". Vector SVGs are mirrored into
@@ -296,8 +297,8 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
   {
     id: "finance",
     name: "Finance NEXT",
-    accent: "#FF9B70",
-    accentArtwork: "#FF9B70",
+    accent: BRAND.peach,
+    accentArtwork: BRAND.peach,
     rgb: "255, 155, 112",
     cmyk: "0, 39, 56, 0",
     pantone: "Pantone 1635 C",
@@ -357,8 +358,8 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
   {
     id: "games",
     name: "Games NEXT",
-    accent: "#A6FA87",
-    accentArtwork: "#A6FA87",
+    accent: BRAND.green,
+    accentArtwork: BRAND.green,
     rgb: "166, 250, 135",
     cmyk: "34, 0, 46, 2",
     pantone: "Pantone 7487 C",
@@ -601,8 +602,8 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
   {
     id: "learn",
     name: "Learn NEXT",
-    accent: "#FFEB66",
-    accentArtwork: "#FFEB66",
+    accent: BRAND.yellow,
+    accentArtwork: BRAND.yellow,
     rgb: "255, 235, 102",
     cmyk: "0, 8, 60, 0",
     pantone: "Pantone 100 C",
@@ -662,8 +663,8 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
   {
     id: "media",
     name: "Media NEXT",
-    accent: "#EC388A",
-    accentArtwork: "#EC388A",
+    accent: BRAND.pink,
+    accentArtwork: BRAND.pink,
     rgb: "236, 56, 138",
     cmyk: "0, 76, 42, 7",
     pantone: "Pantone 205 C",
@@ -723,8 +724,8 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
   {
     id: "digital",
     name: "Digital NEXT",
-    accent: "#C2A3FF",
-    accentArtwork: "#C2A3FF",
+    accent: BRAND.lavender,
+    accentArtwork: BRAND.lavender,
     rgb: "194, 163, 255",
     cmyk: "24, 36, 0, 0",
     pantone: "Pantone 2645 C",

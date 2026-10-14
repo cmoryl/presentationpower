@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ShowcaseGallery } from "@/components/home/ShowcaseGallery";
 
@@ -112,9 +113,9 @@ const MODES: ModeDef[] = [
     id: "presentation",
     label: "Presentation",
     icon: Presentation,
-    accent: "#003FC7",
-    ink: "#003FC7",
-    glow: "#A1FBF9",
+    accent: BRAND.blue,
+    ink: BRAND.blue,
+    glow: BRAND.aqua,
     eyebrow: "Element · Presentation",
     headline: "Built to own the room.",
     copy: "From brief to board-ready in minutes. Element assembles the right story, layout, and approved visuals — you just refine and present.",
@@ -145,9 +146,9 @@ const MODES: ModeDef[] = [
     id: "print",
     label: "Print",
     icon: Printer,
-    accent: "#EC388A",
+    accent: BRAND.pink,
     ink: "#B3186B",
-    glow: "#FFEB66",
+    glow: BRAND.yellow,
     eyebrow: "Element · Print",
     headline: "Print with presence.",
     copy: "Brochures, proposals, and case studies that feel as premium in the hand as they do on screen. Press-ready, every time.",
@@ -165,9 +166,9 @@ const MODES: ModeDef[] = [
     id: "event",
     label: "Event",
     icon: CalendarDays,
-    accent: "#A6FA87",
+    accent: BRAND.green,
     ink: "#0F5C1A",
-    glow: "#C2A3FF",
+    glow: BRAND.lavender,
     eyebrow: "Element · Events",
     headline: "Every event asset, already in motion.",
     copy: "Launches, conferences, webinars, and exec briefings — signage, invites, email, and social, all timed to your run-of-show.",
@@ -190,9 +191,9 @@ const MODES: ModeDef[] = [
     id: "social",
     label: "Social",
     icon: Share2,
-    accent: "#FF9B70",
+    accent: BRAND.peach,
     ink: "#A33B12",
-    glow: "#EC388A",
+    glow: BRAND.pink,
     eyebrow: "Element · Social",
     headline: "One idea, a full feed.",
     copy: "Turn a single brand moment into a complete social set, sized for every channel and ready to post — on brand, instantly.",
@@ -613,10 +614,10 @@ function Dashboard() {
           />
         </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-4">
-          <MiniStat label="Module variants" value={MODULE_VARIANTS.length} accent="#003FC7" />
-          <MiniStat label="Sections" value={SECTION_FRAMEWORKS.length} accent="#A1FBF9" />
-          <MiniStat label="Layouts" value={LAYOUT_FRAMEWORKS.length} accent="#C2A3FF" />
-          <MiniStat label="Brand modes" value={BRAND_MODES.length} accent="#FFEB66" />
+          <MiniStat label="Module variants" value={MODULE_VARIANTS.length} accent={BRAND.blue} />
+          <MiniStat label="Sections" value={SECTION_FRAMEWORKS.length} accent={BRAND.aqua} />
+          <MiniStat label="Layouts" value={LAYOUT_FRAMEWORKS.length} accent={BRAND.lavender} />
+          <MiniStat label="Brand modes" value={BRAND_MODES.length} accent={BRAND.yellow} />
         </div>
       </section>
     </AppShell>
@@ -988,7 +989,7 @@ function AiCard({
       <div className="relative flex items-center gap-2">
         <span
           className="inline-flex h-8 w-8 items-center justify-center rounded-full"
-          style={{ backgroundColor: `${tint}33`, color: "#03002C" }}
+          style={{ backgroundColor: `${tint}33`, color: BRAND.ink }}
         >
           {icon}
         </span>
@@ -1184,10 +1185,10 @@ const ACTIVITY_META: Record<
   ActivityKind,
   { label: string; icon: React.ComponentType<{ size?: number }>; accent: string }
 > = {
-  deck: { label: "Deck", icon: Presentation, accent: "#003FC7" },
-  print: { label: "Print", icon: Printer, accent: "#EC388A" },
-  social: { label: "Social", icon: Share2, accent: "#FF9B70" },
-  event: { label: "Event", icon: CalendarDays, accent: "#A6FA87" },
+  deck: { label: "Deck", icon: Presentation, accent: BRAND.blue },
+  print: { label: "Print", icon: Printer, accent: BRAND.pink },
+  social: { label: "Social", icon: Share2, accent: BRAND.peach },
+  event: { label: "Event", icon: CalendarDays, accent: BRAND.green },
 };
 
 function RecentActivity({

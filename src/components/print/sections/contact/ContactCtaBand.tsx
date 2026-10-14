@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Full-width CTA band — the closing lockup on every curated print piece.
 import type { PrintContactSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, MODULE } from "../shared";
@@ -23,7 +24,7 @@ export function ContactCtaBand({
           gap: cq(MODULE.gridGap),
           borderRadius: cq(MODULE.radius),
           padding: `${cq(MODULE.padY)} ${cq(MODULE.padX)}`,
-          background: `color-mix(in srgb, ${accent} ${mode === "dark" ? 26 : 14}%, ${mode === "dark" ? "#03002C" : "#FFFFFF"})`,
+          background: `color-mix(in srgb, ${accent} ${mode === "dark" ? 26 : 14}%, ${mode === "dark" ? BRAND.ink : "#FFFFFF"})`,
           border: `1px solid color-mix(in srgb, ${accent} 34%, transparent)`,
         }}
       >

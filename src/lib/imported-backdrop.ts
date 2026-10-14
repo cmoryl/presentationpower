@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Master / layout background carry-over for imported PPTX decks.
 //
 // A .pptx slide inherits its backdrop from the slideLayout → slideMaster
@@ -25,11 +26,11 @@ const SCHEME_DEFAULTS: Record<string, string> = {
   lt1: "#FFFFFF",
   lt2: "#F2F2F2",
   dk1: "#000000",
-  dk2: "#03002C",
+  dk2: BRAND.ink,
   bg1: "#FFFFFF",
   bg2: "#F2F2F2",
   tx1: "#000000",
-  tx2: "#03002C",
+  tx2: BRAND.ink,
 };
 
 function hex(color: unknown, theme?: Record<string, string | undefined>): string | undefined {

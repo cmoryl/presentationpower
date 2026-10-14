@@ -728,7 +728,7 @@ export function PillarStudio({
                       width: px(qrPlace.edge),
                       height: px(qrPlace.blockH),
                       cursor: dragging ? "grabbing" : "grab",
-                      border: `1px solid ${dragging ? "#EC388A" : "rgba(0,63,199,0.7)"}`,
+                      border: `1px solid ${dragging ? BRAND.pink : "rgba(0,63,199,0.7)"}`,
                       borderRadius: 4,
                       background: dragging ? "rgba(236,56,138,0.08)" : "transparent",
                       touchAction: "none",

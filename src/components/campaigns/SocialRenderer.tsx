@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Geometry-agnostic social/event renderer.
 //
 // One component, driven by SocialFormat + brand tokens + CampaignCopy.
@@ -528,7 +529,7 @@ export function SocialRenderer({
     transformOrigin: "top left",
   };
 
-  const inkColor = mode === "dark" ? "#FFFFFF" : "#03002C";
+  const inkColor = mode === "dark" ? "#FFFFFF" : BRAND.ink;
   const dimColor = mode === "dark" ? "rgba(255,255,255,0.72)" : "rgba(3,0,44,0.62)";
   const chipBg = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.06)";
   const chipBorder =
@@ -1092,7 +1093,7 @@ export function SocialRenderer({
                           padding: `${(short * 1.2) / 100}px ${(short * 2.2) / 100}px`,
                           borderRadius: style.cta === "block" ? (short * 0.6) / 100 : 9999,
                           background: brand.tokens.accent,
-                          color: "#03002C",
+                          color: BRAND.ink,
                           fontWeight: style.cta === "block" ? 700 : 600,
                           letterSpacing: "0.02em",
                         }

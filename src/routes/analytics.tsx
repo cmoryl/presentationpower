@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -176,10 +177,10 @@ function AnalyticsPage() {
                   <Line
                     type="monotone"
                     dataKey="views"
-                    stroke="#003FC7"
+                    stroke={BRAND.blue}
                     strokeWidth={2}
                     dot={false}
-                    activeDot={{ r: 4, fill: "#A1FBF9" }}
+                    activeDot={{ r: 4, fill: BRAND.aqua }}
                   />
                 </LineChart>
               </ResponsiveContainer>

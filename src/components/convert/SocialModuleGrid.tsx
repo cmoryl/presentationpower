@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { AdaptIcon, iconFor } from "./AdaptIcon";
 // -----------------------------------------------------------------------------
 // SocialModuleGrid — "Rebuilt for this size" for social cards when the module
@@ -20,9 +21,9 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import type { SocialFormat } from "@/lib/social-formats";
 import { brandSystemDarkGround, brandSystemLightGround } from "@/lib/brand-system-template";
 
-const INK = "#03002C";
-const BLUE = "#003FC7";
-const SURFACE = "#EEF1F7";
+const INK = BRAND.ink;
+const BLUE = BRAND.blue;
+const SURFACE = BRAND.surface;
 
 export type ConvertGround = { id: string; label: string; scene: string | null; dark: boolean };
 

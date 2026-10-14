@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // All-formats export verification harness (dev only)
 //
@@ -658,7 +659,7 @@ function syntheticPng(w: number, h: number): string {
   c.width = Math.max(1, w);
   c.height = Math.max(1, h);
   const ctx = c.getContext("2d")!;
-  ctx.fillStyle = "#003FC7";
+  ctx.fillStyle = BRAND.blue;
   ctx.fillRect(0, 0, c.width, c.height);
   return c.toDataURL("image/png");
 }

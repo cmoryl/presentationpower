@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Presentation, Printer, CalendarDays, Share2, ArrowRight, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -53,9 +54,9 @@ const SURFACES: Surface[] = [
     label: "Presentation",
     eyebrow: "Modular decks · governed",
     copy: "Approved slide modules, style packs, and the deck agent — assembled into on-brand presentations and exported as editable PowerPoint.",
-    accent: "#003FC7",
-    ink: "#003FC7",
-    glow: "#A1FBF9",
+    accent: BRAND.blue,
+    ink: BRAND.blue,
+    glow: BRAND.aqua,
     to: "/library",
     artId: "globallink-enterprise-pitch",
     proof: ["Editable PPTX", "189 modules", "Style packs"],
@@ -73,9 +74,9 @@ const SURFACES: Surface[] = [
     label: "Print",
     eyebrow: "Modular print · PDF/X-4",
     copy: "Case studies, spotlights, and e-brochures built from print section modules — page-accurate, editable, and press-ready at 300 DPI.",
-    accent: "#EC388A",
+    accent: BRAND.pink,
     ink: "#B3186B",
-    glow: "#FFEB66",
+    glow: BRAND.yellow,
     to: "/library/print",
     artId: "pd-legal-proposal",
     proof: ["PDF/X-4", "300 DPI", "Layered PPTX"],
@@ -97,7 +98,7 @@ const SURFACES: Surface[] = [
     copy: "Launches, flagship conferences, webinars, and executive briefings — each phase mapped to deliverables and rendered live in your palette.",
     accent: "#0F5C1A",
     ink: "#0F5C1A",
-    glow: "#A6FA87",
+    glow: BRAND.green,
     to: "/events",
     artId: "sc-conference",
     proof: ["Phased kits", "Signage + badges", "Live palette"],
@@ -114,9 +115,9 @@ const SURFACES: Surface[] = [
     label: "Social",
     eyebrow: "Modular campaigns · division-scoped",
     copy: "Turn a single module into a full social kit — anthems, product teases, milestones, and case spotlights sized for every channel.",
-    accent: "#FF9B70",
+    accent: BRAND.peach,
     ink: "#A33B12",
-    glow: "#EC388A",
+    glow: BRAND.pink,
     to: "/social",
     artId: "sc-gaming",
     proof: ["Every channel size", "Division-scoped", "One-click kit"],
@@ -139,15 +140,15 @@ function ElementsLanding() {
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div
             className="hidden absolute -left-24 -top-32 h-[420px] w-[420px] rounded-full blur-[110px]"
-            style={{ background: "#003FC7", opacity: 0.55 }}
+            style={{ background: BRAND.blue, opacity: 0.55 }}
           />
           <div
             className="hidden absolute right-[-8%] top-[-10%] h-[360px] w-[360px] rounded-full blur-[120px]"
-            style={{ background: "#A1FBF9", opacity: 0.22 }}
+            style={{ background: BRAND.aqua, opacity: 0.22 }}
           />
           <div
             className="hidden absolute bottom-[-30%] left-[38%] h-[380px] w-[380px] rounded-full blur-[130px]"
-            style={{ background: "#C2A3FF", opacity: 0.2 }}
+            style={{ background: BRAND.lavender, opacity: 0.2 }}
           />
         </div>
 

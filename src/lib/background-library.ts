@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Curated on-brand background presets for the Backgrounds & Imagery panel.
 // Presets store either a CSS `backgroundImage` string (gradient / SVG pattern
 // data URI) or an image URL. They apply to ANY slide, independent of variant.
@@ -55,10 +56,10 @@ const svg = (inner: string) =>
   )}")`;
 
 // Brand palette anchors (mirrors mem://design/brand-palette core rules).
-const NAVY = "#03002C";
-const BLUE = "#003FC7";
-const AQUA = "#A1FBF9";
-const LAVENDER = "#C2A3FF";
+const NAVY = BRAND.ink;
+const BLUE = BRAND.blue;
+const AQUA = BRAND.aqua;
+const LAVENDER = BRAND.lavender;
 const OFFWHITE = "#F2F2F2";
 const BLUEWHITE = "#E0E8F5";
 
@@ -379,7 +380,7 @@ export function resolveSlideBackground(raw: unknown): SlideBackgroundValue | nul
     };
   }
   if (b.kind === "pattern" && b.patternId) {
-    const fg = b.color ?? "#03002C";
+    const fg = b.color ?? BRAND.ink;
     const bg = b.colorB ?? "#F2F2F2";
     const intensity = clamp01(b.intensity, 0.35);
     const scale = b.patternScale ?? 24;

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // ============================================================================
 // QA auto-fix engine — resolves blocking issues and warnings WITHOUT losing
 // authored or imported content.
@@ -257,13 +258,13 @@ const toHex = (rgb: [number, number, number]) =>
  * synthesised tint, so a governance review still passes.
  */
 const APPROVED_ACCENTS = [
-  "#A1FBF9", // Aqua
-  "#C2A3FF", // Lavender
-  "#FFEB66", // Yellow
-  "#A6FA87", // Green
-  "#FF9B70", // Peach
-  "#003FC7", // Blue 500
-  "#03002C", // Blue 800
+  BRAND.aqua, // Aqua
+  BRAND.lavender, // Lavender
+  BRAND.yellow, // Yellow
+  BRAND.green, // Green
+  BRAND.peach, // Peach
+  BRAND.blue, // Blue 500
+  BRAND.ink, // Blue 800
 ];
 
 /** The approved palette colour closest in hue to `accent` that clears `target`. */

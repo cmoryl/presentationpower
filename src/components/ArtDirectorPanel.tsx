@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -52,16 +53,16 @@ const CHAPTER_LABEL: Record<string, string> = {
 };
 
 const VERDICT_COLOR: Record<string, string> = {
-  light: "#FFEB66",
-  balanced: "#A6FA87",
-  heavy: "#FF9B70",
+  light: BRAND.yellow,
+  balanced: BRAND.green,
+  heavy: BRAND.peach,
 };
 
 function scoreBand(score: number) {
-  if (score >= 85) return { label: "Cinematic", color: "#A6FA87" };
-  if (score >= 70) return { label: "Well paced", color: "#FFEB66" };
-  if (score >= 50) return { label: "Uneven", color: "#FF9B70" };
-  return { label: "Flat", color: "#EC388A" };
+  if (score >= 85) return { label: "Cinematic", color: BRAND.green };
+  if (score >= 70) return { label: "Well paced", color: BRAND.yellow };
+  if (score >= 50) return { label: "Uneven", color: BRAND.peach };
+  return { label: "Flat", color: BRAND.pink };
 }
 
 export function ArtDirectorPanel({

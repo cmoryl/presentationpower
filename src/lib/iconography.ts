@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Iconography system — placement, sizing, treatment, spacing, and accessibility
 // tokens for module variants. Consumed by VariantRenderer, surfaced in /atlas,
 // and referenced from taxonomy.ts (ModuleVariant.iconography).
@@ -154,7 +155,7 @@ export function resolveEmphasisColors(
     case "outline-tile":
       return { bg: "transparent", fg: roleColor, border: hexA(roleColor, dark ? 0.6 : 0.33) };
     case "filled-tile":
-      return { bg: roleColor, fg: dark ? "#03002C" : "#FFFFFF" };
+      return { bg: roleColor, fg: dark ? BRAND.ink : "#FFFFFF" };
     case "duotone":
       return { bg: hexA(accent, dark ? 0.2 : 0.13), fg: primary };
     case "on-dark":

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // High-resolution print & production proof exporter.
 //
@@ -202,7 +203,7 @@ export function proofFileBase(label: string, geo: ProofGeometry, opts: ProofOpti
 export function drawCropMarks(
   ctx: CanvasRenderingContext2D,
   geo: ProofGeometry,
-  colour = "#03002C",
+  colour = BRAND.ink,
 ): void {
   if (!geo.cropMarks) return;
   const { bleedPx, markLenPx, markGapPx, markWeightPx } = geo;

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useRequireSignIn } from "@/hooks/use-require-sign-in";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useId, useMemo, useState } from "react";
@@ -422,7 +423,7 @@ function NewAssetPage() {
               </div>
               {brand && (
                 <div className="mt-3 flex items-center gap-3 rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
-                  <BrandLockup brand={brand} color="#03002C" size="sm" />
+                  <BrandLockup brand={brand} color={BRAND.ink} size="sm" />
                 </div>
               )}
               <dl className="mt-4 space-y-2 text-xs">

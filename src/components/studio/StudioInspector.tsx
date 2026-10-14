@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Right rail for the Open Canvas Studio — properties for the selected item.
 
 import { MODULE_VARIANTS } from "@/lib/taxonomy";
@@ -315,7 +316,7 @@ export function StudioInspector({
             <input
               type="color"
               className="h-9 w-full rounded-lg border border-black/15"
-              value={item.color ?? "#03002C"}
+              value={item.color ?? BRAND.ink}
               onChange={(e) => onPatch({ color: e.target.value } as Partial<CanvasItem>)}
             />
           </Row>
@@ -382,7 +383,7 @@ export function StudioInspector({
               <input
                 type="color"
                 className="h-9 w-full rounded-lg border border-black/15"
-                value={item.accent ?? "#003FC7"}
+                value={item.accent ?? BRAND.blue}
                 onChange={(e) => onPatch({ accent: e.target.value } as Partial<CanvasItem>)}
               />
             </Row>

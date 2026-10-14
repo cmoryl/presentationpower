@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // One agent conversation: threads rail, chat, and a live deck preview.
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -37,14 +38,14 @@ import {
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const AGENT_ACCENT = "#003FC7";
-const AGENT_GLOW = "#A1FBF9";
+const AGENT_ACCENT = BRAND.blue;
+const AGENT_GLOW = BRAND.aqua;
 
 const AGENT_CAPABILITIES: Array<{ label: string; icon: LucideIcon; color: string }> = [
-  { label: "Build from a brief", icon: Bot, color: "#003FC7" },
-  { label: "Apply brand layouts", icon: Wand2, color: "#EC388A" },
-  { label: "Export editable PPTX", icon: Download, color: "#A6FA87" },
-  { label: "Iterate in the chat", icon: MessageSquare, color: "#FF9B70" },
+  { label: "Build from a brief", icon: Bot, color: BRAND.blue },
+  { label: "Apply brand layouts", icon: Wand2, color: BRAND.pink },
+  { label: "Export editable PPTX", icon: Download, color: BRAND.green },
+  { label: "Iterate in the chat", icon: MessageSquare, color: BRAND.peach },
 ];
 
 const STARTER_BRIEFS = [

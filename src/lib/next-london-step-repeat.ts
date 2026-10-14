@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // TransPerfect NEXT 2026 — STEP & REPEAT WALL builder.
 //
 // A step-and-repeat (press / photo wall) is NOT a single signage panel with a
@@ -167,12 +168,12 @@ export const STEP_REPEAT_QR_PLATE_LABELS: Record<StepRepeatQrPlateShape, string>
 
 /** Approved brand inks a repeated code may print in. */
 export const STEP_REPEAT_QR_SWATCHES: { hex: string; label: string }[] = [
-  { hex: "#03002C", label: "Blue 800" },
-  { hex: "#003FC7", label: "Blue 500" },
+  { hex: BRAND.ink, label: "Blue 800" },
+  { hex: BRAND.blue, label: "Blue 500" },
   { hex: "#FFFFFF", label: "White" },
   { hex: "#E0E8F5", label: "Blue white" },
-  { hex: "#A1FBF9", label: "Aqua" },
-  { hex: "#C2A3FF", label: "Lavender" },
+  { hex: BRAND.aqua, label: "Aqua" },
+  { hex: BRAND.lavender, label: "Lavender" },
 ];
 
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
@@ -207,7 +208,7 @@ export const DEFAULT_STEP_REPEAT: StepRepeatConfig = {
   opacity: 1,
   text: "TRANSPERFECT NEXT",
   qrData: "",
-  qrInkHex: "#03002C",
+  qrInkHex: BRAND.ink,
   qrPlateHex: "#FFFFFF",
   qrModuleShape: "square",
   qrPlateShape: "rounded",
@@ -750,7 +751,7 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
         }
       : null,
 
-    inkHex: picked.colourway === "dblue" ? "#03002C" : "#FFFFFF",
+    inkHex: picked.colourway === "dblue" ? BRAND.ink : "#FFFFFF",
     tiles,
     pitchX,
     pitchY,
@@ -836,7 +837,7 @@ export function stepRepeatWarnings(panel: LondonPanel, plan: StepRepeatPlan): st
       const c = [0, 2, 4].map((i) => parseInt(v.slice(i, i + 2), 16) / 255);
       return 0.2126 * c[0]! + 0.7152 * c[1]! + 0.0722 * c[2]!;
     };
-    const ground = plan.qr.plateHex ?? (plan.inkHex === "#03002C" ? "#FFFFFF" : "#03002C");
+    const ground = plan.qr.plateHex ?? (plan.inkHex === BRAND.ink ? "#FFFFFF" : BRAND.ink);
     if (Math.abs(lum(plan.qr.inkHex) - lum(ground)) < 0.4)
       out.push("QR colour and its plate are too close in value — phones will fail to scan it.");
     if (plan.config.qrModuleShape === "dot" && mmToIn(plan.config.tileWidthMm) < 8)

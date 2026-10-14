@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // NEXT event booklet — page rendering (browser only).
 //
@@ -178,7 +179,7 @@ export async function bookletCoverGroundPng(
   });
   if (!img) return null;
 
-  ctx.fillStyle = "#03002C";
+  ctx.fillStyle = BRAND.ink;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   const box = {

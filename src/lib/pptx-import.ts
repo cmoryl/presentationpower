@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Server function: parse an uploaded .pptx into slide records + high-fidelity
 // extras. In addition to text, embedded images, and theme colors, the parser
 // also extracts structured graphical elements per slide:
@@ -73,7 +74,7 @@ export type DiagramLayoutHint =
   | "funnel"
   | "list";
 export type ConnectorStyle = {
-  /** Stroke color resolved through theme (hex, e.g. "#003FC7"). */
+  /** Stroke color resolved through theme (hex, e.g. BRAND.blue). */
   color?: string;
   /** Line width in points (EMU / 12700). */
   widthPt?: number;

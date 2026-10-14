@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * Public test harness for PrintHeroMedia focal-point clamping and safe-area guards.
  *
@@ -120,7 +121,7 @@ function PrintHeroHarness() {
         {/* Wrap with a data-testid probe so Playwright can find the band
             regardless of internal layout changes. */}
         <div data-testid="hero-band-wrap">
-          <PrintHeroMediaLayer media={media} accent="#003FC7" mode="light" cq={cq} />
+          <PrintHeroMediaLayer media={media} accent={BRAND.blue} mode="light" cq={cq} />
         </div>
         {/* Tag the actual band + img so tests read stable selectors even if
             PrintHeroMediaLayer's internal DOM shape changes. We locate them

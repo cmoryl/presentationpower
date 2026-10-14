@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Social playbooks — division-scoped campaign archetypes.
 //
 // Mirrors src/lib/event-playbooks.ts but for evergreen social campaigns
@@ -85,7 +86,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "TransPerfect",
     kitProfileId: "social-essentials",
     seedVariantId: "MV-INS-BIG-IDEA",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     chip: "Master",
     copy: {
       title: "Every language. Every content type. One partner.",
@@ -148,7 +149,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "TransPerfect Media",
     kitProfileId: "full-launch",
     seedVariantId: "MV-CASE-METRICS",
-    accent: "#EC388A",
+    accent: BRAND.pink,
     chip: "Media",
     copy: {
       title: "One title. 62 languages. Zero broadcast delays.",
@@ -213,7 +214,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "TransPerfect Legal",
     kitProfileId: "email-set",
     seedVariantId: "MV-INS-SO-WHAT",
-    accent: "#03002C",
+    accent: BRAND.ink,
     chip: "Legal",
     copy: {
       title: "76% of GCs say cross-border discovery still surprises them at trial.",
@@ -273,7 +274,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "TransPerfect Legal",
     kitProfileId: "social-essentials",
     seedVariantId: "MV-INS-SO-WHAT",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     chip: "Legal",
     copy: {
       title: "We're here for the thorny work.",
@@ -337,7 +338,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "TransPerfect Gaming",
     kitProfileId: "full-launch",
     seedVariantId: "MV-PROOF-STATS-3",
-    accent: "#A6FA87",
+    accent: BRAND.green,
     chip: "Gaming",
     copy: {
       title: "1 billion words of gameplay, localized in 2026.",
@@ -542,7 +543,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "TransPerfect · Enterprise",
     kitProfileId: "email-set",
     seedVariantId: "MV-INS-CALLOUT",
-    accent: "#03002C",
+    accent: BRAND.ink,
     chip: "Enterprise",
     copy: {
       title: "TransPerfect closes 2026 with $1.5B in annual revenue.",
@@ -592,7 +593,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "TransPerfect · Co-brand",
     kitProfileId: "full-launch",
     seedVariantId: "MV-PROOF-LOGOS-FEATURED",
-    accent: "#C2A3FF",
+    accent: BRAND.lavender,
     chip: "Co-brand",
     copy: {
       title: "TransPerfect + [Partner] · one workflow, every language.",
@@ -643,7 +644,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "TransPerfect Life Sciences",
     kitProfileId: "full-launch",
     seedVariantId: "MV-CTX-STAT-GRID",
-    accent: "#A6FA87",
+    accent: BRAND.green,
     chip: "Life Sciences",
     copy: {
       title: "Now enrolling in 4 countries — a Phase II study for treatment-resistant depression.",
@@ -693,7 +694,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "TransPerfect Legal",
     kitProfileId: "social-essentials",
     seedVariantId: "MV-CASE-METRICS",
-    accent: "#003FC7",
+    accent: BRAND.blue,
     chip: "Legal",
     copy: {
       title: "8.4M documents · 12 languages · 74 days.",
@@ -743,7 +744,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "TransPerfect Gaming",
     kitProfileId: "full-launch",
     seedVariantId: "MV-ED-HERO-BLEED",
-    accent: "#EC388A",
+    accent: BRAND.pink,
     chip: "Gaming",
     copy: {
       title: "Every quest. Every quip. 32 languages, day-and-date.",
@@ -793,7 +794,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "GlobalLink",
     kitProfileId: "event-kit",
     seedVariantId: "MV-OP-COVER-DOSSIER",
-    accent: "#A1FBF9",
+    accent: BRAND.aqua,
     chip: "GlobalLink",
     copy: {
       title: "Inside the GlobalLink AI · a 30-minute deep-dive with the product team.",
@@ -842,7 +843,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "TransPerfect Media",
     kitProfileId: "social-essentials",
     seedVariantId: "MV-OP-COVER-EDITORIAL",
-    accent: "#FFEB66",
+    accent: BRAND.yellow,
     chip: "Media",
     copy: {
       title: "Nominated · Best Localized Series, Global Media Awards 2026.",
@@ -886,7 +887,7 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     divisionLabel: "Trial Interactive",
     kitProfileId: "email-set",
     seedVariantId: "MV-CTX-STAT-GRID",
-    accent: "#A1FBF9",
+    accent: BRAND.aqua,
     chip: "Trial Interactive",
     copy: {
       title: "10,000 clinical trials · 68 countries · 1 platform.",

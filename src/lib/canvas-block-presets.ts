@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Advanced block presets for the Open Canvas Studio.
 //
 // A preset is a small, ready-made arrangement of primitive blocks (text, stat,
@@ -25,8 +26,8 @@ export type BlockPreset = {
   parts: PresetPart[];
 };
 
-const INK = "#03002C";
-const ACCENT = "#003FC7";
+const INK = BRAND.ink;
+const ACCENT = BRAND.blue;
 const PLATE = "#E0E8F5";
 const LIGHT = "#F2F2F2";
 
@@ -1243,7 +1244,7 @@ export const BLOCK_PRESETS: BlockPreset[] = [
         y: 660,
         w: 900,
         h: 60,
-        props: kicker({ text: "Name · Role", color: "#A1FBF9" }),
+        props: kicker({ text: "Name · Role", color: BRAND.aqua }),
       },
     ],
   },

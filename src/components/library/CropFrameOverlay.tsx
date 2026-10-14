@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Drag-to-crop frame drawn over the selected image cell in the Slide Studio.
 //
 // Two gestures:
@@ -142,7 +143,7 @@ export function CropFrameOverlay({
           style={{
             left: `${f.x}%`,
             top: `${f.y}%`,
-            background: "#A1FBF9",
+            background: BRAND.aqua,
             boxShadow: "0 0 0 2px rgba(3,0,44,0.6)",
           }}
         />
@@ -158,7 +159,7 @@ export function CropFrameOverlay({
             left: `${c.x * 100}%`,
             top: `${c.y * 100}%`,
             cursor: c.cursor,
-            background: "#A1FBF9",
+            background: BRAND.aqua,
             borderColor: "rgba(3,0,44,0.65)",
             touchAction: "none",
           }}
@@ -167,7 +168,7 @@ export function CropFrameOverlay({
 
       <span
         className="pointer-events-none absolute -top-6 left-0 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide"
-        style={{ background: "#A1FBF9", color: "#03002C" }}
+        style={{ background: BRAND.aqua, color: BRAND.ink }}
       >
         Drag to crop · corners zoom {(zoom && zoom > 0 ? zoom : 1).toFixed(2)}×
       </span>

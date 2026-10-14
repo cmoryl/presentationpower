@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // NEXT MART price list — live editable outputs.
 //
 // One sheet, four editable files, all built from the same layout the browser
@@ -50,7 +51,7 @@ import {
 const MM_TO_PT = 72 / 25.4;
 const MM_TO_IN = 1 / 25.4;
 const CARD = "#FFFFFF";
-const INK = "#03002C";
+const INK = BRAND.ink;
 
 function hexRgb(h: string) {
   const s = (h || "#000000").replace("#", "");

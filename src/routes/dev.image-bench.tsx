@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // Image re-encode performance benchmark (dev only)
 //
@@ -78,7 +79,7 @@ function paint(spec: SampleSpec): HTMLCanvasElement {
   canvas.height = spec.h;
   const ctx = canvas.getContext("2d")!;
   if (!spec.alpha) {
-    ctx.fillStyle = "#03002C";
+    ctx.fillStyle = BRAND.ink;
     ctx.fillRect(0, 0, spec.w, spec.h);
   } else {
     ctx.clearRect(0, 0, spec.w, spec.h);
@@ -86,8 +87,8 @@ function paint(spec: SampleSpec): HTMLCanvasElement {
   if (spec.content === "photo") {
     // Pseudo-random noise + gradients: incompressible, like a real photograph.
     const grad = ctx.createLinearGradient(0, 0, spec.w, spec.h);
-    grad.addColorStop(0, "#003FC7");
-    grad.addColorStop(1, "#FF9B70");
+    grad.addColorStop(0, BRAND.blue);
+    grad.addColorStop(1, BRAND.peach);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, spec.w, spec.h);
     let seed = 1337;

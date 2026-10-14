@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Cross-division approved icon library: every brand guide's approved set in one
 // place, with the same preview + download controls the guides use.
 
@@ -35,7 +36,7 @@ function IconLibraryPage() {
   const guide = getBrandGuide(slug);
   const hero = slug.startsWith("next-2026")
     ? (iconColorOptions(slug)[1]?.hex ?? "#1B3E6F")
-    : (guide?.secondaryColors?.[0]?.hex ?? "#003FC7");
+    : (guide?.secondaryColors?.[0]?.hex ?? BRAND.blue);
 
   return (
     <AppShell>

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Live brand-guide editor.
 //
 // Edits the colours, typography, logo rules and intro copy of one guide, plus
@@ -222,7 +223,7 @@ function SwatchRows({
         variant="outline"
         size="sm"
         className="mt-2"
-        onClick={() => onChange([...list, { name: "New colour", hex: "#003FC7" }])}
+        onClick={() => onChange([...list, { name: "New colour", hex: BRAND.blue }])}
       >
         <Plus className="mr-1 h-4 w-4" />
         Add colour

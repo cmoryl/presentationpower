@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // TransPerfect NEXT 2026 — London signage PLACED ARTWORK (designer uploads).
 //
 // A location designer can drop a vector file (.svg, or an Illustrator .eps)
@@ -140,7 +141,7 @@ export function parsePaint(value: unknown): { hex: string; alpha: number; painte
 
   const named = NAMED_INK[key];
   if (named) return { hex: named, alpha: 1, painted: true };
-  return { hex: "#03002C", alpha: 1, painted: true };
+  return { hex: BRAND.ink, alpha: 1, painted: true };
 }
 
 const NAMED_INK: Record<string, string> = {

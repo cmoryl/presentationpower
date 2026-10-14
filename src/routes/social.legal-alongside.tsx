@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // /social/legal-alongside — the "You're not on it alone." Legal campaign board.
 //
 // Sixteen commissioned documentary frames, each with its own headline and
@@ -99,7 +100,7 @@ function AlongsideView() {
         width: size.w,
         height: size.h,
         cacheBust: true,
-        backgroundColor: "#03002C",
+        backgroundColor: BRAND.ink,
       };
       const url =
         dlFormat === "png"

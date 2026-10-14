@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * ThemedHeroVideo — one photoreal motion plate behind a dark hero band, with a
  * dark-authored and a light-authored version selected by the active theme.
@@ -15,7 +16,7 @@ export function ThemedHeroVideo({
   dark,
   light,
   /** Scrim base colour — matches the hero band behind it. */
-  scrim = "#03002C",
+  scrim = BRAND.ink,
 }: {
   dark: string;
   light: string;

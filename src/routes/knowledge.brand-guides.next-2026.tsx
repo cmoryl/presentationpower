@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LONDON_PACK_GROUNDS, LONDON_PACK_GROUND_NOTE } from "@/lib/next-london-pack-grounds";
 import { LONDON_STYLES } from "@/lib/next-london-signage";
@@ -226,7 +227,7 @@ function NextBrandGuide() {
         <div
           aria-hidden
           className="hidden pointer-events-none absolute -bottom-32 left-1/3 h-80 w-80 rounded-full opacity-20 blur-3xl"
-          style={{ background: "#C2A3FF" }}
+          style={{ background: BRAND.lavender }}
         />
         <div className="relative">
           <div className="text-[11px] uppercase tracking-[0.35em] text-white/60">

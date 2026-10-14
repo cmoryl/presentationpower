@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // Social corner-rounding harness (dev only)
 //
@@ -79,7 +80,7 @@ const COPY: CampaignCopy = {
 const PHOTO =
   "data:image/svg+xml;utf8," +
   encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#03002C"/><stop offset="1" stop-color="#003FC7"/></linearGradient></defs><rect width="1200" height="1200" fill="url(#g)"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color={BRAND.ink}/><stop offset="1" stop-color={BRAND.blue}/></linearGradient></defs><rect width="1200" height="1200" fill="url(#g)"/></svg>`,
   );
 
 function SocialCornersHarness() {

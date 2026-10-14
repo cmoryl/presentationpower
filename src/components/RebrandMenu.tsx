@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useMemo, useRef, useState } from "react";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 import { useServerFn } from "@tanstack/react-start";
@@ -32,10 +33,10 @@ function buildTargets(): BrandTarget[] {
         label: g.title,
         sublabel: "Master brand",
         swatches: [
-          g.primaryColors[0]?.hex ?? "#03002C",
-          g.primaryColors[1]?.hex ?? "#003FC7",
-          g.secondaryColors[0]?.hex ?? "#A1FBF9",
-          g.tertiaryColors[0]?.hex ?? "#FFEB66",
+          g.primaryColors[0]?.hex ?? BRAND.ink,
+          g.primaryColors[1]?.hex ?? BRAND.blue,
+          g.secondaryColors[0]?.hex ?? BRAND.aqua,
+          g.tertiaryColors[0]?.hex ?? BRAND.yellow,
         ],
       });
       continue;
@@ -47,10 +48,10 @@ function buildTargets(): BrandTarget[] {
       label: g.title,
       sublabel: g.subtitle.replace(" · Brand Guidelines", ""),
       swatches: [
-        g.primaryColors[0]?.hex ?? "#03002C",
-        g.primaryColors[1]?.hex ?? g.primaryColors[0]?.hex ?? "#003FC7",
-        g.secondaryColors[0]?.hex ?? "#A1FBF9",
-        g.tertiaryColors[0]?.hex ?? "#FFEB66",
+        g.primaryColors[0]?.hex ?? BRAND.ink,
+        g.primaryColors[1]?.hex ?? g.primaryColors[0]?.hex ?? BRAND.blue,
+        g.secondaryColors[0]?.hex ?? BRAND.aqua,
+        g.tertiaryColors[0]?.hex ?? BRAND.yellow,
       ],
     });
   }
@@ -187,7 +188,7 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
                             logos?.color ??
                             logos?.stackedWhite ??
                             logos?.stackedColor;
-                          const bg = `linear-gradient(135deg, ${t.swatches[0] ?? "#03002C"}, ${t.swatches[1] ?? "#003FC7"})`;
+                          const bg = `linear-gradient(135deg, ${t.swatches[0] ?? BRAND.ink}, ${t.swatches[1] ?? BRAND.blue})`;
                           return (
                             <div
                               className="flex h-10 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md ring-1 ring-white/10"

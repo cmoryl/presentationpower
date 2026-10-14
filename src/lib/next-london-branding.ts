@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // TransPerfect NEXT 2026 — London signage BRANDING LAYER.
 //
 // Every generated panel now carries the official NEXT 2026 lockup and its
@@ -446,8 +447,8 @@ export function londonBrandingPlan(
           radiusMm: qrSize * nudge.qrRadius,
           // Inverted codes knock the modules out of a deep-navy plate; scanners
           // read both polarities, and the dark plate sits better on light art.
-          plateInk: nudge.qrInvert ? "#03002C" : "#FFFFFF",
-          moduleInk: nudge.qrInvert ? "#FFFFFF" : "#03002C",
+          plateInk: nudge.qrInvert ? BRAND.ink : "#FFFFFF",
+          moduleInk: nudge.qrInvert ? "#FFFFFF" : BRAND.ink,
         };
       })()
     : null;
