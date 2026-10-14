@@ -7,4 +7,4 @@
 - [x] 4. Retry-safe generate_deck: deck_jobs table + idempotency key + get_deck_job; duplicate-call test
 - [x] 5. Role access audit script (`scripts/rls-role-audit.sh`)
 - [x] 6. Trial Interactive logos checked: already vector in every page
-- [ ] 7. Look inside AI infographic + Baxter source folders — blocked: needs the Dropbox link again
+- [x] 7. AI infographic + Baxter source files checked: picture parts match pictures embedded in the designers' files
