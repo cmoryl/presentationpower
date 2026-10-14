@@ -82,6 +82,7 @@ import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { BulkSlideActions } from "@/components/BulkSlideActions";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
 import { SlideAlternatives } from "@/components/SlideAlternatives";
+import { SlideBrandChecks } from "@/components/SlideBrandChecks";
 import { TemplateOverridePanel } from "@/components/slide/TemplateOverridePanel";
 import {
   useDeckStore,
@@ -2157,6 +2158,15 @@ function DeckEditor() {
                         storageKey="deck-inspector-tab"
                         onCollapse={() => setRailTab(null)}
                       >
+                        {active && (
+                          <InspectorSection id="checks" label="Checks">
+                            <SlideBrandChecks
+                              slide={active}
+                              qa={qa}
+                              extraBanned={[]}
+                            />
+                          </InspectorSection>
+                        )}
                         {active && mv && (
                           <InspectorSection id="swap" label="Swap">
                             <Panel label="Current module">

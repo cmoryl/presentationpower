@@ -16,6 +16,9 @@ export type QaIssue = {
   code: string;
 };
 
+/** Aqua, Lavender, Yellow, Green, Peach — fail on white, approved on navy. */
+export const DARK_ONLY_ACCENTS = new Set(["#A1FBF9", "#C2A3FF", "#FFEB66", "#A6FA87", "#FF9B70"]);
+
 export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
   const issues: QaIssue[] = [];
   const profile = brandModeId ? BRAND_PROFILES[brandModeId] : undefined;
@@ -115,6 +118,15 @@ export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
             ratio < 3
               ? `Accent ${accent.toUpperCase()} contrasts ${ratio.toFixed(2)}:1 against the ${slide.mode === "dark" ? "dark" : "light"} slide background — below WCAG AA (3:1 large / 4.5:1 text)`
               : `Accent ${accent.toUpperCase()} contrasts ${ratio.toFixed(2)}:1 — OK for large/graphical use only, fails 4.5:1 for text`,
+        });
+      }
+      // Light secondary/tertiary accents are approved for dark grounds only.
+      if (slide.mode !== "dark" && DARK_ONLY_ACCENTS.has(accent.toUpperCase())) {
+        issues.push({
+          slideId: slide.id,
+          severity: "warn",
+          code: "accent-dark-only",
+          message: `Accent ${accent.toUpperCase()} is for dark backgrounds only — switch this slide to dark or use Blue 500`,
         });
       }
     }
