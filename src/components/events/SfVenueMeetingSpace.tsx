@@ -67,9 +67,15 @@ export function SfVenueMeetingSpace() {
       </div>
 
       <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-        <a href={plan.url} target="_blank" rel="noreferrer" className="block rounded-md border border-[#03002C]/10 bg-white p-2">
-          <img src={plan.url} alt={`InterContinental San Francisco ${plan.title.toLowerCase()} plan`} className="h-auto w-full" loading="lazy" />
-        </a>
+        <div>
+          <a href={plan.vectorUrl} target="_blank" rel="noreferrer" className="block rounded-md border border-[#03002C]/10 bg-white p-2">
+            <img src={plan.vectorUrl} alt={`InterContinental San Francisco ${plan.title.toLowerCase()} plan`} className="h-auto w-full" loading="lazy" />
+          </a>
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px]">
+            <a href={plan.vectorUrl} download={`InterContinental-SF-floor-${plan.floor}-vector.svg`} className="font-semibold text-[#003FC7] hover:underline">Download vector plan (SVG)</a>
+            <span className="text-[#666666]">Drawn paths from the hotel&rsquo;s 2017 sheet — confirm with the hotel before printing.</span>
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-[12px] text-[#03002C]">
             <caption className="sr-only">{plan.title} room capacities</caption>

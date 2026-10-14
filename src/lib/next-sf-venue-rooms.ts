@@ -10,6 +10,10 @@ import floor3 from "@/assets/sf-venue/floor-3.jpg.asset.json";
 import floor4 from "@/assets/sf-venue/floor-4.jpg.asset.json";
 import floor5 from "@/assets/sf-venue/floor-5.jpg.asset.json";
 import floor6 from "@/assets/sf-venue/floor-6.jpg.asset.json";
+import vec3 from "@/assets/sf-intercontinental/level-3.svg?url";
+import vec4 from "@/assets/sf-intercontinental/level-4.svg?url";
+import vec5 from "@/assets/sf-intercontinental/level-5.svg?url";
+import vec6 from "@/assets/sf-intercontinental/level-6.svg?url";
 import type { AssetRoom } from "@/lib/event-assets";
 
 export const SF_VENUE_FACT_SHEET = {
@@ -78,11 +82,16 @@ export const SF_VENUE_ROOMS: SfVenueRoom[] = [
   r("Spa Terrace", 6, [_, _, 200, 120, _, _, _], "50 x 40", _),
 ];
 
+/**
+ * Each floor: `url` = picture of the sheet, `vectorUrl` = the plan's own vector
+ * paths split from the fact sheet by `scripts/sf-venue-floor-vectors.py`
+ * (shapes and inks as drawn, nothing traced or redrawn).
+ */
 export const SF_VENUE_FLOORS = [
-  { floor: 3, title: "Third floor", url: floor3.url },
-  { floor: 4, title: "Fourth floor", url: floor4.url },
-  { floor: 5, title: "Fifth floor", url: floor5.url },
-  { floor: 6, title: "Sixth floor", url: floor6.url },
+  { floor: 3, title: "Third floor", url: floor3.url, vectorUrl: vec3 },
+  { floor: 4, title: "Fourth floor", url: floor4.url, vectorUrl: vec4 },
+  { floor: 5, title: "Fifth floor", url: floor5.url, vectorUrl: vec5 },
+  { floor: 6, title: "Sixth floor", url: floor6.url, vectorUrl: vec6 },
 ] as const;
 
 /** Largest seated/standing figure the sheet gives a room, as text. */
