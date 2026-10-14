@@ -23,4 +23,4 @@
 - [ ] C1. Cited two-pass generation with server-side figure validator
 - [ ] C2. One token file → generated outputs (scoped by the retired-division-colours rule)
 - [ ] H4 / Quarter items (.potx masters, Office add-in, Canva autofill, C2PA, role-split nav) — larger projects
-- [ ] H5. GitHub sync + protected main — owner action in Lovable settings
+- [x] H5. GitHub sync — owner connected
