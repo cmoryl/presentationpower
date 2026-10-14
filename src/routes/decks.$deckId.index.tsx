@@ -2157,6 +2157,15 @@ function DeckEditor() {
                         storageKey="deck-inspector-tab"
                         onCollapse={() => setRailTab(null)}
                       >
+                        {active && (
+                          <InspectorSection id="checks" label="Checks">
+                            <SlideBrandChecks
+                              slide={active}
+                              qa={qa}
+                              extraBanned={brief?.wordsToAvoid ?? []}
+                            />
+                          </InspectorSection>
+                        )}
                         {active && mv && (
                           <InspectorSection id="swap" label="Swap">
                             <Panel label="Current module">
