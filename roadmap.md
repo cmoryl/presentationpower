@@ -11,8 +11,8 @@
 
 # Build review — remaining (Weeks 1–4 + Quarter)
 
-- [ ] 2c. Export gate: field capacity + brief leakage on cover/closing slides
-- [ ] H3. Check the knowledge search index (EXPLAIN) and division coverage; add index if missing
+- [x] 2c. Export gate: brief wording on cover/closing blocked; new-deck covers no longer copy the meeting objective (capacity already blocked by export QA)
+- [x] H3. Search index checked: fast index already exists; gap is coverage (Legal, Games, Media, Trial Interactive have no PowerPoint material; Trial Interactive has 3 pieces)
 - [ ] P7. Print preflight (low-res images, bleed/trim, fonts; RGB-only and thin-stroke warnings)
 - [ ] P6. "Show alternatives" variant shuffle on deck slides
 - [ ] P5. Live brand checks panel (contrast, safe area, banned words, overflow, off-palette)
