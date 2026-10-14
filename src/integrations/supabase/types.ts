@@ -2618,9 +2618,12 @@ export type Database = {
           published_by: string | null
           rooms: Json
           source_file: string | null
+          source_page: string | null
           source_url: string | null
           status: string
           updated_at: string
+          verified_at: string | null
+          verified_by: string | null
           version: number
         }
         Insert: {
@@ -2633,9 +2636,12 @@ export type Database = {
           published_by?: string | null
           rooms?: Json
           source_file?: string | null
+          source_page?: string | null
           source_url?: string | null
           status?: string
           updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
           version: number
         }
         Update: {
@@ -2648,9 +2654,12 @@ export type Database = {
           published_by?: string | null
           rooms?: Json
           source_file?: string | null
+          source_page?: string | null
           source_url?: string | null
           status?: string
           updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
           version?: number
         }
         Relationships: []
@@ -4256,11 +4265,15 @@ export type Database = {
           share_token: string | null
           shared_at: string | null
           source_deck_id: string | null
+          source_file: string | null
           source_module_ids: string[]
+          source_page: string | null
           source_slide_ids: string[]
           status: string
           title: string
           updated_at: string
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           brand_mode_id?: string | null
@@ -4275,11 +4288,15 @@ export type Database = {
           share_token?: string | null
           shared_at?: string | null
           source_deck_id?: string | null
+          source_file?: string | null
           source_module_ids?: string[]
+          source_page?: string | null
           source_slide_ids?: string[]
           status?: string
           title: string
           updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           brand_mode_id?: string | null
@@ -4294,11 +4311,15 @@ export type Database = {
           share_token?: string | null
           shared_at?: string | null
           source_deck_id?: string | null
+          source_file?: string | null
           source_module_ids?: string[]
+          source_page?: string | null
           source_slide_ids?: string[]
           status?: string
           title?: string
           updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: [
           {

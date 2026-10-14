@@ -1,4 +1,5 @@
 // Event assets: bring in the agenda and room list from a link or a file,
+import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 // check every row, save a draft, publish (admins and brand leads).
 
 import { useEffect, useMemo, useState } from "react";
@@ -226,6 +227,7 @@ export function EventAssetsPanel({ eventId }: { eventId: string }) {
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="assets-rooms" className="text-lg font-semibold">Room list</h2>
           <span className="text-xs text-muted-foreground">{pub(d.publishedRooms)}</span>
+          {d.publishedRooms?.id && <ProvenanceBadge table="event_rooms" id={d.publishedRooms.id} />}
         </div>
         <p className="mt-1 max-w-3xl text-sm text-muted-foreground">Paste a link or upload the venue's room list. Published rooms become the room choices in the agenda and for room signage.</p>
         <div className="mt-4"><ImportBar kind="rooms" onRows={(rows, src) => { setRooms(cleanRooms(rows)); setRmSrc(src); }} /></div>
