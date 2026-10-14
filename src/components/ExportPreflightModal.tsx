@@ -26,6 +26,7 @@ export function ExportPreflightModal({
   const dialogRef = useRef<HTMLDivElement>(null);
   useModalA11y({ open, onClose: onCancel, containerRef: dialogRef });
   if (!open || typeof document === "undefined") return null;
+  const blocking = issues.some((i) => i.blocking);
   const corsCount = issues.filter((i) => i.kind === "cors-image").length;
 
   // Portal to <body>: this modal is rendered from inside anchored panels /
@@ -53,6 +54,12 @@ export function ExportPreflightModal({
           <h2 id="export-preflight-title" className="mt-1 text-xl font-semibold">
             {issues.length} {issues.length === 1 ? "issue" : "issues"} may affect this export
           </h2>
+          {blocking && (
+            <p className="mt-1 text-sm text-black/60">
+              Banned words and figures without a source must be fixed before this file can be
+              downloaded.
+            </p>
+          )}
           {corsCount > 0 && (
             <p className="mt-1 text-sm text-black/60">
               {corsCount} pasted image {corsCount === 1 ? "URL" : "URLs"} likely won't embed in the
@@ -66,6 +73,7 @@ export function ExportPreflightModal({
           {issues.map((issue) => (
             <li
               key={`${issue.slideId}-${issue.kind}`}
+              data-blocking={issue.blocking ? "true" : undefined}
               className="rounded-xl border border-amber-200 bg-amber-50/60 px-3 py-2.5 text-sm"
             >
               <div className="flex items-start justify-between gap-3">
@@ -100,14 +108,14 @@ export function ExportPreflightModal({
           >
             Cancel
           </button>
-          <button
+          {!blocking && (<button
             type="button"
             onClick={onExportAnyway}
             disabled={busy}
             className="rounded-full bg-primary px-4 py-2 text-xs uppercase tracking-widest text-primary-foreground hover:bg-[#03002C] disabled:opacity-40"
           >
             {busy ? "Exporting…" : "Export anyway"}
-          </button>
+          </button>)}
         </footer>
       </div>
     </div>,

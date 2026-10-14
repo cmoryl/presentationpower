@@ -9,12 +9,15 @@
 
 import type { Deck, DeckSlide } from "./deck-store";
 import { variantSupportsImagery } from "./variant-media";
+import { lintContent } from "./compliance-check";
 
 export type PreflightIssue = {
   slideId: string;
   slideIndex: number;
   variantId: string;
-  kind: "cors-image" | "empty-title";
+  kind: "cors-image" | "empty-title" | "banned-word" | "needs-source";
+  /** Blocking issues stop the download; "Export anyway" is not offered. */
+  blocking?: boolean;
   message: string;
   detail?: string;
 };
@@ -77,5 +80,31 @@ export async function runExportPreflight(deck: Deck): Promise<PreflightIssue[]> 
       detail: r.url,
     });
   }
+  issues.push(...complianceIssues(deck));
   return issues;
+}
+
+/** Banned words and unsourced figures, one blocking issue per slide and kind. */
+export function complianceIssues(deck: Deck): PreflightIssue[] {
+  const out: PreflightIssue[] = [];
+  deck.slides.forEach((slide, index) => {
+    const found = lintContent(slide.content);
+    for (const kind of ["banned-word", "needs-source"] as const) {
+      const hits = [...new Set(found.filter((f) => f.kind === kind).map((f) => f.match))];
+      if (!hits.length) continue;
+      out.push({
+        slideId: slide.id,
+        slideIndex: index,
+        variantId: slide.variantId,
+        kind,
+        blocking: true,
+        message:
+          kind === "banned-word"
+            ? `Slide ${index + 1}: banned word${hits.length > 1 ? "s" : ""} — reword before export`
+            : `Slide ${index + 1}: figure${hits.length > 1 ? "s" : ""} with no source — add a source or remove`,
+        detail: hits.join(", "),
+      });
+    }
+  });
+  return out;
 }
