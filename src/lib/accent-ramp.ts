@@ -1,3 +1,4 @@
+import { ACCENT_RAMP } from "@/lib/brand-colors";
 /**
  * Single source of truth for the TransPerfect division accent ramp.
  *
@@ -10,15 +11,7 @@
  * tokens drift from this list.
  */
 
-export const DIVISION_ACCENT_RAMP = [
-  "#13b1f3", // City blue
-  "#5ce1e6", // Aqua
-  "#a6fa87", // Green
-  "#ffeb66", // Yellow
-  "#ff9b70", // Peach
-  "#ec388a", // Pink
-  "#c2a3ff", // Lavender
-] as const;
+export const DIVISION_ACCENT_RAMP = ACCENT_RAMP;
 
 export type DivisionAccent = (typeof DIVISION_ACCENT_RAMP)[number];
 

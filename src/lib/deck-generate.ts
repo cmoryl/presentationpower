@@ -277,7 +277,7 @@ export async function generateDeckFromBrief(
         deck.slides = deck.slides.map((s) => {
           if (!byIdMap.has(s.id)) return s;
           const merged = { ...s.content, ...byIdMap.get(s.id)! };
-          return { ...s, content: validateFigures(merged, s.content, sources, removed) as typeof s.content };
+          return { ...s, content: validateFigures(merged, s.content, sources, removed, { checkTemplate: true }) as typeof s.content };
         });
         if (removed.length) {
           notes.push(`Replaced ${removed.length} unsourced figure(s) with "[figure needed]": ${[...new Set(removed)].join(", ")}.`);

@@ -14,6 +14,7 @@
 import type { SlideBackgroundValue } from "./background-library";
 import { hexToRgba, resolveSlideBackground } from "./background-library";
 import { backdropRasterSize, STAGE_H, STAGE_W, type ExportQualityId } from "./export-quality";
+import { BRAND } from "@/lib/brand-colors";
 
 export type PptxBackgroundPlan =
   | { kind: "none" }
@@ -121,14 +122,14 @@ export async function planPptxBackground(
   // ── Image kinds: embed source photograph + honor scrim/tint. ─────────
   if ((bg.kind === "upload" || bg.kind === "ai") && bg.url) {
     const data = await fetchDataUrl(bg.url);
-    if (!data) return { kind: "solid", color: stripHash(bg.tint ?? "#03002C") };
+    if (!data) return { kind: "solid", color: stripHash(bg.tint ?? BRAND.ink) };
     const strength = clamp01(bg.scrimStrength, 0.55);
     return {
       kind: "image",
       data,
-      solidFallback: stripHash(bg.tint ?? "#03002C"),
+      solidFallback: stripHash(bg.tint ?? BRAND.ink),
       scrim: {
-        color: stripHash(bg.tint ?? "#03002C"),
+        color: stripHash(bg.tint ?? BRAND.ink),
         strengthTop: bg.scrim === "top" || bg.scrim === "full" ? strength : strength * 0.15,
         strengthMiddle: strength * 0.55,
         strengthBottom: bg.scrim === "bottom" || bg.scrim === "full" ? strength : strength * 0.15,
@@ -148,7 +149,7 @@ export async function planPptxBackground(
 
   // ── Everything else (library preset, gradient, pattern): rasterize CSS.
   const css = bg.css ?? "";
-  const solid = bg.solid ?? bg.color ?? "#FFFFFF";
+  const solid = bg.solid ?? bg.color ?? BRAND.white;
   if (css) {
     const data = await rasterizeCss(css, solid, quality);
     if (data) {
