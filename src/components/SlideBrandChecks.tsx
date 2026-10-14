@@ -27,7 +27,7 @@ export function SlideBrandChecks({
       .filter((q) => q.slideId === slide.id)
       .map((q) => ({
         key: `${q.code}-${q.message}`,
-        tone: q.severity === "error" ? ("block" as const) : ("warn" as const),
+        tone: q.severity === "block" ? ("block" as const) : ("warn" as const),
         text: q.message,
       }));
     return [...lint, ...own];
