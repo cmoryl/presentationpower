@@ -20,6 +20,12 @@ import {
 } from "./slide-image-export";
 import { fetchIccProfile, wrapPdfAsX4, type IccProfileKey } from "./pdf-x4";
 import { extendRasterForBleed } from "./print-bleed-extend";
+import {
+  measurePrintPages,
+  scorePrintPreflight,
+  PrintPreflightError,
+  type PrintPreflightIssue,
+} from "./print-preflight";
 import { checkExportAspect, logAspectReport, type AspectCheckReport } from "./export-aspect-check";
 import {
   captureVectorText,
@@ -142,6 +148,10 @@ export interface PrintExportOptions {
   onBlob?: (blob: Blob) => void;
   /** Set false to skip the browser download (verification runs). */
   download?: boolean;
+  /** Receives the print preflight result (press formats only). */
+  onPrintPreflight?: (issues: PrintPreflightIssue[]) => void;
+  /** Verification-only escape hatch; never exposed in the UI. */
+  skipPrintPreflight?: boolean;
 }
 
 export interface VectorTextReport {
@@ -287,6 +297,21 @@ export async function exportPrintAssetAsPdf(
   const trimWidthPx = Math.max(1, Math.round(resolved.widthPx * (trim.widthIn / pageWidth)));
   const bleedRasterPx = Math.round(bleed * resolved.dpi);
   let bleedApproximated = false;
+
+  // --- print preflight (P7) -------------------------------------------------
+  // Press downloads stop on low-res images, missing bleed or unloaded fonts.
+  if (!isDigital && !opts.skipPrintPreflight) {
+    const measured = measurePrintPages(pages, trim.widthIn);
+    const issues = scorePrintPreflight({
+      format,
+      trimWidthIn: trim.widthIn,
+      trimHeightIn: trim.heightIn,
+      bleedIn: bleed,
+      ...measured,
+    });
+    opts.onPrintPreflight?.(issues);
+    if (issues.some((i) => i.level === "fail")) throw new PrintPreflightError(issues);
+  }
 
   // --- aspect preflight -----------------------------------------------------
   // Measured against the TRIM box: that is the geometry the capture is placed
