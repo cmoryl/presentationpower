@@ -1190,6 +1190,7 @@ function AssetEditor() {
             <span className="rounded-md bg-[#A1FBF9]/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#03002C] dark:text-[#A1FBF9]">
               {row.kind}
             </span>
+            <ProvenanceBadge table="print_assets" id={assetId} />
             {dirty && <span className="text-xs text-amber-600">Unsaved changes</span>}
           </div>
           <div className="flex items-center gap-2">
