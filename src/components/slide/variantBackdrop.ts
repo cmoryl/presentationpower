@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import type { ModuleVariant } from "@/lib/taxonomy";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import type { SlideBackdrop } from "./SlideChrome";
@@ -125,7 +126,7 @@ function _computeBackdrop(
   // back to aurora instead of borrowing a mismatched image set.
   if (!hasOwnBackdropPool(effectiveBrandId)) {
     return mode === "dark"
-      ? { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" }
+      ? { aurora: true, auroraSeed: id, darkChrome: true, tint: BRAND.ink }
       : { aurora: true, auroraSeed: id, darkChrome: false, tint: surface };
   }
 
@@ -155,19 +156,19 @@ function _computeBackdrop(
         scrim: "left",
         scrimStrength: 0.7,
         imageDim: 0.08,
-        tint: "#03002C",
+        tint: BRAND.ink,
       };
     }
     // Hero variants otherwise aurora — use the effective brand surface.
     return mode === "dark"
-      ? { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" }
+      ? { aurora: true, auroraSeed: id, darkChrome: true, tint: BRAND.ink }
       : { aurora: true, auroraSeed: id, darkChrome: false, tint: surface };
   }
 
   // Default aurora wash for modes without a curated PNG set.
   if (!hasCuratedDarkSet) {
     return mode === "dark"
-      ? { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" }
+      ? { aurora: true, auroraSeed: id, darkChrome: true, tint: BRAND.ink }
       : { aurora: true, auroraSeed: id, darkChrome: false, tint: surface };
   }
 
@@ -183,7 +184,7 @@ function _computeBackdrop(
   // plates, so it read darker than its neighbours. Pin it to a violet→aqua
   // plate with the same light scrim the other dark data slides use.
   if (useCorporateDark && id === "MV-STAT-PROOF-BOARD") {
-    return { url: CORPORATE_DARK_BACKDROPS[7]!, scrim: "left", scrimStrength: 0.8, imageDim: 0.1, tint: "#03002C" };
+    return { url: CORPORATE_DARK_BACKDROPS[7]!, scrim: "left", scrimStrength: 0.8, imageDim: 0.1, tint: BRAND.ink };
   }
 
   // Full-bleed cover / hero — enterprise photograph, strong side scrim.
@@ -193,13 +194,13 @@ function _computeBackdrop(
       scrim: "left",
       scrimStrength: 0.75,
       imageDim: 0.1,
-      tint: "#03002C",
+      tint: BRAND.ink,
     };
   }
 
   // Minimal cover — abstract atmospheric with gentle side scrim.
   if (id === "MV-OP-COVER-MINIMAL") {
-    return { url: pickAbstract(0), scrim: "left", scrimStrength: 0.65, tint: "#03002C" };
+    return { url: pickAbstract(0), scrim: "left", scrimStrength: 0.65, tint: BRAND.ink };
   }
 
   // Dividers — abstract atmospherics with full-frame vignette.
@@ -229,7 +230,7 @@ function _computeBackdrop(
       scrim: "right",
       scrimStrength: 0.8,
       imageDim: 0.05,
-      tint: "#03002C",
+      tint: BRAND.ink,
     };
   }
 
@@ -255,7 +256,7 @@ function _computeBackdrop(
       scrim: "left",
       scrimStrength: 0.8,
       imageDim: 0.05,
-      tint: "#03002C",
+      tint: BRAND.ink,
     };
   }
 

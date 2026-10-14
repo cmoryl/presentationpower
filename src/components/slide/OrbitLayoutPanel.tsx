@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * OrbitLayoutPanel — direct-manipulation placement for the growth-proof orbit
  * stats (MV-PROOF-GROWTH-ORBITS).
@@ -130,9 +131,9 @@ export function OrbitLayoutPanel({ orbits, onChange }: Props) {
                 width: `${28 * p.size}%`,
                 aspectRatio: "1 / 1",
                 transform: "translate(-50%, -50%)",
-                border: `2px solid ${on ? "#003FC7" : "rgba(3,0,44,0.35)"}`,
+                border: `2px solid ${on ? BRAND.blue : "rgba(3,0,44,0.35)"}`,
                 background: on ? "rgba(0,63,199,0.10)" : "rgba(255,255,255,0.85)",
-                color: on ? "#003FC7" : "#03002C",
+                color: on ? BRAND.blue : BRAND.ink,
                 cursor: "grab",
               }}
             >

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useResignDeckMedia } from "@/hooks/use-resign-deck-media";
 import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { StatStylePicker } from "@/components/slide/StatStylePicker";
@@ -3521,7 +3522,7 @@ function LogoGridItemsPanel({
               <div className="flex items-center gap-2">
                 <div
                   className="flex h-10 w-14 items-center justify-center rounded-md"
-                  style={{ backgroundColor: activeVariant === "dark" ? "#03002C" : "#F5F7FB" }}
+                  style={{ backgroundColor: activeVariant === "dark" ? BRAND.ink : "#F5F7FB" }}
                 >
                   {logoUrl ? (
                     <img src={logoUrl} alt="" className="max-h-8 max-w-[90%] object-contain" />

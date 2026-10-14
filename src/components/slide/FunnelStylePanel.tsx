@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import * as React from "react";
 import {
   readFunnelStyle,
@@ -149,7 +150,7 @@ export function FunnelStylePanel({
                   <span
                     className="rounded-full uppercase"
                     style={{
-                      ...funnelChipStyle(resolved, "#03002C", true),
+                      ...funnelChipStyle(resolved, BRAND.ink, true),
                       fontSize: 9,
                       padding: "2px 8px",
                       letterSpacing: "0.16em",

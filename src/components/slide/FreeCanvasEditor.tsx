@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { CanvasBlock, CanvasBlockKind } from "@/lib/deck-store";
@@ -107,8 +108,8 @@ function isTextKind(kind: CanvasBlockKind): boolean {
 
 /** Guide colour by origin: stage/margin = accent, canvas objects = pink, module geometry = aqua. */
 function guideColor(kind: Guide["kind"], accent: string): string {
-  if (kind === "object") return "#EC388A";
-  if (kind === "module") return "#A1FBF9";
+  if (kind === "object") return BRAND.pink;
+  if (kind === "module") return BRAND.aqua;
   return accent;
 }
 
@@ -1292,7 +1293,7 @@ export function FreeCanvasEditor({
                   ? `0 0 0 10px ${b.id === emphSelectedId ? "rgba(0,63,199,0.16)" : "rgba(236,56,138,0.14)"}`
                   : undefined,
                 outline: emphasized
-                  ? `4px solid ${b.id === emphSelectedId ? "#003FC7" : "#EC388A"}`
+                  ? `4px solid ${b.id === emphSelectedId ? BRAND.blue : BRAND.pink}`
                   : editing
                     ? `2px dashed ${accent}`
                     : isSelected
@@ -1606,7 +1607,7 @@ export function FreeCanvasEditor({
         style={{
           display: "none",
           // Red while removing so a destructive click never looks like a pick.
-          outline: `2px solid ${pickMode === "remove" ? "#E53D2E" : accent}`,
+          outline: `2px solid ${pickMode === "remove" ? BRAND.red : accent}`,
           outlineOffset: 1,
           background: pickMode === "remove" ? "rgba(229,61,46,0.16)" : "rgba(236,56,138,0.10)",
         }}
@@ -1752,21 +1753,21 @@ export function FreeCanvasEditor({
                   label={pickMode === "adopt" ? "● picking" : "✥ pick section"}
                   title="Pick a section or asset the module drew and make it movable"
                   pressed={pickMode === "adopt"}
-                  activeColor="#EC388A"
+                  activeColor={BRAND.pink}
                   onClick={() => setPickMode((v) => (v === "adopt" ? "off" : "adopt"))}
                 />
                 <TBtn
                   label={pickMode === "card" ? "● picking box" : "▣ pick box"}
                   title="Click any card the module drew to make the whole box (plate, icon, title, copy) movable and duplicable"
                   pressed={pickMode === "card"}
-                  activeColor="#A6FA87"
+                  activeColor={BRAND.green}
                   onClick={() => setPickMode((v) => (v === "card" ? "off" : "card"))}
                 />
                 <TBtn
                   label={pickMode === "remove" ? "● removing" : "⌫ delete section"}
                   title="Click a module section to delete it from this slide (your copy only — the shared module is unchanged)"
                   pressed={pickMode === "remove"}
-                  activeColor="#E53D2E"
+                  activeColor={BRAND.red}
                   onClick={() => setPickMode((v) => (v === "remove" ? "off" : "remove"))}
                 />
                 {removedCount > 0 && (
@@ -2098,7 +2099,7 @@ function TBtn({
             ? "text-foreground hover:bg-[#E53D2E] hover:text-white"
             : "text-foreground hover:bg-muted"
       }`}
-      style={pressed && activeColor ? { background: activeColor, color: "#03002C" } : undefined}
+      style={pressed && activeColor ? { background: activeColor, color: BRAND.ink } : undefined}
     >
       {label}
     </button>

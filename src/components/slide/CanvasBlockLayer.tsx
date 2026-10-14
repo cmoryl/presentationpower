@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useRef } from "react";
 import type { CanvasBlock } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -58,7 +59,7 @@ export function CanvasBlockLayer({
             ...canvasBlockFrameStyle(b),
             opacity: 1,
             outline: `${b.id === selectedId ? 4 : 3}px solid ${
-              b.id === selectedId ? "#003FC7" : "#EC388A"
+              b.id === selectedId ? BRAND.blue : BRAND.pink
             }`,
             outlineOffset: "3px",
             borderRadius: 6,

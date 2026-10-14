@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * STYLE PACK THUMBNAIL
  *
@@ -183,12 +184,12 @@ export function BrandSystemThumb({ className = "" }: { className?: string }) {
           "radial-gradient(120% 90% at 12% 6%, rgba(161,251,249,0.32) 0%, rgba(0,63,199,0) 58%), radial-gradient(100% 80% at 92% 96%, rgba(194,163,255,0.28) 0%, rgba(3,0,44,0) 62%), linear-gradient(160deg, #03002C 0%, #061049 58%, #003FC7 130%)",
       }}
     >
-      <div className="absolute inset-x-0 top-0 h-[3px]" style={{ backgroundColor: "#A1FBF9" }} />
+      <div className="absolute inset-x-0 top-0 h-[3px]" style={{ backgroundColor: BRAND.aqua }} />
       <div className="relative flex h-full flex-col justify-between p-[9px]">
         <div>
           <div
             className="text-[5px] uppercase tracking-[0.28em]"
-            style={{ color: "#A1FBF9", fontFamily: "'Geist', system-ui, sans-serif" }}
+            style={{ color: BRAND.aqua, fontFamily: "'Geist', system-ui, sans-serif" }}
           >
             Approved system
           </div>
@@ -198,7 +199,7 @@ export function BrandSystemThumb({ className = "" }: { className?: string }) {
           >
             Brand system
           </div>
-          <div className="mt-[5px] h-[2px] w-[34%]" style={{ backgroundColor: "#A1FBF9" }} />
+          <div className="mt-[5px] h-[2px] w-[34%]" style={{ backgroundColor: BRAND.aqua }} />
           <div className="mt-[5px] h-[2px] w-[62%] rounded-full bg-white/45" />
         </div>
         <div className="flex items-stretch gap-[6px]">
@@ -210,7 +211,7 @@ export function BrandSystemThumb({ className = "" }: { className?: string }) {
             >
               <div
                 className="h-[3px] w-[55%] rounded-full"
-                style={{ backgroundColor: "#A1FBF9" }}
+                style={{ backgroundColor: BRAND.aqua }}
               />
               <div className="mt-[5px] h-[2px] w-full rounded-full bg-white/40" />
               <div className="mt-[3px] h-[2px] w-[70%] rounded-full bg-white/25" />

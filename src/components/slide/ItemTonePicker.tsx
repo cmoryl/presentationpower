@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Per-row accent tone picker. Used by the deck inspector and the admin module
 // sample studio so a single lane / pillar's gradient wash, rail and hairline can
 // be recoloured without touching the rest of the module.
@@ -53,7 +54,7 @@ export function ItemToneRow({
         Custom
         <input
           type="color"
-          value={isToneHex(tone) ? (tone as string) : "#003FC7"}
+          value={isToneHex(tone) ? (tone as string) : BRAND.blue}
           onChange={(e) => onChange(e.target.value)}
           className={`h-5 w-6 cursor-pointer rounded border p-0 ${dark ? "border-white/20 bg-transparent" : "border-black/15 bg-white"}`}
           aria-label="Custom gradient colour"
@@ -138,7 +139,7 @@ export function ItemTonePanel({
                   className="ml-auto h-5 w-16 shrink-0 rounded-md border border-black/10"
                   style={{
                     backgroundColor: "#fff",
-                    backgroundImage: toneWashGradient(itemTone(row) ?? "#003FC7", itemToneEnd(row)),
+                    backgroundImage: toneWashGradient(itemTone(row) ?? BRAND.blue, itemToneEnd(row)),
                   }}
                 />
               </div>

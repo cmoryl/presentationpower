@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import type { BrandMode } from "@/lib/taxonomy";
 import type { CSSProperties, ReactNode } from "react";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
@@ -215,20 +216,20 @@ export function makeSlideInk(
   const textHex = dark
     ? "#FFFFFF"
     : readableOn(
-        primaryHex ?? baseInkHex ?? "#03002C",
+        primaryHex ?? baseInkHex ?? BRAND.ink,
         ["#FFFFFF", surfaceHex ?? "#FFFFFF"],
         "darken",
         4.5,
       );
   const bodyHex = dark
     ? "#FFFFFF"
-    : readableOn(baseInkHex ?? "#03002C", ["#FFFFFF", surfaceHex ?? "#FFFFFF"], "darken", 4.5);
+    : readableOn(baseInkHex ?? BRAND.ink, ["#FFFFFF", surfaceHex ?? "#FFFFFF"], "darken", 4.5);
   const accentText = accentHex ? readableAccent(accentHex, mode, surfaceHex ?? undefined) : textHex;
   const rgb = hexToRgb(bodyHex) ?? (dark ? { r: 255, g: 255, b: 255 } : { r: 10, g: 15, b: 28 });
   const base = `${rgb.r},${rgb.g},${rgb.b}`;
-  const textBackgrounds = dark ? ["#03002C", "#0A1230"] : ["#FFFFFF", surfaceHex ?? "#FFFFFF"];
+  const textBackgrounds = dark ? [BRAND.ink, "#0A1230"] : ["#FFFFFF", surfaceHex ?? "#FFFFFF"];
   const surfaceRgb =
-    hexToRgb(dark ? "#03002C" : (surfaceHex ?? "#FFFFFF")) ??
+    hexToRgb(dark ? BRAND.ink : (surfaceHex ?? "#FFFFFF")) ??
     (dark ? { r: 3, g: 0, b: 44 } : { r: 255, g: 255, b: 255 });
   // Secondary and tertiary copy used to be translucent ink. On bright scene
   // plates that alpha composited to only 1–3:1, which made locked footers,
@@ -253,7 +254,7 @@ export function makeSlideInk(
     onSurface: (hex: string) =>
       readableOn(
         hex,
-        dark ? ["#03002C", "#0A1230"] : ["#FFFFFF", surfaceHex ?? "#FFFFFF"],
+        dark ? [BRAND.ink, "#0A1230"] : ["#FFFFFF", surfaceHex ?? "#FFFFFF"],
         dark ? "lighten" : "darken",
         4.5,
       ),
@@ -575,7 +576,7 @@ export function SlideFrame({
   const lightBackdrop = hasBackdrop && !backdropIsDark && !slideDark;
   const darkBackdrop = hasBackdrop && !lightBackdrop;
 
-  const bg = pack ? pack.tokens.surface : slideDark ? "#03002C" : "#ffffff";
+  const bg = pack ? pack.tokens.surface : slideDark ? BRAND.ink : "#ffffff";
   const fg = pack ? pack.tokens.ink : darkBackdrop || slideDark ? "#ffffff" : brand.tokens.ink;
 
   // Chrome (logo lockup + footer band) can sit on top of full-bleed
@@ -646,7 +647,7 @@ export function SlideFrame({
   // inside the approved type floors rather than clipped.
   useAutoRefit(rootRef, `${variant}-${layoutId ?? ""}-${pageNumber ?? ""}`);
 
-  const logoColor = darkBackdrop || slideDark || logoOnMedia ? "#ffffff" : "#03002C";
+  const logoColor = darkBackdrop || slideDark || logoOnMedia ? "#ffffff" : BRAND.ink;
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
   const showLogo = placement.position !== "hidden";
@@ -663,7 +664,7 @@ export function SlideFrame({
 
   // Light backdrops use a cream/white tint so photography reads bright; dark
   // backdrops keep the original navy scrim. Callers can still override tint.
-  const defaultTint = lightBackdrop ? "#FFFFFF" : "#03002C";
+  const defaultTint = lightBackdrop ? "#FFFFFF" : BRAND.ink;
   // Light mode: force the backdrop tint to pure white and push the scrim
   // near-opaque so imagery reads as a subtle wash on a white page.
   const tint = lightBackdrop ? "#FFFFFF" : (backdrop?.tint ?? defaultTint);

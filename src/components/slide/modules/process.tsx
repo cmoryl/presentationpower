@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Process family — extracted from the legacy `VariantRenderer` switch onto the
 // module registry. Step rails, chains and spotlights share one owner here so a
 // connector or seam change lands across every process module at once.
@@ -42,7 +43,7 @@ export function LoopHalo({ uid, slim = false, small = false }: { uid: string; sl
   // Small badges (< ~130px) get thicker, brighter hairlines so the rings
   // survive at size instead of dissolving into the ground.
   const k = small ? 4.6 : 1, ko = small ? 2.4 : 1;
-  const AQ = "#7FE3F5", LV = "#C2A3FF";
+  const AQ = "#7FE3F5", LV = BRAND.lavender;
   const nodes = [-60, 30, 120, 210];
   const pt = (deg: number, r: number) => {
     const a = (deg * Math.PI) / 180;
@@ -258,7 +259,7 @@ registerSlideModule({
                   const line = itemTone(it)
                     ? cellAccent(it, accentTone, mode)
                     : flagged
-                      ? accentInk("#EC388A", mode, 3)
+                      ? accentInk(BRAND.pink, mode, 3)
                       : accentTone;
                   return (
                     <div
@@ -485,7 +486,7 @@ registerSlideModule({
         const n = Number(stepNo) || 1;
         const photoRight = n % 2 === 0;
         const dense = rows.length > 3;
-        const AQ = "#7FE3F5", LV = "#C2A3FF";
+        const AQ = "#7FE3F5", LV = BRAND.lavender;
         const rule = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)";
 
         const photo = (
@@ -1194,7 +1195,7 @@ registerSlideModule({
                 const x = colW * (i + 0.5);
                 const above = i % 2 === 0;
                 const flagged = truthy(it.highlight);
-                const line = itemTone(it) ?? (flagged ? "#EC388A" : accent);
+                const line = itemTone(it) ?? (flagged ? BRAND.pink : accent);
                 const StopIcon = it.icon ? iconByName(s(it.icon)) : null;
                 return (
                   <React.Fragment key={i}>
@@ -1386,7 +1387,7 @@ registerSlideModule({
               <div className="flex flex-col" style={{ gap: count >= 5 ? 22 : 30 }}>
                 {stages.map((it, i) => {
                   const flagged = truthy(it.highlight);
-                  const line = itemTone(it) ?? (flagged ? "#EC388A" : accent);
+                  const line = itemTone(it) ?? (flagged ? BRAND.pink : accent);
                   const StageIcon = it.icon ? iconByName(s(it.icon)) : null;
                   return (
                     <div
@@ -1634,7 +1635,7 @@ registerSlideModule({
                       const cell = obj(cells[ci]);
                       const text = s(cell.label);
                       const flagged = truthy(cell.highlight);
-                      const line = itemTone(cell) ?? (flagged ? "#EC388A" : accent);
+                      const line = itemTone(cell) ?? (flagged ? BRAND.pink : accent);
                       const CellIcon = cell.icon ? iconByName(s(cell.icon)) : null;
                       if (!text && !CellIcon) {
                         return (
@@ -1746,10 +1747,10 @@ registerSlideModule({
         const lanes = arr(c.items).slice(0, 5);
         const laneTones = [
           accent,
-          accentInk(isDark ? "#A1FBF9" : "#0E7A86", mode, 4.5),
-          accentInk("#EC388A", mode, 4.5),
-          accentInk(isDark ? "#C2A3FF" : "#5B3FBF", mode, 4.5),
-          accentInk(isDark ? "#A6FA87" : "#2F7A3C", mode, 4.5),
+          accentInk(isDark ? BRAND.aqua : "#0E7A86", mode, 4.5),
+          accentInk(BRAND.pink, mode, 4.5),
+          accentInk(isDark ? BRAND.lavender : "#5B3FBF", mode, 4.5),
+          accentInk(isDark ? BRAND.green : "#2F7A3C", mode, 4.5),
         ];
         const laneCount = Math.max(lanes.length, 1);
         // Sized so 2–5 lanes plus the title block and summary band always land
@@ -2134,8 +2135,8 @@ registerSlideModule({
         const chipFont = perRow > 7 ? 17 : perRow > 5 ? 19 : 21;
         const pillarTones = [
           accent,
-          accentInk(isDark ? "#A1FBF9" : "#0E7A86", mode, 4.5),
-          accentInk("#EC388A", mode, 4.5),
+          accentInk(isDark ? BRAND.aqua : "#0E7A86", mode, 4.5),
+          accentInk(BRAND.pink, mode, 4.5),
         ];
 
         return (

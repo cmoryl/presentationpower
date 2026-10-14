@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useMemo, useRef, useState } from "react";
 import {
   Activity,
@@ -303,12 +304,12 @@ function iconSvgFrom(node: SVGSVGElement, color: string, weight: number): string
 }
 
 const SWATCH_LABELS: Record<string, string> = {
-  "#03002C": "Brand navy",
-  "#003FC7": "Brand blue",
-  "#A1FBF9": "Aqua",
-  "#C2A3FF": "Lavender",
-  "#FFEB66": "Yellow",
-  "#EC388A": "Pink",
+  BRAND.ink: "Brand navy",
+  BRAND.blue: "Brand blue",
+  BRAND.aqua: "Aqua",
+  BRAND.lavender: "Lavender",
+  BRAND.yellow: "Yellow",
+  BRAND.pink: "Pink",
   "#FFFFFF": "White",
   "#666666": "Gray",
 };
@@ -462,7 +463,7 @@ export function CanvasInsertLibrary({
           ))}
           <input
             type="color"
-            value={/^#[0-9a-f]{6}$/i.test(color) ? color : "#003FC7"}
+            value={/^#[0-9a-f]{6}$/i.test(color) ? color : BRAND.blue}
             onChange={(e) => setColor(e.target.value)}
             aria-label="Custom colour"
             className="h-6 w-8 cursor-pointer rounded-md border border-white/25 bg-transparent p-0"
@@ -481,7 +482,7 @@ export function CanvasInsertLibrary({
                   className="min-h-7 rounded-md px-2 font-semibold"
                   style={
                     style === s
-                      ? { background: "rgba(255,255,255,0.9)", color: "#03002C" }
+                      ? { background: "rgba(255,255,255,0.9)", color: BRAND.ink }
                       : { background: "rgba(255,255,255,0.08)" }
                   }
                 >

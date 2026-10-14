@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Client logo-wall family — extracted from the legacy `VariantRenderer` switch
 // onto the module registry. Seven treatments (grid, strip, marquee, featured,
 // categorized, mosaic) share the same mark-resolution rules and the "logo wins
@@ -351,7 +352,7 @@ registerSlideModule({
                     <div
                       key={i}
                       className="flex items-center justify-center rounded-xl p-4"
-                      style={isDark ? { background: "linear-gradient(160deg, rgba(127,179,245,0.16) 0%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.02) 100%)", border: "1px solid rgba(255,255,255,0.16)", borderBottom: `2px solid ${["#7FB3F5", "#7FE3F5", "#C2A3FF"][i % 3]}88`, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2)", backdropFilter: "blur(14px)" } : { background: "rgba(255,255,255,0.72)", border: `1px solid ${ink.hairline}` }}
+                      style={isDark ? { background: "linear-gradient(160deg, rgba(127,179,245,0.16) 0%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.02) 100%)", border: "1px solid rgba(255,255,255,0.16)", borderBottom: `2px solid ${["#7FB3F5", "#7FE3F5", BRAND.lavender][i % 3]}88`, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2)", backdropFilter: "blur(14px)" } : { background: "rgba(255,255,255,0.72)", border: `1px solid ${ink.hairline}` }}
                     >
                       {url || path ? (
                         <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-[70%] max-w-[85%] object-contain" style={isDark && !whiteLogo ? { filter: "brightness(0) invert(1)" } : undefined} />

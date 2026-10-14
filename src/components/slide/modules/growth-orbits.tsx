@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Growth proof split — a two-panel module: on the left an acquisitions logo
 // wall plus a numbered growth stat list, on the right up to three headline
 // percentage figures set inside hairline orbit rings. Both halves are mode
@@ -212,7 +213,7 @@ registerSlideModule({
                             style={{
                               fontSize: fillPx(18, "body"),
                               fontWeight: 700,
-                              color: isDark ? "#03002C" : ink.strong,
+                              color: isDark ? BRAND.ink : ink.strong,
                             }}
                           >
                             {name}

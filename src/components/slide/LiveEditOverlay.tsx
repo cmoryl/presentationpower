@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { expandPath, readPath } from "@/lib/qa";
 
@@ -21,17 +22,17 @@ import { expandPath, readPath } from "@/lib/qa";
  */
 
 const COLOR_SWATCHES: { label: string; hex: string }[] = [
-  { label: "Ink", hex: "#03002C" },
+  { label: "Ink", hex: BRAND.ink },
   { label: "Slate", hex: "#334155" },
   { label: "White", hex: "#FFFFFF" },
-  { label: "Blue", hex: "#003FC7" },
-  { label: "Aqua", hex: "#A1FBF9" },
-  { label: "Lavender", hex: "#C2A3FF" },
-  { label: "Yellow", hex: "#FFEB66" },
-  { label: "Green", hex: "#A6FA87" },
-  { label: "Peach", hex: "#FF9B70" },
-  { label: "Pink", hex: "#EC388A" },
-  { label: "Red", hex: "#E53D2E" },
+  { label: "Blue", hex: BRAND.blue },
+  { label: "Aqua", hex: BRAND.aqua },
+  { label: "Lavender", hex: BRAND.lavender },
+  { label: "Yellow", hex: BRAND.yellow },
+  { label: "Green", hex: BRAND.green },
+  { label: "Peach", hex: BRAND.peach },
+  { label: "Pink", hex: BRAND.pink },
+  { label: "Red", hex: BRAND.red },
   // DataForce product accents.
   { label: "DataForce Green", hex: "#7BCD3A" },
   { label: "DataForce Blue", hex: "#139DD8" },
@@ -553,7 +554,7 @@ export function LiveEditOverlay({
                 type="color"
                 data-testid="ink-custom-hex"
                 className="absolute h-0 w-0 opacity-0"
-                value={activeHex ?? "#003FC7"}
+                value={activeHex ?? BRAND.blue}
                 onChange={(e) => applyColor(e.target.value)}
               />
             </label>

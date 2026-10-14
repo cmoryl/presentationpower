@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Opening family — covers, dividers and agendas extracted from the legacy
 // `VariantRenderer` switch onto the module registry so cover chrome and title
 // treatments have a single owner.
@@ -168,7 +169,7 @@ registerSlideModule({
             )}
             <GrainOverlay opacity={platedCover ? 0.05 : 0.09} />
             {platedCover ? (
-              <CinematicScrim anchor="bottom" strength={0.5} tint="#03002C" vignette={0.12} />
+              <CinematicScrim anchor="bottom" strength={0.5} tint={BRAND.ink} vignette={0.12} />
             ) : (
               <CinematicScrim anchor="bottom" strength={0.9} tint="#050418" vignette={0.28} />
             )}

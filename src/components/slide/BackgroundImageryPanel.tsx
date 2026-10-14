@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { checkUploadSize, UPLOAD_IMAGE_MAX_BYTES } from "@/lib/upload-limits";
 // Backgrounds & Imagery inspector panel for the deck editor.
 // Six tabs:
@@ -52,17 +53,17 @@ import { sceneBackgroundById } from "@/lib/scene-background-gallery";
 type Tab = "library" | "scenes" | "brand" | "solid" | "gradient" | "pattern" | "upload" | "ai";
 
 const BRAND_SWATCHES = [
-  "#03002C",
-  "#003FC7",
-  "#A1FBF9",
-  "#C2A3FF",
+  BRAND.ink,
+  BRAND.blue,
+  BRAND.aqua,
+  BRAND.lavender,
   "#F2F2F2",
   "#E0E8F5",
-  "#FFEB66",
-  "#A6FA87",
-  "#FF9B70",
-  "#EC388A",
-  "#E53D2E",
+  BRAND.yellow,
+  BRAND.green,
+  BRAND.peach,
+  BRAND.pink,
+  BRAND.red,
   "#FFFFFF",
 ];
 
@@ -250,16 +251,16 @@ export function BackgroundImageryPanel({
   }
 
   // Local parametric state — seeded from `current`, updates emit via onChange.
-  const solidColor = current?.kind === "color" ? (current.color ?? "#03002C") : "#03002C";
+  const solidColor = current?.kind === "color" ? (current.color ?? BRAND.ink) : BRAND.ink;
   const solidIntensity = current?.kind === "color" ? (current.intensity ?? 1) : 1;
 
-  const gradA = current?.kind === "gradient" ? (current.color ?? "#003FC7") : "#003FC7";
-  const gradB = current?.kind === "gradient" ? (current.colorB ?? "#03002C") : "#03002C";
+  const gradA = current?.kind === "gradient" ? (current.color ?? BRAND.blue) : BRAND.blue;
+  const gradB = current?.kind === "gradient" ? (current.colorB ?? BRAND.ink) : BRAND.ink;
   const gradAngle = current?.kind === "gradient" ? (current.angle ?? 135) : 135;
   const gradIntensity = current?.kind === "gradient" ? (current.intensity ?? 1) : 1;
 
   const patternId = current?.kind === "pattern" ? (current.patternId ?? "dots") : "dots";
-  const patFg = current?.kind === "pattern" ? (current.color ?? "#03002C") : "#03002C";
+  const patFg = current?.kind === "pattern" ? (current.color ?? BRAND.ink) : BRAND.ink;
   const patBg = current?.kind === "pattern" ? (current.colorB ?? "#F2F2F2") : "#F2F2F2";
   const patIntensity = current?.kind === "pattern" ? (current.intensity ?? 0.35) : 0.35;
   const patScale = current?.kind === "pattern" ? (current.patternScale ?? 24) : 24;

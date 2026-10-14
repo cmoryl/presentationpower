@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Adobe-style crop frame for a single image block on the free canvas.
 //
 // Positioned in the stage's percentage coordinate space (same as every other
@@ -41,7 +42,7 @@ export function parseCropFocus(focus?: string): { x: number; y: number } {
 
 export function CanvasCropOverlay({
   target,
-  accent = "#A1FBF9",
+  accent = BRAND.aqua,
   onChange,
   onCommit,
 }: {
@@ -192,7 +193,7 @@ export function CanvasCropOverlay({
 
       <span
         className="pointer-events-none absolute -top-6 left-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide"
-        style={{ background: accent, color: "#03002C" }}
+        style={{ background: accent, color: BRAND.ink }}
       >
         Drag to crop · corners zoom {zoom.toFixed(2)}×
       </span>

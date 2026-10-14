@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // "Preview in PowerPoint" validation modal.
 //
 // Runs the exact same background-planning pipeline used by pptx-export.ts
@@ -519,7 +520,7 @@ function buildChecks(
         patch: {
           kind: "library",
           presetId: "bg-navy-aurora",
-          solid: "#03002C",
+          solid: BRAND.ink,
           css: "radial-gradient(130% 90% at 12% 8%, #003FC755 0%, transparent 55%), radial-gradient(80% 60% at 100% 100%, #A1FBF922 0%, transparent 60%), linear-gradient(180deg, #03002C 0%, #05003C 100%)",
           darkChrome: true,
         },
@@ -546,7 +547,7 @@ function buildChecks(
       detail: "Falling back to solid color — check CSS or image URL.",
       fix: {
         label: "Use safe solid fill (#03002C)",
-        patch: merge({ kind: "color", color: "#03002C", solid: "#03002C", darkChrome: true }),
+        patch: merge({ kind: "color", color: BRAND.ink, solid: BRAND.ink, darkChrome: true }),
       },
     });
   }

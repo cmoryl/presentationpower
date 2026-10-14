@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 /**
  * MapStylePanel — map look picker for MV-LOC-* variants.
  *
@@ -74,7 +75,7 @@ export function MapStylePanel({ brandId, accent, primary, items, mapStyle, onCha
             >
               <div
                 className="overflow-hidden rounded-lg"
-                style={{ background: "#EEF1F7", aspectRatio: "2 / 1" }}
+                style={{ background: BRAND.surface, aspectRatio: "2 / 1" }}
               >
                 <WorldMap
                   pins={pins}

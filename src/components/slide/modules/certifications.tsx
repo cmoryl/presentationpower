@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Credential proof split — architectural enterprise layout: an unframed
 // programme statement on the left (heading, stat tiles, a ruled spec-sheet
 // bullet block) and a staggered stack of credential cards on the right,
@@ -12,7 +13,7 @@ import { fillPx } from "@/lib/open-space-fill";
 import { resolveCertStyle } from "@/lib/cert-style";
 import { LoopHalo } from "./process";
 
-const GLOWS = ["#7FB3F5", "#7FE3F5", "#C2A3FF"];
+const GLOWS = ["#7FB3F5", "#7FE3F5", BRAND.lavender];
 
 /** Thin ring whose arc runs exactly to the percentage. */
 function PctRing({ pct, glow, uid }: { pct: number; glow: string; uid: string }) {
