@@ -32,9 +32,12 @@ def main(pdf, out):
     os.makedirs(out, exist_ok=True)
     tmp = tempfile.mktemp(suffix=".svg")
     subprocess.run(["pdftocairo", "-svg", "-f", "2", "-l", "2", pdf, tmp], check=True)
-    doc = SVG.parse(tmp, reify=True, ppi=72.0)
+    doc = SVG.parse(tmp, reify=True)
     shapes = [e for e in doc.elements() if isinstance(e, Shape)]
-    for floor, (x, y, w, h) in FLOORS.items():
+    # svgelements reads the page's pt size as 96-ppi px; work in that space.
+    k = 96 / 72
+    for floor, (px, py, pw, ph) in FLOORS.items():
+        x, y, w, h = px * k, py * k, pw * k, ph * k
         parts = []
         for s in shapes:
             p = Path(s)
@@ -50,7 +53,7 @@ def main(pdf, out):
             fill, stroke = col(s.fill), col(s.stroke)
             if fill == "none" and stroke == "none":
                 continue
-            sw = s.stroke_width if stroke != "none" else 0
+            sw = (s.stroke_width or 1) if stroke != "none" else 0
             d = p.d(relative=False)
             a = f'<path d="{d}" fill="{fill}"'
             if stroke != "none":
@@ -60,7 +63,7 @@ def main(pdf, out):
             parts.append(a + "/>")
         svg = (
             f'<?xml version="1.0" encoding="UTF-8"?>\n'
-            f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}pt" height="{h}pt" viewBox="{x} {y} {w} {h}">\n'
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{pw}pt" height="{ph}pt" viewBox="{x} {y} {w} {h}">\n'
             f"<!-- InterContinental San Francisco, floor {floor}. Vector paths copied from the hotel's "
             f"meetings fact sheet (CorelDRAW, March 2017). Confirm with the hotel before printing. -->\n"
             + "\n".join(parts)
