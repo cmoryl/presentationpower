@@ -1,4 +1,4 @@
-import { BRAND } from "@/lib/brand-colors";
+import { BRAND } from "./brand-colors";
 /**
  * DESIGN SKIN CATALOG (OnDeck v2) — the master skin system used by the
  * Presentation Agent.

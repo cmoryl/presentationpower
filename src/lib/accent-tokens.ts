@@ -8,7 +8,7 @@
  * the active division re-colours every module page identically.
  */
 import type { CSSProperties } from "react";
-import { BRAND } from "@/lib/brand-colors";
+import { BRAND } from "./brand-colors";
 
 export type AccentMode = "light" | "dark" | string | undefined;
 

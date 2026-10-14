@@ -1,4 +1,4 @@
-import { BRAND } from "@/lib/brand-colors";
+import { BRAND } from "./brand-colors";
 // Iconography system — placement, sizing, treatment, spacing, and accessibility
 // tokens for module variants. Consumed by VariantRenderer, surfaced in /atlas,
 // and referenced from taxonomy.ts (ModuleVariant.iconography).
@@ -6,8 +6,8 @@ import { BRAND } from "@/lib/brand-colors";
 // The goal: every icon on every slide can be described with a single
 // IconSpec, so composition rules are explicit rather than ad-hoc.
 
-import type { BrandMode } from "@/lib/taxonomy";
-import { accentInk, hexA } from "@/lib/accent-tokens";
+import type { BrandMode } from "./taxonomy";
+import { accentInk, hexA } from "./accent-tokens";
 
 // ---------- Sizes ----------
 // glyphPx = the SVG size; containerPx = the surrounding tile/circle (if any);
@@ -263,7 +263,7 @@ export const ICON_EMPHASIS_META: Array<{ id: IconEmphasis; name: string }> = [
 // this resolver assigns a sensible default from the variant id pattern so
 // every module still has an explicit contract without hand-editing 94 records.
 
-import type { ModuleVariant } from "@/lib/taxonomy";
+import type { ModuleVariant } from "./taxonomy";
 
 type PatternRule = {
   test: (id: string) => boolean;
