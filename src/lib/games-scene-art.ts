@@ -1,4 +1,4 @@
-import { BRAND } from "@/lib/brand-colors";
+import { BRAND } from "./brand-colors";
 /**
  * GAMES SCENE ART — the authored Games (bm-tp-games) plate kit.
  *

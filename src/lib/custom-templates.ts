@@ -1,4 +1,4 @@
-import { BRAND } from "@/lib/brand-colors";
+import { BRAND } from "./brand-colors";
 /**
  * CUSTOM TEMPLATES — admin-authored looks that render through the exact same
  * pipeline as the catalog skins.

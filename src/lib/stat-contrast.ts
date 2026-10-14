@@ -1,4 +1,4 @@
-import { BRAND } from "@/lib/brand-colors";
+import { BRAND } from "./brand-colors";
 // Automatic contrast guard for statistic figures (gradient text + glow).
 //
 // Division accents are chosen for brand pop, not readability. On dark artwork

@@ -1,4 +1,4 @@
-import { BRAND } from "@/lib/brand-colors";
+import { BRAND } from "./brand-colors";
 // WCAG contrast audit for reinterpretation colour choices.
 //
 // The reinterpretation controls let a reviewer lock an accent and a light/dark
