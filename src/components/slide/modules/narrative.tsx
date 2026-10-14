@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Narrative family — context/challenge cards, solution pillars, insight
 // callouts, proof stats and the testimonial spread. Extracted verbatim from the
 // legacy `VariantRenderer` switch onto the module registry.
@@ -492,7 +493,7 @@ registerSlideModule({
       case "MV-SOL-PILLARS-5": {
         const hero = obj(c.hero);
         const stack = isDark && arr(c.items).length === 4;
-        const GL5 = ["#7FB3F5", "#7FE3F5", "#C2A3FF", "#A6C8FF"];
+        const GL5 = ["#7FB3F5", "#7FE3F5", BRAND.lavender, "#A6C8FF"];
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <AuroraOrb x={92} y={30} size={820} />
@@ -546,14 +547,14 @@ registerSlideModule({
                         {callout && (
                           <div aria-hidden className="mt-7 flex gap-2">
                             <span style={{ width: 96, height: 4, borderRadius: 2, background: "#7FE3F5", boxShadow: "0 0 14px #7FE3F5" }} />
-                            <span style={{ width: 40, height: 4, borderRadius: 2, background: "#C2A3FF", boxShadow: "0 0 14px #C2A3FF" }} />
+                            <span style={{ width: 40, height: 4, borderRadius: 2, background: BRAND.lavender, boxShadow: "0 0 14px #C2A3FF" }} />
                           </div>
                         )}
                         {callout && parts.length > 1 ? (
                           <ul className="mt-8 space-y-4" style={{ maxWidth: 600 }}>
                             {parts.map((p, k) => (
                               <li key={k} className="flex items-start gap-4" style={{ fontSize: 26, lineHeight: 1.3, color: isDark ? "rgba(255,255,255,0.88)" : ink.strong }}>
-                                <span aria-hidden style={{ marginTop: 12, width: 9, height: 9, borderRadius: 9, flexShrink: 0, background: ["#7FB3F5", "#7FE3F5", "#C2A3FF", "#A6C8FF"][k % 4], boxShadow: `0 0 10px ${["#7FB3F5", "#7FE3F5", "#C2A3FF", "#A6C8FF"][k % 4]}` }} />
+                                <span aria-hidden style={{ marginTop: 12, width: 9, height: 9, borderRadius: 9, flexShrink: 0, background: ["#7FB3F5", "#7FE3F5", BRAND.lavender, "#A6C8FF"][k % 4], boxShadow: `0 0 10px ${["#7FB3F5", "#7FE3F5", BRAND.lavender, "#A6C8FF"][k % 4]}` }} />
                                 {p}
                               </li>
                             ))}

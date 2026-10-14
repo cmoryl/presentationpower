@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Shared slide-module primitives: icon resolution, cards/grids, media tiles,
 // sparklines and the freeform chart family. Extracted out of `VariantRenderer`
 // so registry modules import them directly instead of going through kit slots.
@@ -1267,7 +1268,7 @@ export function MediaTile({
       ref={rootRef}
       data-media-tile="true"
       className={`group ${/\b(absolute|fixed)\b/.test(className ?? "") ? "" : "relative"} overflow-hidden rounded-2xl ${className ?? ""}`}
-      style={{ background: "#03002C", filter: grayscale }}
+      style={{ background: BRAND.ink, filter: grayscale }}
     >
       {hasVideo && shouldPlay ? (
         <video

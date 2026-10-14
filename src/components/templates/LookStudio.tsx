@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // LOOK STUDIO — the single cohesive surface for every alternate look/template.
 //
@@ -93,7 +94,7 @@ export const BLANK_DRAFT: CustomTemplate = {
   description: "",
   bestFit: "",
   mode: "light",
-  palette: ["#F7F7F5", "#111214", "#003FC7", "#A1FBF9", "#E0E8F5"],
+  palette: ["#F7F7F5", "#111214", BRAND.blue, BRAND.aqua, "#E0E8F5"],
   typography: "Large scale · restrained weight",
   surfaceNote: "Flat canvas · one lifted plane",
   imagery: "Monumental crop · natural shadow",
@@ -585,7 +586,7 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
               const code = r.pack ? codeForPack(r.pack) : (r.template?.code ?? "");
               const swatch = r.pack
                 ? [r.pack.tokens.surface, r.pack.tokens.accent]
-                : [r.template?.palette[0] ?? "#fff", r.template?.palette[2] ?? "#003FC7"];
+                : [r.template?.palette[0] ?? "#fff", r.template?.palette[2] ?? BRAND.blue];
               const tuned = overrides.some((o) => o.skinCode.toUpperCase() === code.toUpperCase());
               const rowTemplateId = r.template?.id ?? null;
               const checked = !!rowTemplateId && picked.includes(rowTemplateId);

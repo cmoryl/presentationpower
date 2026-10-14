@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Dashboard family — summary, donut trio, sales chart, gauges, performance,
 // report cards, growth columns, breakdown and region stats. Extracted from the
 // legacy `VariantRenderer` switch onto the module registry so the free-form
@@ -95,7 +96,7 @@ function FreeformBreakdownRow({
               style={{
                 fontSize: fillPx(12, "kicker"),
                 letterSpacing: "0.24em",
-                color: negative ? "#E53D2E" : "var(--slide-accent-text)",
+                color: negative ? BRAND.red : "var(--slide-accent-text)",
                 fontWeight: 700,
               }}
             >
@@ -198,7 +199,7 @@ function FreeformReportItem({
             which drops to ~1:1 against a bright aurora plate in dark chrome.
             Route it through ink.onSurface so the "reduction" signal keeps its
             hue but always meets AA against the surface it renders on. */}
-        <Kicker brand={brand} color={negative ? ink.onSurface("#E53D2E") : undefined}>
+        <Kicker brand={brand} color={negative ? ink.onSurface(BRAND.red) : undefined}>
           {meta}
         </Kicker>
         <div

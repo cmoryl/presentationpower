@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Locations family — MV-LOC-WORLD-PINS / WORLD-STATS / REGION-FOCUS /
 // HUB-SPOKE. Extracted from the legacy `VariantRenderer` switch onto the module
 // registry together with its pin/metric coercion helpers, so the map geometry,
@@ -799,7 +800,7 @@ function renderLocationsVariant(
                     void exportMapNodeAsPng(
                       root,
                       `${(title || "world-stats").toString().toLowerCase().replace(/\s+/g, "-")}.png`,
-                      isDark ? "#03002C" : "#ffffff",
+                      isDark ? BRAND.ink : "#ffffff",
                     );
                 }}
                 aria-label="Export map as PNG"

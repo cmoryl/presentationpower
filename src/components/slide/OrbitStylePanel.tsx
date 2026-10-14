@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Editor controls for the orbit rings on the growth-proof split module: ring
 // colour, ring weight and the orbit dot treatment, authored separately for the
 // light face and the dark face.
@@ -21,14 +22,14 @@ import {
 
 const SWATCHES = [
   { id: "accent", value: null as string | null, label: "Brand accent" },
-  { id: "blue", value: "#003FC7", label: "Blue 500" },
-  { id: "aqua", value: "#A1FBF9", label: "Aqua" },
-  { id: "lavender", value: "#C2A3FF", label: "Lavender" },
-  { id: "yellow", value: "#FFEB66", label: "Yellow" },
-  { id: "green", value: "#A6FA87", label: "Green" },
-  { id: "pink", value: "#EC388A", label: "Pink" },
+  { id: "blue", value: BRAND.blue, label: "Blue 500" },
+  { id: "aqua", value: BRAND.aqua, label: "Aqua" },
+  { id: "lavender", value: BRAND.lavender, label: "Lavender" },
+  { id: "yellow", value: BRAND.yellow, label: "Yellow" },
+  { id: "green", value: BRAND.green, label: "Green" },
+  { id: "pink", value: BRAND.pink, label: "Pink" },
   { id: "white", value: "#FFFFFF", label: "White" },
-  { id: "navy", value: "#03002C", label: "Blue 800" },
+  { id: "navy", value: BRAND.ink, label: "Blue 800" },
 ];
 
 function Swatches({

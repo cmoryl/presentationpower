@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useMemo, useState } from "react";
 import type { StylePack } from "@/lib/style-packs";
 import { isCuratedGroundPack, packCompositionFor } from "@/lib/style-packs";
@@ -39,7 +40,7 @@ function Row({ k, v, warn }: { k: string; v: string; warn?: boolean }) {
       <span
         style={{
           fontWeight: 600,
-          color: warn ? "#FFEB66" : "#A1FBF9",
+          color: warn ? BRAND.yellow : BRAND.aqua,
           wordBreak: "break-word",
         }}
       >

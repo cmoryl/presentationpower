@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Advanced diagram family — the bento value/close spread, the KPI dashboard
 // grid, roadmap quarters, funnel, flywheel, maturity curve, journey map, logo
 // wall, 2x2 matrix and iceberg. Extracted from the legacy `VariantRenderer`
@@ -483,7 +484,7 @@ registerSlideModule({
         // the mosaic reads as a real infographic (green/red visual grammar) while
         // still respecting the brand palette.
         const upInk = "var(--slide-accent-text)";
-        const downInk = "#E53D2E";
+        const downInk = BRAND.red;
         const trendInk = (t: string) => (t === "down" ? downInk : upInk);
 
         const chip = (tInk: string, arrow: string, delta: string, size = 15) => (
@@ -577,7 +578,7 @@ registerSlideModule({
           void surf;
           void bod;
           const blue = isDark ? "#7FB0FF" : INFO_FILL.blue.bg;
-          const ringCols = [blue, isDark ? INFO_FILL.aqua.bg : "#03002C", INFO_FILL.lavender.bg];
+          const ringCols = [blue, isDark ? INFO_FILL.aqua.bg : BRAND.ink, INFO_FILL.lavender.bg];
           const heroA = gA[0];
           const restA = gA.slice(1, 3);
           // Thin tick ruler — exactly N ticks for a stated whole number.
@@ -1520,7 +1521,7 @@ registerSlideModule({
             return `M${x1} ${y1} A${r2} ${r2} 0 ${lg} 1 ${x2} ${y2} L${x3} ${y3} A${r1} ${r1} 0 ${lg} 0 ${x4} ${y4}Z`;
           };
           const step = SPAN / N;
-          const DAQ = "#7FE3F5", DLV = "#C2A3FF", DBL = "#7FB3F5";
+          const DAQ = "#7FE3F5", DLV = BRAND.lavender, DBL = "#7FB3F5";
           const mix = (i: number) => {
             // blue → aqua → lavender along the dial
             const t = i / (N - 1);
@@ -1595,8 +1596,8 @@ registerSlideModule({
                       <path d={seg(R0, R0 + t, a, b)} fill={col} opacity={op} stroke={isDark ? "rgba(255,255,255,0.35)" : "none"} strokeWidth={1} />
                       <line x1={dx} y1={dy} x2={ex} y2={ey} stroke={col} strokeOpacity={0.7} strokeWidth={1.5} strokeDasharray="2 4" />
                       <circle cx={ex} cy={ey} r={5} fill={col} />
-                      <circle cx={ex} cy={ey} r={2} fill={isDark ? "#03002C" : "#FFFFFF"} />
-                      <text x={nx} y={ny + 8} textAnchor="middle" fontSize={24} fontWeight={800} fill={isDark ? "#03002C" : i > N / 2 ? "#FFFFFF" : ink.strong}>
+                      <circle cx={ex} cy={ey} r={2} fill={isDark ? BRAND.ink : "#FFFFFF"} />
+                      <text x={nx} y={ny + 8} textAnchor="middle" fontSize={24} fontWeight={800} fill={isDark ? BRAND.ink : i > N / 2 ? "#FFFFFF" : ink.strong}>
                         {String(i + 1).padStart(2, "0")}
                       </text>
                       <text x={lx} y={ly - ((lines.length - 1) * 30) / 2 + 10} textAnchor={right ? "start" : left ? "end" : "middle"} fontSize={28} fontWeight={600} fill={labelInk}>
@@ -2031,7 +2032,7 @@ registerSlideModule({
         const target = Number(c.target ?? 0);
         const items = arr(c.items);
         const S = 720;
-        const AQ = "#7FE3F5", LV = "#C2A3FF", BL = "#5B9BFF";
+        const AQ = "#7FE3F5", LV = BRAND.lavender, BL = "#5B9BFF";
         const clamp = (v: unknown) => Math.max(0.04, Math.min(0.96, Number(v ?? 0.5)));
         const heroIdx = items.findIndex((it) => truthy(it.highlight) || /globallink/i.test(s(it.label)));
         const ranked = items.map((it, i) => ({ it, i })).sort((a, b) => Number(b.it.y ?? 0) - Number(a.it.y ?? 0));

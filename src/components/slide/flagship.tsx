@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Flagship 2026 — mode-aware editorial primitives.
 //
 // This module raises the visual bar on the highest-impact slide moments
@@ -585,7 +586,7 @@ export function AuroraLayer({
 }) {
   const mode = useSlideMode();
   const pack = useStylePack();
-  const base = baseTint ?? (mode === "dark" ? "#03002C" : "#FFFFFF");
+  const base = baseTint ?? (mode === "dark" ? BRAND.ink : "#FFFFFF");
   const orbs = useMemo(
     () => auroraOrbs(seed, brand, mode, aspect),
     [seed, brand, mode, aspect?.w, aspect?.h],

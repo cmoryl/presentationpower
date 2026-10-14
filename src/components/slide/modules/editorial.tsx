@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Editorial family — the typographic spreads and poster variants: editorial
 // spread, split manifesto, numbers triptych, vs-list and slider comparisons,
 // pull-quote stack, definition, principles, countdown, horizon and the
@@ -152,7 +153,7 @@ registerSlideModule({
             >
               <div
                 className="relative flex flex-col justify-between overflow-hidden p-16"
-                style={{ background: "#03002C", color: "#FFFFFF" }}
+                style={{ background: BRAND.ink, color: "#FFFFFF" }}
               >
                 <div
                   aria-hidden
@@ -323,8 +324,8 @@ registerSlideModule({
         // panel of logo tiles (white marks on frosted glass) around a VS disc.
         const hasLogos = [...leftRows, ...rightRows].some((r) => s(obj(r).logo));
         if (hasLogos) {
-          const glows = ["#7FB3F5", "#C2A3FF"];
-          const fg = isDark ? "#FFFFFF" : brand.tokens.ink ?? "#03002C";
+          const glows = ["#7FB3F5", BRAND.lavender];
+          const fg = isDark ? "#FFFFFF" : brand.tokens.ink ?? BRAND.ink;
           const hair = isDark ? "rgba(255,255,255,0.16)" : "rgba(3,0,44,0.14)";
           const Panel = ({ heading, rows, glow }: { heading: string; rows: ReturnType<typeof arr>; glow: string }) => (
             <div
@@ -420,7 +421,7 @@ registerSlideModule({
         const shortTerms = leftRows.length > 0 && leftRows.length <= 6 &&
           leftRows.every((it) => s(typeof it === "string" ? it : obj(it).label).split(/\s+/).length <= 3);
         if (isDark && shortTerms && rightRows.length > 0 && rightRows.length <= 4) {
-          const G = ["#7FB3F5", "#7FE3F5", "#C2A3FF", "#A6C8FF"];
+          const G = ["#7FB3F5", "#7FE3F5", BRAND.lavender, "#A6C8FF"];
           const glass = (glow: string): CSSProperties => ({
             borderRadius: 22,
             background: `linear-gradient(160deg, ${glow}24 0%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.02) 100%)`,

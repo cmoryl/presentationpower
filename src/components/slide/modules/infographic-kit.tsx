@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Infographic kit — solid colour blocks, donut gauges and labelled bars used
 // by the stat/KPI modules. Every graphic is data-true: rings fill exactly to a
 // stated percentage, bars are scaled against the largest figure in their own
@@ -8,10 +9,10 @@ import { fillPx } from "@/lib/open-space-fill";
 
 /** Approved brand fills (enterprise palette: primary, secondary accents, ink). */
 export const INFO_FILL = {
-  blue: { bg: "#003FC7", fg: "#FFFFFF", track: "rgba(255,255,255,0.22)", ring: "#A1FBF9" },
-  navy: { bg: "#03002C", fg: "#FFFFFF", track: "rgba(255,255,255,0.16)", ring: "#C2A3FF" },
-  aqua: { bg: "#A1FBF9", fg: "#03002C", track: "rgba(3,0,44,0.12)", ring: "#003FC7" },
-  lavender: { bg: "#C2A3FF", fg: "#03002C", track: "rgba(3,0,44,0.12)", ring: "#03002C" },
+  blue: { bg: BRAND.blue, fg: "#FFFFFF", track: "rgba(255,255,255,0.22)", ring: BRAND.aqua },
+  navy: { bg: BRAND.ink, fg: "#FFFFFF", track: "rgba(255,255,255,0.16)", ring: BRAND.lavender },
+  aqua: { bg: BRAND.aqua, fg: BRAND.ink, track: "rgba(3,0,44,0.12)", ring: BRAND.blue },
+  lavender: { bg: BRAND.lavender, fg: BRAND.ink, track: "rgba(3,0,44,0.12)", ring: BRAND.ink },
 } as const;
 export type InfoFill = keyof typeof INFO_FILL;
 
@@ -339,7 +340,7 @@ export function LogLollipop({
     <div className="flex h-full flex-col justify-between gap-2">
       {rows.map((r, i) => (
         <div key={i} className="grid items-center gap-4" style={{ gridTemplateColumns: "44px 150px 1fr" }}>
-          <span className="flex h-[44px] w-[44px] items-center justify-center rounded-[12px]" style={{ background: r.color, color: "#03002C" }}>{r.icon}</span>
+          <span className="flex h-[44px] w-[44px] items-center justify-center rounded-[12px]" style={{ background: r.color, color: BRAND.ink }}>{r.icon}</span>
           <div className="min-w-0">
             <div className="tabular-nums" style={{ fontSize: px(34), fontWeight: 800, lineHeight: 1, letterSpacing: "-0.03em", color: ink, whiteSpace: "nowrap" }}>
               {r.value}

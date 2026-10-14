@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // BACKGROUND TUNER — the friendly, real-time face of background retuning.
 //
@@ -323,9 +324,9 @@ export function BackgroundTuner({
     pack.tokens.accent,
     pack.tokens.accentAlt,
     pack.tokens.ink,
-    "#003FC7",
-    "#A1FBF9",
-    "#FFEB66",
+    BRAND.blue,
+    BRAND.aqua,
+    BRAND.yellow,
   ].filter((c, i, a) => !!c && a.indexOf(c) === i);
 
   const zoomLayers = zoomCompare ? authoredLayers : previewLayers;
@@ -719,7 +720,7 @@ export function BackgroundTuner({
                 <input
                   type="color"
                   aria-label="Custom wash colour"
-                  value={edit.tint && /^#[0-9a-f]{6}$/i.test(edit.tint) ? edit.tint : "#003FC7"}
+                  value={edit.tint && /^#[0-9a-f]{6}$/i.test(edit.tint) ? edit.tint : BRAND.blue}
                   onChange={(e) => {
                     upd("tint", e.target.value.toUpperCase());
                     if (edit.tintStrength < 0.05) upd("tintStrength", 0.16);

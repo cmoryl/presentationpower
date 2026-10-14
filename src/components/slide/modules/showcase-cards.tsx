@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Showcase family — two enterprise layouts extracted onto the module registry:
 //
 //  • MV-SOL-CAP-CARDS     photo card → label band → lead claim → ruled bullets
@@ -26,9 +27,9 @@ import {
 import { Cpu, Handshake, LayoutGrid, Sparkles } from "lucide-react";
 
 const cssPx = (v: number | string) => (typeof v === "number" ? `${v}px` : v);
-const AQUA = "#A1FBF9";
-const LAVENDER = "#C2A3FF";
-const DEEP_INK = "#03002C";
+const AQUA = BRAND.aqua;
+const LAVENDER = BRAND.lavender;
+const DEEP_INK = BRAND.ink;
 
 function toneFill(tone: CapCardTone, accent: string, isDark: boolean): string {
   switch (tone) {
@@ -169,7 +170,7 @@ registerSlideModule({
                         }}
                       >
                         <svg width={68} height={68} viewBox="0 0 68 68">
-                          <circle cx={34} cy={34} r={33} fill="#A1FBF9" fillOpacity={0.12} />
+                          <circle cx={34} cy={34} r={33} fill={BRAND.aqua} fillOpacity={0.12} />
                           <circle cx={34} cy={34} r={27} fill="#141A52" stroke="#FFFFFF" strokeOpacity={0.5} strokeWidth={1.5} />
                           <Icon x={19} y={19} width={30} height={30} strokeWidth={1.8} color={AQUA} />
                         </svg>

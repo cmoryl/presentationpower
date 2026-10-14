@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // ExactSlideStage — the canonical, unscaled 1920×1080 render of one module.
 //
@@ -48,7 +49,7 @@ export function ExactSlideStage({
   // publish its own tokens, but it must not override a slide explicitly marked
   // light/dark in the editor or agent output.
   const effMode = mode;
-  const surface = pack ? pack.tokens.surface : effMode === "dark" ? "#03002C" : "#F2F2F2";
+  const surface = pack ? pack.tokens.surface : effMode === "dark" ? BRAND.ink : "#F2F2F2";
 
   return (
     <div

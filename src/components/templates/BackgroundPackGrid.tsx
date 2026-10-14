@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // -----------------------------------------------------------------------------
 // BACKGROUND PACK GRID — every section of one look, listed at once.
 //
@@ -96,7 +97,7 @@ export function BackgroundPackGrid({
   });
   const [form, setForm] = useState({
     intensity: 1,
-    tint: "#003FC7",
+    tint: BRAND.blue as string,
     tintStrength: 0.18,
     imageUrl: null as string | null,
     imagePriority: "front" as "front" | "behind",

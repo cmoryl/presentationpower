@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // Info-graphic family — hub & satellites, pill orbit, donut, funnel, bar
 // comparison, circular flow, pyramid and Venn. Extracted verbatim from the
 // legacy `VariantRenderer` switch onto the module registry so the diagram
@@ -324,7 +325,7 @@ registerSlideModule({
                 // Neutral base under the accent wash so the connector ring (and
                 // any ground pattern) is occluded rather than showing through the
                 // icon — same treatment as the pill-orbit chips.
-                backgroundColor: `color-mix(in oklab, ${isDark ? "#03002C" : "#FFFFFF"} ${isDark ? 72 : 82}%, transparent)`,
+                backgroundColor: `color-mix(in oklab, ${isDark ? BRAND.ink : "#FFFFFF"} ${isDark ? 72 : 82}%, transparent)`,
                 backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${nodeAccent} ${isDark ? 30 : 18}%, transparent), color-mix(in oklab, ${nodeAccent} ${isDark ? 10 : 5}%, transparent))`,
                 zIndex: 4,
               }}
@@ -614,7 +615,7 @@ registerSlideModule({
                   border: `1px solid color-mix(in oklab, ${pillAccent} ${isDark ? 46 : 34}%, transparent)`,
                   // Neutral base under the accent wash so the chip holds its own
                   // against bright or busy patches of the ground.
-                  backgroundColor: `color-mix(in oklab, ${isDark ? "#03002C" : "#FFFFFF"} ${isDark ? 62 : 58}%, transparent)`,
+                  backgroundColor: `color-mix(in oklab, ${isDark ? BRAND.ink : "#FFFFFF"} ${isDark ? 62 : 58}%, transparent)`,
                   backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${pillAccent} ${isDark ? 26 : 12}%, transparent), color-mix(in oklab, ${pillAccent} ${isDark ? 8 : 3}%, transparent))`,
                   flexDirection: side === "left" ? "row-reverse" : "row",
                 }}

@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ASSET_SELECTOR,
@@ -227,7 +228,7 @@ export function GutterDebugOverlay({ scope }: { scope: HTMLElement | null }) {
         >
           <span
             className="absolute whitespace-nowrap rounded px-1 text-[10px] font-semibold"
-            style={{ top: -14, left: 0, background: "#E53D2E", color: "#fff" }}
+            style={{ top: -14, left: 0, background: BRAND.red, color: "#fff" }}
           >
             {b.label}
           </span>
@@ -238,7 +239,7 @@ export function GutterDebugOverlay({ scope }: { scope: HTMLElement | null }) {
         style={{
           left: 12,
           bottom: 12,
-          background: hits.length ? "#E53D2E" : "#03002C",
+          background: hits.length ? BRAND.red : BRAND.ink,
           color: "#fff",
         }}
       >

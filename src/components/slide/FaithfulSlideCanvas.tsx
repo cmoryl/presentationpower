@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand-colors";
 // FaithfulSlideCanvas — renders an imported PPTX slide 1:1 using the
 // captured layout (see extractSlideLayout in pptx-import.functions.ts).
 // Coordinates are inches; we scale the whole thing with a CSS transform so
@@ -41,17 +42,17 @@ const SCHEME_DEFAULTS: Record<string, string> = {
   tx1: "#0B0B12",
   bg2: "#F2F2F2",
   tx2: "#333333",
-  accent1: "#003FC7",
+  accent1: BRAND.blue,
   accent2: "#5A6ACF",
   accent3: "#8892D0",
-  accent4: "#A1FBF9",
-  accent5: "#C2A3FF",
-  accent6: "#FFEB66",
+  accent4: BRAND.aqua,
+  accent5: BRAND.lavender,
+  accent6: BRAND.yellow,
   dk1: "#0B0B12",
-  dk2: "#03002C",
+  dk2: BRAND.ink,
   lt1: "#FFFFFF",
   lt2: "#F5F5F5",
-  hlink: "#003FC7",
+  hlink: BRAND.blue,
   folHlink: "#5A6ACF",
   phClr: "#0B0B12",
 };
@@ -985,7 +986,7 @@ function ParaBlock({ para }: { para: ResolvedPara }) {
               rel={href ? "noopener noreferrer" : undefined}
               onClick={href ? undefined : (e) => e.preventDefault()}
               title={hit?.target}
-              style={{ ...r.style, textDecoration: "underline", color: r.style.color ?? "#003FC7" }}
+              style={{ ...r.style, textDecoration: "underline", color: r.style.color ?? BRAND.blue }}
             >
               {r.text}
             </a>
@@ -1309,14 +1310,14 @@ function ResolvedShapeNode({
 // + legend + axis titles + numberFormat unit are honored.
 
 const CHART_PALETTE = [
-  "#003FC7",
+  BRAND.blue,
   "#5A6ACF",
-  "#A1FBF9",
-  "#C2A3FF",
-  "#FFEB66",
-  "#A6FA87",
-  "#FF9B70",
-  "#EC388A",
+  BRAND.aqua,
+  BRAND.lavender,
+  BRAND.yellow,
+  BRAND.green,
+  BRAND.peach,
+  BRAND.pink,
 ];
 
 function formatValue(v: number, unit?: string, fmt?: string): string {
@@ -1820,7 +1821,7 @@ export function FaithfulSlideCanvas({
                       fontWeight: 600,
                       letterSpacing: "0.04em",
                       color:
-                        b.tone === "hidden" ? "#fff" : b.tone === "accent" ? "#03002C" : "#03002C",
+                        b.tone === "hidden" ? "#fff" : b.tone === "accent" ? BRAND.ink : BRAND.ink,
                       background:
                         b.tone === "hidden"
                           ? "rgba(11,11,18,0.72)"
