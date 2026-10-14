@@ -304,12 +304,12 @@ function iconSvgFrom(node: SVGSVGElement, color: string, weight: number): string
 }
 
 const SWATCH_LABELS: Record<string, string> = {
-  BRAND.ink: "Brand navy",
-  BRAND.blue: "Brand blue",
-  BRAND.aqua: "Aqua",
-  BRAND.lavender: "Lavender",
-  BRAND.yellow: "Yellow",
-  BRAND.pink: "Pink",
+  [BRAND.ink]: "Brand navy",
+  [BRAND.blue]: "Brand blue",
+  [BRAND.aqua]: "Aqua",
+  [BRAND.lavender]: "Lavender",
+  [BRAND.yellow]: "Yellow",
+  [BRAND.pink]: "Pink",
   "#FFFFFF": "White",
   "#666666": "Gray",
 };
