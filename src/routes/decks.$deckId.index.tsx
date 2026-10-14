@@ -81,6 +81,7 @@ import {
 import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { BulkSlideActions } from "@/components/BulkSlideActions";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
+import { SlideAlternatives } from "@/components/SlideAlternatives";
 import { TemplateOverridePanel } from "@/components/slide/TemplateOverridePanel";
 import {
   useDeckStore,
@@ -2174,6 +2175,15 @@ function DeckEditor() {
                                   clientName={brief?.prospect}
                                   subCompany={deck?.subCompany}
                                 />
+                                <SlideAlternatives
+                                  slide={active}
+                                  brand={brand}
+                                  onSwap={(vid) => swapVariantWithRefit(active.id, vid, "related")}
+                                  clientLogoUrl={clientLogoUrl}
+                                  clientName={brief?.prospect}
+                                  subCompany={deck?.subCompany}
+                                />
+
                                 <details className="text-[11px] text-black/50">
                                   <summary className="cursor-pointer hover:text-black/70">
                                     Quick select…
