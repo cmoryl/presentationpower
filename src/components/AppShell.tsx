@@ -1,4 +1,5 @@
 import { ADMIN_NAV_GROUPS } from "@/lib/admin-nav";
+import { audienceFor, BRAND_REVIEW_LINKS, showElementItem, showTopLink } from "@/lib/role-nav";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
@@ -102,7 +103,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
   const showAdminChrome = !inAdmin && isAdminLinked && adminCtx;
   const caps = useWorkspaceCapabilities();
   const createOnly = caps.createOnly;
-  const { persona, isLoading: personaLoading } = useWorkspacePersona();
+  const { persona, roles: personaRoles, isLoading: personaLoading } = useWorkspacePersona();
   // The sidebar/top-nav Dashboard entry names the active persona dashboard so
   // it matches the dashboard tabs and the page breadcrumb. Until the user's
   // roles have resolved, stay on the neutral word — naming a workspace early
@@ -118,6 +119,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
     { to: "/demos", label: "Demos" },
 
     { to: "/files", label: "My files" },
+    ...BRAND_REVIEW_LINKS,
     { to: "/admin", label: "Admin" },
   ] as const;
 
@@ -125,10 +127,8 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
   // entry (and every admin-only sub-item) is only offered to confirmed admins:
   // signed-out visitors, sales/viewer and editor accounts never see admin
   // affordances, and nothing admin shows while roles are still resolving.
-  const canSeeAdmin = caps.isAdmin && !caps.isLoading;
-  const visibleNav = nav.filter(
-    (n) => !(n.to === "/" && pathname === "/") && !(n.to === "/admin" && !canSeeAdmin),
-  );
+  const audience = audienceFor(personaRoles, caps.isLoading);
+  const visibleNav = nav.filter((n) => !(n.to === "/" && pathname === "/") && showTopLink(n.to, audience));
 
   // Elements mega-menu: the four output channels and their sub-options.
   const elementGroups: ReadonlyArray<{
@@ -187,11 +187,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
   // admin studios are removed for everyone who is not a confirmed admin.
   const visibleElementGroups = elementGroups.map((g) => ({
     ...g,
-    items: g.items.filter(
-      (i) =>
-        (canSeeAdmin || !i.to.startsWith("/admin")) &&
-        !(createOnly && i.to === "/library/print/modules"),
-    ),
+    items: g.items.filter((i) => showElementItem(i.to, audience)),
   }));
 
   const adminGroups = ADMIN_NAV_GROUPS;
