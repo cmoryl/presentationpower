@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { describeExportError } from "@/lib/export-feedback";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 import { toastExportWarnings } from "@/lib/export-warning-toast";
+import { useApprovedFigures } from "@/hooks/use-approved-figures";
 import { complianceIssues, runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
@@ -48,6 +49,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const setDeckContext = useDeckStore((s) => s.setDeckContext);
   const navigate = useNavigate();
+  useApprovedFigures();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLDivElement>(null);

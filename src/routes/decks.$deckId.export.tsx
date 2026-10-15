@@ -26,6 +26,7 @@ import type { GeometryRepairReport } from "@/lib/canvas-repair-report";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
 import { BrandHealthBadge } from "@/components/brand/BrandHealthBadge";
 import { PrintProofMenu } from "@/components/export/PrintProofMenu";
+import { useApprovedFigures } from "@/hooks/use-approved-figures";
 import { complianceIssues, runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import { auditExportCoverage, type ExportCoverageReport } from "@/lib/export-coverage";
@@ -100,6 +101,7 @@ function ExportView() {
   const deck = useDeckStore((s) => s.decks[deckId]);
   useResignDeckMedia(deck);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
+  useApprovedFigures();
   const [exporting, setExporting] = useState(false);
   // PDF page size: the slide canvas is re-proportioned to the page so every
   // layout fills it (taller canvas for paper, narrower canvas for portrait).

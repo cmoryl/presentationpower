@@ -1,4 +1,5 @@
 import { validateFigures } from "./figure-validator";
+import { approvedGrounding, type ApprovedFigure } from "./approved-figures";
 // Brief → deck generation pipeline, transport-free.
 //
 // One implementation, two callers: `deck-generate.functions.ts` wraps it in a
@@ -225,6 +226,22 @@ export async function generateDeckFromBrief(
     notes.push(`Knowledge retrieval skipped (${(e as Error).message}).`);
   }
 
+  // Approved, sourced standard figures join the grounding and the validator.
+  let approvedFigures: ApprovedFigure[] = [];
+  try {
+    const { data } = await (supabase as { from: (t: string) => any })
+      .from("approved_figures")
+      .select("id,figure,claim,division_id,valid_until,status")
+      .eq("status", "approved");
+    approvedFigures = (data ?? []) as ApprovedFigure[];
+  } catch {
+    /* none — every figure still needs grounding */
+  }
+  const approvedText = approvedGrounding(approvedFigures, brief.brandModeId);
+  if (approvedText) {
+    snippets.push({ source: "kb", title: "Approved figures (sourced, brand-lead approved)", snippet: approvedText, tags: ["approved-figures"] });
+  }
+
   // ── 4. Deterministic assembly with strategy overrides ──────────────────
   const strategyOverride = strategy?.recommendedSections?.length
     ? {
@@ -272,12 +289,12 @@ export async function generateDeckFromBrief(
       } else {
         const byIdMap = new Map(res.slides.map((s) => [s.id, s.content]));
         // Every AI-written figure must appear in the grounding; else "[figure needed]".
-        const sources = [brief.clientFacts ?? "", ...snippets.map((s) => `${s.title} ${s.snippet}`)].join("\n");
+        const sources = [brief.clientFacts ?? "", ...snippets.filter((s) => !s.tags.includes("approved-figures")).map((s) => `${s.title} ${s.snippet}`)].join("\n");
         const removed: string[] = [];
         deck.slides = deck.slides.map((s) => {
           if (!byIdMap.has(s.id)) return s;
           const merged = { ...s.content, ...byIdMap.get(s.id)! };
-          return { ...s, content: validateFigures(merged, s.content, sources, removed, { checkTemplate: true }) as typeof s.content };
+          return { ...s, content: validateFigures(merged, s.content, sources, removed, { checkTemplate: true, approved: approvedFigures, division: brief.brandModeId }) as typeof s.content };
         });
         if (removed.length) {
           notes.push(`Replaced ${removed.length} unsourced figure(s) with "[figure needed]": ${[...new Set(removed)].join(", ")}.`);
