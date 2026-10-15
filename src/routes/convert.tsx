@@ -539,6 +539,7 @@ function ConvertPage() {
               </h2>
               <div className="flex flex-wrap items-center gap-2">
                 <AssetExportMenu
+division={brandId}
                   label="Digital export"
                   filename={label}
                   allowZip={false}
