@@ -54,3 +54,10 @@ describe("approved figures matcher", () => {
     expect(lintText("200+ languages, 200+ integrations", "", [], { approved }).length).toBe(1);
   });
 });
+
+describe("stacked stats", () => {
+  it("a figure with its label on the next line passes", () => {
+    expect(needs("Global reach\n200+\nLanguages", [f()])).toEqual([]);
+    expect(needs("200+\nIntegrations", [f()])).toEqual(["200+"]);
+  });
+});

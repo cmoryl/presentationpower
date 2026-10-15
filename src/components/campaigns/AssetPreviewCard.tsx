@@ -142,6 +142,7 @@ export function AssetPreviewCard({
             {formatWidth}×{formatHeight} · {mode}
           </span>
           <AssetExportMenu
+division={rendererProps.brandId}
             label="Export"
             filename={`${formatLabel}-${formatWidth}x${formatHeight}`}
             bundleName={formatLabel}

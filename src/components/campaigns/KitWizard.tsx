@@ -1335,6 +1335,7 @@ export function KitWizard({
                       </div>
                       <div className="shrink-0">
                         <AssetExportMenu
+division={brandId}
                           label="Export"
                           allowZip={false}
                           filename={`${asset.format.label}-${asset.format.width}x${asset.format.height}`}

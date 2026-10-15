@@ -59,7 +59,11 @@ export function isLive(f: ApprovedFigure, division: string | null | undefined, n
 // Words after the figure up to the next clause break; words before only when
 // the figure ends its clause ("Languages: 200+").
 function wordsNear(text: string, start: number, end: number): string[] {
-  const after = text.slice(end).split(/[,;.!?\n]/)[0].split(/\s+/).filter(Boolean).slice(0, WINDOW_AFTER);
+  // A stacked stat ("200+" over "Languages") puts its label on the next line.
+  const rest = text.slice(end);
+  const lines = rest.split("\n");
+  const tail = lines[0].trim() ? lines[0] : (lines.slice(1).find((l) => l.trim()) ?? "");
+  const after = tail.split(/[,;.!?]/)[0].split(/\s+/).filter(Boolean).slice(0, WINDOW_AFTER);
   if (after.length) return after.map(stem);
   const clause = text.slice(0, start).split(/[,;.!?\n]/).pop() ?? "";
   return clause.split(/\s+/).filter(Boolean).slice(-WINDOW_BEFORE).map(stem);
