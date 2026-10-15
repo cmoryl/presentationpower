@@ -32,7 +32,7 @@ const WINDOW_AFTER = 4;
 const WINDOW_BEFORE = 3;
 
 export const normFigure = (s: string) => s.toLowerCase().replace(/[\s,]/g, "").replace(/×/g, "x");
-const stem = (w: string) => w.toLowerCase().replace(/[^a-z]/g, "").replace(/(es|s)$/, "");
+const stem = (w: string) => w.toLowerCase().replace(/[^a-z]/g, "").replace(/ies$/, "y").replace(/s$/, "");
 
 /** First meaningful word of the claim after the figure ("90% of the Fortune 500" → "fortune"). */
 export function keyNoun(claim: string, figure: string): string {
@@ -56,10 +56,13 @@ export function isLive(f: ApprovedFigure, division: string | null | undefined, n
   return true;
 }
 
+// Words after the figure up to the next clause break; words before only when
+// the figure ends its clause ("Languages: 200+").
 function wordsNear(text: string, start: number, end: number): string[] {
-  const after = text.slice(end).split(/\s+/).filter(Boolean).slice(0, WINDOW_AFTER);
-  const before = text.slice(0, start).split(/\s+/).filter(Boolean).slice(-WINDOW_BEFORE);
-  return [...before, ...after].map(stem);
+  const after = text.slice(end).split(/[,;.!?\n]/)[0].split(/\s+/).filter(Boolean).slice(0, WINDOW_AFTER);
+  if (after.length) return after.map(stem);
+  const clause = text.slice(0, start).split(/[,;.!?\n]/).pop() ?? "";
+  return clause.split(/\s+/).filter(Boolean).slice(-WINDOW_BEFORE).map(stem);
 }
 
 /** True when the figure at text[index..] is covered by an approved entry. */
