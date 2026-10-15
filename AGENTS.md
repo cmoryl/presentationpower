@@ -38,6 +38,4 @@
 - `src/lib/compliance-check.ts` finds unsourced figures/banned words, listed on `/admin/needs-source` — why: prompt rules didn't stop invented stats.
 - Approved figures (`approved_figures`, matcher in `src/lib/approved-figures.ts`) are the only way a figure passes without a per-asset source; compliance check, downloads, Checks tab and generator all call the same matcher — why: editor and export must never disagree.
 
-- Brand colours live only in `src/lib/brand-colors.ts`; CSS `--tp-*`, slides, PowerPoint, print and social feeders import it and `brand-colors-parity.test.ts` blocks drift — why: one change must reach every format.
-
-- Site colour settings come from the generated `src/styles/brand-tokens.css` (run `bun scripts/gen-brand-css.ts` after editing `src/lib/brand-colors.ts`); the parity test fails when stale — why: a hand-kept copy can drift.
+- Brand colours live only in `src/lib/brand-colors.ts`; CSS tokens are generated into `src/styles/brand-tokens.css` (`bun scripts/gen-brand-css.ts`) and feeders import it; parity tests block drift — why: one change must reach every format.
