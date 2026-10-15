@@ -1,0 +1,24 @@
+/* GENERATED from src/lib/brand-colors.ts by scripts/gen-brand-css.ts — do not edit. */
+:root {
+  --tp-ink: #03002c;
+  --tp-blue: #003fc7;
+  --tp-surface: #eef1f7;
+  --tp-white: #ffffff;
+  --tp-aqua: #a1fbf9;
+  --tp-lavender: #c2a3ff;
+  --tp-yellow: #ffeb66;
+  --tp-green: #a6fa87;
+  --tp-peach: #ff9b70;
+  --tp-pink: #ec388a;
+  --tp-red: #e53d2e;
+  --tp-dark-gray: #666666;
+  --tp-light-gray: #f2f2f2;
+  --tp-blue-white: #e0e8f5;
+  --tp-accent-1: #13b1f3;
+  --tp-accent-2: #5ce1e6;
+  --tp-accent-3: #a6fa87;
+  --tp-accent-4: #ffeb66;
+  --tp-accent-5: #ff9b70;
+  --tp-accent-6: #ec388a;
+  --tp-accent-7: #c2a3ff;
+}

@@ -1,5 +1,6 @@
 @import "./design-system/element/styles/theme.css";
 @import "./styles/print-section-layouts.css";
+@import "./styles/brand-tokens.css";
 @source "../src";
 
 /*
@@ -202,16 +203,16 @@
 }
 
 .dark [class*="text-[#03002C]"] {
-  color: #e0e8f5 !important;
+  color: var(--tp-blue-white) !important;
 }
 .dark [class*="text-[#03002C]"] {
-  color: #e0e8f5 !important;
+  color: var(--tp-blue-white) !important;
 }
 .dark [class*="text-[#0B2A4A]"] {
-  color: #a1fbf9 !important;
+  color: var(--tp-aqua) !important;
 }
 .dark [class*="text-[#003FC7]"] {
-  color: #a1fbf9 !important;
+  color: var(--tp-aqua) !important;
 }
 .dark [class*="text-black/60"] {
   color: rgba(255, 255, 255, 0.72) !important;
@@ -230,11 +231,11 @@
  * Uses :where() to keep specificity low so explicit dark:* utility classes
  * (e.g. dark:bg-[#A1FBF9]) can override when the component already opted in. */
 .dark :where(button, a, [role="button"]):is([class*="bg-[#03002C]"], [class*="bg-[#0B2A4A]"]) {
-  background-color: #003fc7;
+  background-color: var(--tp-blue);
 }
 .dark
   :where(button, a, [role="button"]):is([class*="border-[#03002C]"], [class*="border-[#0B2A4A]"]) {
-  border-color: #003fc7;
+  border-color: var(--tp-blue);
 }
 
 .dark [class*="border-black/5"] {
@@ -302,13 +303,13 @@
 
 /* Mid-navy ink used on light cards → light foreground on dark for AA */
 .dark [class*="text-[#0F1B3D]"] {
-  color: #e0e8f5 !important;
+  color: var(--tp-blue-white) !important;
 }
 .dark [class*="text-[#1E3A5F]"] {
   color: #c6d6ea !important;
 }
 .dark [class*="text-[#3B6FA0]"] {
-  color: #a1fbf9 !important;
+  color: var(--tp-aqua) !important;
 }
 .dark [class*="border-[#3B6FA0]"] {
   border-color: rgba(161, 251, 249, 0.35) !important;
@@ -325,7 +326,7 @@
 .dark select,
 .dark textarea {
   background-color: #0f0f30 !important;
-  color: #e0e8f5 !important;
+  color: var(--tp-blue-white) !important;
   border-color: rgba(255, 255, 255, 0.18) !important;
 }
 .dark input::placeholder,
@@ -336,7 +337,7 @@
 /* <select> option list uses the OS renderer — force dark to avoid white flash */
 .dark select option {
   background-color: #0f0f30;
-  color: #e0e8f5;
+  color: var(--tp-blue-white);
 }
 
 /* Divider/hr colors used across listings */
@@ -359,9 +360,9 @@
 .dark {
   --brief-page: #0a0929;
   --brief-surface: #141435;
-  --brief-ink: #e0e8f5;
+  --brief-ink: var(--tp-blue-white);
   --brief-ink-soft: #c6d6ea;
-  --brief-blue: #a1fbf9;
+  --brief-blue: var(--tp-aqua);
   --brief-hairline: rgba(255, 255, 255, 0.14);
   --brief-field: #0f0f30;
 }
@@ -381,7 +382,7 @@
   background-color: rgba(0, 63, 199, 0.06);
 }
 .live-edit-active [data-live-path]:focus {
-  outline: 2px solid #003fc7;
+  outline: 2px solid var(--tp-blue);
   outline-offset: 3px;
   background-color: rgba(0, 63, 199, 0.09);
 }
@@ -654,28 +655,7 @@ body.export-mode [data-print-surface] {
    Mirrors src/lib/accent-ramp.ts (DIVISION_ACCENT_RAMP + ACCENT_RAMP_INTENSITY).
    Never inline these hexes elsewhere — reference the tokens below. */
 :root {
-  /* Brand palette — mirrors src/lib/brand-colors.ts (parity-tested). */
-  --tp-ink: #03002c;
-  --tp-blue: #003fc7;
-  --tp-surface: #eef1f7;
-  --tp-white: #ffffff;
-  --tp-aqua: #a1fbf9;
-  --tp-lavender: #c2a3ff;
-  --tp-yellow: #ffeb66;
-  --tp-green: #a6fa87;
-  --tp-peach: #ff9b70;
-  --tp-pink: #ec388a;
-  --tp-red: #e53d2e;
-  --tp-dark-gray: #666666;
-  --tp-light-gray: #f2f2f2;
-  --tp-blue-white: #e0e8f5;
-  --tp-accent-1: #13b1f3;
-  --tp-accent-2: #5ce1e6;
-  --tp-accent-3: #a6fa87;
-  --tp-accent-4: #ffeb66;
-  --tp-accent-5: #ff9b70;
-  --tp-accent-6: #ec388a;
-  --tp-accent-7: #c2a3ff;
+  /* Brand palette lives in the generated ./styles/brand-tokens.css. */
 
   --tp-accent-ramp:
     var(--tp-accent-1), var(--tp-accent-2), var(--tp-accent-3), var(--tp-accent-4),
