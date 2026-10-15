@@ -102,7 +102,6 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
 
   const showAdminChrome = !inAdmin && isAdminLinked && adminCtx;
   const caps = useWorkspaceCapabilities();
-  const createOnly = caps.createOnly;
   const { persona, roles: personaRoles, isLoading: personaLoading } = useWorkspacePersona();
   // The sidebar/top-nav Dashboard entry names the active persona dashboard so
   // it matches the dashboard tabs and the page breadcrumb. Until the user's
