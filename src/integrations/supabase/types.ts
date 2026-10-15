@@ -565,6 +565,60 @@ export type Database = {
         }
         Relationships: []
       }
+      approved_figures: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          claim: string
+          created_at: string
+          created_by: string | null
+          division_id: string | null
+          figure: string
+          id: string
+          note: string | null
+          source_file: string | null
+          source_title: string | null
+          source_url: string | null
+          status: string
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          claim: string
+          created_at?: string
+          created_by?: string | null
+          division_id?: string | null
+          figure: string
+          id?: string
+          note?: string | null
+          source_file?: string | null
+          source_title?: string | null
+          source_url?: string | null
+          status?: string
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          claim?: string
+          created_at?: string
+          created_by?: string | null
+          division_id?: string | null
+          figure?: string
+          id?: string
+          note?: string | null
+          source_file?: string | null
+          source_title?: string | null
+          source_url?: string | null
+          status?: string
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
       approved_print_suggestions: {
         Row: {
           asset_id: string

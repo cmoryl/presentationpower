@@ -64,6 +64,13 @@
       "when": 1791988307814,
       "tag": "0008_provenance_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792023087341,
+      "tag": "0009_approved_figures",
+      "breakpoints": true
     }
   ]
 }
