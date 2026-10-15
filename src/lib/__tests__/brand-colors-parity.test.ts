@@ -1,13 +1,15 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { brandCssVars, BRAND } from "../brand-colors";
+import { brandCssVars, brandTokensCss, BRAND } from "../brand-colors";
 
 const read = (p: string) => readFileSync(resolve(process.cwd(), p), "utf8");
 
 describe("one colour file feeds every format", () => {
   it("CSS tokens match brand-colors.ts", () => {
-    const css = read("src/styles.css");
+    const css = read("src/styles/brand-tokens.css");
+    expect(css, "run: bun scripts/gen-brand-css.ts").toBe(brandTokensCss());
+    expect(read("src/styles.css")).toContain('@import "./styles/brand-tokens.css";');
     for (const [k, v] of Object.entries(brandCssVars())) expect(css).toContain(`${k}: ${v};`);
   });
   it("format feeders carry no literal brand hex", () => {
