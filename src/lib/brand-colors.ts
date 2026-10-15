@@ -69,3 +69,9 @@ export function brandCssVars(): Record<string, string> {
   ACCENT_RAMP.forEach((v, i) => (out[`--tp-accent-${i + 1}`] = v));
   return out;
 }
+
+/** Full text of the generated src/styles/brand-tokens.css. */
+export function brandTokensCss(): string {
+  const lines = Object.entries(brandCssVars()).map(([k, v]) => `  ${k}: ${v};`);
+  return `/* GENERATED from src/lib/brand-colors.ts by scripts/gen-brand-css.ts — do not edit. */\n:root {\n${lines.join("\n")}\n}\n`;
+}
