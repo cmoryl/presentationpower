@@ -939,18 +939,9 @@ export async function exportDeckToPptx(
   // plate or photo fails to embed, and it is what makes "Reset background" in
   // PowerPoint land on brand rather than white.
   // ---------------------------------------------------------------------------
-  const MASTER_DARK = "TP_BRAND_DARK";
-  const MASTER_LIGHT = "TP_BRAND_LIGHT";
-  pptx.defineSlideMaster({
-    title: MASTER_DARK,
-    background: { color: palette.primary },
-    objects: [],
-  });
-  pptx.defineSlideMaster({
-    title: MASTER_LIGHT,
-    background: { color: "FFFFFF" },
-    objects: [],
-  });
+  const brandMaster = await import("./pptx-brand-master");
+  const { MASTER_DARK, MASTER_LIGHT } = brandMaster;
+  brandMaster.defineBrandMasters(pptx as never, `#${palette.primary}`);
   /** Master a slide should inherit, decided from the resolved background plan. */
   const masterFor = (dark: boolean) => (dark ? MASTER_DARK : MASTER_LIGHT);
 
@@ -2354,7 +2345,11 @@ export async function exportDeckToPptx(
     (typeof document === "undefined" ? DEFAULT_EXPORT_EMBED_FONTS : readExportEmbedFonts());
   const endFonts = telemetry.phase("fonts");
   const rawBlob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
-  const fontBlob = await embedFontsInPptx(rawBlob, { embedFontData: embedFonts });
+  // Brand theme colour scheme (from the one colour file) so PowerPoint's
+  // colour picker offers brand colours on every exported deck.
+  const fontBlob = await brandMaster.applyBrandTheme(
+    await embedFontsInPptx(rawBlob, { embedFontData: embedFonts }),
+  );
   // pptxgenjs cannot emit slide transitions or per-object alt text, so both are
   // patched into the finished bytes: the deck's configured transitions play in
   // PowerPoint's slide show, and every object carries alt text for the
