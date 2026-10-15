@@ -52,13 +52,18 @@ export function lintAsset(a: StoredAsset, approved: readonly ApprovedFigure[]): 
 /** Text around a hit, for prefilling the "Add as approved figure" form. */
 export function phraseAround(content: unknown, path: string, match: string): string {
   let v: unknown = content;
+  let parent: unknown = null;
   for (const part of path.match(/[^.[\]]+/g) ?? []) {
     if (v == null) break;
+    parent = v;
     v = (v as Record<string, unknown>)[part];
   }
   const text = typeof v === "string" ? v : match;
   const i = text.indexOf(match);
   if (i < 0) return match;
-  const after = text.slice(i).split(/\s+/).slice(0, 4).join(" ");
-  return after.replace(/[.,;:]+$/, "");
+  const after = text.slice(i).split(/\s+/).slice(0, 4).join(" ").replace(/[.,;:]+$/, "");
+  if (after.trim() !== match.trim() || !parent || typeof parent !== "object") return after;
+  // Bare value ("90%"): use its sibling label ("Of the Fortune 500").
+  const label = Object.values(parent as Record<string, unknown>).find((x) => typeof x === "string" && x !== text);
+  return typeof label === "string" ? `${match} ${label.toLowerCase()}`.slice(0, 80) : after;
 }
