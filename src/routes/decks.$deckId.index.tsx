@@ -56,6 +56,7 @@ import {
   AutosaveIndicator,
 } from "@/components/CloudDeckControls";
 import { ShareMenu } from "@/components/ShareMenu";
+import { BrandTemplateButton } from "@/components/BrandTemplateButton";
 import { VersionHistoryButton } from "@/components/VersionHistoryDrawer";
 import { DuplicateDeckButton, TemplateToggleButton } from "@/components/DeckActions";
 import { TranslateButton } from "@/components/TranslateDrawer";
@@ -658,6 +659,7 @@ function DeckEditor() {
                       Explore looks
                     </Link>
                   )}
+                  <BrandTemplateButton />
                   <Link
                     to="/decks/$deckId/export"
                     params={{ deckId }}
