@@ -39,3 +39,5 @@
 - Approved figures (`approved_figures`, matcher in `src/lib/approved-figures.ts`) are the only way a figure passes without a per-asset source; compliance check, downloads, Checks tab and generator all call the same matcher — why: editor and export must never disagree.
 
 - Brand colours live only in `src/lib/brand-colors.ts`; CSS `--tp-*`, slides, PowerPoint, print and social feeders import it and `brand-colors-parity.test.ts` blocks drift — why: one change must reach every format.
+
+- Site colour settings come from the generated `src/styles/brand-tokens.css` (run `bun scripts/gen-brand-css.ts` after editing `src/lib/brand-colors.ts`); the parity test fails when stale — why: a hand-kept copy can drift.

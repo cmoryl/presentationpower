@@ -21,6 +21,6 @@
 - [x] L2. Abstract backgrounds added for divisions with none (Legal, Digital, Trial Interactive, Games, Division, Sub-company) — awaiting approval
 - [ ] H2b. Background generation — BLOCKED: no timed-job support on this project (no managed HTTP schedules, no pg_cron) and the server cannot keep working after replying. Retry-safety + 15-min stuck detection already in place.
 - [x] C1. Server-side figure validator: AI-written figures not found in the brief facts or knowledge snippets become "[figure needed]" (figure-validator.ts)
-- [ ] C2. One token file → generated outputs (scoped by the retired-division-colours rule)
+- [x] C2. One token file → generated outputs (scoped by the retired-division-colours rule)
 - [ ] H4 / Quarter items (.potx masters, Office add-in, Canva autofill, C2PA, role-split nav) — larger projects
 - [x] H5. GitHub sync — owner connected
