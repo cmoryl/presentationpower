@@ -39,6 +39,7 @@ import { Route as AdminAiRouteImport } from './routes/admin.ai'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
+import { Route as AdminApprovedFiguresRouteImport } from './routes/admin.approved-figures'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminBrandAssetsRouteImport } from './routes/admin.brand-assets'
 import { Route as AdminCampaignsRouteImport } from './routes/admin.campaigns'
@@ -372,6 +373,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
 const AdminApprovalsRoute = AdminApprovalsRouteImport.update({
   id: '/approvals',
   path: '/approvals',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminApprovedFiguresRoute = AdminApprovedFiguresRouteImport.update({
+  id: '/approved-figures',
+  path: '/approved-figures',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAuditRoute = AdminAuditRouteImport.update({
@@ -1334,6 +1340,7 @@ export interface FileRoutesByFullPath {
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/approvals': typeof AdminApprovalsRoute
+  '/admin/approved-figures': typeof AdminApprovedFiguresRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/campaigns': typeof AdminCampaignsRoute
@@ -1544,6 +1551,7 @@ export interface FileRoutesByTo {
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/approvals': typeof AdminApprovalsRoute
+  '/admin/approved-figures': typeof AdminApprovedFiguresRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/campaigns': typeof AdminCampaignsRoute
@@ -1759,6 +1767,7 @@ export interface FileRoutesById {
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/approvals': typeof AdminApprovalsRoute
+  '/admin/approved-figures': typeof AdminApprovedFiguresRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/campaigns': typeof AdminCampaignsRoute
@@ -1975,6 +1984,7 @@ export interface FileRouteTypes {
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/approvals'
+    | '/admin/approved-figures'
     | '/admin/audit'
     | '/admin/brand-assets'
     | '/admin/campaigns'
@@ -2185,6 +2195,7 @@ export interface FileRouteTypes {
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/approvals'
+    | '/admin/approved-figures'
     | '/admin/audit'
     | '/admin/brand-assets'
     | '/admin/campaigns'
@@ -2399,6 +2410,7 @@ export interface FileRouteTypes {
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/approvals'
+    | '/admin/approved-figures'
     | '/admin/audit'
     | '/admin/brand-assets'
     | '/admin/campaigns'
@@ -2903,6 +2915,13 @@ declare module '@tanstack/react-router' {
       path: '/approvals'
       fullPath: '/admin/approvals'
       preLoaderRoute: typeof AdminApprovalsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/approved-figures': {
+      id: '/admin/approved-figures'
+      path: '/approved-figures'
+      fullPath: '/admin/approved-figures'
+      preLoaderRoute: typeof AdminApprovedFiguresRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/audit': {
@@ -4187,6 +4206,7 @@ interface AdminRouteChildren {
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminApprovalsRoute: typeof AdminApprovalsRoute
+  AdminApprovedFiguresRoute: typeof AdminApprovedFiguresRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBrandAssetsRoute: typeof AdminBrandAssetsRoute
   AdminCampaignsRoute: typeof AdminCampaignsRoute
@@ -4227,6 +4247,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAlertsRoute: AdminAlertsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminApprovalsRoute: AdminApprovalsRoute,
+  AdminApprovedFiguresRoute: AdminApprovedFiguresRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBrandAssetsRoute: AdminBrandAssetsRoute,
   AdminCampaignsRoute: AdminCampaignsRoute,

@@ -21,6 +21,7 @@ import {
   type AssetImageFormat,
 } from "@/lib/asset-export";
 import { lintText } from "@/lib/compliance-check";
+import { useApprovedFigures } from "@/hooks/use-approved-figures";
 import { verifyExportBlob, type ExportKind } from "@/lib/export-verify-bytes";
 
 export type AssetExportMenuProps = {
@@ -34,6 +35,8 @@ export type AssetExportMenuProps = {
   className?: string;
   /** Hide the zip row even when several targets resolve. */
   allowZip?: boolean;
+  /** Brand mode of the asset — scopes approved figures. */
+  division?: string | null;
 };
 
 type Job =
@@ -55,7 +58,9 @@ export function AssetExportMenu({
   label = "Export",
   className,
   allowZip = true,
+  division,
 }: AssetExportMenuProps) {
+  const approved = useApprovedFigures();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -83,7 +88,7 @@ export function AssetExportMenu({
       return;
     }
     // Banned words and unsourced figures block the download (same rule as decks).
-    const hits = targets.flatMap((t) => lintText(t.node.innerText ?? t.node.textContent ?? ""));
+    const hits = targets.flatMap((t) => lintText(t.node.innerText ?? t.node.textContent ?? "", "", [], { approved, division }));
     if (hits.length) {
       const words = [...new Set(hits.filter((h) => h.kind === "banned-word").map((h) => h.match))];
       const figs = [...new Set(hits.filter((h) => h.kind === "needs-source").map((h) => h.match))];

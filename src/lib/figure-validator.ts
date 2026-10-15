@@ -6,6 +6,8 @@
 // `checkTemplate: true` so layout sample copy (sample stats, sample source
 // lines) can't ride through into a client deck either.
 
+import { figureApproved, type ApprovedFigure } from "./approved-figures";
+
 const FIGURE = /(?<![\w.])(?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s?(?:%|×|x\b|\+|-fold\b)/gi;
 // Plain counts next to a countable noun ("28 markets", "1,200 documents").
 const COUNT =
@@ -17,6 +19,11 @@ const norm = (s: string) => s.toLowerCase().replace(/[\s,]/g, "").replace(/×/g,
 
 export interface FigureOptions {
   checkTemplate?: boolean;
+  /** Approved figures (same matcher as the export check). */
+  approved?: readonly ApprovedFigure[];
+  division?: string | null;
+  /** Sibling text for bare values; set internally. */
+  context?: string;
 }
 
 export function validateFigures(
@@ -29,8 +36,10 @@ export function validateFigures(
   const src = norm(sources);
   if (typeof next === "string") {
     if (next === before && !opts.checkTemplate) return next;
-    const swap = (m: string) => {
+    const swap = (m: string, ...rest: unknown[]) => {
       if (src.includes(norm(m))) return m;
+      const idx = rest.find((r) => typeof r === "number") as number;
+      if (opts.approved && figureApproved(m.trim(), next, idx, { approved: opts.approved, division: opts.division, context: opts.context })) return m;
       removed.push(m.trim());
       return FIGURE_NEEDED;
     };
@@ -42,6 +51,8 @@ export function validateFigures(
   }
   if (next && typeof next === "object") {
     const b = (before && typeof before === "object" ? before : {}) as Record<string, unknown>;
+    const context = Object.values(next as Record<string, unknown>).filter((v): v is string => typeof v === "string").join(" ");
+    const inner = { ...opts, context };
     return Object.fromEntries(
       Object.entries(next as Record<string, unknown>).map(([k, v]) => {
         if (k.startsWith("__") || /(^id$|Id$|url|Url|src|color|colour|hex)/.test(k)) return [k, v];
@@ -53,7 +64,7 @@ export function validateFigures(
             return [k, ""];
           }
         }
-        return [k, validateFigures(v, b[k], sources, removed, opts)];
+        return [k, validateFigures(v, b[k], sources, removed, typeof v === "string" ? inner : opts)];
       }),
     );
   }

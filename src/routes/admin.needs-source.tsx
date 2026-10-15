@@ -7,7 +7,9 @@ import { useMemo, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { RequireAdmin } from "@/components/AdminShell";
-import { lintContent, type ComplianceViolation } from "@/lib/compliance-check";
+import { type ComplianceViolation } from "@/lib/compliance-check";
+import { loadApprovedFigures } from "@/lib/approved-figures";
+import { loadStoredAssets, lintAsset, phraseAround, type StoredAsset } from "@/lib/stored-assets-scan";
 
 export const Route = createFileRoute("/admin/needs-source")({
   head: () => ({
@@ -27,37 +29,17 @@ export const Route = createFileRoute("/admin/needs-source")({
   ),
 });
 
-type Hit = { surface: "Deck" | "Print" | "Social kit"; id: string; title: string; link: { to: string; params: Record<string, string> } | null; issues: ComplianceViolation[] };
+type Hit = { surface: StoredAsset["surface"]; id: string; title: string; link: StoredAsset["link"]; content: unknown; issues: ComplianceViolation[] };
 
 async function scan(): Promise<Hit[]> {
+  const approved = await loadApprovedFigures(supabase, true);
+  const assets = await loadStoredAssets(supabase);
   const hits: Hit[] = [];
-  const [decks, prints, kits] = await Promise.all([
-    supabase.from("decks").select("id,title,context").limit(2000),
-    supabase.from("print_assets").select("id,title,content").limit(2000),
-    supabase.from("campaign_kits").select("id,name,copy,event_facts").limit(2000),
-  ]);
-  const deckRows = decks.data ?? [];
-  for (let i = 0; i < deckRows.length; i += 100) {
-    const ids = deckRows.slice(i, i + 100).map((d) => d.id);
-    const { data } = await supabase.from("deck_slides").select("deck_id,position,content,notes").in("deck_id", ids);
-    const by = new Map<string, unknown[]>();
-    for (const s of data ?? []) by.set(s.deck_id, [...(by.get(s.deck_id) ?? []), { [`slide ${s.position + 1}`]: s.content }]);
-    for (const d of deckRows.slice(i, i + 100)) {
-      const ctx = (d.context ?? {}) as Record<string, unknown>;
-      const extra = Array.isArray(ctx["risksToAvoid"]) ? (ctx["risksToAvoid"] as unknown[]).filter((x): x is string => typeof x === "string" && x.length < 40) : [];
-      const issues = lintContent(by.get(d.id) ?? [], extra);
-      if (issues.length) hits.push({ surface: "Deck", id: d.id, title: d.title ?? "Untitled deck", link: { to: "/decks/$deckId", params: { deckId: d.id } }, issues });
-    }
+  for (const a of assets) {
+    const issues = lintAsset(a, approved);
+    if (issues.length) hits.push({ surface: a.surface, id: a.id, title: a.title, link: a.link, content: a.content, issues });
   }
-  for (const p of prints.data ?? []) {
-    const issues = lintContent(p.content);
-    if (issues.length) hits.push({ surface: "Print", id: p.id, title: p.title ?? "Untitled print piece", link: { to: "/asset/$assetId", params: { assetId: p.id } }, issues });
-  }
-  for (const k of kits.data ?? []) {
-    const issues = lintContent({ copy: k.copy, facts: k.event_facts });
-    if (issues.length) hits.push({ surface: "Social kit", id: k.id, title: k.name ?? "Untitled kit", link: null, issues });
-  }
-  return hits.sort((a, b) => b.issues.length - a.issues.length);
+  return hits.sort((x, y) => y.issues.length - x.issues.length);
 }
 
 function NeedsSource() {
@@ -70,7 +52,7 @@ function NeedsSource() {
     <main className="mx-auto max-w-6xl px-6 py-10 text-[#03002C]">
       <h1 className="text-2xl font-semibold">Needs source</h1>
       <p className="mt-1 max-w-3xl text-[14px] text-[#666666]">
-        Every stored figure written with %, x, × or + is listed until it has a source, plus banned words (seamless, revolutionize, unlock, leverage and each deck's own words to avoid). Nothing here is changed or deleted; open an item to fix it.
+        Every stored figure written with %, x, × or + is listed until it has a source, plus banned words (seamless, revolutionize, unlock, leverage and each deck's own words to avoid). Approved figures with a source pass. Nothing here is changed or deleted; open an item to fix it.
       </p>
       {q.isLoading && <p className="mt-6 text-[14px]">Scanning stored assets…</p>}
       {q.error && <p className="mt-6 text-[14px] text-[#E53D2E]">The scan didn't finish: {(q.error as Error).message}</p>}
@@ -97,8 +79,17 @@ function NeedsSource() {
                   <td className="py-2 pr-3 text-[#666666]">{h.surface}</td>
                   <td className="py-2">
                     {h.shown.slice(0, 8).map((i, n) => (
-                      <span key={n} className="mr-1.5 inline-block rounded-sm bg-[#F2F2F2] px-1.5 py-0.5" title={i.path}>
+                      <span key={n} className="mr-1.5 mb-1 inline-flex items-center gap-1 rounded-sm bg-[#F2F2F2] px-1.5 py-0.5" title={i.path}>
                         {i.kind === "banned-word" ? "word: " : ""}{i.match}
+                        {i.kind === "needs-source" && (
+                          <Link
+                            to="/admin/approved-figures"
+                            search={{ figure: i.match, claim: phraseAround(h.content, i.path, i.match) }}
+                            className="ml-1 text-[11px] font-semibold text-[#003FC7] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+                          >
+                            Add as approved figure
+                          </Link>
+                        )}
                       </span>
                     ))}
                     {h.shown.length > 8 && <span className="text-[#666666]">+{h.shown.length - 8} more</span>}

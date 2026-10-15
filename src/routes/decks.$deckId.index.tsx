@@ -2165,6 +2165,7 @@ function DeckEditor() {
                               slide={active}
                               qa={qa}
                               extraBanned={[]}
+                              division={deck?.brandModeId}
                             />
                           </InspectorSection>
                         )}
