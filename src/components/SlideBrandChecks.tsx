@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { lintContent } from "@/lib/compliance-check";
+import { useApprovedFigures } from "@/hooks/use-approved-figures";
 import type { QaIssue } from "@/lib/qa";
 import type { DeckSlide } from "@/lib/deck-store";
 
@@ -12,13 +13,17 @@ export function SlideBrandChecks({
   slide,
   qa,
   extraBanned = [],
+  division,
 }: {
   slide: DeckSlide;
   qa: QaIssue[];
   extraBanned?: readonly string[];
+  /** Deck brand mode — scopes approved figures, same as the export check. */
+  division?: string | null;
 }) {
+  const approved = useApprovedFigures();
   const rows = useMemo(() => {
-    const lint = lintContent(slide.content, extraBanned).map((v) => ({
+    const lint = lintContent(slide.content, extraBanned, "", { approved, division }).map((v) => ({
       key: `${v.kind}-${v.path}-${v.match}`,
       tone: "block" as const,
       text: v.kind === "banned-word" ? `Banned word: “${v.match}”` : `Figure needs a source: ${v.match}`,
@@ -31,7 +36,7 @@ export function SlideBrandChecks({
         text: q.message,
       }));
     return [...lint, ...own];
-  }, [slide.content, slide.id, qa, extraBanned]);
+  }, [slide.content, slide.id, qa, extraBanned, approved, division]);
 
   return (
     <section aria-label="Brand checks" aria-live="polite" className="rounded-md border border-black/10 bg-white p-3">

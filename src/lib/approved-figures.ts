@@ -36,12 +36,11 @@ const stem = (w: string) => w.toLowerCase().replace(/[^a-z]/g, "").replace(/(es|
 
 /** First meaningful word of the claim after the figure ("90% of the Fortune 500" → "fortune"). */
 export function keyNoun(claim: string, figure: string): string {
-  const i = normFigure(claim).indexOf(normFigure(figure));
   const raw = claim.toLowerCase();
   // Remove the figure text itself, then read words after it (else before).
   const figRe = new RegExp(figure.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/,/g, ",?"), "i");
   const m = raw.match(figRe);
-  const after = m ? raw.slice((m.index ?? 0) + m[0].length) : i >= 0 ? raw : raw;
+  const after = m ? raw.slice((m.index ?? 0) + m[0].length) : raw;
   const before = m ? raw.slice(0, m.index ?? 0) : "";
   const pick = (s: string) => s.split(/\s+/).map(stem).find((w) => w.length > 1 && !STOP.has(w));
   return pick(after) ?? pick(before.split(/\s+/).reverse().join(" ")) ?? "";

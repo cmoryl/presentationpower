@@ -123,7 +123,7 @@ export function complianceIssues(
     }
   }
   deck.slides.forEach((slide, index) => {
-    const found = lintContent(slide.content);
+    const found = lintContent(slide.content, [], "", { division: deck.brandModeId });
     for (const kind of ["banned-word", "needs-source"] as const) {
       const hits = [...new Set(found.filter((f) => f.kind === kind).map((f) => f.match))];
       if (!hits.length) continue;
