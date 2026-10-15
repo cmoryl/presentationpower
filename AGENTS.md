@@ -36,5 +36,6 @@
 - Sign-up is limited to @transperfect.com (plus the shared team account) by the `enforce_signup_domain` trigger on auth.users — why: the UI alone can be bypassed.
 - `generate_deck` is retry-safe via `deck_jobs` (key = hash of user + inputs; `get_deck_job`) — why: retries made duplicate decks.
 - `src/lib/compliance-check.ts` finds unsourced figures/banned words, listed on `/admin/needs-source` — why: prompt rules didn't stop invented stats.
+- Approved figures (`approved_figures`, matcher in `src/lib/approved-figures.ts`) are the only way a figure passes without a per-asset source; compliance check, downloads, Checks tab and generator all call the same matcher — why: editor and export must never disagree.
 
 - Brand colours live only in `src/lib/brand-colors.ts`; CSS `--tp-*`, slides, PowerPoint, print and social feeders import it and `brand-colors-parity.test.ts` blocks drift — why: one change must reach every format.
