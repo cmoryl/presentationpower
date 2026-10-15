@@ -51,6 +51,8 @@ export async function applyBrandTheme(blob: Blob): Promise<Blob> {
     const themes = Object.keys(zip.files).filter((n) => /^ppt\/theme\/theme\d+\.xml$/.test(n));
     if (!themes.length) return blob;
     for (const n of themes) zip.file(n, patchThemeXml(await zip.file(n)!.async("string")));
+    const { repairPresentationOrder } = await import("./pptx-presentation-order");
+    await repairPresentationOrder(zip);
     const { repackPptx } = await import("./pptx-repack");
     return await repackPptx(zip);
   } catch (e) {
@@ -142,9 +144,14 @@ export async function buildBrandTemplatePptx(): Promise<Blob> {
   pptx.theme = { headFontFace: FONT, bodyFontFace: FONT };
   defineBrandMasters(pptx as unknown as PptxLike);
   defineTemplateLayouts(pptx as unknown as PptxLike);
-  for (const m of [MASTER_TITLE, MASTER_SECTION, MASTER_CONTENT]) {
+  const samples: Array<[string, Record<string, string>]> = [
+    [MASTER_TITLE, { title: "Presentation title", subtitle: "Subtitle or date" }],
+    [MASTER_SECTION, { title: "Section title" }],
+    [MASTER_CONTENT, { title: "Slide title", body: "Body text in Geist, brand ink on white." }],
+  ];
+  for (const [m, texts] of samples) {
     const s = pptx.addSlide({ masterName: m });
-    s.addText("", { placeholder: "title" });
+    for (const [name, text] of Object.entries(texts)) s.addText(text, { placeholder: name });
   }
   const raw = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
   return applyBrandTheme(raw);
