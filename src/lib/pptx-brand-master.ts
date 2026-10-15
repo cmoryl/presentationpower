@@ -95,6 +95,7 @@ const ph = (
       fontSize: style.fontSize,
       color: pptxHex(style.color),
       bold: style.bold ?? false,
+      align: "left",
       valign: "top",
       margin: 0,
     },
