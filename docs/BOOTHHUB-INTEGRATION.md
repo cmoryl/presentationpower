@@ -25,3 +25,12 @@ BoothHub should read them and paint them on the 3D booth faces.
 
 ## Signs (demo booth, screen surrounds, pillars)
 7. Signs are in the same list with `"type": "sign"` and slugs matching BoothHub's sign ids (`sign:demo-booth`, `sign:surround-all`, `sign:surround-three`, `sign:welcome`, `sign:finance`). Fetch `...?slug=sign:demo-booth` and paint `art.front` (and `left`/`right` for the demo booth) on the model; keep built-in art only when `art` is empty. Element is the source of truth for artwork; BoothHub-side edits are only for users working in BoothHub itself.
+
+## Venue floor plans (San Francisco)
+- `GET https://transperfectelement.lovable.app/api/public/venue/next-sf` (public, CORS open, cached 5 min)
+- Returns `venue`, `caution`, and `floors[]`: `{ id: "next-sf:3", floor, title, planSvg, planImage, rooms[] }`; rooms carry `name`, `dimsFt`, `heightFt`, `sqft`, capacities.
+
+8. Add a "Venue" ground to the SF scene: load `planSvg` as a texture (fallback `planImage`) on a flat plane under the booths, keeping the SVG's aspect ratio, light neutral background, no recolouring of the drawing.
+9. Add a floor switcher (Floor 3–6) from `floors[]`; default to floor 3. Show the room list for the current floor in a side panel (name, size, ceiling height).
+10. `metresPerUnit` is null — the hotel sheet gives no scale. Fit the plan to the existing ground and show the `caution` line ("confirm with the hotel") in the panel. Do not place booths in rooms yet; placement will come from Element later.
+11. Toggle "Show venue" on/off so existing booth views still work without the plan.
