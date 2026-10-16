@@ -206,6 +206,7 @@ import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
 import { Route as ApiPublicBoothsEventRouteImport } from './routes/api/public/booths.$event'
 import { Route as ApiPublicCanvaCallbackRouteImport } from './routes/api/public/canva.callback'
+import { Route as ApiPublicVenueEventRouteImport } from './routes/api/public/venue.$event'
 import { Route as EventsNextBoothBoothIdRouteImport } from './routes/events.next_.booth.$boothId'
 import { Route as EventsNextDivisionsIndexRouteImport } from './routes/events.next_.divisions.index'
 import { Route as EventsNextDivisionsDivisionIdRouteImport } from './routes/events.next_.divisions.$divisionId'
@@ -1224,6 +1225,11 @@ const ApiPublicCanvaCallbackRoute = ApiPublicCanvaCallbackRouteImport.update({
   path: '/api/public/canva/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicVenueEventRoute = ApiPublicVenueEventRouteImport.update({
+  id: '/api/public/venue/$event',
+  path: '/api/public/venue/$event',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventsNextBoothBoothIdRoute = EventsNextBoothBoothIdRouteImport.update({
   id: '/next_/booth/$boothId',
   path: '/next/booth/$boothId',
@@ -1526,6 +1532,7 @@ export interface FileRoutesByFullPath {
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
+  '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
   '/events/next/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next/intake/$eventId': typeof EventsNextIntakeEventIdRoute
@@ -1740,6 +1747,7 @@ export interface FileRoutesByTo {
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
+  '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
   '/events/next/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next/intake/$eventId': typeof EventsNextIntakeEventIdRoute
@@ -1959,6 +1967,7 @@ export interface FileRoutesById {
   '/admin/modules_/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
+  '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
   '/events/next_/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next_/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next_/intake/$eventId': typeof EventsNextIntakeEventIdRoute
@@ -2179,6 +2188,7 @@ export interface FileRouteTypes {
     | '/admin/modules/print/$moduleId'
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
+    | '/api/public/venue/$event'
     | '/events/next/booth/$boothId'
     | '/events/next/divisions/$divisionId'
     | '/events/next/intake/$eventId'
@@ -2393,6 +2403,7 @@ export interface FileRouteTypes {
     | '/admin/modules/print/$moduleId'
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
+    | '/api/public/venue/$event'
     | '/events/next/booth/$boothId'
     | '/events/next/divisions/$divisionId'
     | '/events/next/intake/$eventId'
@@ -2611,6 +2622,7 @@ export interface FileRouteTypes {
     | '/admin/modules_/print/$moduleId'
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
+    | '/api/public/venue/$event'
     | '/events/next_/booth/$boothId'
     | '/events/next_/divisions/$divisionId'
     | '/events/next_/intake/$eventId'
@@ -2741,6 +2753,7 @@ export interface RootRouteChildren {
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
   ApiPublicBoothsEventRoute: typeof ApiPublicBoothsEventRoute
   ApiPublicCanvaCallbackRoute: typeof ApiPublicCanvaCallbackRoute
+  ApiPublicVenueEventRoute: typeof ApiPublicVenueEventRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -4124,6 +4137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCanvaCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/venue/$event': {
+      id: '/api/public/venue/$event'
+      path: '/api/public/venue/$event'
+      fullPath: '/api/public/venue/$event'
+      preLoaderRoute: typeof ApiPublicVenueEventRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/events/next_/booth/$boothId': {
       id: '/events/next_/booth/$boothId'
       path: '/next/booth/$boothId'
@@ -4623,6 +4643,7 @@ const rootRouteChildren: RootRouteChildren = {
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
   ApiPublicBoothsEventRoute: ApiPublicBoothsEventRoute,
   ApiPublicCanvaCallbackRoute: ApiPublicCanvaCallbackRoute,
+  ApiPublicVenueEventRoute: ApiPublicVenueEventRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
