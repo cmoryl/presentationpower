@@ -35,9 +35,8 @@
 - Sign-in is deny-by-default (open list in `src/lib/sign-out.ts`); gated pages render nothing until a session is confirmed — why: the published audience is public.
 - Sign-up is limited to @transperfect.com (plus the shared team account) by the `enforce_signup_domain` trigger on auth.users — why: the UI alone can be bypassed.
 - `generate_deck` is retry-safe via `deck_jobs` (key = hash of user + inputs; `get_deck_job`) — why: retries made duplicate decks.
-- `src/lib/compliance-check.ts` finds unsourced figures/banned words, listed on `/admin/needs-source` — why: prompt rules didn't stop invented stats.
-- Approved figures (`approved_figures`, matcher in `src/lib/approved-figures.ts`) are the only way a figure passes without a per-asset source; compliance check, downloads, Checks tab and generator all call the same matcher — why: editor and export must never disagree.
+- `compliance-check.ts` flags unsourced figures/banned words (`/admin/needs-source`); `approved-figures.ts` is the one matcher every check, export and the generator use — why: invented stats, and editor/export must agree.
 
 - Brand colours live only in `src/lib/brand-colors.ts`; CSS tokens are generated into `src/styles/brand-tokens.css` (`bun scripts/gen-brand-css.ts`) and feeders import it; parity tests block drift — why: one change must reach every format.
 
-- Send to Canva goes to one shared team Canva account: tokens only in `canva_shared_connection` (service-role, no policies), connect on `/admin/canva`, import via `/api/canva-import` from the export page's already-checked .pptx — why: same QA-gated file reaches PowerPoint and Canva.
+- Send to Canva: one shared team account, tokens only in service-role `canva_shared_connection`; sends the export page's checked .pptx — why: one QA-gated file for PowerPoint and Canva.
