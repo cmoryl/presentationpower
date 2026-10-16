@@ -1,3 +1,4 @@
+import { SendToCanvaButton } from "@/components/SendToCanvaButton";
 import { useResignDeckMedia } from "@/hooks/use-resign-deck-media";
 import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { AuthoringNav } from "@/components/editor/EditorChrome";
@@ -682,6 +683,10 @@ function ExportView() {
                     )}
                     {exporting ? "Preparing…" : preflightBusy ? "Checking…" : "Download .pptx"}
                   </button>
+                  <SendToCanvaButton
+                    getFile={() => lastBlobRef.current}
+                    disabled={exporting || preflightBusy || empty || blocked}
+                  />
                   <Link
                     to="/decks/$deckId/document"
                     params={{ deckId }}
