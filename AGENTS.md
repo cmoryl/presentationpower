@@ -39,3 +39,5 @@
 - Approved figures (`approved_figures`, matcher in `src/lib/approved-figures.ts`) are the only way a figure passes without a per-asset source; compliance check, downloads, Checks tab and generator all call the same matcher — why: editor and export must never disagree.
 
 - Brand colours live only in `src/lib/brand-colors.ts`; CSS tokens are generated into `src/styles/brand-tokens.css` (`bun scripts/gen-brand-css.ts`) and feeders import it; parity tests block drift — why: one change must reach every format.
+
+- Send to Canva goes to one shared team Canva account: tokens only in `canva_shared_connection` (service-role, no policies), connect on `/admin/canva`, import via `/api/canva-import` from the export page's already-checked .pptx — why: same QA-gated file reaches PowerPoint and Canva.
