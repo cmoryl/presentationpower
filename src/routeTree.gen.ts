@@ -43,6 +43,7 @@ import { Route as AdminApprovedFiguresRouteImport } from './routes/admin.approve
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminBrandAssetsRouteImport } from './routes/admin.brand-assets'
 import { Route as AdminCampaignsRouteImport } from './routes/admin.campaigns'
+import { Route as AdminCanvaRouteImport } from './routes/admin.canva'
 import { Route as AdminDivisionSeedsRouteImport } from './routes/admin.division-seeds'
 import { Route as AdminExportAuditRouteImport } from './routes/admin.export-audit'
 import { Route as AdminGloballinkRouteImport } from './routes/admin.globallink'
@@ -73,6 +74,7 @@ import { Route as AdminCanvasRouteImport } from './routes/admin_.canvas'
 import { Route as AgentIndexRouteImport } from './routes/agent.index'
 import { Route as AgentThreadIdRouteImport } from './routes/agent.$threadId'
 import { Route as ApiAgentChatRouteImport } from './routes/api/agent-chat'
+import { Route as ApiCanvaImportRouteImport } from './routes/api/canva-import'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as ApiDeckExportValidateRouteImport } from './routes/api/deck-export-validate'
 import { Route as ApiDeckExportVisualValidateRouteImport } from './routes/api/deck-export-visual-validate'
@@ -203,6 +205,7 @@ import { Route as ShareNextBrandKitTokenRouteImport } from './routes/share.next-
 import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
 import { Route as ApiPublicBoothsEventRouteImport } from './routes/api/public/booths.$event'
+import { Route as ApiPublicCanvaCallbackRouteImport } from './routes/api/public/canva.callback'
 import { Route as EventsNextBoothBoothIdRouteImport } from './routes/events.next_.booth.$boothId'
 import { Route as EventsNextDivisionsIndexRouteImport } from './routes/events.next_.divisions.index'
 import { Route as EventsNextDivisionsDivisionIdRouteImport } from './routes/events.next_.divisions.$divisionId'
@@ -395,6 +398,11 @@ const AdminCampaignsRoute = AdminCampaignsRouteImport.update({
   path: '/campaigns',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCanvaRoute = AdminCanvaRouteImport.update({
+  id: '/canva',
+  path: '/canva',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDivisionSeedsRoute = AdminDivisionSeedsRouteImport.update({
   id: '/division-seeds',
   path: '/division-seeds',
@@ -543,6 +551,11 @@ const AgentThreadIdRoute = AgentThreadIdRouteImport.update({
 const ApiAgentChatRoute = ApiAgentChatRouteImport.update({
   id: '/api/agent-chat',
   path: '/api/agent-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCanvaImportRoute = ApiCanvaImportRouteImport.update({
+  id: '/api/canva-import',
+  path: '/api/canva-import',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -1206,6 +1219,11 @@ const ApiPublicBoothsEventRoute = ApiPublicBoothsEventRouteImport.update({
   path: '/api/public/booths/$event',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCanvaCallbackRoute = ApiPublicCanvaCallbackRouteImport.update({
+  id: '/api/public/canva/callback',
+  path: '/api/public/canva/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventsNextBoothBoothIdRoute = EventsNextBoothBoothIdRouteImport.update({
   id: '/next_/booth/$boothId',
   path: '/next/booth/$boothId',
@@ -1344,6 +1362,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/campaigns': typeof AdminCampaignsRoute
+  '/admin/canva': typeof AdminCanvaRoute
   '/admin/division-seeds': typeof AdminDivisionSeedsRoute
   '/admin/export-audit': typeof AdminExportAuditRoute
   '/admin/globallink': typeof AdminGloballinkRoute
@@ -1373,6 +1392,7 @@ export interface FileRoutesByFullPath {
   '/admin/canvas': typeof AdminCanvasRoute
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
+  '/api/canva-import': typeof ApiCanvaImportRoute
   '/api/chat': typeof ApiChatRoute
   '/api/deck-export-validate': typeof ApiDeckExportValidateRoute
   '/api/deck-export-visual-validate': typeof ApiDeckExportVisualValidateRoute
@@ -1505,6 +1525,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
+  '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
   '/events/next/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next/intake/$eventId': typeof EventsNextIntakeEventIdRoute
@@ -1555,6 +1576,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/campaigns': typeof AdminCampaignsRoute
+  '/admin/canva': typeof AdminCanvaRoute
   '/admin/division-seeds': typeof AdminDivisionSeedsRoute
   '/admin/export-audit': typeof AdminExportAuditRoute
   '/admin/globallink': typeof AdminGloballinkRoute
@@ -1584,6 +1606,7 @@ export interface FileRoutesByTo {
   '/admin/canvas': typeof AdminCanvasRoute
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
+  '/api/canva-import': typeof ApiCanvaImportRoute
   '/api/chat': typeof ApiChatRoute
   '/api/deck-export-validate': typeof ApiDeckExportValidateRoute
   '/api/deck-export-visual-validate': typeof ApiDeckExportVisualValidateRoute
@@ -1716,6 +1739,7 @@ export interface FileRoutesByTo {
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
+  '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
   '/events/next/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next/intake/$eventId': typeof EventsNextIntakeEventIdRoute
@@ -1771,6 +1795,7 @@ export interface FileRoutesById {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/campaigns': typeof AdminCampaignsRoute
+  '/admin/canva': typeof AdminCanvaRoute
   '/admin/division-seeds': typeof AdminDivisionSeedsRoute
   '/admin/export-audit': typeof AdminExportAuditRoute
   '/admin/globallink': typeof AdminGloballinkRoute
@@ -1800,6 +1825,7 @@ export interface FileRoutesById {
   '/admin_/canvas': typeof AdminCanvasRoute
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
+  '/api/canva-import': typeof ApiCanvaImportRoute
   '/api/chat': typeof ApiChatRoute
   '/api/deck-export-validate': typeof ApiDeckExportValidateRoute
   '/api/deck-export-visual-validate': typeof ApiDeckExportVisualValidateRoute
@@ -1932,6 +1958,7 @@ export interface FileRoutesById {
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules_/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
+  '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
   '/events/next_/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next_/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next_/intake/$eventId': typeof EventsNextIntakeEventIdRoute
@@ -1988,6 +2015,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/brand-assets'
     | '/admin/campaigns'
+    | '/admin/canva'
     | '/admin/division-seeds'
     | '/admin/export-audit'
     | '/admin/globallink'
@@ -2017,6 +2045,7 @@ export interface FileRouteTypes {
     | '/admin/canvas'
     | '/agent/$threadId'
     | '/api/agent-chat'
+    | '/api/canva-import'
     | '/api/chat'
     | '/api/deck-export-validate'
     | '/api/deck-export-visual-validate'
@@ -2149,6 +2178,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides/'
     | '/admin/modules/print/$moduleId'
     | '/api/public/booths/$event'
+    | '/api/public/canva/callback'
     | '/events/next/booth/$boothId'
     | '/events/next/divisions/$divisionId'
     | '/events/next/intake/$eventId'
@@ -2199,6 +2229,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/brand-assets'
     | '/admin/campaigns'
+    | '/admin/canva'
     | '/admin/division-seeds'
     | '/admin/export-audit'
     | '/admin/globallink'
@@ -2228,6 +2259,7 @@ export interface FileRouteTypes {
     | '/admin/canvas'
     | '/agent/$threadId'
     | '/api/agent-chat'
+    | '/api/canva-import'
     | '/api/chat'
     | '/api/deck-export-validate'
     | '/api/deck-export-visual-validate'
@@ -2360,6 +2392,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides'
     | '/admin/modules/print/$moduleId'
     | '/api/public/booths/$event'
+    | '/api/public/canva/callback'
     | '/events/next/booth/$boothId'
     | '/events/next/divisions/$divisionId'
     | '/events/next/intake/$eventId'
@@ -2414,6 +2447,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/brand-assets'
     | '/admin/campaigns'
+    | '/admin/canva'
     | '/admin/division-seeds'
     | '/admin/export-audit'
     | '/admin/globallink'
@@ -2443,6 +2477,7 @@ export interface FileRouteTypes {
     | '/admin_/canvas'
     | '/agent/$threadId'
     | '/api/agent-chat'
+    | '/api/canva-import'
     | '/api/chat'
     | '/api/deck-export-validate'
     | '/api/deck-export-visual-validate'
@@ -2575,6 +2610,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides/'
     | '/admin/modules_/print/$moduleId'
     | '/api/public/booths/$event'
+    | '/api/public/canva/callback'
     | '/events/next_/booth/$boothId'
     | '/events/next_/divisions/$divisionId'
     | '/events/next_/intake/$eventId'
@@ -2625,6 +2661,7 @@ export interface RootRouteChildren {
   AdminCanvasRoute: typeof AdminCanvasRoute
   AgentThreadIdRoute: typeof AgentThreadIdRoute
   ApiAgentChatRoute: typeof ApiAgentChatRoute
+  ApiCanvaImportRoute: typeof ApiCanvaImportRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiDeckExportValidateRoute: typeof ApiDeckExportValidateRoute
   ApiDeckExportVisualValidateRoute: typeof ApiDeckExportVisualValidateRoute
@@ -2703,6 +2740,7 @@ export interface RootRouteChildren {
   ShareNextBrandKitTokenRoute: typeof ShareNextBrandKitTokenRoute
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
   ApiPublicBoothsEventRoute: typeof ApiPublicBoothsEventRoute
+  ApiPublicCanvaCallbackRoute: typeof ApiPublicCanvaCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2945,6 +2983,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCampaignsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/canva': {
+      id: '/admin/canva'
+      path: '/canva'
+      fullPath: '/admin/canva'
+      preLoaderRoute: typeof AdminCanvaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/division-seeds': {
       id: '/admin/division-seeds'
       path: '/division-seeds'
@@ -3153,6 +3198,13 @@ declare module '@tanstack/react-router' {
       path: '/api/agent-chat'
       fullPath: '/api/agent-chat'
       preLoaderRoute: typeof ApiAgentChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/canva-import': {
+      id: '/api/canva-import'
+      path: '/api/canva-import'
+      fullPath: '/api/canva-import'
+      preLoaderRoute: typeof ApiCanvaImportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -4065,6 +4117,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicBoothsEventRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/canva/callback': {
+      id: '/api/public/canva/callback'
+      path: '/api/public/canva/callback'
+      fullPath: '/api/public/canva/callback'
+      preLoaderRoute: typeof ApiPublicCanvaCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/events/next_/booth/$boothId': {
       id: '/events/next_/booth/$boothId'
       path: '/next/booth/$boothId'
@@ -4210,6 +4269,7 @@ interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBrandAssetsRoute: typeof AdminBrandAssetsRoute
   AdminCampaignsRoute: typeof AdminCampaignsRoute
+  AdminCanvaRoute: typeof AdminCanvaRoute
   AdminDivisionSeedsRoute: typeof AdminDivisionSeedsRoute
   AdminExportAuditRoute: typeof AdminExportAuditRoute
   AdminGloballinkRoute: typeof AdminGloballinkRoute
@@ -4251,6 +4311,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
   AdminBrandAssetsRoute: AdminBrandAssetsRoute,
   AdminCampaignsRoute: AdminCampaignsRoute,
+  AdminCanvaRoute: AdminCanvaRoute,
   AdminDivisionSeedsRoute: AdminDivisionSeedsRoute,
   AdminExportAuditRoute: AdminExportAuditRoute,
   AdminGloballinkRoute: AdminGloballinkRoute,
@@ -4482,6 +4543,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminCanvasRoute: AdminCanvasRoute,
   AgentThreadIdRoute: AgentThreadIdRoute,
   ApiAgentChatRoute: ApiAgentChatRoute,
+  ApiCanvaImportRoute: ApiCanvaImportRoute,
   ApiChatRoute: ApiChatRoute,
   ApiDeckExportValidateRoute: ApiDeckExportValidateRoute,
   ApiDeckExportVisualValidateRoute: ApiDeckExportVisualValidateRoute,
@@ -4560,6 +4622,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShareNextBrandKitTokenRoute: ShareNextBrandKitTokenRoute,
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
   ApiPublicBoothsEventRoute: ApiPublicBoothsEventRoute,
+  ApiPublicCanvaCallbackRoute: ApiPublicCanvaCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

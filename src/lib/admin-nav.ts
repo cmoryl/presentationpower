@@ -52,6 +52,7 @@ export const ADMIN_NAV_GROUPS: ReadonlyArray<AdminNavGroup> = [
       { to: "/admin/division-seeds", label: "Division seeds" },
       { to: "/admin/imagery", label: "Imagery" },
       { to: "/admin/icon-studio", label: "Icon Studio" },
+      { to: "/admin/canva", label: "Canva connection" },
       { to: "/admin/pdf-ingest", label: "PDF ingestion" },
       { to: "/admin/print-color", label: "Print colour & preflight" },
     ],

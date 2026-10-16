@@ -1264,6 +1264,57 @@ export type Database = {
         }
         Relationships: []
       }
+      canva_oauth_states: {
+        Row: {
+          created_at: string
+          return_to: string | null
+          state: string
+          user_id: string
+          verifier: string
+        }
+        Insert: {
+          created_at?: string
+          return_to?: string | null
+          state: string
+          user_id: string
+          verifier: string
+        }
+        Update: {
+          created_at?: string
+          return_to?: string | null
+          state?: string
+          user_id?: string
+          verifier?: string
+        }
+        Relationships: []
+      }
+      canva_shared_connection: {
+        Row: {
+          access_token: string
+          connected_by: string | null
+          expires_at: string
+          id: number
+          refresh_token: string
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          connected_by?: string | null
+          expires_at: string
+          id?: number
+          refresh_token: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          connected_by?: string | null
+          expires_at?: string
+          id?: number
+          refresh_token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       client_logos: {
         Row: {
           client_name: string

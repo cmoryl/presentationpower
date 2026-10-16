@@ -71,6 +71,13 @@
       "when": 1792023087341,
       "tag": "0009_approved_figures",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792109788465,
+      "tag": "0010_canva_shared_connection",
+      "breakpoints": true
     }
   ]
 }
