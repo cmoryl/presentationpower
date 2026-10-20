@@ -6,7 +6,7 @@
 
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Ban, Check, Download } from "lucide-react";
+import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { BRAND } from "@/lib/brand-colors";
