@@ -2,6 +2,7 @@
 // from the venue's own vector files; the London map engine draws, colours and
 // exports them with the same looks, room cuts and approved palette.
 
+import { saveFile } from "@/lib/save-file";
 import { Button } from "@/design-system/element";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
 import { listVenueMapEdits, saveVenueMapEdits } from "@/lib/qeii-map-edits.functions";
@@ -211,15 +212,11 @@ function MapsPage() {
   }
 
   function download() {
-    if (!current || !svg) return;
-    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `rdraft-${eventId}-${current.floor_key}-${face}.svg`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    if (!current || !svg) {
+      toast.error("The map is still drawing — try again in a moment.");
+      return;
+    }
+    saveFile(new Blob([svg], { type: "image/svg+xml" }), `rdraft-${eventId}-${current.floor_key}-${face}.svg`);
   }
 
   const paint = (room: string) => {
