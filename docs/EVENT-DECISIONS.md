@@ -1,5 +1,13 @@
 # Event design decisions
 
+### 2026-10-20 — Bowl stadium target switched to Juan Ramón Loubriel
+**Area:** San Juan Bowl stadium reconstruction and BoothHUB handoff.
+**Options tested:** Hiram Bithorn requested initially versus Juan Ramón Loubriel named by Discover Puerto Rico and ESPN for the Puerto Rico Bowl.
+**Chosen:** Juan Ramón Loubriel in Bayamón, explicitly approved by the user after the discrepancy was reported.
+**Why:** use the announced venue as the customization target; Hiram-specific baseball distances and roof geometry must not migrate into this model.
+**Would change if:** the organiser supplies an approved different venue or conversion plan.
+**Applies to:** San Juan Bowl stadium study; public references are not an approved construction survey, and the existing event brand is unchanged.
+
 ### 2026-10-20 — Source micro extraction and centered orbit
 **Area:** San Juan Bowl dissection.
 **Options tested:** landmark highlight groups versus every source shape; top-anchored CSS layer spread versus a camera orbiting the stack midpoint.
