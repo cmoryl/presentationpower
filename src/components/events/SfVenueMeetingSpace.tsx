@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import { saveRoomsVersion, useEventAssets, useRefreshEventAssets } from "@/lib/event-assets-data";
 import { SF_VENUE_FACT_SHEET, SF_VENUE_FLOORS, SF_VENUE_ROOMS, sfVenueRoomList } from "@/lib/next-sf-venue-rooms";
+import { SF_VENUE_ZONES } from "@/lib/next-sf-venue-zones";
 
 const n = (v: number | null) => (v == null ? "–" : v.toLocaleString("en-US"));
 
@@ -68,13 +69,46 @@ export function SfVenueMeetingSpace() {
 
       <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         <div>
-          <a href={plan.vectorUrl} target="_blank" rel="noreferrer" className="block rounded-md border border-[#03002C]/10 bg-white p-2">
-            <img src={plan.vectorUrl} alt={`InterContinental San Francisco ${plan.title.toLowerCase()} plan`} className="h-auto w-full" loading="lazy" />
-          </a>
+          <div className="rounded-md border border-[#03002C]/10 bg-white p-2">
+            <div className="relative">
+              <a href={plan.vectorUrl} target="_blank" rel="noreferrer" className="block">
+                <img src={plan.vectorUrl} alt={`InterContinental San Francisco ${plan.title.toLowerCase()} plan`} className="h-auto w-full" loading="lazy" />
+              </a>
+              {(SF_VENUE_ZONES[plan.floor] ?? []).map((z) => (
+                <div
+                  key={z.label}
+                  title={z.space ? `${z.label} — ${z.space}` : z.label}
+                  className="pointer-events-none absolute flex items-center justify-center rounded-[2px] border-2"
+                  style={{
+                    left: `${z.x}%`, top: `${z.y}%`, width: `${z.w}%`, height: `${z.h}%`,
+                    borderColor: z.color, backgroundColor: `${z.color}59`,
+                  }}
+                >
+                  <span className="rounded-sm bg-white/85 px-1 py-px text-center text-[10px] font-bold leading-tight text-[#03002C]">
+                    {z.label}{z.provisional ? " ‡" : ""}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+          {(SF_VENUE_ZONES[plan.floor] ?? []).length > 0 && (
+            <ul aria-label={`${plan.title} event zones`} className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-[12px] text-[#03002C]">
+              {(SF_VENUE_ZONES[plan.floor] ?? []).map((z) => (
+                <li key={z.label} className="inline-flex items-center gap-1.5">
+                  <span aria-hidden className="inline-block h-3 w-3 rounded-[2px] border" style={{ backgroundColor: z.color, borderColor: z.color }} />
+                  <span className="font-semibold">{z.label}{z.provisional ? " ‡" : ""}</span>
+                  {z.space && <span className="text-[#666666]">— {z.space}</span>}
+                </li>
+              ))}
+            </ul>
+          )}
           <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px]">
             <a href={plan.vectorUrl} download={`InterContinental-SF-floor-${plan.floor}-vector.svg`} className="font-semibold text-[#003FC7] hover:underline">Download vector plan (SVG)</a>
             <span className="text-[#666666]">Drawn paths from the hotel&rsquo;s 2017 sheet — confirm with the hotel before printing.</span>
           </div>
+          {(SF_VENUE_ZONES[plan.floor] ?? []).some((z) => z.provisional) && (
+            <p className="mt-1 text-[11px] text-[#666666]">‡ First-pass placement — confirm against the event team&rsquo;s marked-up plan.</p>
+          )}
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-[12px] text-[#03002C]">
