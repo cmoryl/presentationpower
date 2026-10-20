@@ -7,7 +7,7 @@
 // artwork is used as a background.
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Maximize2, Minus, Plus, RotateCcw, X } from "lucide-react";
+import { Maximize2, Minus, Plus, RotateCcw } from "lucide-react";
 import { Button } from "@/design-system/element";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
@@ -15,7 +15,7 @@ const MIN_ZOOM = 1;
 const MAX_ZOOM = 8;
 
 const pill =
-  "inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#03002C]/15 bg-white/95 text-[#03002C] shadow-sm transition-colors hover:bg-[#F2F2F2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]";
+  "size-8 p-0 rounded-md border-border bg-background text-foreground shadow-sm hover:bg-muted";
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(max, Math.max(min, v));
@@ -116,7 +116,7 @@ function ZoomSurface({
     <div className={`relative ${className ?? ""}`}>
       <div
         ref={frame}
-        className={`relative overflow-hidden bg-[#EEF1F7] ${full ? "h-full" : ""} ${
+        className={`relative overflow-hidden bg-muted ${full ? "h-full" : ""} ${
           zoom > 1 ? "cursor-grab active:cursor-grabbing" : ""
         }`}
         style={{ touchAction: "none" }}
@@ -155,11 +155,12 @@ function ZoomSurface({
       </div>
 
       <div className={`absolute top-3 flex items-center gap-1.5 ${full ? "left-3" : "right-3"}`}>
-        <span className="rounded-full bg-white/95 px-2.5 py-1 font-mono text-[10.5px] font-semibold text-[#03002C]/70 shadow-sm">
+        <span className="rounded-md bg-background px-2.5 py-1 font-mono text-xs font-semibold text-muted-foreground shadow-sm">
           {zoom.toFixed(1)}×
         </span>
         <Button
           type="button"
+          variant="outline" size="icon" title="Zoom out"
           className={pill}
           aria-label={`Zoom out of the ${label} plan`}
           onClick={() => centreZoom(1 / 1.4)}
@@ -168,6 +169,7 @@ function ZoomSurface({
         </Button>
         <Button
           type="button"
+          variant="outline" size="icon" title="Zoom in"
           className={pill}
           aria-label={`Zoom into the ${label} plan`}
           onClick={() => centreZoom(1.4)}
@@ -180,6 +182,7 @@ function ZoomSurface({
         {onFull ? (
           <Button
             type="button"
+            variant="outline" size="icon"
             className={pill}
             aria-label={`Open the ${label} plan full screen`}
             title="Enlarge map"
