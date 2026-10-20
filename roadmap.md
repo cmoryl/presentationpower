@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [ ] San Juan Bowl: audit palm highlights, expose every source shape as a separate SVG with element filtering, center the layer viewer and add an enlarged interactive dialog.
+
 - [x] San Juan Bowl: source-coordinate grid, measured sizing calculator, six preserved original layers and verified ZIP download; composite scene elements are not falsely offered as independent symbols.
 
 - [x] Embed logos in map SVG downloads; all four SF floor downloads contain vector logos with no external image links and render offline. Illustrator itself is unavailable for verification.
