@@ -10,7 +10,7 @@
   "parts": [
     {
       "id": "white-underlay",
-      "name": "White underlay",
+      "name": "Unpainted source geometry",
       "order": 1,
       "bounds": {
         "x": 62.700035095214844,
