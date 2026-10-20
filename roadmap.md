@@ -27,3 +27,4 @@
 - [ ] Import supplied NEXT A5 touchpoint flyers as editable event templates with QR codes, register in NEXT assets, and verify editing/export — BLOCKED: Canva share link allows 35 page previews but denies source export; awaiting PDF Print export.
 - [x] H5. GitHub sync — owner connected
 - [x] Map labels: resizing, rotation and positioning controls with saved adjustments; fix clipped San Francisco labels and verify SVG export.
+- [x] Restore original bathroom people symbols on San Francisco Levels 4–5 and verify map previews and SVG downloads.

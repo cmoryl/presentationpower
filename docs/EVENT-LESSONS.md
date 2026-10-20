@@ -1,5 +1,11 @@
 # Event lessons log
 
+### 2026-10-20 — Bathroom heads are not pillar dots
+**Context:** San Francisco Levels 4–5.
+**What happened:** QEII-specific pillar cleanup suppressed circular head paths in imported hotel bathroom figures.
+**Rule now:** scope symbol cleanup to the issued QEII floors; preserve imported venue pictograms path for path.
+**Enforced by:** real Level 4/5 SVG fixtures in `venue-map-import.test.ts`.
+
 ### 2026-10-20 — Narrow map rooms need turned text
 **Context:** San Francisco Union Square, Telegraph Hill and Pacific Terrace Foyer.
 **What happened:** horizontal names crossed the edges of narrow room areas.

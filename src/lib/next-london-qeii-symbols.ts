@@ -165,11 +165,18 @@ export function qeiiTracedSymbolShapes(floor: QeiiFloorVector): Set<number> {
 /** How close two pictograms must be to count as the same washroom. */
 const CLUSTER_REACH = 46;
 
+// Cleanup rules were reviewed against these issued QEII sheets only. Imported
+// venues have their own symbols: a small circular path may be a person's head.
+const QEII_SYMBOL_CLEANUP_FLOORS = new Set([
+  "ground", "first", "second", "third", "fourth", "fifth", "sixth",
+]);
+
 /**
  * Shape indexes to leave undrawn: the repeated cubicle figures. One symbol per
  * washroom cluster stays, so every bathroom still carries its icon.
  */
 export function qeiiRepeatedSymbolShapes(floor: QeiiFloorVector): Set<number> {
+  if (!QEII_SYMBOL_CLEANUP_FLOORS.has(floor.id)) return new Set<number>();
   const groups = symbolGroups(floor);
   const drop = qeiiTracedSymbolShapes(floor);
   const kept: SymbolGroup[] = [];
