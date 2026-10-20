@@ -202,6 +202,36 @@ function ConvertPage() {
     eyebrow: "",
   });
 
+  // Uploaded artwork file (.ai / Canva PDF or PPTX export / SVG …).
+  const [upload, setUpload] = useState<UploadState>({ status: "idle" });
+  const structureUpload = useServerFn(structureConvertUpload);
+  const onUploadFile = async (file: File) => {
+    const kind = uploadKindOf(file.name);
+    if (!kind) {
+      setUpload({ status: "error", name: file.name, message: "That file type isn't supported — use an Illustrator (.ai), PDF, PowerPoint, Word, Excel or SVG file." });
+      return;
+    }
+    if (file.size > CONVERT_UPLOAD_MAX_BYTES) {
+      setUpload({ status: "error", name: file.name, message: `That file is ${Math.round(file.size / 1024 / 1024)} MB — the limit is 20 MB. Export a smaller version and try again.` });
+      return;
+    }
+    setUpload({ status: "reading", name: file.name });
+    try {
+      if (kind === "svg") {
+        const content = contentFromSvgMarkup(await file.text());
+        if (!content) throw new Error("No readable text found in that SVG — it may be outlined artwork. Convert text to a PDF or type the copy in.");
+        setUpload({ status: "done", name: file.name, kindLabel: uploadKindLabel(file.name), content });
+        return;
+      }
+      const { content } = await structureUpload({
+        data: { filename: file.name, mime: file.type || undefined, base64: await fileToBase64(file) },
+      });
+      setUpload({ status: "done", name: file.name, kindLabel: uploadKindLabel(file.name), content: content as AdaptContent });
+    } catch (e) {
+      setUpload({ status: "error", name: file.name, message: (e as Error).message || "Could not read that file." });
+    }
+  };
+
   const choice = decks.find((d) => d.id === deckId) ?? null;
   const localDeck = choice?.local ? decksMap[choice.id] : undefined;
   const saved = useQuery({
@@ -248,6 +278,9 @@ function ConvertPage() {
   }, [sourceKind, moduleId, moduleVariant?.familyId]);
 
   const rawSource: AdaptContent = useMemo(() => {
+    if (sourceKind === "upload") {
+      return upload.status === "done" ? upload.content : { headline: "Upload a file to convert" };
+    }
     if (sourceKind === "print") {
       return piece ? contentFromLibraryPiece(piece) : { headline: "Pick a print piece" };
     }
