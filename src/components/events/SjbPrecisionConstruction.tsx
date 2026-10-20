@@ -53,6 +53,7 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
         </div>
       </div>
     </div>
+    <ExplodedView />
     <div className="border-t border-border pt-5"><h3 className="text-lg font-semibold">How the supplied logo is assembled</h3>
       <p className="mt-2 text-sm text-muted-foreground">Six original drawing layers, stacked in source order at the same origin and scale. Component files are production references, not approved standalone marks. The fortress, palms, football and banner share one composite scene; separating them into complete symbols would require designer work.</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{SJB_COMPONENTS.map(p => <article key={p.id} className="min-w-0 rounded-md border border-border">
