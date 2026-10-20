@@ -1,6 +1,6 @@
 # Events, kiosks, signage, venue maps
 
-- San Juan Bowl component assets preserve original top-level SVG drawing order and source coordinates; `san-juan-logo-measurements.json` records measured geometry and feeds the production calculator — why: exact inspection must not redraw composite shapes or confuse artboard width with badge width.
+- San Juan Bowl component assets preserve original top-level SVG drawing order and source coordinates, and count every shape element (path, polygon, polyline — 293 total); `san-juan-logo-measurements.json` records measured geometry and feeds the production calculator — why: exact inspection must not redraw composite shapes or confuse artboard width with badge width.
 
 - Generated map SVG downloads (including ZIP entries) and PDF/PNG inputs pass through `selfContainedSvg` before delivery; SVG logos are nested vector paths with unique IDs, raster images embedded, and missing assets block export — why: Illustrator cannot reliably resolve linked web logos and proofs must not silently lose them. Issued source files remain byte-for-byte unchanged.
 
