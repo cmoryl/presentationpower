@@ -282,11 +282,22 @@ function ConstructionSection() {
   ];
   return (
     <div className={`${card} space-y-4`}>
-      <h3 className="text-[15px] font-bold">Construction &amp; measurements</h3>
-      <p className="text-[13px] text-[#03002C]/80">
-        Every distance is measured from the supplied artwork and expressed in <strong>x</strong>, where{" "}
-        <strong>{c.unit}</strong>. Use these ratios to size, space and align the badge at any scale.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="text-[15px] font-bold">Construction &amp; measurements</h3>
+          <p className="mt-1 text-[13px] text-[#03002C]/80">
+            Every distance is measured from the supplied artwork and expressed in <strong>x</strong>, where{" "}
+            <strong>{c.unit}</strong>. Use these ratios to size, space and align the badge at any scale.
+          </p>
+        </div>
+        <a
+          href="/downloads/san-juan-bowl-logo-construction-sheet.pdf"
+          download="san-juan-bowl-logo-construction-sheet.pdf"
+          className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3.5 py-2 text-[12px] font-semibold text-white hover:bg-[#03002C]"
+        >
+          <Download className="h-3.5 w-3.5" /> Construction sheet (PDF)
+        </a>
+      </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <ConstructionDiagram />
         <div className="space-y-3">
