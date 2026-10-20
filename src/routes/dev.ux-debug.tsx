@@ -97,7 +97,7 @@ function UxDebugReportPage() {
     a.href = URL.createObjectURL(blob);
     a.download = `ux-session-${session.id}.json`;
     a.click();
-    URL.revokeObjectURL(a.href);
+    setTimeout(() => URL.revokeObjectURL(a.href), 30_000);
   };
 
   return (

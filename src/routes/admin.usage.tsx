@@ -53,7 +53,7 @@ function csv(report: UsageReport) {
   a.href = url;
   a.download = `element-usage-${report.days}d-${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }
 
 function UsageView() {

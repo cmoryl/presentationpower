@@ -35,7 +35,7 @@ function downloadCsv(units: readonly BespokeUnit[], floor: string) {
   a.href = url;
   a.download = `next-london-${floor.toLowerCase()}-scenic-artwork.csv`;
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }
 
 export function LondonBespokePanel({ floor, floorLabel }: LondonBespokePanelProps) {
