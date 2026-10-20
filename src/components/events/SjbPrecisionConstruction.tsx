@@ -64,3 +64,25 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
     </div>
   </section>;
 }
+
+function ExplodedView() {
+  const [open, setOpen] = useState(true);
+  const layers = SJB_COMPONENTS.filter(p => p.id !== "white-underlay");
+  return <div className="border-t border-border pt-5">
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <div><h3 className="text-lg font-semibold">Dissected logo</h3>
+        <p className="mt-1 text-sm text-muted-foreground">The original drawing layers pulled apart in depth, bottom to top. Toggle to watch them assemble.</p></div>
+      <Button variant="outline" onClick={() => setOpen(o => !o)} aria-pressed={open}>{open ? "Assemble" : "Dissect"}</Button>
+    </div>
+    <div className="mt-4 overflow-hidden rounded-md bg-foreground py-16" style={{ perspective: "1600px" }}>
+      <div className="relative mx-auto aspect-square w-[min(60%,380px)] transition-transform duration-700 motion-reduce:transition-none" style={{ transformStyle: "preserve-3d", transform: open ? "rotateX(58deg) rotateZ(-38deg)" : "none" }}>
+        {layers.map((p, i) => <div key={p.id} className="absolute inset-0 transition-transform duration-700 motion-reduce:transition-none" style={{ transformStyle: "preserve-3d", transform: `translateZ(${open ? i * 90 : 0}px)` }}>
+          {open ? <div className="absolute inset-0 rounded-sm border border-background/25 bg-background/5" /> : null}
+          <img src={p.url} alt={p.name} className="relative h-full w-full object-contain" />
+          {open ? <span className="absolute -right-2 top-0 translate-x-full whitespace-nowrap font-mono text-[11px] text-background/80">{p.order}. {p.definition?.role ?? p.name}</span> : null}
+        </div>)}
+      </div>
+    </div>
+    <p className="mt-2 text-xs text-muted-foreground">Display view only. The foundation layer has no paint, so it is not shown. Never reproduce the logo separated like this.</p>
+  </div>;
+}
