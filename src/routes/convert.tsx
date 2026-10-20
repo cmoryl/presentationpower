@@ -54,6 +54,15 @@ import {
   type AdaptTargetId,
 } from "@/lib/cross-format-adapt";
 import { CSS_DPI } from "@/lib/print-proof-export";
+import {
+  CONVERT_UPLOAD_ACCEPT,
+  CONVERT_UPLOAD_MAX_BYTES,
+  contentFromSvgMarkup,
+  fileToBase64,
+  uploadKindLabel,
+  uploadKindOf,
+} from "@/lib/convert-upload";
+import { structureConvertUpload } from "@/lib/convert-upload.functions";
 import { seedContent, useDeckStore, type Brief } from "@/lib/deck-store";
 import { BRAND_MODES, byId, MODULE_FAMILIES, MODULE_VARIANTS } from "@/lib/taxonomy";
 
@@ -108,7 +117,13 @@ const MASTER_BRIEF: Brief = {
   clientFacts: "",
 };
 
-type SourceKind = "module" | "deck" | "manual" | "print";
+type SourceKind = "module" | "deck" | "manual" | "print" | "upload";
+
+type UploadState =
+  | { status: "idle" }
+  | { status: "reading"; name: string }
+  | { status: "done"; name: string; kindLabel: string; content: AdaptContent }
+  | { status: "error"; name: string; message: string };
 
 function ConvertPage() {
   const search = Route.useSearch();
@@ -187,6 +202,36 @@ function ConvertPage() {
     eyebrow: "",
   });
 
+  // Uploaded artwork file (.ai / Canva PDF or PPTX export / SVG …).
+  const [upload, setUpload] = useState<UploadState>({ status: "idle" });
+  const structureUpload = useServerFn(structureConvertUpload);
+  const onUploadFile = async (file: File) => {
+    const kind = uploadKindOf(file.name);
+    if (!kind) {
+      setUpload({ status: "error", name: file.name, message: "That file type isn't supported — use an Illustrator (.ai), PDF, PowerPoint, Word, Excel or SVG file." });
+      return;
+    }
+    if (file.size > CONVERT_UPLOAD_MAX_BYTES) {
+      setUpload({ status: "error", name: file.name, message: `That file is ${Math.round(file.size / 1024 / 1024)} MB — the limit is 20 MB. Export a smaller version and try again.` });
+      return;
+    }
+    setUpload({ status: "reading", name: file.name });
+    try {
+      if (kind === "svg") {
+        const content = contentFromSvgMarkup(await file.text());
+        if (!content) throw new Error("No readable text found in that SVG — it may be outlined artwork. Convert text to a PDF or type the copy in.");
+        setUpload({ status: "done", name: file.name, kindLabel: uploadKindLabel(file.name), content });
+        return;
+      }
+      const { content } = await structureUpload({
+        data: { filename: file.name, mime: file.type || undefined, base64: await fileToBase64(file) },
+      });
+      setUpload({ status: "done", name: file.name, kindLabel: uploadKindLabel(file.name), content: content as AdaptContent });
+    } catch (e) {
+      setUpload({ status: "error", name: file.name, message: (e as Error).message || "Could not read that file." });
+    }
+  };
+
   const choice = decks.find((d) => d.id === deckId) ?? null;
   const localDeck = choice?.local ? decksMap[choice.id] : undefined;
   const saved = useQuery({
@@ -233,6 +278,9 @@ function ConvertPage() {
   }, [sourceKind, moduleId, moduleVariant?.familyId]);
 
   const rawSource: AdaptContent = useMemo(() => {
+    if (sourceKind === "upload") {
+      return upload.status === "done" ? upload.content : { headline: "Upload a file to convert" };
+    }
     if (sourceKind === "print") {
       return piece ? contentFromLibraryPiece(piece) : { headline: "Pick a print piece" };
     }
@@ -257,7 +305,7 @@ function ConvertPage() {
       { content: slide.content, notes: slide.notes },
       byId(MODULE_VARIANTS, slide.variantId)?.name,
     );
-  }, [sourceKind, moduleId, moduleVariant, manual, slide, draft, piece]);
+  }, [sourceKind, moduleId, moduleVariant, manual, slide, draft, piece, upload]);
 
   // The module itself, for "Use the module as drawn".
   const drawnSource = useMemo(() => {
@@ -277,13 +325,19 @@ function ConvertPage() {
     f ? { w: f.width, h: f.height } : { w: Math.round((r.target.trimIn?.width ?? 8.268) * CSS_DPI), h: Math.round((r.target.trimIn?.height ?? 11.693) * CSS_DPI) };
 
   // A new source starts with everything included and no edits.
-  const sourceKey = sourceKind === "print" ? `p:${pieceId}` : sourceKind === "module" ? `m:${moduleId}` : manual ? "manual" : `d:${deckId}:${slideIndex}`;
+  const sourceKey = sourceKind === "print" ? `p:${pieceId}` : sourceKind === "module" ? `m:${moduleId}` : sourceKind === "upload" ? `u:${upload.status === "done" ? upload.name : "none"}` : manual ? "manual" : `d:${deckId}:${slideIndex}`;
   useEffect(() => setSelection(EMPTY_SELECTION), [sourceKey]);
   const source = useMemo(() => applySelection(rawSource, selection), [rawSource, selection]);
 
   const brandId = sourceKind === "print" ? (piece?.divisionId ?? BRAND_MODES[0].id) : sourceKind === "module" ? moduleBrand : (deck?.brandModeId ?? BRAND_MODES[0].id);
   const mode: "light" | "dark" = sourceKind === "deck" ? (slide?.mode ?? "light") : "light";
   const result = useMemo(() => adaptContent(source, targetId), [source, targetId]);
+  // How much each size has to change the copy — shown on the format picker so
+  // people can pick a size that fits before they open it.
+  const fitNotes = useMemo(
+    () => new Map(ADAPT_TARGETS.map((t) => [t.id, adaptContent(source, t.id).notes.length] as const)),
+    [source],
+  );
   const format = adaptTargetFormat(result.target);
   // Modules with a set of cells (bento, cards, figures) rebuild as a tile grid on social sizes.
   const chartLabels = new Set((source.chart?.data ?? []).map((d) => d.label.trim().toLowerCase()));
@@ -303,32 +357,34 @@ function ConvertPage() {
   return (
     <AppShell>
       <main className="mx-auto w-full max-w-[1200px] px-5 py-10">
-        <p className="text-[11px] font-semibold tracking-[0.18em] text-[#666] uppercase">
+        <p className="text-[11px] font-semibold tracking-[0.18em] text-[var(--tp-dark-gray)] uppercase">
           Cross-format adapter
         </p>
-        <h1 className="mt-2 text-[34px] leading-[1.1] font-bold tracking-[-0.02em] text-[#03002C]">
+        <h1 className="mt-2 text-[34px] leading-[1.1] font-bold tracking-[-0.02em] text-[var(--tp-ink)]">
           One piece of content, every medium
         </h1>
-        <p className="mt-2 max-w-[70ch] text-[14px] leading-[1.5] text-[#03002C]/75">
-          Convert a slide into a social card, a 1-page print brief, or a case study page. The
-          headline, body copy, supporting points, figure and photography carry across; the layout
-          structure and type hierarchy are the target medium's own. Anything shortened or left out is
-          listed before you export.
+        <p className="mt-2 max-w-[70ch] text-[14px] leading-[1.5] text-[var(--tp-ink)]/75">
+          Start from a master module, a deck slide, a print piece, or an uploaded artwork file
+          (Illustrator .ai, a Canva PDF/PowerPoint download, or SVG) — then convert it into any
+          social, print or event size. The headline, body copy, supporting points, figures and
+          photography carry across; the layout structure and type hierarchy are the target medium's
+          own. Anything shortened or left out is listed before you export.
         </p>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[360px_1fr]">
           {/* ── Source ─────────────────────────────────────────── */}
           <section className="space-y-4">
-            <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[#666] uppercase">
-              Source content
+            <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
+              Step 1 · Choose your content
             </h2>
 
-            <div role="group" aria-label="Source" className="grid grid-cols-4 gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5">
+            <div role="group" aria-label="Source" className="grid grid-cols-3 gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5 sm:grid-cols-5">
               {(
                 [
                   ["module", "Master module"],
                   ["deck", "Deck slide"],
                   ["print", "Print piece"],
+                  ["upload", "Upload file"],
                   ["manual", "Type copy"],
                 ] as const
               ).map(([k, l]) => (
@@ -441,7 +497,54 @@ function ConvertPage() {
                 {piece ? <BrickList bricks={contentBricks(piece)} /> : null}
               </div>
             ) : null}
-            {sourceKind === "module" || sourceKind === "print" ? null : manual ? (
+            {sourceKind === "upload" ? (
+              <div className="space-y-2">
+                <label
+                  htmlFor="convert-upload"
+                  className="block cursor-pointer rounded-lg border border-dashed border-[var(--tp-blue)] bg-[var(--tp-surface)] p-4 text-center hover:bg-[var(--tp-blue-white)]"
+                >
+                  <span className="block text-[13px] font-semibold text-[var(--tp-ink)]">
+                    {upload.status === "reading" ? "Reading your file…" : "Choose an artwork file"}
+                  </span>
+                  <span className="mt-1 block text-[11.5px] leading-snug text-[var(--tp-dark-gray)]">
+                    Illustrator (.ai), Canva export (PDF or PowerPoint), Word, Excel or SVG — up to 20 MB.
+                  </span>
+                  <input
+                    id="convert-upload"
+                    type="file"
+                    accept={CONVERT_UPLOAD_ACCEPT}
+                    className="sr-only"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) void onUploadFile(f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+                {upload.status === "reading" ? (
+                  <p role="status" className="rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-muted)] p-3 text-[12.5px] text-[var(--tp-ink)]">
+                    Reading {upload.name} — large files can take up to a minute.
+                  </p>
+                ) : null}
+                {upload.status === "error" ? (
+                  <p role="alert" className="rounded-lg border border-[var(--tp-red)] bg-[color:var(--color-muted)] p-3 text-[12.5px] text-[var(--tp-ink)]">
+                    {upload.message}
+                  </p>
+                ) : null}
+                {upload.status === "done" ? (
+                  <div className="rounded-lg border border-[var(--tp-green)] bg-[#F1FEEC] p-3 text-[12.5px] text-[var(--tp-ink)]">
+                    <p className="font-semibold">{upload.name}</p>
+                    <p className="mt-0.5 text-[11.5px] text-[var(--tp-dark-gray)]">
+                      {upload.kindLabel} — headline, copy{upload.content.points?.length ? `, ${upload.content.points.length} supporting line(s)` : ""}{upload.content.stat ? ` and the figure “${upload.content.stat.value}”` : ""} read from the file. Edit anything below before converting.
+                    </p>
+                  </div>
+                ) : null}
+                <p className="text-[11px] leading-snug text-[color:var(--color-muted-foreground)]">
+                  From Canva: Share → Download → “PDF Print” or “PPTX”, then upload that file here. Only words and figures printed in the file are used — nothing is invented.
+                </p>
+              </div>
+            ) : null}
+            {sourceKind === "module" || sourceKind === "print" || sourceKind === "upload" ? null : manual ? (
               <div className="space-y-2">
                 <input
                   value={draft.eyebrow}
@@ -464,12 +567,12 @@ function ConvertPage() {
                 />
               </div>
             ) : decks.length === 0 ? (
-              <p className="rounded-lg border border-black/10 bg-muted p-3 text-[12.5px] text-[#03002C]">
+              <p className="rounded-lg border border-black/10 bg-muted p-3 text-[12.5px] text-[var(--tp-ink)]">
                 {cloud.isLoading ? "Loading your decks…" : "No decks yet — open or save a deck, or switch to “Type the copy”."}
               </p>
             ) : (
               <div className="space-y-2">
-                <label className="block text-[11px] font-medium text-[#666]">Deck</label>
+                <label className="block text-[11px] font-medium text-[var(--tp-dark-gray)]">Deck</label>
                 <select
                   value={deckId}
                   onChange={(e) => {
@@ -484,7 +587,7 @@ function ConvertPage() {
                     </option>
                   ))}
                 </select>
-                <label className="block text-[11px] font-medium text-[#666]">Slide</label>
+                <label className="block text-[11px] font-medium text-[var(--tp-dark-gray)]">Slide</label>
                 <select
                   value={String(Math.min(slideIndex, (deck?.slides.length ?? 1) - 1))}
                   onChange={(e) => setSlideIndex(Number(e.target.value))}
@@ -502,14 +605,14 @@ function ConvertPage() {
 
             {manual ? null : <InfoBuilder source={rawSource} selection={selection} onChange={setSelection} />}
 
-            <h2 className="pt-2 text-[12px] font-semibold tracking-[0.12em] text-[#666] uppercase">
-              Convert to
+            <h2 className="pt-2 text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
+              Step 3 · Choose a format
             </h2>
             <div className="grid gap-1">
               {ADAPT_TARGETS.map((t, i) => (
                 <Fragment key={t.id}>
                 {i === 0 || (ADAPT_TARGETS[i - 1].surface ?? ADAPT_TARGETS[i - 1].medium) !== (t.surface ?? t.medium) ? (
-                  <h3 className="pt-2 text-[11px] font-semibold tracking-[0.1em] text-[#666] uppercase">
+                  <h3 className="pt-2 text-[11px] font-semibold tracking-[0.1em] text-[var(--tp-dark-gray)] uppercase">
                     {t.surface === "event" ? "Event signage" : t.medium === "print" ? "Print" : "Social"}
                   </h3>
                 ) : null}
@@ -517,13 +620,22 @@ function ConvertPage() {
                   key={t.id}
                   type="button"
                   onClick={() => setTargetId(t.id)}
-                  className={`rounded-lg border px-3 py-2 text-left text-[12.5px] ${targetId === t.id ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]" : "border-black/15 text-[#03002C] hover:border-[#003FC7]"}`}
+                  className={`rounded-lg border px-3 py-2 text-left text-[12.5px] ${targetId === t.id ? "border-[var(--tp-blue)] bg-[var(--tp-blue-white)] text-[var(--tp-ink)]" : "border-black/15 text-[var(--tp-ink)] hover:border-[var(--tp-blue)]"}`}
                 >
-                  <span className="font-semibold">{t.label}</span>
-                  <span className="mt-0.5 block text-[11px] text-[#666]">
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="font-semibold">{t.label}</span>
+                    {(fitNotes.get(t.id) ?? 0) === 0 ? (
+                      <span className="shrink-0 rounded-sm bg-[var(--tp-green)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--tp-ink)]">Fits as-is</span>
+                    ) : (
+                      <span className="shrink-0 rounded-sm bg-[var(--tp-surface)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--tp-dark-gray)]">
+                        {fitNotes.get(t.id)} change{(fitNotes.get(t.id) ?? 0) === 1 ? "" : "s"} to fit
+                      </span>
+                    )}
+                  </span>
+                  <span className="mt-0.5 block text-[11px] text-[var(--tp-dark-gray)]">
                     {t.medium === "print"
-                      ? `${Math.round((t.trimIn?.width ?? 0) * 25.4)} × ${Math.round((t.trimIn?.height ?? 0) * 25.4)} mm · headline ${t.type.headlinePx}px`
-                      : `${adaptTargetFormat(t)?.width} × ${adaptTargetFormat(t)?.height} px · headline ${t.type.headlinePx}px`}
+                      ? `${Math.round((t.trimIn?.width ?? 0) * 25.4)} × ${Math.round((t.trimIn?.height ?? 0) * 25.4)} mm`
+                      : `${adaptTargetFormat(t)?.width} × ${adaptTargetFormat(t)?.height} px`}
                   </span>
                 </button>
                 </Fragment>
@@ -534,8 +646,8 @@ function ConvertPage() {
           {/* ── Adapted preview ────────────────────────────────── */}
           <section className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[#666] uppercase">
-                {result.target.label}
+              <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
+                Step 4 · Preview &amp; export — {result.target.label}
               </h2>
               <div className="flex flex-wrap items-center gap-2">
                 <AssetExportMenu
@@ -782,7 +894,7 @@ division={brandId}
               </div>
             ) : null}
 
-            <div className={`flex justify-center rounded-sm border border-black/10 bg-[#F2F2F2] p-6 ${view === "all" ? "hidden" : ""}`}>
+            <div className={`flex justify-center rounded-sm border border-black/10 bg-[var(--tp-light-gray)] p-6 ${view === "all" ? "hidden" : ""}`}>
               {drawn && drawnSource ? (
                 format ? (
                   <div ref={socialWrapRef}>
@@ -842,10 +954,10 @@ division={brandId}
             </div>
 
             <div>
-              <h3 className="text-[12px] font-semibold tracking-[0.12em] text-[#666] uppercase">
+              <h3 className="text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
                 What carried across
               </h3>
-              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#03002C]/80">
+              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[var(--tp-ink)]/80">
                 {result.target.structure
                   .filter((f) => {
                     const c = result.content as Record<string, unknown>;
@@ -860,11 +972,12 @@ division={brandId}
                 const c = result.content;
                 const extras = [
                   c.chart ? `${c.chart.kind} chart (${c.chart.data.length} values)` : null,
+                  c.stats?.length ? `${c.stats.length} more figure${c.stats.length > 1 ? "s" : ""} in the strip` : null,
                   c.images?.length ? `${c.images.length} picture${c.images.length > 1 ? "s" : ""}` : null,
                   c.pointIcons ? `${Object.values(c.pointIcons).filter((v, i, a) => a.indexOf(v) === i).length} icon(s): ${[...new Set(Object.values(c.pointIcons))].slice(0, 6).join(", ")}` : null,
                 ].filter(Boolean);
                 return extras.length ? (
-                  <p data-carried-visuals="true" className="mt-1 text-[12.5px] leading-[1.5] text-[#03002C]/80">
+                  <p data-carried-visuals="true" className="mt-1 text-[12.5px] leading-[1.5] text-[var(--tp-ink)]/80">
                     Visuals: {extras.join(" · ")}
                   </p>
                 ) : null;
@@ -875,23 +988,40 @@ division={brandId}
                 </p>
               ) : null}
               {result.notes.length === 0 ? (
-                <p className="mt-3 rounded-lg border border-[#A6FA87] bg-[#F1FEEC] p-3 text-[12.5px] text-[#03002C]">
+                <p className="mt-3 rounded-lg border border-[var(--tp-green)] bg-[#F1FEEC] p-3 text-[12.5px] text-[var(--tp-ink)]">
                   Everything fitted — nothing shortened, nothing left out.
                 </p>
               ) : (
-                <ul className="mt-3 space-y-1.5">
-                  {(format && socialGrid && !drawn ? [...result.notes.filter((n) => n.field !== "points" && n.field !== "body"), ...(gridPoints.length > socialGridCapacity(format) ? [{ severity: "dropped" as const, field: "points", detail: `${gridPoints.length - socialGridCapacity(format)} tile(s) left out — this size holds ${socialGridCapacity(format)}.` }] : [])] : result.notes).map((n, i) => (
-                    <li
-                      key={`${n.field}-${i}`}
-                      className={`rounded-lg border p-2.5 text-[12.5px] leading-[1.45] text-[#03002C] ${SEVERITY_STYLE[n.severity] ?? "border-black/10 bg-white"}`}
-                    >
-                      <span className="font-semibold uppercase tracking-[0.1em] text-[10px] text-[#666]">
-                        {n.severity} · {n.field}
-                      </span>
-                      <span className="mt-0.5 block">{n.detail}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="mt-3 space-y-3">
+                  {(
+                    [
+                      ["shortened", "Shortened to fit"],
+                      ["dropped", "Left out of this format"],
+                      ["refused", "Couldn't carry across"],
+                    ] as const
+                  ).map(([sev, heading]) => {
+                    const visible = format && socialGrid && !drawn
+                      ? [...result.notes.filter((n) => n.field !== "points" && n.field !== "body"), ...(gridPoints.length > socialGridCapacity(format) ? [{ severity: "dropped" as const, field: "points", detail: `${gridPoints.length - socialGridCapacity(format)} tile(s) left out — this size holds ${socialGridCapacity(format)}.` }] : [])]
+                      : result.notes;
+                    const list = visible.filter((n) => n.severity === sev);
+                    if (!list.length) return null;
+                    return (
+                      <div key={sev}>
+                        <h4 className="text-[11px] font-semibold tracking-[0.1em] text-[var(--tp-dark-gray)] uppercase">{heading}</h4>
+                        <ul className="mt-1.5 space-y-1.5">
+                          {list.map((n, i) => (
+                            <li
+                              key={`${n.field}-${i}`}
+                              className={`rounded-lg border p-2.5 text-[12.5px] leading-[1.45] text-[var(--tp-ink)] ${SEVERITY_STYLE[n.severity] ?? "border-black/10 bg-white"}`}
+                            >
+                              {n.detail}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           </section>
@@ -948,7 +1078,7 @@ function InfoBuilder({
     <div className="space-y-3 border-t border-[color:var(--color-border)] pt-4">
       <div className="flex items-baseline justify-between">
         <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[color:var(--color-muted-foreground)] uppercase">
-          Info to carry across
+          Step 2 · Pick what carries across
         </h2>
         <button type="button" className="text-[11px] font-semibold text-[color:var(--color-primary)] hover:underline" onClick={() => onChange(EMPTY_SELECTION)}>
           Reset
@@ -1079,10 +1209,10 @@ function BrickList({ bricks }: { bricks: ContentBrick[] }) {
   if (!bricks.length) return null;
   return (
     <div className="space-y-1.5 pt-2">
-      <h3 className="text-[11px] font-semibold tracking-[0.1em] text-[#666] uppercase">Content bricks</h3>
+      <h3 className="text-[11px] font-semibold tracking-[0.1em] text-[var(--tp-dark-gray)] uppercase">Content bricks</h3>
       <ul className="space-y-1.5">
         {bricks.map((b) => (
-          <li key={b.id} className="rounded-md border border-black/10 p-2 text-[12px] text-[#03002C]">
+          <li key={b.id} className="rounded-md border border-black/10 p-2 text-[12px] text-[var(--tp-ink)]">
             <div className="flex items-center justify-between gap-2">
               <span className="font-semibold">{b.label}</span>
               <button
@@ -1091,13 +1221,13 @@ function BrickList({ bricks }: { bricks: ContentBrick[] }) {
                   void navigator.clipboard?.writeText(b.text);
                   setCopied(b.id);
                 }}
-                className="rounded border border-black/15 px-2 py-0.5 text-[11px] hover:border-[#003FC7]"
+                className="rounded border border-black/15 px-2 py-0.5 text-[11px] hover:border-[var(--tp-blue)]"
               >
                 {copied === b.id ? "Copied" : "Copy"}
               </button>
             </div>
-            <p className="mt-0.5 line-clamp-2 text-[11.5px] text-[#666]">{b.text}</p>
-            <p className="mt-1 text-[10.5px] text-[#666]">Feeds: {b.surfaces.join(" · ")}</p>
+            <p className="mt-0.5 line-clamp-2 text-[11.5px] text-[var(--tp-dark-gray)]">{b.text}</p>
+            <p className="mt-1 text-[10.5px] text-[var(--tp-dark-gray)]">Feeds: {b.surfaces.join(" · ")}</p>
           </li>
         ))}
       </ul>

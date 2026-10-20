@@ -37,6 +37,8 @@ export type AdaptContent = {
   body?: string;
   points?: string[];
   stat?: { value: string; label: string };
+  /** Every further figure the source prints (the first is `stat`). */
+  stats?: { value: string; label: string }[];
   cta?: string;
   footnote?: string;
   media?: AdaptMedia;
@@ -173,6 +175,9 @@ export type AdaptTargetId =
   | "social-card"
   | "social-portrait"
   | "social-story"
+  | "social-landscape"
+  | "social-wide"
+  | "email-header"
   | "print-brief"
   | "case-study"
   | "print-letter"
@@ -274,6 +279,58 @@ export const ADAPT_TARGETS: AdaptTarget[] = [
       headlineLeading: 1.04,
     },
     structure: ["eyebrow", "headline", "body", "points", "stat", "cta", "lockup"],
+  },
+  {
+    id: "social-landscape",
+    label: "Social card · landscape (LinkedIn link)",
+    medium: "social",
+    formatId: "linkedin-link-1200x627",
+    caps: { headline: 90, body: 160, points: 3, pointChars: 40 },
+    type: {
+      eyebrowPx: 24,
+      headlinePx: 72,
+      bodyPx: 30,
+      pointPx: 26,
+      statPx: 96,
+      bodyLeading: 1.3,
+      headlineLeading: 1.05,
+    },
+    structure: ["eyebrow", "headline", "body", "points", "stat", "cta", "lockup"],
+  },
+  {
+    id: "social-wide",
+    label: "Social card · wide 16:9 (X / YouTube)",
+    medium: "social",
+    formatId: "x-1600x900",
+    caps: { headline: 100, body: 200, points: 4, pointChars: 48 },
+    type: {
+      eyebrowPx: 26,
+      headlinePx: 84,
+      bodyPx: 34,
+      pointPx: 30,
+      statPx: 110,
+      bodyLeading: 1.35,
+      headlineLeading: 1.05,
+    },
+    structure: ["eyebrow", "headline", "body", "points", "stat", "cta", "lockup"],
+  },
+  {
+    id: "email-header",
+    label: "Email header banner",
+    medium: "social",
+    formatId: "email-header-1200x400",
+    // A shallow banner: headline + one support line, no list block.
+    caps: { headline: 80, body: 120, points: 2, pointChars: 36 },
+    type: {
+      eyebrowPx: 22,
+      headlinePx: 64,
+      bodyPx: 28,
+      pointPx: 24,
+      statPx: 88,
+      bodyLeading: 1.3,
+      headlineLeading: 1.05,
+    },
+    structure: ["eyebrow", "headline", "body", "cta", "lockup"],
   },
   {
     id: "print-brief",
@@ -602,6 +659,32 @@ function pickStat(content: Record<string, unknown>): { value: string; label: str
 }
 
 /**
+ * Every figure the source prints, in reading order. The first becomes the
+ * payload's `stat`; the rest ride in `stats` so a figure grid or KPI strip is
+ * not flattened to a single number when it crosses formats.
+ */
+export function pickStats(content: Record<string, unknown>): { value: string; label: string }[] {
+  const first = pickStat(content);
+  const out = first ? [first] : [];
+  for (const key of ["stats", "items", "metrics", "kpis"]) {
+    const stats = asList(content[key]);
+    if (!stats) continue;
+    for (const s of stats) {
+      if (!s || typeof s !== "object") continue;
+      const rec = s as Record<string, unknown>;
+      const raw = rec.value ?? rec.stat ?? rec.number;
+      const value = typeof raw === "number" ? String(raw) : str(raw);
+      if (!value) continue;
+      const unit = str(rec.unit) ?? "";
+      const joined = unit && !/^[%+x×]/.test(unit) ? `${value} ${unit}` : `${value}${unit}`;
+      const label = str(rec.label) ?? str(rec.caption) ?? "";
+      if (!out.some((o) => o.value === joined && o.label === label)) out.push({ value: joined, label });
+    }
+  }
+  return out;
+}
+
+/**
  * Background/media travel rule. A photograph or curated image asset travels as
  * itself; a solid brand token travels as a token. Anything generated as vector
  * artwork is refused — backgrounds stay on approved photography, solid tokens
@@ -699,7 +782,8 @@ export function contentFromSlide(
   fallbackHeadline = "Untitled slide",
 ): AdaptContent {
   const c = (slide.content ?? {}) as Record<string, unknown>;
-  const stat = pickStat(c);
+  const stats = pickStats(c);
+  const stat = stats[0];
   const statLine = stat ? [stat.value, stat.label].filter(Boolean).join(" ") : undefined;
   const headline = pick(c, HEADLINE_KEYS) ?? statLine ?? fallbackHeadline;
   // Never repeat the headline as the eyebrow or body (a cover's client name
@@ -734,6 +818,7 @@ export function contentFromSlide(
     body,
     points,
     stat,
+    stats: stats.length > 1 ? stats.slice(1, 5) : undefined,
     cta,
     footnote,
     media: adaptMediaFrom(c),
@@ -867,11 +952,23 @@ export function adaptContent(content: AdaptContent, targetId: AdaptTargetId): Ad
 
   if (content.stat && !target.structure.includes("stat")) {
     out.stat = undefined;
+    out.stats = undefined;
     notes.push({
       severity: "dropped",
       field: "stat",
-      detail: `Figure "${content.stat.value}" not shown — ${target.label} has no figure block.`,
+      detail: `Figure "${content.stat.value}"${content.stats?.length ? ` and ${content.stats.length} more` : ""} not shown — ${target.label} has no figure block.`,
     });
+  } else if (content.stats?.length) {
+    // A figure strip holds the lead figure plus three more.
+    const kept = content.stats.slice(0, 3);
+    out.stats = kept;
+    if (content.stats.length > kept.length) {
+      notes.push({
+        severity: "dropped",
+        field: "stat",
+        detail: `${content.stats.length - kept.length} figure(s) did not fit — the figure strip holds the lead figure plus ${kept.length}.`,
+      });
+    }
   }
 
   if (content.footnote && !target.structure.includes("footnote")) {
@@ -993,6 +1090,7 @@ export function applySelection(source: AdaptContent, sel: AdaptSelection): Adapt
     body: text("body"),
     points: points && points.length ? points : undefined,
     stat,
+    stats: off.has("stat") || !stat ? undefined : source.stats,
     cta: text("cta"),
     footnote: text("footnote"),
     media: off.has("media") ? undefined : source.media,
