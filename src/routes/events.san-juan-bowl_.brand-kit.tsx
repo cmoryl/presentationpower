@@ -13,6 +13,7 @@ import { BRAND } from "@/lib/brand-colors";
 import {
   SJB_BACKGROUNDS,
   SJB_CLEAR_SPACE,
+  SJB_CONSTRUCTION,
   SJB_COLORS,
   SJB_EVENT,
   SJB_LOGOS,
@@ -222,6 +223,101 @@ function MisuseTile({ id, title, detail }: { id: SjbMisuseDemo; title: string; d
   );
 }
 
+function ConstructionDiagram() {
+  const g = SJB_CONSTRUCTION.grid;
+  const cells = Array.from({ length: g - 1 }, (_, i) => ((i + 1) * 100) / g);
+  return (
+    <div className="relative aspect-square w-full overflow-hidden rounded-xl border border-[#03002C]/10 bg-white">
+      <img
+        src={SJB_LOGOS[0].svg}
+        alt="San Juan Bowl badge on its construction grid"
+        className="absolute inset-0 h-full w-full object-contain"
+      />
+      <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden="true">
+        {cells.map((p) => (
+          <line key={`v${p}`} x1={p} y1={0} x2={p} y2={100} stroke="#003FC7" strokeWidth={0.18} opacity={0.22} />
+        ))}
+        {cells.map((p) => (
+          <line key={`h${p}`} x1={0} y1={p} x2={100} y2={p} stroke="#003FC7" strokeWidth={0.18} opacity={0.22} />
+        ))}
+        {/* centre axes */}
+        <line x1={50} y1={0} x2={50} y2={100} stroke="#003FC7" strokeWidth={0.4} strokeDasharray="2 1.4" />
+        <line x1={0} y1={50} x2={100} y2={50} stroke="#003FC7" strokeWidth={0.4} strokeDasharray="2 1.4" />
+        {/* banner unit bar, top left */}
+        <line x1={4} y1={6} x2={4} y2={6 + SJB_CLEAR_SPACE.bannerPctOfBadge} stroke="#E53D2E" strokeWidth={0.7} />
+        <line x1={3} y1={6} x2={5} y2={6} stroke="#E53D2E" strokeWidth={0.7} />
+        <line x1={3} y1={6 + SJB_CLEAR_SPACE.bannerPctOfBadge} x2={5} y2={6 + SJB_CLEAR_SPACE.bannerPctOfBadge} stroke="#E53D2E" strokeWidth={0.7} />
+        <text x={6.5} y={6 + SJB_CLEAR_SPACE.bannerPctOfBadge / 2 + 1.2} fontSize={3.2} fill="#E53D2E" fontWeight={700}>
+          1x
+        </text>
+        {/* width dimension, bottom */}
+        <line x1={2.7} y1={97.2} x2={97.3} y2={97.2} stroke="#03002C" strokeWidth={0.45} />
+        <line x1={2.7} y1={96.2} x2={2.7} y2={98.2} stroke="#03002C" strokeWidth={0.45} />
+        <line x1={97.3} y1={96.2} x2={97.3} y2={98.2} stroke="#03002C" strokeWidth={0.45} />
+        <text x={50} y={95.4} fontSize={3.2} fill="#03002C" fontWeight={700} textAnchor="middle">
+          {SJB_CONSTRUCTION.badge.w}x
+        </text>
+        {/* height dimension, right */}
+        <line x1={99.2} y1={3.7} x2={99.2} y2={96.3} stroke="#03002C" strokeWidth={0.45} />
+        <line x1={98.2} y1={3.7} x2={100} y2={3.7} stroke="#03002C" strokeWidth={0.45} />
+        <line x1={98.2} y1={96.3} x2={100} y2={96.3} stroke="#03002C" strokeWidth={0.45} />
+        <text x={97.6} y={50} fontSize={3.2} fill="#03002C" fontWeight={700} textAnchor="middle" transform="rotate(-90 97.6 50)">
+          {SJB_CONSTRUCTION.badge.h}x
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+function ConstructionSection() {
+  const c = SJB_CONSTRUCTION;
+  const rows = [
+    { el: "Badge width", x: `${c.badge.w}x`, pct: "100%" },
+    { el: "Badge height", x: `${c.badge.h}x`, pct: "98.6% of width" },
+    { el: "Yellow banner", x: `${c.banner.w}x × 1x`, pct: `${SJB_CLEAR_SPACE.bannerPctOfBadge}% of badge height` },
+    { el: "Clear space", x: `${c.clearSpace}x per side`, pct: "Scales with the badge" },
+    { el: "Minimum footprint", x: `${c.footprint.w}x × ${c.footprint.h}x`, pct: "Badge + clear space" },
+    { el: "Artboard padding", x: `${c.canvasPadPct.x}% / ${c.canvasPadPct.y}%`, pct: "Horizontal / vertical, inside the supplied file" },
+  ];
+  return (
+    <div className={`${card} space-y-4`}>
+      <h3 className="text-[15px] font-bold">Construction &amp; measurements</h3>
+      <p className="text-[13px] text-[#03002C]/80">
+        Every distance is measured from the supplied artwork and expressed in <strong>x</strong>, where{" "}
+        <strong>{c.unit}</strong>. Use these ratios to size, space and align the badge at any scale.
+      </p>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ConstructionDiagram />
+        <div className="space-y-3">
+          <table className="w-full text-left text-[13px]">
+            <thead>
+              <tr className="border-b border-[#03002C]/15 text-[11px] uppercase tracking-wide text-[#666666]">
+                <th className="py-1.5 pr-3 font-semibold">Element</th>
+                <th className="py-1.5 pr-3 font-semibold">x-units</th>
+                <th className="py-1.5 font-semibold">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.el} className="border-b border-[#03002C]/8">
+                  <td className="py-1.5 pr-3 font-semibold">{r.el}</td>
+                  <td className="py-1.5 pr-3 font-mono text-[12px]">{r.x}</td>
+                  <td className="py-1.5 text-[12px] text-[#666666]">{r.pct}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <ul className="list-disc space-y-1 pl-5 text-[12px] text-[#03002C]/80">
+            <li>{c.centerNote}</li>
+            <li>{c.scaleNote}</li>
+            <li>The supplied file is a square artboard; keep that square intact when placing the artwork.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SjbBrandKit() {
   return (
     <AppShell>
@@ -260,6 +356,8 @@ function SjbBrandKit() {
             <ClearSpaceDiagram />
             <MinSizeCard />
           </div>
+
+          <ConstructionSection />
 
           <div className={`${card} space-y-3`}>
             <h3 className="text-[15px] font-bold">Approved backgrounds</h3>
