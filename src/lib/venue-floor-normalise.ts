@@ -18,6 +18,10 @@ function invert(hex: string | undefined): string | undefined {
   if (!hex) return hex;
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
   if (!m) return hex;
+  // Any dark wall ink is a wall, whatever grey the venue drew it in — flipped
+  // to pure white so every floor reads its walls the same way in styled looks.
+  const l = lum(hex);
+  if (l != null && l < 0.35) return "#FFFFFF";
   const n = 0xffffff - parseInt(m[1]!, 16);
   return `#${n.toString(16).padStart(6, "0").toUpperCase()}`;
 }
