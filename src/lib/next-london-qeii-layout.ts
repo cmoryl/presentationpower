@@ -247,7 +247,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
     // A live correction replaces the printed name and the line beneath it; the
     // schedule is still read against the name the venue issued.
     const edit = qeiiRoomEdit(options.edits, room);
-    const lines = edit?.name ? [edit.name] : issuedLines;
+    const lines = edit?.name ? edit.name.split("\n") : issuedLines;
     const angle = edit?.angle ?? group.angle;
     const issuedUse = options.showUse ? spaceUseLine(room, floor.id) : undefined;
     // A hand-picked lockup set replaces the schedule's own reading, including an
