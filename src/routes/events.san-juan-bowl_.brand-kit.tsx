@@ -6,13 +6,14 @@
 
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Ban, Check, Download } from "lucide-react";
+import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { BRAND } from "@/lib/brand-colors";
 import {
   SJB_BACKGROUNDS,
   SJB_CLEAR_SPACE,
+  SJB_COLOR_NOTES,
   SJB_CONSTRUCTION,
   SJB_COLORS,
   SJB_EVENT,
@@ -318,6 +319,29 @@ function ConstructionSection() {
   );
 }
 
+function CopyCode({ value, label }: { value: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      aria-label={`Copy ${label} value ${value}`}
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(value);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500);
+        } catch {
+          /* clipboard unavailable — value stays visible for manual copy */
+        }
+      }}
+      className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/20 px-2 py-0.5 text-[11px] font-semibold text-[#03002C]/70 hover:bg-[#F2F2F2]"
+    >
+      {copied ? <Check className="h-3 w-3 text-[#003FC7]" /> : <Copy className="h-3 w-3" />}
+      {copied ? "Copied" : "Copy"}
+    </button>
+  );
+}
+
 function SjbBrandKit() {
   return (
     <AppShell>
@@ -425,20 +449,65 @@ function SjbBrandKit() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-[17px] font-bold">Event palette</h2>
+          <h2 className="text-[17px] font-bold">Logo palette — print &amp; web codes</h2>
           <p className="text-[13px] text-[#666666]">
             Read from the supplied artwork. These are for San Juan Bowl material; everything else stays on the
-            TransPerfect enterprise palette.
+            TransPerfect enterprise palette. Click any code to copy it.
           </p>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             {SJB_COLORS.map((c) => (
-              <div key={c.id} className={`${card} space-y-2`}>
-                <div className="h-16 rounded-lg border border-[#03002C]/10" style={{ background: c.hex }} />
-                <div className="text-[14px] font-bold">{c.name}</div>
-                <div className="font-mono text-[12px] text-[#666666]">{c.hex}</div>
-                <p className="text-[12px] text-[#03002C]/70">{c.role}</p>
+              <div key={c.id} className={`${card} space-y-3`}>
+                <div
+                  className="flex h-20 items-end rounded-lg border border-[#03002C]/10 p-2"
+                  style={{ background: c.hex }}
+                >
+                  <span
+                    className="rounded px-1.5 py-0.5 text-[11px] font-bold"
+                    style={{
+                      background: c.id === "navy" ? "#FFFFFF" : "#0D0E21",
+                      color: c.id === "navy" ? "#0D0E21" : "#FFFFFF",
+                    }}
+                  >
+                    Text on this colour: {c.textOn}
+                  </span>
+                </div>
+                <div>
+                  <div className="text-[15px] font-bold">{c.name}</div>
+                  <p className="text-[12px] text-[#03002C]/70">{c.role}</p>
+                </div>
+                <table className="w-full text-left text-[12px]">
+                  <tbody>
+                    {(
+                      [
+                        ["HEX", c.hex],
+                        ["RGB", c.rgb],
+                        ["HSL", c.hsl],
+                        ["CMYK", c.cmyk],
+                        ["Pantone", "Vendor-matched"],
+                      ] as const
+                    ).map(([label, value]) => (
+                      <tr key={label} className="border-t border-[#03002C]/8">
+                        <td className="w-20 py-1.5 pr-2 text-[11px] font-semibold uppercase tracking-wide text-[#666666]">
+                          {label}
+                        </td>
+                        <td className="py-1.5 font-mono text-[12px]">{value}</td>
+                        <td className="py-1.5 text-right">
+                          {label !== "Pantone" && <CopyCode value={value} label={`${c.name} ${label}`} />}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             ))}
+          </div>
+          <div className={`${card} space-y-1.5`}>
+            <h3 className="text-[14px] font-bold">Before you print</h3>
+            <ul className="list-disc space-y-1 pl-5 text-[13px] text-[#03002C]/80">
+              {SJB_COLOR_NOTES.map((n) => (
+                <li key={n}>{n}</li>
+              ))}
+            </ul>
           </div>
         </section>
 
