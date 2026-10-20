@@ -449,7 +449,7 @@ export function PillarStudio({
       a.href = url;
       a.download = result.filename;
       a.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
       toast.success("Pillar package downloaded", {
         id,
         description: `PDF + .ai + editable vector ground + proof · plate ${result.plate.width}×${result.plate.height}px at ${result.plate.ppi} ppi`,
@@ -470,7 +470,7 @@ export function PillarStudio({
     a.href = url;
     a.download = name;
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
   };
 
   const batchItems: PillarBatchItem[] = Object.entries(batch)
@@ -606,7 +606,7 @@ export function PillarStudio({
       a.href = url;
       a.download = result.filename;
       a.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
       toast.success("Batch package downloaded", {
         id,
         description: `${result.entries.length} size${result.entries.length === 1 ? "" : "s"} · ${result.totalQuantity} panels · layered PDF + .ai per size + production manifest`,

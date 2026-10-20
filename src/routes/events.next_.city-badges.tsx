@@ -129,7 +129,7 @@ function CityBadgePage() {
       a.href = url;
       a.download = result.filename;
       a.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
       toast.success("Print package downloaded", {
         id,
         description: `PDF + .ai + proof · plate ${result.plate.width}×${result.plate.height}px at ${result.plate.dpi} ppi`,

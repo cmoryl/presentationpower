@@ -460,7 +460,7 @@ export function AgendaStudio({
       a.href = url;
       a.download = result.filename;
       a.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
       toast.success("Agenda package downloaded", {
         id,
         description: `Layered ${AGENDA_SPEC.exportPreset} · ${result.pageCount} page${result.pageCount === 1 ? "" : "s"} · ${result.layers.length} layers · ${(result.pdfBytes / 1024).toFixed(0)} KB PDF`,
@@ -482,7 +482,7 @@ export function AgendaStudio({
       a.href = url;
       a.download = `next-agenda-${agendaSlug(config)}.docx`;
       a.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
       toast.success("Word file downloaded", { id, description: notes[0] });
     } catch (e) {
       toast.error("Word export failed", { id, description: (e as Error).message });
@@ -515,7 +515,7 @@ export function AgendaStudio({
       a.href = url;
       a.download = result.filename;
       a.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
       const missing = result.entries.filter((e) => e.problems.length);
       if (missing.length) {
         toast.warning("Master pack downloaded with gaps", {
@@ -548,7 +548,7 @@ export function AgendaStudio({
       a.href = url;
       a.download = filename;
       a.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
       toast.success("PowerPoint deck downloaded", { id, description: notes[notes.length - 1] });
     } catch (e) {
       toast.error("PowerPoint export failed", { id, description: (e as Error).message });

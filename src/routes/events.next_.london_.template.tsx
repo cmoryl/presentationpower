@@ -272,7 +272,7 @@ function LondonTemplatePage() {
         link.href = url;
         link.download = `${base}.${kind}`;
         link.click();
-        URL.revokeObjectURL(url);
+        setTimeout(() => URL.revokeObjectURL(url), 30_000);
         toast.success(`${base}.${kind} downloaded · ${colorSpace.toUpperCase()}`);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Download blocked by QA");
@@ -347,7 +347,7 @@ function LondonTemplatePage() {
         colorSpace === "cmyk" ? "-cmyk" : ""
       }.zip`;
       link.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
       if (pack.skipped.length) {
         toast.warning(
           `${pack.files.length} files packed · ${pack.skipped.length} sign(s) failed the print check and were left out — see SKIPPED.txt`,

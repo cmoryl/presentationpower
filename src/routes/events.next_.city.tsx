@@ -111,7 +111,7 @@ function NextCityPage() {
     a.href = url;
     a.download = `next-${(brief.city || "city").toLowerCase().replace(/[^a-z0-9]+/g, "-")}-sign-schedule.csv`;
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
   };
 
   return (

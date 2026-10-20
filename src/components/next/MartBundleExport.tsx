@@ -40,7 +40,7 @@ export function MartBundleExport({ stop }: { stop?: MartStop }) {
       a.href = url;
       a.download = res.filename;
       a.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
       setEntries(res.entries);
       toast.success(`Bundle ready · ${res.entries.length} sets · ${res.totalPanels} panels`, {
         id,

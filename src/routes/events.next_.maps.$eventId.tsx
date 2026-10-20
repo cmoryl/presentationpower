@@ -216,8 +216,10 @@ function MapsPage() {
     const a = document.createElement("a");
     a.href = url;
     a.download = `rdraft-${eventId}-${current.floor_key}-${face}.svg`;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
   }
 
   const paint = (room: string) => {
