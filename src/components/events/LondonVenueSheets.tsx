@@ -540,7 +540,7 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
         const directoryName = qeiiDirectoryFilename(face, directoryGround);
         zip.file(
           `01-${directoryName}`,
-          qeiiDirectorySvg({ face, showMarks, groundId: directoryGround }),
+          await selfContainedSvg(qeiiDirectorySvg({ face, showMarks, groundId: directoryGround })),
         );
         for (const sheet of LONDON_EVENT_SHEETS) {
           const state = qeiiPlanState(sheet.id);

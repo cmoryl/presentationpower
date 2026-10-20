@@ -9,6 +9,7 @@
 // page and in the file name.
 
 import { NEXT_APP_ORIGIN } from "@/lib/next-event";
+import { selfContainedSvg } from "@/lib/export-self-contained-svg";
 import type { QeiiPlanFace } from "@/lib/next-london-qeii-plan";
 
 export type QeiiPdfPage = {
@@ -194,7 +195,6 @@ export async function exportQeiiFloorsPdf(
   const { jsPDF } = await import("jspdf");
   const skipped: QeiiPdfResult["skipped"] = [];
   const warnings: string[] = [];
-  const cache = new Map<string, string | null>();
   let doc: import("jspdf").jsPDF | undefined;
   let drawn = 0;
 
@@ -202,13 +202,7 @@ export async function exportQeiiFloorsPdf(
     let art: { dataUrl: string; w: number; h: number };
     try {
       if (page.svg) {
-        const inlined = await inlineSvgImages(page.svg, cache);
-        if (inlined.dropped.length) {
-          warnings.push(
-            `${page.title}: ${inlined.dropped.length} division lockup${inlined.dropped.length === 1 ? "" : "s"} could not be embedded, so ${inlined.dropped.length === 1 ? "it is" : "they are"} not on this page.`,
-          );
-        }
-        art = await qeiiRasteriseSvg(inlined.svg);
+        art = await qeiiRasteriseSvg(await selfContainedSvg(page.svg));
       } else if (page.imageUrl) {
         art = await loadRaster(page.imageUrl);
       } else {
@@ -216,11 +210,7 @@ export async function exportQeiiFloorsPdf(
         continue;
       }
     } catch (err) {
-      skipped.push({
-        title: page.title,
-        reason: err instanceof Error ? err.message : "The artwork could not be read.",
-      });
-      continue;
+      throw new Error(`${page.title}: PDF not downloaded — ${err instanceof Error ? err.message : "The artwork could not be read."}`);
     }
 
     const landscape = art.w > art.h;
