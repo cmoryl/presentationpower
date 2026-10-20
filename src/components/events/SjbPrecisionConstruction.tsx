@@ -67,7 +67,7 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
       <h4 className="mt-6 text-base font-semibold">Inside layer 2: badge and scene elements</h4>
       <p className="mt-1 text-sm text-muted-foreground">The composite scene separated by its original shapes. Each file keeps only that element's paths at their source position, so the files stack back into the exact badge.</p>
       <div className="mt-3 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">{SJB_SCENE_ELEMENTS.map((e, n) => <article key={e.id} className="min-w-0 rounded-md border border-border">
-        <div className={`aspect-square p-3 ${e.id === "base" || e.id === "scene-bird" || e.id === "banner" ? "bg-muted" : "bg-foreground"}`}><CroppedSvg url={e.url} label={e.name} over={e.id === "banner" ? SJB_SCENE_ELEMENTS.find(x => x.id === "base")?.url : undefined} /></div>
+        <div className={`aspect-square p-3 ${e.id === "base" || e.id === "scene-bird" || e.id === "banner" ? "bg-muted" : "bg-foreground"}`}><CroppedSvg url={e.url} label={e.name} /></div>
         <div className="space-y-1 p-3"><h5 className="text-sm font-semibold">2.{n + 1} {e.name}</h5><p className="text-xs text-muted-foreground">{e.detail}</p><p className="font-mono text-[11px] text-muted-foreground">{e.paths.length} paths</p>
         <Button asChild size="sm" variant="outline"><a href={e.url} download><Download />SVG</a></Button></div>
       </article>)}</div>
