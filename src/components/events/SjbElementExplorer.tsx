@@ -31,7 +31,7 @@ export function SjbElementExplorer({ className }: SjbElementExplorerProps) {
       .then(setSvg).catch(e => setErr(`Logo file could not be loaded (${e.message}).`));
   }, []);
 
-  const paths = () => Array.from(host.current?.querySelectorAll<SVGGraphicsElement>("svg path") ?? []);
+  const paths = () => Array.from(host.current?.querySelectorAll<SVGGraphicsElement>("svg path, svg polygon, svg polyline") ?? []);
   const layerOf = (p: Element, root: Element) => { let n: Element = p; while (n.parentElement && n.parentElement !== root) n = n.parentElement; return Array.from(root.children).filter(c => c.tagName !== "defs").indexOf(n); };
 
   useEffect(() => {
@@ -87,7 +87,7 @@ export function SjbElementExplorer({ className }: SjbElementExplorerProps) {
   const exportStudy = () => {
     const root = host.current?.querySelector("svg"); if (!root) return;
     const clone = root.cloneNode(true) as SVGSVGElement;
-    clone.querySelectorAll<SVGElement>("path").forEach(p => { p.style.stroke = ""; p.style.strokeWidth = ""; p.style.opacity = ""; p.style.cursor = ""; p.removeAttribute("data-i"); });
+    clone.querySelectorAll<SVGElement>("path, polygon, polyline").forEach(p => { p.style.stroke = ""; p.style.strokeWidth = ""; p.style.opacity = ""; p.style.cursor = ""; p.removeAttribute("data-i"); });
     clone.insertBefore(document.createComment(" STUDY ONLY — modified from the supplied San Juan Bowl master. Not approved artwork. "), clone.firstChild);
     const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(clone)], { type: "image/svg+xml" }));
     const a = document.createElement("a"); a.href = url; a.download = "san-juan-bowl-logo-STUDY-not-approved.svg"; a.click();
@@ -107,8 +107,8 @@ export function SjbElementExplorer({ className }: SjbElementExplorerProps) {
     <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_300px]">
       <div className="space-y-3 min-w-0">
         <div ref={host} tabIndex={0} onKeyDown={onKey} aria-label="Logo element explorer. Click a shape to select it."
-          onClick={e => { const p = (e.target as Element).closest("path") as SVGElement | null; setSel(p?.dataset.i ? Number(p.dataset.i) : null); }}
-          onMouseOver={e => { const p = (e.target as Element).closest("path") as SVGElement | null; setHover(p?.dataset.i ? Number(p.dataset.i) : null); }}
+          onClick={e => { const p = (e.target as Element).closest("path, polygon, polyline") as SVGElement | null; setSel(p?.dataset.i ? Number(p.dataset.i) : null); }}
+          onMouseOver={e => { const p = (e.target as Element).closest("path, polygon, polyline") as SVGElement | null; setHover(p?.dataset.i ? Number(p.dataset.i) : null); }}
           onMouseLeave={() => setHover(null)}
           className="overflow-hidden rounded-md border border-border bg-muted p-6 outline-none focus-visible:ring-2 focus-visible:ring-ring"
           dangerouslySetInnerHTML={svg ? { __html: svg } : undefined} />

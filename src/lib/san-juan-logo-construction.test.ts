@@ -3,7 +3,7 @@ import { SJB_COMPONENTS, SJB_MEASUREMENTS, sjbProductionSize } from "./san-juan-
 
 it("preserves every original path across the six source layers", () => {
   expect(SJB_COMPONENTS).toHaveLength(6);
-  expect(SJB_COMPONENTS.reduce((sum,p) => sum+p.paths,0)).toBe(218);
+  expect(SJB_COMPONENTS.reduce((sum,p) => sum+p.paths,0)).toBe(293);
   expect(SJB_COMPONENTS.map(p => p.order)).toEqual([1,2,3,4,5,6]);
 });
 it("scales from badge bounds rather than the square artboard", () => {
@@ -15,11 +15,11 @@ it("scales from badge bounds rather than the square artboard", () => {
 });
 import { SJB_SCENE_ELEMENTS } from "./san-juan-logo-construction";
 describe("scene elements", () => {
-  it("cover all 89 scene paths exactly once", () => {
+  it("cover all 109 scene shapes exactly once", () => {
     const all = SJB_SCENE_ELEMENTS.flatMap(e => [...e.paths]);
-    expect(all.length).toBe(89);
-    expect(new Set(all).size).toBe(89);
-    expect(Math.min(...all)).toBe(30);
-    expect(Math.max(...all)).toBe(118);
+    expect(all.length).toBe(109);
+    expect(new Set(all).size).toBe(109);
+    expect(Math.min(...all)).toBe(34);
+    expect(Math.max(...all)).toBe(142);
   });
 });
