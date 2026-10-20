@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Download, RotateCcw } from "lucide-react";
 import { Button } from "@/design-system/element";
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
-import { SJB_COMPONENTS } from "@/lib/san-juan-logo-construction";
+import { SJB_COMPONENTS, SJB_SCENE_ELEMENT_OF } from "@/lib/san-juan-logo-construction";
 
 /** Every original path in the supplied colour master, selectable and adjustable as a study. */
 interface PathMeta { i: number; layer: number; colour: string; x: number; y: number; w: number; h: number }
@@ -65,7 +65,7 @@ export function SjbElementExplorer({ className }: SjbElementExplorerProps) {
 
   const tree = useMemo(() => {
     const out = new Map<number, Map<string, PathMeta[]>>();
-    meta.forEach(m => { const l = out.get(m.layer) ?? new Map(); l.set(m.colour, [...(l.get(m.colour) ?? []), m]); out.set(m.layer, l); });
+    meta.forEach(m => { const l = out.get(m.layer) ?? new Map(); const k = SJB_SCENE_ELEMENT_OF[m.i] ?? m.colour; l.set(k, [...(l.get(k) ?? []), m]); out.set(m.layer, l); });
     return [...out.entries()].sort((a, b) => a[0] - b[0]);
   }, [meta]);
 
@@ -118,7 +118,7 @@ export function SjbElementExplorer({ className }: SjbElementExplorerProps) {
       <div className="space-y-4 text-sm">
         {cur ? <div className="space-y-3 rounded-md border border-border p-3">
           <div><p className="font-medium">Shape #{cur.i + 1}</p>
-            <p className="text-muted-foreground">{layerName(cur.layer)} · {cur.colour}</p>
+            <p className="text-muted-foreground">{layerName(cur.layer)}{SJB_SCENE_ELEMENT_OF[cur.i] ? ` › ${SJB_SCENE_ELEMENT_OF[cur.i]}` : ""} · {cur.colour}</p>
             <p className="font-mono text-xs text-muted-foreground">x {cur.x.toFixed(1)} · y {cur.y.toFixed(1)} · {cur.w.toFixed(1)} × {cur.h.toFixed(1)} u</p></div>
           <div className="flex flex-wrap gap-2">
             <Button size="sm" variant={ed.hidden ? "default" : "outline"} aria-pressed={!!ed.hidden} onClick={() => set({ hidden: !ed.hidden })}>{ed.hidden ? "Show" : "Hide"}</Button>

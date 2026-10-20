@@ -3,7 +3,7 @@ import { Download } from "lucide-react";
 import { Button } from "@/design-system/element";
 import { SjbElementExplorer } from "./SjbElementExplorer";
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
-import { SJB_COMPONENTS, SJB_COMPONENT_PACK, SJB_MEASUREMENTS as m, sjbProductionSize } from "@/lib/san-juan-logo-construction";
+import { SJB_COMPONENTS, SJB_SCENE_ELEMENTS, SJB_COMPONENT_PACK, SJB_MEASUREMENTS as m, sjbProductionSize } from "@/lib/san-juan-logo-construction";
 
 export interface SjbPrecisionConstructionProps { className?: string }
 
@@ -68,7 +68,8 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
 }
 
 function ExplodedView() {
-  const layers = SJB_COMPONENTS.filter(p => p.id !== "white-underlay");
+  const layers = SJB_COMPONENTS.filter(p => p.id !== "white-underlay").flatMap(p => p.id !== "badge-scene-banner" ? [p] :
+    SJB_SCENE_ELEMENTS.map((e, n) => ({ ...p, id: e.id, name: e.name, url: e.url, order: `${p.order}.${n + 1}` as unknown as number, definition: { role: e.name, detail: e.detail, rule: p.definition?.rule ?? "" } })));
   const [spread, setSpread] = useState(90);
   const [rot, setRot] = useState({ x: 58, z: -38 });
   const [focus, setFocus] = useState<string | null>(null);
@@ -110,11 +111,11 @@ function ExplodedView() {
             const dim = focus && focus !== p.id;
             const lift = focus === p.id && open ? 40 : 0;
             return <div key={p.id} className="absolute inset-0 transition-all duration-500 motion-reduce:transition-none"
-              style={{ transformStyle: "preserve-3d", transform: `translateZ(${i * spread + lift}px)`, opacity: dim ? 0.12 : 1 }}>
+              style={{ transformStyle: "preserve-3d", transform: `translateZ(${i * spread * 0.55 + lift}px)`, opacity: dim ? 0.12 : 1 }}>
               {open ? <div className={`absolute inset-0 rounded-sm border ${focus === p.id ? "border-primary bg-primary/10" : "border-background/25 bg-background/5"}`} /> : null}
               {open && xray ? <div className="absolute border border-dashed border-destructive" style={{ left: `${p.bounds.x / 12.54}%`, top: `${p.bounds.y / 12.54}%`, width: `${p.bounds.w / 12.54}%`, height: `${p.bounds.h / 12.54}%` }} /> : null}
               <img src={p.url} alt="" draggable={false} className="pointer-events-none relative h-full w-full object-contain" style={{ filter: xray ? "grayscale(1) contrast(2) invert(1)" : undefined }} />
-              {open ? <span className="absolute -right-2 top-0 hidden translate-x-full whitespace-nowrap sm:inline font-mono text-[11px] text-background/80">{p.order}. {p.definition?.role ?? p.name} · z{i * spread}</span> : null}
+              {open ? <span className="absolute -right-2 top-0 hidden translate-x-full whitespace-nowrap sm:inline font-mono text-[11px] text-background/80">{p.order}. {p.definition?.role ?? p.name} · z{Math.round(i * spread * 0.55)}</span> : null}
             </div>;
           })}
         </div>
