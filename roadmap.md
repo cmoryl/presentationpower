@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Embed logos in map SVG downloads and verify downloaded files contain no external image links.
+- [x] Embed logos in map SVG downloads; all four SF floor downloads contain vector logos with no external image links and render offline. Illustrator itself is unavailable for verification.
 
 - [x] 1. Access lockdown: deny-by-default sign-in wall, @transperfect.com sign-up trigger, buckets private, signed-out probe
 - [x] 2. Compliance check: banned words + unsourced figures check, "Needs source" admin page
