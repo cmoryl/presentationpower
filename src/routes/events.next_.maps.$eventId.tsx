@@ -364,7 +364,7 @@ function MapsPage() {
               <section className="space-y-3 border-b border-border pb-4">
                 <h2 className="text-[15px] font-bold">Map text</h2>
                 <label className="block text-sm">Label
-                  <select className={field} value={labelRoom} onChange={(e) => setSelectedLabel(e.target.value)}>
+                  <select aria-label="Map label" className={field} value={labelRoom} onChange={(e) => setSelectedLabel(e.target.value)}>
                     {labelLayout?.blocks.map((b) => <option key={b.key} value={b.room}>{b.room}</option>)}
                   </select>
                 </label>

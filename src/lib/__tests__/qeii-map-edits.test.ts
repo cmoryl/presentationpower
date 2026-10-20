@@ -12,6 +12,22 @@ import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { qeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 
 describe("live map edits", () => {
+  it("preserves label resizing and rotation through saved edits", () => {
+    const edits = sanitizeQeiiMapEdits({ rooms: { "Telegraph Hill": { scale: 0.8, angle: 90 } } });
+    expect(edits.rooms['telegraph hill']).toEqual({ scale: 0.8, angle: 90 });
+  });
+
+  it("constrains the complete rotated label after a nudge", () => {
+    const floor = { id: "san-francisco:level-4", marker: "4", title: "Level 4", page: 1, kind: "vector" as const, w: 200, h: 150, shapes: [], labels: [{ text: "Telegraph Hill", x: 4, y: 75, size: 12 }] };
+    const edits = sanitizeQeiiMapEdits({ rooms: { "Telegraph Hill": { scale: 0.8, angle: 90, dx: -400 } } });
+    const block = qeiiPlanLayout(floor, { edits }).blocks[0];
+    expect(block?.angle).toBe(90);
+    expect(block?.box.x0).toBeGreaterThanOrEqual(2);
+    expect(block?.box.x1).toBeLessThanOrEqual(198);
+    expect(block?.box.y0).toBeGreaterThanOrEqual(2);
+    expect(block?.box.y1).toBeLessThanOrEqual(148);
+  });
+
   it("keeps only recognised corrections", () => {
     const edits = sanitizeQeiiMapEdits({
       rooms: { Brunel: { name: "War Room", use: "Registration", dx: 4, dy: -2, junk: 1 } },
