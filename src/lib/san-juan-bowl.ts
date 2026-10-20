@@ -60,12 +60,40 @@ export const SJB_LOGO_ANATOMY = [
 
 /**
  * Clear space = the height of the yellow banner on every side.
- * `unitPct` is the banner height as a share of badge height, used to draw
- * the diagram; measured from the supplied SVG.
+ * `unitPct` is the banner height as a share of the diagram container
+ * (badge + ring), used to draw the diagram; measured from the supplied SVG.
  */
 export const SJB_CLEAR_SPACE = {
   rule: "Keep clear space around the badge of at least the height of the yellow banner on every side.",
   unitPct: 12,
+  /** Banner height as a share of badge height, measured from the artwork. */
+  bannerPctOfBadge: 14.8,
+} as const;
+
+/**
+ * Construction geometry, measured from the supplied SVG (viewBox 0 0 1254
+ * 1254, Adobe Illustrator 29.8.11 export). All distances are expressed in x,
+ * where x = the height of the yellow banner (171.7 artwork units).
+ *
+ *   badge  1186.7 × 1161.7  →  6.9x × 6.8x
+ *   banner 1128.6 ×  171.7  →  6.6x × 1x
+ *   artboard padding 33.7 / 46.1 units → 2.7% / 3.7% of the square file
+ *   badge centre x = 627.05 = exactly half of the 1254-wide artboard
+ */
+export const SJB_CONSTRUCTION = {
+  unit: "x = the height of the yellow banner",
+  grid: 12,
+  badge: { w: 6.9, h: 6.8 },
+  banner: { w: 6.6, h: 1 },
+  clearSpace: 1,
+  /** Smallest footprint the badge may occupy: badge + 1x clear space per side. */
+  footprint: { w: 8.9, h: 8.8 },
+  /** Empty padding inside the supplied square file, per side. */
+  canvasPadPct: { x: 2.7, y: 3.7 },
+  centerNote:
+    "The badge is exactly centred on the vertical axis of its square artboard — always align it on centre, never optically.",
+  scaleNote:
+    "Every distance scales linearly with the badge. At the 25 mm print minimum, x = 3.7 mm and clear space is 3.7 mm per side.",
 } as const;
 
 /** Smallest sizes the badge may reproduce at before detail is lost. */
