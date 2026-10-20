@@ -73,9 +73,9 @@ function LogoVariantCard({ logo }: { logo: (typeof SJB_LOGOS)[number] }) {
       >
         <img src={logo.svg} alt={`${SJB_EVENT.name} logo — ${logo.label}`} className="max-h-full max-w-full object-contain" />
       </div>
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[13px] font-semibold">{logo.label}</p>
-        <div className="flex items-center gap-1" role="group" aria-label="Preview background">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="min-w-0 text-[13px] font-semibold">{logo.label}</p>
+        <div className="flex shrink-0 items-center gap-1" role="group" aria-label="Preview background">
           {PREVIEW_BGS.map((b) => (
             <button
               key={b.hex}
