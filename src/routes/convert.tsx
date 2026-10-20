@@ -12,7 +12,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { listMyCloudDecks, loadCloudDeck } from "@/lib/cloud-decks.functions";
 import { useSessionUser } from "@/hooks/use-session-user";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { cascadePiece, cascadePieces, contentBricks, type ContentBrick, contentFromLibraryPiece, deckSnapshotFromPiece } from "@/lib/print-cascade";
 import { z } from "zod";
 import { syncCopyFromOriginal, type OriginalLayout } from "@/lib/print-library/original-layout";
@@ -213,6 +213,10 @@ function ConvertPage() {
     }
     if (file.size > CONVERT_UPLOAD_MAX_BYTES) {
       setUpload({ status: "error", name: file.name, message: `That file is ${Math.round(file.size / 1024 / 1024)} MB — the limit is 20 MB. Export a smaller version and try again.` });
+      return;
+    }
+    if (kind !== "svg" && !userId) {
+      setUpload({ status: "error", name: file.name, message: "Sign in first — reading Illustrator, PDF and Office files needs your account." });
       return;
     }
     setUpload({ status: "reading", name: file.name });
@@ -499,6 +503,21 @@ function ConvertPage() {
             ) : null}
             {sourceKind === "upload" ? (
               <div className="space-y-2">
+                {userId === undefined ? (
+                  <div className="rounded-lg border border-dashed border-[var(--tp-blue)] bg-[var(--tp-surface)] p-4 text-center">
+                    <span className="block text-[13px] font-semibold text-[var(--tp-ink)]">Checking your sign-in…</span>
+                  </div>
+                ) : userId === null ? (
+                  <div className="rounded-lg border border-dashed border-[var(--tp-blue)] bg-[var(--tp-surface)] p-4 text-center">
+                    <span className="block text-[13px] font-semibold text-[var(--tp-ink)]">Sign in to upload artwork files</span>
+                    <span className="mt-1 block text-[11.5px] leading-snug text-[var(--tp-dark-gray)]">
+                      Reading Illustrator, PDF and Office files needs your account.
+                    </span>
+                    <Link to="/auth" className="mt-2 inline-block rounded-md bg-[var(--tp-blue)] px-3 py-1.5 text-[12.5px] font-semibold text-white hover:opacity-90">
+                      Sign in
+                    </Link>
+                  </div>
+                ) : (
                 <label
                   htmlFor="convert-upload"
                   className="block cursor-pointer rounded-lg border border-dashed border-[var(--tp-blue)] bg-[var(--tp-surface)] p-4 text-center hover:bg-[var(--tp-blue-white)]"
@@ -521,6 +540,7 @@ function ConvertPage() {
                     }}
                   />
                 </label>
+                )}
                 {upload.status === "reading" ? (
                   <p role="status" className="rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-muted)] p-3 text-[12.5px] text-[var(--tp-ink)]">
                     Reading {upload.name} — large files can take up to a minute.
