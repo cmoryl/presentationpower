@@ -24,4 +24,5 @@
 - [x] C2. One token file → generated outputs (scoped by the retired-division-colours rule)
 - [ ] H4 / Quarter items (.potx masters, Office add-in, Canva autofill, C2PA, role-split nav — done) — larger projects
 - [ ] NEXT VIP dinner invitation creation option with logo, location and copy editing — BLOCKED: supplied Canva design requires access; awaiting an uploaded PDF/SVG or access for the connected Canva account.
+- [ ] Import supplied NEXT A5 touchpoint flyers as editable event templates with QR codes, register in NEXT assets, and verify editing/export.
 - [x] H5. GitHub sync — owner connected
