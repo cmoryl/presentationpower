@@ -15,7 +15,7 @@ import { downloadFloorMapSvg, mapPngBlob } from "./next-london-floormap-export";
 import { exportQeiiFloorsPdf } from "./next-london-qeii-pdf";
 
 it("blocks a floor SVG instead of downloading a missing logo", async () => {
-  await expect(downloadFloorMapSvg("G", { panels: [] })).rejects.toThrow("Logo unavailable");
+  await expect(downloadFloorMapSvg("GF", { panels: [] })).rejects.toThrow("Logo unavailable");
   expect(save).not.toHaveBeenCalled();
 });
 
