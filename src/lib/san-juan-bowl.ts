@@ -144,6 +144,32 @@ export const SJB_CONSTRUCTION = {
     "Every distance scales linearly with the badge. At the 25 mm print minimum, x = 3.7 mm and clear space is 3.7 mm per side.",
 } as const;
 
+/**
+ * Large-format reproduction — stadium signage, field application, banners.
+ * x = banner height = badge width / 6.91; clear space = 1x per side.
+ */
+export const SJB_LARGE_FORMAT = {
+  intro:
+    "The badge is built to run from a 25 mm printed card to a 20 m midfield painting. Every rule below is the same construction math from the grid, scaled up — there is no separate 'large' version of the artwork.",
+  /** Scale table: badge width → x (clear space per side) → typical use. */
+  scale: [
+    { width: "1 m (3.3 ft)", x: "14.5 cm", use: "Concourse signage, press backdrops" },
+    { width: "2 m (6.6 ft)", x: "28.9 cm", use: "Stage surrounds, entrance features" },
+    { width: "5 m (16.4 ft)", x: "72.4 cm", use: "Stadium fascia, large banners" },
+    { width: "10 m (32.8 ft)", x: "1.45 m", use: "Building wraps, stand coverings" },
+    { width: "20 m (65.6 ft)", x: "2.89 m", use: "Field application, midfield mark" },
+  ],
+  production: [
+    "Reproduce from the vector master (SVG/PDF) only — never upscale a PNG. The vector file scales to any size with no quality loss.",
+    "Hand the vendor the vector master plus the construction sheet (PDF). The vendor converts it in their own RIP, cutter or stencil workflow — nobody redraws anything.",
+    "Colour at scale is matched physically: the vendor matches spot colours to a Pantone swatch book, or prints the CMYK working builds with a contract proof. Never let a vendor match colour from a screen.",
+    "At stadium viewing distances the fine detail (waves, sun rays, banner lettering) reads as texture — that is expected. The badge is designed to be recognised as a whole from 50 m and beyond.",
+    "For field paint or turf application, the vendor prepares stencils from the vector master. Painted detail narrower than about 5 cm is merged at stencil stage — this is a production simplification, not a redesign.",
+    "On panelled or mesh installations, seams and panel breaks fall at the artboard edge — never through the badge.",
+    "Clear space scales with the badge: at 10 m wide, keep 1.45 m clear on every side.",
+  ],
+} as const;
+
 /** Smallest sizes the badge may reproduce at before detail is lost. */
 export const SJB_MIN_SIZES = [
   { context: "Print", minimum: "25 mm wide", note: "Below this the lettering inside the badge clogs." },

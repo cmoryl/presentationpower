@@ -17,6 +17,7 @@ import {
   SJB_CONSTRUCTION,
   SJB_COLORS,
   SJB_EVENT,
+  SJB_LARGE_FORMAT,
   SJB_LOGOS,
   SJB_LOGO_ANATOMY,
   SJB_MIN_SIZES,
@@ -330,6 +331,43 @@ function ConstructionSection() {
   );
 }
 
+function LargeFormatSection() {
+  const lf = SJB_LARGE_FORMAT;
+  return (
+    <div className={`${card} space-y-4`}>
+      <div>
+        <h3 className="text-[15px] font-bold">Large-format &amp; signage</h3>
+        <p className="mt-1 text-[13px] text-[#03002C]/80">{lf.intro}</p>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <table className="w-full text-left text-[13px]">
+          <thead>
+            <tr className="border-b border-[#03002C]/15 text-[11px] uppercase tracking-wide text-[#666666]">
+              <th className="py-1.5 pr-3 font-semibold">Badge width</th>
+              <th className="py-1.5 pr-3 font-semibold">x (clear space)</th>
+              <th className="py-1.5 font-semibold">Typical use</th>
+            </tr>
+          </thead>
+          <tbody>
+            {lf.scale.map((r) => (
+              <tr key={r.width} className="border-b border-[#03002C]/8">
+                <td className="py-1.5 pr-3 font-semibold">{r.width}</td>
+                <td className="py-1.5 pr-3 font-mono text-[12px]">{r.x}</td>
+                <td className="py-1.5 text-[12px] text-[#666666]">{r.use}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <ul className="list-disc space-y-1.5 pl-5 text-[12px] text-[#03002C]/80">
+          {lf.production.map((p) => (
+            <li key={p}>{p}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 function CopyCode({ value, label }: { value: string; label: string }) {
   const [copied, setCopied] = useState(false);
   return (
@@ -393,6 +431,8 @@ function SjbBrandKit() {
           </div>
 
           <ConstructionSection />
+
+          <LargeFormatSection />
 
           <div className={`${card} space-y-3`}>
             <h3 className="text-[15px] font-bold">Approved backgrounds</h3>
