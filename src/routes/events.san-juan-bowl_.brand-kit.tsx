@@ -23,6 +23,12 @@ import {
   SJB_MIN_SIZES,
   SJB_MISUSE,
   SJB_TYPE_NOTE,
+  SJB_TYPE_SCALE,
+  SJB_TYPE_RULES,
+  SJB_COLOR_PROPORTION,
+  SJB_PAIRINGS,
+  SJB_NAMING,
+  sjbContrast,
   type SjbMisuseDemo,
 } from "@/lib/san-juan-bowl";
 
@@ -562,9 +568,100 @@ function SjbBrandKit() {
           </div>
         </section>
 
-        <section className={`${card} space-y-2`}>
+        <section className="space-y-3">
+          <h2 className="text-[17px] font-bold">Colour balance &amp; readable pairings</h2>
+          <p className="text-[13px] text-[#666666]">
+            A suggested share of each colour in a layout, then every text/background pair checked against web
+            accessibility contrast (AA needs 4.5:1 for body text, 3:1 for large headlines).
+          </p>
+          <div className={`${card} space-y-2`}>
+            <div className="flex h-10 overflow-hidden rounded-lg border border-[#03002C]/10">
+              {SJB_COLOR_PROPORTION.map((p) => {
+                const c = SJB_COLORS.find((x) => x.id === p.id)!;
+                return (
+                  <div key={p.id} style={{ width: `${p.pct}%`, background: c.hex }} title={`${c.name} ${p.pct}%`} />
+                );
+              })}
+            </div>
+            <div className="flex flex-wrap gap-4 text-[12px]">
+              {SJB_COLOR_PROPORTION.map((p) => (
+                <span key={p.id}>
+                  <b>{SJB_COLORS.find((x) => x.id === p.id)!.name}</b> {p.pct}%
+                </span>
+              ))}
+            </div>
+            <p className="text-[12px] text-[#666666]">Guidance only — gold stays the smallest share so it keeps its punch.</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {SJB_PAIRINGS.map((p) => {
+              const fg = SJB_COLORS.find((x) => x.id === p.fg)!;
+              const bg = SJB_COLORS.find((x) => x.id === p.bg)!;
+              const r = sjbContrast(fg.hex, bg.hex);
+              const verdict = r >= 4.5 ? "Any text" : r >= 3 ? "Large headlines only" : "Never for text";
+              return (
+                <div key={`${p.fg}-${p.bg}`} className="overflow-hidden rounded-xl border border-[#03002C]/10">
+                  <div className="px-3 py-4 text-[18px] font-bold" style={{ background: bg.hex, color: fg.hex }}>
+                    Aa Bowl
+                  </div>
+                  <div className="space-y-0.5 px-3 py-2 text-[12px]">
+                    <div className="font-semibold">
+                      {fg.name} on {bg.name}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {r >= 3 ? <Check className="h-3.5 w-3.5 text-[#003FC7]" /> : <Ban className="h-3.5 w-3.5 text-[#E53D2E]" />}
+                      <span className="font-mono">{r.toFixed(1)}:1</span> · {verdict}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="space-y-3">
           <h2 className="text-[17px] font-bold">Typography</h2>
-          <p className="text-[14px] text-[#03002C]/80">{SJB_TYPE_NOTE}</p>
+          <p className="text-[13px] text-[#666666]">{SJB_TYPE_NOTE}</p>
+          <div className={`${card} divide-y divide-[#03002C]/8`}>
+            {SJB_TYPE_SCALE.map((t) => (
+              <div key={t.role} className="grid gap-2 py-3 sm:grid-cols-[1fr_220px]">
+                <div
+                  style={{ fontWeight: t.weight, lineHeight: t.leading, fontSize: `min(${t.web}, 7vw)` }}
+                  className="truncate"
+                >
+                  {t.sample}
+                </div>
+                <dl className="grid grid-cols-2 gap-x-2 text-[11px]">
+                  <dt className="font-semibold uppercase text-[#666666]">{t.role}</dt>
+                  <dd>Geist {t.weight}</dd>
+                  <dt className="text-[#666666]">Web</dt>
+                  <dd className="font-mono">{t.web}</dd>
+                  <dt className="text-[#666666]">Print</dt>
+                  <dd className="font-mono">{t.print}</dd>
+                  <dt className="text-[#666666]">Leading</dt>
+                  <dd className="font-mono">{t.leading}</dd>
+                  <dt className="text-[#666666]">Signage</dt>
+                  <dd>{t.signage}</dd>
+                </dl>
+              </div>
+            ))}
+          </div>
+          <ul className="list-disc space-y-1 pl-5 text-[13px] text-[#03002C]/80">
+            {SJB_TYPE_RULES.map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className={`${card} space-y-2`}>
+          <h2 className="text-[17px] font-bold">Naming the event</h2>
+          <dl className="grid gap-3 sm:grid-cols-3">
+            {SJB_NAMING.map((n) => (
+              <div key={n.label} className="rounded-xl border border-[#03002C]/10 bg-[#F2F2F2]/60 px-3 py-2.5">
+                <dt className="text-[11px] font-semibold uppercase text-[#666666]">{n.label}</dt>
+                <dd className="mt-0.5 text-[13px] font-bold">{n.value}</dd>
+              </div>
+            ))}
+          </dl>
         </section>
 
         <section className={`${card} space-y-2`}>

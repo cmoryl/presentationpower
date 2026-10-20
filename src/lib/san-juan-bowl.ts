@@ -222,3 +222,57 @@ export const SJB_LOGO_RULES = [
 
 export const SJB_TYPE_NOTE =
   "Supporting type is Geist, the TransPerfect house face — Geist Bold for headlines, Geist Regular for body. The lettering inside the badge is part of the artwork and is never retyped.";
+
+/** Supporting type scale (Geist). Sizes are starting points per surface. */
+export const SJB_TYPE_SCALE = [
+  { role: "Display", weight: 700, web: "56 px", print: "48 pt", signage: "Cap height ≥ 1/50 of viewing distance", leading: "100%", sample: "San Juan Bowl" },
+  { role: "Headline", weight: 700, web: "32 px", print: "28 pt", signage: "Cap height ≥ 1/100 of viewing distance", leading: "110%", sample: "Game day in San Juan" },
+  { role: "Subhead", weight: 600, web: "20 px", print: "16 pt", signage: "Secondary lines only", leading: "120%", sample: "Kick-off details to follow" },
+  { role: "Body", weight: 400, web: "16 px", print: "10 pt", signage: "Not used on signage", leading: "140%", sample: "Supporting copy sits in Geist Regular with comfortable leading." },
+  { role: "Label", weight: 600, web: "12 px", print: "7 pt", signage: "Not used on signage", leading: "120%", sample: "GATE · SECTION · ROW" },
+] as const;
+
+export const SJB_TYPE_RULES = [
+  "Geist only — no script, slab or novelty faces, even for a sports or island feel.",
+  "Headlines in Geist Bold, sentence case. Labels may be uppercase with open tracking.",
+  "Never set type inside the badge or on its banner; the badge lettering is artwork.",
+  "Keep type outside the logo's clear space (1x on every side).",
+];
+
+/** Suggested share of colour in a layout — guidance, not a measured rule. */
+export const SJB_COLOR_PROPORTION = [
+  { id: "navy", pct: 60 },
+  { id: "white", pct: 25 },
+  { id: "sky", pct: 10 },
+  { id: "gold", pct: 5 },
+] as const;
+
+/** Text/background pairs to check; ratios are computed, not typed. */
+export const SJB_PAIRINGS = [
+  { fg: "white", bg: "navy" },
+  { fg: "gold", bg: "navy" },
+  { fg: "sky", bg: "navy" },
+  { fg: "navy", bg: "white" },
+  { fg: "navy", bg: "gold" },
+  { fg: "navy", bg: "sky" },
+  { fg: "sky", bg: "white" },
+  { fg: "gold", bg: "white" },
+] as const;
+
+function lum(hex: string) {
+  const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  const l = c.map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * l[0] + 0.7152 * l[1] + 0.0722 * l[2];
+}
+
+/** WCAG 2.x contrast ratio between two hex colours. */
+export function sjbContrast(a: string, b: string) {
+  const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m);
+  return (x + 0.05) / (y + 0.05);
+}
+
+export const SJB_NAMING = [
+  { label: "First mention", value: "TransPerfect San Juan Bowl" },
+  { label: "After first mention", value: "San Juan Bowl" },
+  { label: "Never", value: "SJB, the TP Bowl, San Juan Classic" },
+];
