@@ -1,5 +1,11 @@
 # Event lessons log
 
+### 2026-10-20 — Palm highlights are not complete palm symbols
+**Context:** San Juan Bowl source component previews.
+**What happened:** individual palm groups include white trunk highlights; navy contours belong to the shared badge base, so highlight-only extracts appear incomplete.
+**Rule now:** preserve the white paths, expose every source shape with ink filtering and never promise whole independent symbols from fused contours.
+**Enforced by:** `sjb-shape-extraction.test.ts` and source-shape ZIP verification.
+
 ### 2026-10-20 — Linked logos do not travel with SVGs
 **Context:** downloaded event floor maps opened in Illustrator.
 **What happened:** logos referenced website URLs; Illustrator reported missing images.

@@ -1,5 +1,13 @@
 # Event design decisions
 
+### 2026-10-20 — Source micro extraction and centered orbit
+**Area:** San Juan Bowl dissection.
+**Options tested:** landmark highlight groups versus every source shape; top-anchored CSS layer spread versus a camera orbiting the stack midpoint.
+**Chosen:** keep the original 293 source shapes with individual downloads, source-ink filters and a midpoint-centered Three.js viewer with an enlarged dialog.
+**Why:** removing white palm highlights changes the supplied art; fused navy contours cannot be reconstructed as complete symbols without designer changes. A centered stack stays in view during orbit.
+**Would change if:** the designer supplies independent full palm/landmark symbols.
+**Applies to:** the supplied San Juan Bowl colour master.
+
 ### 2026-10 — San Juan Bowl exact inspection and source layers
 **Area:** logo construction and production components.
 **Options tested:** rounded 12-cell overlay; source-coordinate grid and SVG geometric bounds; original top-level layers versus named landmark groups.

@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Download } from "lucide-react";
 import { Button } from "@/design-system/element";
 import { SjbElementExplorer } from "./SjbElementExplorer";
+import { SjbLayerViewer } from "./SjbLayerViewer";
+import { SjbMicroAssets } from "./SjbMicroAssets";
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
 import { SJB_COMPONENTS, SJB_SCENE_ELEMENTS, SJB_COMPONENT_PACK, SJB_MEASUREMENTS as m, sjbProductionSize } from "@/lib/san-juan-logo-construction";
 
@@ -55,7 +57,8 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
         </div>
       </div>
     </div>
-    <ExplodedView />
+    <SjbLayerViewer />
+    <SjbMicroAssets />
     <SjbElementExplorer />
     <div className="border-t border-border pt-5"><h3 className="text-lg font-semibold">How the supplied logo is assembled</h3>
       <p className="mt-2 text-sm text-muted-foreground">Six original drawing layers, stacked in source order at the same origin and scale. Component files are production references, not approved standalone marks. The fortress, palms, football and banner share one composite scene; separating them into complete symbols would require designer work.</p>
@@ -67,7 +70,7 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
       <h4 className="mt-6 text-base font-semibold">Inside layer 2: badge and scene elements</h4>
       <p className="mt-1 text-sm text-muted-foreground">The composite scene separated by its original shapes. Each file keeps only that element's paths at their source position, so the files stack back into the exact badge.</p>
       <div className="mt-3 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">{SJB_SCENE_ELEMENTS.map((e, n) => <article key={e.id} className="min-w-0 rounded-md border border-border">
-        <div className={`aspect-square p-3 ${e.id === "base" || e.id === "scene-bird" || e.id === "banner" ? "bg-muted" : "bg-foreground"}`}><CroppedSvg url={e.url} label={e.name} /></div>
+        <div className={`aspect-square p-3 ${e.id === "base" || e.id === "scene-bird" || e.id === "banner" || e.id === "fortress" ? "bg-muted" : "bg-foreground"}`}><CroppedSvg url={e.url} label={e.name} /></div>
         <div className="space-y-1 p-3"><h5 className="text-sm font-semibold">2.{n + 1} {e.name}</h5><p className="text-xs text-muted-foreground">{e.detail}</p><p className="font-mono text-[11px] text-muted-foreground">{e.paths.length} shapes</p>
         <Button asChild size="sm" variant="outline"><a href={e.url} download><Download />SVG</a></Button></div>
       </article>)}</div>
@@ -75,83 +78,6 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
   </section>;
 }
 
-function ExplodedView() {
-  const layers = SJB_COMPONENTS.filter(p => p.id !== "white-underlay").flatMap(p => p.id !== "badge-scene-banner" ? [p] :
-    SJB_SCENE_ELEMENTS.map((e, n) => ({ ...p, id: e.id, name: e.name, url: e.url, order: `${p.order}.${n + 1}` as unknown as number, definition: { role: e.name, detail: e.detail, rule: p.definition?.rule ?? "" } })));
-  const [spread, setSpread] = useState(90);
-  const [rot, setRot] = useState({ x: 58, z: -38 });
-  const [focus, setFocus] = useState<string | null>(null);
-  const [xray, setXray] = useState(false);
-  const [drag, setDrag] = useState<{ px: number; py: number; x: number; z: number } | null>(null);
-  const open = spread > 0;
-  const active = layers.find(l => l.id === focus);
-  const presets = { Exploded: { x: 58, z: -38, s: 90 }, Side: { x: 82, z: 0, s: 110 }, Top: { x: 0, z: 0, s: 0 } } as const;
-  const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
-  const onKey = (e: React.KeyboardEvent) => {
-    const d = e.shiftKey ? 10 : 3;
-    if (e.key === "ArrowLeft") setRot(r => ({ ...r, z: r.z - d }));
-    else if (e.key === "ArrowRight") setRot(r => ({ ...r, z: r.z + d }));
-    else if (e.key === "ArrowUp") setRot(r => ({ ...r, x: clamp(r.x - d, 0, 85) }));
-    else if (e.key === "ArrowDown") setRot(r => ({ ...r, x: clamp(r.x + d, 0, 85) }));
-    else return;
-    e.preventDefault();
-  };
-  return <div className="border-t border-border pt-5">
-    <div className="flex flex-wrap items-end justify-between gap-3">
-      <div><h3 className="text-lg font-semibold">Dissected logo</h3>
-        <p className="mt-1 text-sm text-muted-foreground">Drag (or use arrow keys) to orbit. Pick a layer to isolate it. Slide to assemble.</p></div>
-      <div className="flex flex-wrap gap-2">
-        {Object.entries(presets).map(([k, v]) => <Button key={k} size="sm" variant="outline" onClick={() => { setRot({ x: v.x, z: v.z }); setSpread(v.s); }}>{k}</Button>)}
-        <Button size="sm" variant={xray ? "default" : "outline"} aria-pressed={xray} onClick={() => setXray(v => !v)}>X-ray</Button>
-      </div>
-    </div>
-    <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_240px]">
-      <div tabIndex={0} role="application" aria-label="Rotatable dissected logo. Arrow keys orbit, Shift for larger steps."
-        onKeyDown={onKey}
-        onPointerDown={e => { (e.target as Element).setPointerCapture?.(e.pointerId); setDrag({ px: e.clientX, py: e.clientY, ...rot }); }}
-        onPointerMove={e => drag && setRot({ z: drag.z + (e.clientX - drag.px) * 0.4, x: clamp(drag.x - (e.clientY - drag.py) * 0.3, 0, 85) })}
-        onPointerUp={() => setDrag(null)} onPointerCancel={() => setDrag(null)}
-        className="relative touch-none select-none overflow-hidden rounded-md bg-foreground py-16 outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-grab active:cursor-grabbing"
-        style={{ perspective: "1600px" }}>
-        <div className={`relative mx-auto aspect-square w-[min(60%,380px)] ${drag ? "" : "transition-transform duration-700"} motion-reduce:transition-none`}
-          style={{ transformStyle: "preserve-3d", transform: `rotateX(${rot.x}deg) rotateZ(${rot.z}deg)` }}>
-          {layers.map((p, i) => {
-            const dim = focus && focus !== p.id;
-            const lift = focus === p.id && open ? 40 : 0;
-            return <div key={p.id} className="absolute inset-0 transition-all duration-500 motion-reduce:transition-none"
-              style={{ transformStyle: "preserve-3d", transform: `translateZ(${i * spread * 0.55 + lift}px)`, opacity: dim ? 0.12 : 1 }}>
-              {open ? <div className={`absolute inset-0 rounded-sm border ${focus === p.id ? "border-primary bg-primary/10" : "border-background/25 bg-background/5"}`} /> : null}
-              {open && xray ? <div className="absolute border border-dashed border-destructive" style={{ left: `${p.bounds.x / 12.54}%`, top: `${p.bounds.y / 12.54}%`, width: `${p.bounds.w / 12.54}%`, height: `${p.bounds.h / 12.54}%` }} /> : null}
-              <img src={p.url} alt="" draggable={false} className="pointer-events-none relative h-full w-full object-contain" style={{ filter: xray ? "grayscale(1) contrast(2) invert(1)" : undefined }} />
-              {open ? <span className="absolute -right-2 top-0 hidden translate-x-full whitespace-nowrap sm:inline font-mono text-[11px] text-background/80">{p.order}. {p.definition?.role ?? p.name} · z{Math.round(i * spread * 0.55)}</span> : null}
-            </div>;
-          })}
-        </div>
-        <p className="absolute bottom-2 left-3 font-mono text-[10px] text-background/60">rotX {rot.x.toFixed(0)}° · rotZ {rot.z.toFixed(0)}° · spread {spread}px</p>
-      </div>
-      <div className="space-y-4 text-sm">
-        <label className="block space-y-1"><span className="font-medium">Layer spread</span>
-          <input type="range" min={0} max={160} value={spread} onChange={e => setSpread(Number(e.target.value))} className="w-full" aria-label="Layer spread" /></label>
-        <label className="block space-y-1 sm:hidden"><span className="font-medium">Isolate layer</span>
-          <select className="w-full rounded-md border border-border bg-background px-2 py-2" value={focus ?? ""} onChange={e => setFocus(e.target.value || null)} aria-label="Isolate layer">
-            <option value="">All layers</option>
-            {layers.map(p => <option key={p.id} value={p.id}>{p.order}. {p.definition?.role ?? p.name}</option>)}
-          </select></label>
-        <fieldset className="hidden space-y-1 sm:block"><legend className="font-medium">Isolate layer</legend>
-          <Button size="sm" variant={focus ? "outline" : "default"} className="w-full justify-start" onClick={() => setFocus(null)}>All layers</Button>
-          {layers.map(p => <Button key={p.id} size="sm" variant={focus === p.id ? "default" : "outline"} className="w-full justify-start"
-            onMouseEnter={() => setFocus(p.id)} onFocus={() => setFocus(p.id)} onClick={() => setFocus(p.id)}>{p.order}. {p.definition?.role ?? p.name}</Button>)}
-        </fieldset>
-        {active ? <div className="space-y-1 border-t border-border pt-3" aria-live="polite">
-          <p className="font-medium">{active.definition?.role}</p>
-          <p className="text-muted-foreground">{active.definition?.detail}</p>
-          <p className="font-mono text-xs text-muted-foreground">{active.paths} shapes · {active.bounds.w.toFixed(1)} × {active.bounds.h.toFixed(1)} u</p>
-        </div> : null}
-      </div>
-    </div>
-    <p className="mt-2 text-xs text-muted-foreground">Display view only. The foundation layer has no paint, so it is not shown. X-ray shows each layer's measured bounds. Never reproduce the logo separated like this.</p>
-  </div>;
-}
 /** Inlines an element SVG and zooms its viewBox to the painted shapes, so tiny parts fill the preview. */
 function CroppedSvg({ url, label, over }: { url: string; label: string; over?: string }) {
   const ref = React.useRef<HTMLDivElement>(null);
