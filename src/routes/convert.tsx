@@ -305,7 +305,7 @@ function ConvertPage() {
       { content: slide.content, notes: slide.notes },
       byId(MODULE_VARIANTS, slide.variantId)?.name,
     );
-  }, [sourceKind, moduleId, moduleVariant, manual, slide, draft, piece]);
+  }, [sourceKind, moduleId, moduleVariant, manual, slide, draft, piece, upload]);
 
   // The module itself, for "Use the module as drawn".
   const drawnSource = useMemo(() => {
@@ -325,7 +325,7 @@ function ConvertPage() {
     f ? { w: f.width, h: f.height } : { w: Math.round((r.target.trimIn?.width ?? 8.268) * CSS_DPI), h: Math.round((r.target.trimIn?.height ?? 11.693) * CSS_DPI) };
 
   // A new source starts with everything included and no edits.
-  const sourceKey = sourceKind === "print" ? `p:${pieceId}` : sourceKind === "module" ? `m:${moduleId}` : manual ? "manual" : `d:${deckId}:${slideIndex}`;
+  const sourceKey = sourceKind === "print" ? `p:${pieceId}` : sourceKind === "module" ? `m:${moduleId}` : sourceKind === "upload" ? `u:${upload.status === "done" ? upload.name : "none"}` : manual ? "manual" : `d:${deckId}:${slideIndex}`;
   useEffect(() => setSelection(EMPTY_SELECTION), [sourceKey]);
   const source = useMemo(() => applySelection(rawSource, selection), [rawSource, selection]);
 
