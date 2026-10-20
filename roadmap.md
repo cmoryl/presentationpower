@@ -1,6 +1,7 @@
 # Roadmap — build review (Week 1)
 
-- [ ] San Juan Bowl: research Hiram Bithorn Stadium dimensions/references and prepare BoothHUB handoff; connect the public stadium viewer after BoothHUB supplies its event/viewer URL.
+- [x] San Juan Bowl: research Hiram Bithorn historical dimensions and NCAA field references; prepare sourced BoothHUB handoff, flag official Puerto Rico Bowl venue discrepancy.
+- [ ] San Juan Bowl stadium connection — BLOCKED: BoothHUB must build/publish the requested stadium view and supply its public viewer URL; exact placement requires current venue survey and organiser-approved football conversion.
 
 - [x] San Juan Bowl: default to 14 named major pieces, with TRANSPERFECT lettering separated from ribbon/stars in the viewer and downloads; grouped SVG/ZIP downloads preserve all 293 source shapes; individual-shape view and editor remain optional.
 
