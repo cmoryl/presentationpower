@@ -371,12 +371,13 @@ function ConvertPage() {
               Source content
             </h2>
 
-            <div role="group" aria-label="Source" className="grid grid-cols-4 gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5">
+            <div role="group" aria-label="Source" className="grid grid-cols-3 gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5 sm:grid-cols-5">
               {(
                 [
                   ["module", "Master module"],
                   ["deck", "Deck slide"],
                   ["print", "Print piece"],
+                  ["upload", "Upload file"],
                   ["manual", "Type copy"],
                 ] as const
               ).map(([k, l]) => (
@@ -487,6 +488,53 @@ function ConvertPage() {
                   Same copy, figures and cover image as the print piece. The full text goes in the speaker notes.
                 </p>
                 {piece ? <BrickList bricks={contentBricks(piece)} /> : null}
+              </div>
+            ) : null}
+            {sourceKind === "upload" ? (
+              <div className="space-y-2">
+                <label
+                  htmlFor="convert-upload"
+                  className="block cursor-pointer rounded-lg border border-dashed border-[var(--tp-blue)] bg-[var(--tp-surface)] p-4 text-center hover:bg-[var(--tp-blue-white)]"
+                >
+                  <span className="block text-[13px] font-semibold text-[var(--tp-ink)]">
+                    {upload.status === "reading" ? "Reading your file…" : "Choose an artwork file"}
+                  </span>
+                  <span className="mt-1 block text-[11.5px] leading-snug text-[var(--tp-dark-gray)]">
+                    Illustrator (.ai), Canva export (PDF or PowerPoint), Word, Excel or SVG — up to 20 MB.
+                  </span>
+                  <input
+                    id="convert-upload"
+                    type="file"
+                    accept={CONVERT_UPLOAD_ACCEPT}
+                    className="sr-only"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) void onUploadFile(f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+                {upload.status === "reading" ? (
+                  <p role="status" className="rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-muted)] p-3 text-[12.5px] text-[var(--tp-ink)]">
+                    Reading {upload.name} — large files can take up to a minute.
+                  </p>
+                ) : null}
+                {upload.status === "error" ? (
+                  <p role="alert" className="rounded-lg border border-[var(--tp-red)] bg-[color:var(--color-muted)] p-3 text-[12.5px] text-[var(--tp-ink)]">
+                    {upload.message}
+                  </p>
+                ) : null}
+                {upload.status === "done" ? (
+                  <div className="rounded-lg border border-[var(--tp-green)] bg-[#F1FEEC] p-3 text-[12.5px] text-[var(--tp-ink)]">
+                    <p className="font-semibold">{upload.name}</p>
+                    <p className="mt-0.5 text-[11.5px] text-[var(--tp-dark-gray)]">
+                      {upload.kindLabel} — headline, copy{upload.content.points?.length ? `, ${upload.content.points.length} supporting line(s)` : ""}{upload.content.stat ? ` and the figure “${upload.content.stat.value}”` : ""} read from the file. Edit anything below before converting.
+                    </p>
+                  </div>
+                ) : null}
+                <p className="text-[11px] leading-snug text-[color:var(--color-muted-foreground)]">
+                  From Canva: Share → Download → “PDF Print” or “PPTX”, then upload that file here. Only words and figures printed in the file are used — nothing is invented.
+                </p>
               </div>
             ) : null}
             {sourceKind === "module" || sourceKind === "print" ? null : manual ? (
