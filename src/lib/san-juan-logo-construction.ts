@@ -53,7 +53,7 @@ export const SJB_SCENE_ELEMENTS = [
   { id: "football", name: "Football", detail: "The ball rising behind the walls, with its laces and ground line.", paths: [31, 32, 33, 68, 71, 92, 93, 94, 95, 98, 99, 105, 106], url: sBall.url },
   { id: "palm-left", name: "Left palm", detail: "Sky-blue fronds and gold trunk highlights of the left palm.", paths: [34, 35, 36, 40, 44, 45, 46, 51, 54, 55, 58, 83], url: sPalmL.url },
   { id: "palm-right", name: "Right palm", detail: "Sky-blue fronds and gold trunk highlights of the right palm.", paths: [37, 38, 42, 43, 47, 48, 49, 50, 52, 53, 56, 81], url: sPalmR.url },
-  { id: "banner", name: "TRANSPERFECT banner", detail: "Gold ribbon, sky-blue tail folds and navy lettering. Some letters are drawn in the lettering layers above.", paths: [39, 41, 59, 60, 62, 114, 115, 116, 117, 118], url: sBanner.url },
+  { id: "banner", name: "TRANSPERFECT banner", detail: "Gold ribbon and sky-blue tail folds. The TRANSPERFECT letters are cut out of the ribbon, so the navy badge base shows through as the lettering.", paths: [39, 41, 59, 60, 62, 114, 115, 116, 117, 118], url: sBanner.url },
   { id: "scene-bird", name: "Scene bird", detail: "Navy bird in the sky (the second bird is the separate Bird accent layer).", paths: [30], url: sBird.url },
 ] as const;
 
