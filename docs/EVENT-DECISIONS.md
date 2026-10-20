@@ -1,5 +1,13 @@
 # Event design decisions
 
+### 2026-10 — San Juan Bowl exact inspection and source layers
+**Area:** logo construction and production components.
+**Options tested:** rounded 12-cell overlay; source-coordinate grid and SVG geometric bounds; original top-level layers versus named landmark groups.
+**Chosen:** source-coordinate grid and six original layers, retaining every path and stacking position. The fortress, palms, football and banner remain the composite scene supplied by the designer.
+**Why:** named landmark groups are absent from the source; inventing their boundaries would alter artwork. getBBox values support inspection, not fabrication tolerances. The first group is unpainted geometry, not a white underlay.
+**Would change if:** the designer supplies complete independently grouped symbols or a formal construction specification.
+**Applies to:** San Juan Bowl full-colour master only; dark variant is not assumed to share layer indices.
+
 The tested-and-settled choices behind the event work. The lessons log
 (`docs/EVENT-LESSONS.md`) records what went wrong; this file records what we
 tried, what we chose, and why — so the next city inherits the reasoning, not
