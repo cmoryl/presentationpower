@@ -646,7 +646,7 @@ function ConvertPage() {
           <section className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
-                {result.target.label}
+                Step 4 · Preview &amp; export — {result.target.label}
               </h2>
               <div className="flex flex-wrap items-center gap-2">
                 <AssetExportMenu
@@ -990,19 +990,36 @@ division={brandId}
                   Everything fitted — nothing shortened, nothing left out.
                 </p>
               ) : (
-                <ul className="mt-3 space-y-1.5">
-                  {(format && socialGrid && !drawn ? [...result.notes.filter((n) => n.field !== "points" && n.field !== "body"), ...(gridPoints.length > socialGridCapacity(format) ? [{ severity: "dropped" as const, field: "points", detail: `${gridPoints.length - socialGridCapacity(format)} tile(s) left out — this size holds ${socialGridCapacity(format)}.` }] : [])] : result.notes).map((n, i) => (
-                    <li
-                      key={`${n.field}-${i}`}
-                      className={`rounded-lg border p-2.5 text-[12.5px] leading-[1.45] text-[var(--tp-ink)] ${SEVERITY_STYLE[n.severity] ?? "border-black/10 bg-white"}`}
-                    >
-                      <span className="font-semibold uppercase tracking-[0.1em] text-[10px] text-[var(--tp-dark-gray)]">
-                        {n.severity} · {n.field}
-                      </span>
-                      <span className="mt-0.5 block">{n.detail}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="mt-3 space-y-3">
+                  {(
+                    [
+                      ["shortened", "Shortened to fit"],
+                      ["dropped", "Left out of this format"],
+                      ["refused", "Couldn't carry across"],
+                    ] as const
+                  ).map(([sev, heading]) => {
+                    const visible = format && socialGrid && !drawn
+                      ? [...result.notes.filter((n) => n.field !== "points" && n.field !== "body"), ...(gridPoints.length > socialGridCapacity(format) ? [{ severity: "dropped" as const, field: "points", detail: `${gridPoints.length - socialGridCapacity(format)} tile(s) left out — this size holds ${socialGridCapacity(format)}.` }] : [])]
+                      : result.notes;
+                    const list = visible.filter((n) => n.severity === sev);
+                    if (!list.length) return null;
+                    return (
+                      <div key={sev}>
+                        <h4 className="text-[11px] font-semibold tracking-[0.1em] text-[var(--tp-dark-gray)] uppercase">{heading}</h4>
+                        <ul className="mt-1.5 space-y-1.5">
+                          {list.map((n, i) => (
+                            <li
+                              key={`${n.field}-${i}`}
+                              className={`rounded-lg border p-2.5 text-[12.5px] leading-[1.45] text-[var(--tp-ink)] ${SEVERITY_STYLE[n.severity] ?? "border-black/10 bg-white"}`}
+                            >
+                              {n.detail}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           </section>
