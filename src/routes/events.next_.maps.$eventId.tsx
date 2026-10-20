@@ -211,15 +211,11 @@ function MapsPage() {
   }
 
   function download() {
-    if (!current || !svg) return;
-    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `rdraft-${eventId}-${current.floor_key}-${face}.svg`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    if (!current || !svg) {
+      toast.error("The map is still drawing — try again in a moment.");
+      return;
+    }
+    saveFile(new Blob([svg], { type: "image/svg+xml" }), `rdraft-${eventId}-${current.floor_key}-${face}.svg`);
   }
 
   const paint = (room: string) => {
