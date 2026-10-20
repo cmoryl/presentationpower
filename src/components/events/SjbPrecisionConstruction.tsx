@@ -3,7 +3,7 @@ import { Download } from "lucide-react";
 import { Button } from "@/design-system/element";
 import { SjbElementExplorer } from "./SjbElementExplorer";
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
-import { SJB_COMPONENTS, SJB_COMPONENT_PACK, SJB_MEASUREMENTS as m, sjbProductionSize } from "@/lib/san-juan-logo-construction";
+import { SJB_COMPONENTS, SJB_SCENE_ELEMENTS, SJB_COMPONENT_PACK, SJB_MEASUREMENTS as m, sjbProductionSize } from "@/lib/san-juan-logo-construction";
 
 export interface SjbPrecisionConstructionProps { className?: string }
 
@@ -63,12 +63,20 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
         <div className="space-y-2 p-4"><h4 className="text-sm font-semibold">{p.order}. {p.name}</h4>{p.definition ? <><p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{p.definition.role}</p><p className="text-sm">{p.definition.detail}</p><p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">Rule: </span>{p.definition.rule}</p></> : null}<p className="font-mono text-xs text-muted-foreground">{p.paths} original paths · {fmt(p.bounds.w)} × {fmt(p.bounds.h)} u</p>
         <Button asChild size="sm" variant="outline"><a href={p.url} download><Download />Layer SVG</a></Button></div>
       </article>)}</div>
+      <h4 className="mt-6 text-base font-semibold">Inside layer 2: badge and scene elements</h4>
+      <p className="mt-1 text-sm text-muted-foreground">The composite scene separated by its original shapes. Each file keeps only that element's paths at their source position, so the files stack back into the exact badge.</p>
+      <div className="mt-3 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">{SJB_SCENE_ELEMENTS.map((e, n) => <article key={e.id} className="min-w-0 rounded-md border border-border">
+        <div className="aspect-square bg-foreground p-2"><img src={e.url} alt={e.name} className="h-full w-full object-contain" /></div>
+        <div className="space-y-1 p-3"><h5 className="text-sm font-semibold">2.{n + 1} {e.name}</h5><p className="text-xs text-muted-foreground">{e.detail}</p><p className="font-mono text-[11px] text-muted-foreground">{e.paths.length} paths</p>
+        <Button asChild size="sm" variant="outline"><a href={e.url} download><Download />SVG</a></Button></div>
+      </article>)}</div>
     </div>
   </section>;
 }
 
 function ExplodedView() {
-  const layers = SJB_COMPONENTS.filter(p => p.id !== "white-underlay");
+  const layers = SJB_COMPONENTS.filter(p => p.id !== "white-underlay").flatMap(p => p.id !== "badge-scene-banner" ? [p] :
+    SJB_SCENE_ELEMENTS.map((e, n) => ({ ...p, id: e.id, name: e.name, url: e.url, order: `${p.order}.${n + 1}` as unknown as number, definition: { role: e.name, detail: e.detail, rule: p.definition?.rule ?? "" } })));
   const [spread, setSpread] = useState(90);
   const [rot, setRot] = useState({ x: 58, z: -38 });
   const [focus, setFocus] = useState<string | null>(null);
@@ -110,11 +118,11 @@ function ExplodedView() {
             const dim = focus && focus !== p.id;
             const lift = focus === p.id && open ? 40 : 0;
             return <div key={p.id} className="absolute inset-0 transition-all duration-500 motion-reduce:transition-none"
-              style={{ transformStyle: "preserve-3d", transform: `translateZ(${i * spread + lift}px)`, opacity: dim ? 0.12 : 1 }}>
+              style={{ transformStyle: "preserve-3d", transform: `translateZ(${i * spread * 0.55 + lift}px)`, opacity: dim ? 0.12 : 1 }}>
               {open ? <div className={`absolute inset-0 rounded-sm border ${focus === p.id ? "border-primary bg-primary/10" : "border-background/25 bg-background/5"}`} /> : null}
               {open && xray ? <div className="absolute border border-dashed border-destructive" style={{ left: `${p.bounds.x / 12.54}%`, top: `${p.bounds.y / 12.54}%`, width: `${p.bounds.w / 12.54}%`, height: `${p.bounds.h / 12.54}%` }} /> : null}
               <img src={p.url} alt="" draggable={false} className="pointer-events-none relative h-full w-full object-contain" style={{ filter: xray ? "grayscale(1) contrast(2) invert(1)" : undefined }} />
-              {open ? <span className="absolute -right-2 top-0 hidden translate-x-full whitespace-nowrap sm:inline font-mono text-[11px] text-background/80">{p.order}. {p.definition?.role ?? p.name} · z{i * spread}</span> : null}
+              {open ? <span className="absolute -right-2 top-0 hidden translate-x-full whitespace-nowrap sm:inline font-mono text-[11px] text-background/80">{p.order}. {p.definition?.role ?? p.name} · z{Math.round(i * spread * 0.55)}</span> : null}
             </div>;
           })}
         </div>
