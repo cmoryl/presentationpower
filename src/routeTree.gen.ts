@@ -187,6 +187,7 @@ import { Route as EventsNextSanFranciscoRouteImport } from './routes/events.next
 import { Route as EventsNextStartRouteImport } from './routes/events.next_.start'
 import { Route as EventsNextVenueRouteImport } from './routes/events.next_.venue'
 import { Route as EventsNextVenuesRouteImport } from './routes/events.next_.venues'
+import { Route as EventsSanJuanBowlBrandKitRouteImport } from './routes/events.san-juan-bowl_.brand-kit'
 import { Route as EventsVenuesIndexRouteImport } from './routes/events.venues.index'
 import { Route as EventsVenuesSlugRouteImport } from './routes/events.venues.$slug'
 import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
@@ -1123,6 +1124,12 @@ const EventsNextVenuesRoute = EventsNextVenuesRouteImport.update({
   path: '/next/venues',
   getParentRoute: () => EventsRoute,
 } as any)
+const EventsSanJuanBowlBrandKitRoute =
+  EventsSanJuanBowlBrandKitRouteImport.update({
+    id: '/san-juan-bowl_/brand-kit',
+    path: '/san-juan-bowl/brand-kit',
+    getParentRoute: () => EventsRoute,
+  } as any)
 const EventsVenuesIndexRoute = EventsVenuesIndexRouteImport.update({
   id: '/venues/',
   path: '/venues/',
@@ -1512,6 +1519,7 @@ export interface FileRoutesByFullPath {
   '/events/next/start': typeof EventsNextStartRoute
   '/events/next/venue': typeof EventsNextVenueRoute
   '/events/next/venues': typeof EventsNextVenuesRoute
+  '/events/san-juan-bowl/brand-kit': typeof EventsSanJuanBowlBrandKitRoute
   '/events/venues/$slug': typeof EventsVenuesSlugRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/element': typeof KnowledgeBrandGuidesElementRoute
@@ -1727,6 +1735,7 @@ export interface FileRoutesByTo {
   '/events/next/start': typeof EventsNextStartRoute
   '/events/next/venue': typeof EventsNextVenueRoute
   '/events/next/venues': typeof EventsNextVenuesRoute
+  '/events/san-juan-bowl/brand-kit': typeof EventsSanJuanBowlBrandKitRoute
   '/events/venues/$slug': typeof EventsVenuesSlugRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/element': typeof KnowledgeBrandGuidesElementRoute
@@ -1947,6 +1956,7 @@ export interface FileRoutesById {
   '/events/next_/start': typeof EventsNextStartRoute
   '/events/next_/venue': typeof EventsNextVenueRoute
   '/events/next_/venues': typeof EventsNextVenuesRoute
+  '/events/san-juan-bowl_/brand-kit': typeof EventsSanJuanBowlBrandKitRoute
   '/events/venues/$slug': typeof EventsVenuesSlugRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/element': typeof KnowledgeBrandGuidesElementRoute
@@ -2168,6 +2178,7 @@ export interface FileRouteTypes {
     | '/events/next/start'
     | '/events/next/venue'
     | '/events/next/venues'
+    | '/events/san-juan-bowl/brand-kit'
     | '/events/venues/$slug'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/element'
@@ -2383,6 +2394,7 @@ export interface FileRouteTypes {
     | '/events/next/start'
     | '/events/next/venue'
     | '/events/next/venues'
+    | '/events/san-juan-bowl/brand-kit'
     | '/events/venues/$slug'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/element'
@@ -2602,6 +2614,7 @@ export interface FileRouteTypes {
     | '/events/next_/start'
     | '/events/next_/venue'
     | '/events/next_/venues'
+    | '/events/san-juan-bowl_/brand-kit'
     | '/events/venues/$slug'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/element'
@@ -4004,6 +4017,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsNextVenuesRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/san-juan-bowl_/brand-kit': {
+      id: '/events/san-juan-bowl_/brand-kit'
+      path: '/san-juan-bowl/brand-kit'
+      fullPath: '/events/san-juan-bowl/brand-kit'
+      preLoaderRoute: typeof EventsSanJuanBowlBrandKitRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/venues/': {
       id: '/events/venues/'
       path: '/venues'
@@ -4394,6 +4414,7 @@ interface EventsRouteChildren {
   EventsNextStartRoute: typeof EventsNextStartRoute
   EventsNextVenueRoute: typeof EventsNextVenueRoute
   EventsNextVenuesRoute: typeof EventsNextVenuesRoute
+  EventsSanJuanBowlBrandKitRoute: typeof EventsSanJuanBowlBrandKitRoute
   EventsVenuesSlugRoute: typeof EventsVenuesSlugRoute
   EventsVenuesIndexRoute: typeof EventsVenuesIndexRoute
   EventsNextBoothBoothIdRoute: typeof EventsNextBoothBoothIdRoute
@@ -4444,6 +4465,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextStartRoute: EventsNextStartRoute,
   EventsNextVenueRoute: EventsNextVenueRoute,
   EventsNextVenuesRoute: EventsNextVenuesRoute,
+  EventsSanJuanBowlBrandKitRoute: EventsSanJuanBowlBrandKitRoute,
   EventsVenuesSlugRoute: EventsVenuesSlugRoute,
   EventsVenuesIndexRoute: EventsVenuesIndexRoute,
   EventsNextBoothBoothIdRoute: EventsNextBoothBoothIdRoute,

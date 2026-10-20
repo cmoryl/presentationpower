@@ -6,6 +6,7 @@
 import type { LinkOptions } from "@tanstack/react-router";
 import { NEXT_EVENT } from "./next-event";
 import { SF_READINESS, SF_VENUE } from "./next-sf-event";
+import { SJB_EVENT } from "./san-juan-bowl";
 
 export type EventTabId =
   | "checklist"
