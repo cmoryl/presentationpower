@@ -544,7 +544,7 @@ function ConvertPage() {
                 </p>
               </div>
             ) : null}
-            {sourceKind === "module" || sourceKind === "print" ? null : manual ? (
+            {sourceKind === "module" || sourceKind === "print" || sourceKind === "upload" ? null : manual ? (
               <div className="space-y-2">
                 <input
                   value={draft.eyebrow}
