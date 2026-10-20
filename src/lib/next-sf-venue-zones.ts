@@ -30,7 +30,7 @@ export type SfVenueZone = {
 
 export const SF_VENUE_ZONES: Record<number, SfVenueZone[]> = {
   3: [
-    { label: "Grand Ballroom", color: BRAND.lavender, x: 71, y: 18, w: 28, h: 80 },
+    { label: "Grand Ballroom", color: BRAND.lavender, x: 72, y: 20, w: 27, h: 78 },
     { label: "Union Square", space: "Breakout", color: BRAND.red, x: 1, y: 47, w: 11, h: 46 },
     { label: "Discovery Rooms", space: "SoMa · Mission · Marina", color: BRAND.green, x: 13, y: 74, w: 28, h: 17 },
     { label: "NEXTmart", space: "Grand Ballroom Foyer", color: BRAND.aqua, x: 62, y: 23, w: 10, h: 72, provisional: true },
@@ -38,8 +38,8 @@ export const SF_VENUE_ZONES: Record<number, SfVenueZone[]> = {
     { label: "Internal booths + sponsors", space: "Main corridor", color: BRAND.ink, x: 14.5, y: 1, w: 72, h: 22, provisional: true },
   ],
   4: [
-    { label: "Telegraph Hill", space: "Breakout", color: BRAND.red, x: 1, y: 47, w: 12, h: 50 },
-    { label: "Pacific Terrace", space: "Meals", color: BRAND.blue, x: 73, y: 18, w: 22, h: 79 },
+    { label: "Telegraph Hill", space: "Breakout", color: BRAND.red, x: 1, y: 48, w: 12, h: 49 },
+    { label: "Pacific Terrace", space: "Meals", color: BRAND.blue, x: 73, y: 33, w: 22, h: 64 },
   ],
   5: [{ label: "Sutter", space: "Breakout", color: BRAND.red, x: 2, y: 26, w: 10, h: 42 }],
 };
