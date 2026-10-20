@@ -1,5 +1,11 @@
 # Event lessons log
 
+### 2026-10-20 — Narrow map rooms need turned text
+**Context:** San Francisco Union Square, Telegraph Hill and Pacific Terrace Foyer.
+**What happened:** horizontal names crossed the edges of narrow room areas.
+**Rule now:** fit text with measured Geist advances and full rotated bounds; keep size, rotation and position as saved patches rather than changing venue geometry. Current narrow-room names use vertical text.
+**Enforced by:** `qeii-map-edits.test.ts`; signed-in save/reload and SVG verification.
+
 A running record of judgement calls, near-misses and "we tried this and it was wrong"
 from real event builds. Tests lock in fixed bugs; this file carries the reasoning that
 tests cannot express. Read it before starting a new city, venue or signage family.
