@@ -133,6 +133,8 @@ function MapsPage() {
     () => ({
       venueName: plan?.venue || q.data?.venue?.name || plan?.name || "Venue",
       tabs: rows.map((r) => ({ id: eventFloorId(eventId, r.floor_key), label: r.marker })),
+      // San Francisco is a GlobalLink NEXT edition: its maps carry the GlobalLink NEXT lockup.
+      lockup: /san-francisco|next-sf/i.test(eventId) ? "globallink-side-by-side-color.svg" : undefined,
     }),
     [plan, rows, eventId, q.data?.venue],
   );
