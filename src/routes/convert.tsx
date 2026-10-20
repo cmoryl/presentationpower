@@ -364,10 +364,11 @@ function ConvertPage() {
           One piece of content, every medium
         </h1>
         <p className="mt-2 max-w-[70ch] text-[14px] leading-[1.5] text-[var(--tp-ink)]/75">
-          Convert a slide into a social card, a 1-page print brief, or a case study page. The
-          headline, body copy, supporting points, figure and photography carry across; the layout
-          structure and type hierarchy are the target medium's own. Anything shortened or left out is
-          listed before you export.
+          Start from a master module, a deck slide, a print piece, or an uploaded artwork file
+          (Illustrator .ai, a Canva PDF/PowerPoint download, or SVG) — then convert it into any
+          social, print or event size. The headline, body copy, supporting points, figures and
+          photography carry across; the layout structure and type hierarchy are the target medium's
+          own. Anything shortened or left out is listed before you export.
         </p>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[360px_1fr]">
@@ -971,6 +972,7 @@ division={brandId}
                 const c = result.content;
                 const extras = [
                   c.chart ? `${c.chart.kind} chart (${c.chart.data.length} values)` : null,
+                  c.stats?.length ? `${c.stats.length} more figure${c.stats.length > 1 ? "s" : ""} in the strip` : null,
                   c.images?.length ? `${c.images.length} picture${c.images.length > 1 ? "s" : ""}` : null,
                   c.pointIcons ? `${Object.values(c.pointIcons).filter((v, i, a) => a.indexOf(v) === i).length} icon(s): ${[...new Set(Object.values(c.pointIcons))].slice(0, 6).join(", ")}` : null,
                 ].filter(Boolean);
