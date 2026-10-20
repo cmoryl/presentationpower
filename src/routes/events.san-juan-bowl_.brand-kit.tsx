@@ -13,6 +13,7 @@ import { BRAND } from "@/lib/brand-colors";
 import {
   SJB_BACKGROUNDS,
   SJB_CLEAR_SPACE,
+  SJB_CONSTRUCTION,
   SJB_COLORS,
   SJB_EVENT,
   SJB_LOGOS,
