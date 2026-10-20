@@ -373,8 +373,8 @@ function MapsPage() {
                     {labelLayout?.blocks.map((b) => <option key={b.key} value={b.room}>{b.room}</option>)}
                   </select>
                 </label>
-                <label className="block text-sm">Text
-                  <input className={field} value={labelEdit?.name ?? labelRoom} onChange={(e) => patchLabel({ name: e.target.value })} />
+                <label className="block text-sm">Text <span className="text-muted-foreground">(Enter starts a new line, up to 3)</span>
+                  <textarea rows={3} className={field} value={labelEdit?.name ?? labelRoom} onChange={(e) => patchLabel({ name: e.target.value })} />
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <label className="text-sm">Size (%)<input aria-label="Label size percent" className={field} type="number" min="25" max="300" step="5" value={Math.round((labelEdit?.scale ?? 1) * 100)} onChange={(e) => { if (e.target.value) patchLabel({ scale: Math.max(0.25, Math.min(3, Number(e.target.value) / 100)) }); }} /></label>

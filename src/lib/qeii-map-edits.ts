@@ -68,7 +68,10 @@ export function sanitizeQeiiMapEdits(raw: unknown): QeiiMapEdits {
       if (!value || typeof value !== "object") continue;
       const v = value as Record<string, unknown>;
       const edit: QeiiRoomEdit = {};
-      const name = text(v['name'], MAX_NAME);
+      // Names keep deliberate line breaks (up to three lines) so long rooms can stack.
+      const name = typeof v['name'] === "string"
+        ? v['name'].split(/\r?\n/).map((l) => l.replace(/[\t ]+/g, " ").trim()).filter(Boolean).slice(0, 3).join("\n").slice(0, MAX_NAME)
+        : undefined;
       if (name) edit.name = name;
       const use = text(v['use'], MAX_USE);
       if (use !== undefined) edit.use = use;

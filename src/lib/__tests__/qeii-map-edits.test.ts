@@ -74,3 +74,12 @@ describe("live map edits", () => {
     expect(edited.blocks.length).toBe(plain.blocks.length);
   });
 });
+
+import { sanitizeQeiiMapEdits as sanitizeMultiline } from "@/lib/qeii-map-edits";
+import { describe as d2, it as i2, expect as e2 } from "vitest";
+d2("multi-line map names", () => {
+  i2("keeps up to three typed lines", () => {
+    const out = sanitizeMultiline({ rooms: { "Grand Ballroom Foyer": { name: "Grand\nBallroom\nFoyer\nExtra" } } });
+    e2(Object.values(out.rooms)[0]?.name).toBe("Grand\nBallroom\nFoyer");
+  });
+});
