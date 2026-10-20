@@ -24,7 +24,7 @@ import {
   type SpaceUseMark,
 } from "@/lib/next-london-space-use";
 import type { QeiiFloorVector, QeiiLabel } from "@/lib/next-london-qeii-vectors";
-import { qeiiRoomEdit, type QeiiMapEdits } from "@/lib/qeii-map-edits";
+import { qeiiFloorMapEdits, qeiiRoomEdit, type QeiiMapEdits } from "@/lib/qeii-map-edits";
 
 import {
   qeiiHolderBox,
@@ -224,6 +224,7 @@ function shortUse(use: string): string {
  * facility label gives way. Nothing is invented and no room name is hidden.
  */
 export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOptions = {}): QeiiLayout {
+  options = { ...options, edits: qeiiFloorMapEdits(floor.id, options.edits) };
   const scale = options.labelScale ?? 1;
   const groups = qeiiLabelGroups(floor)
     .map((g, i) => ({ ...g, order: i }))
