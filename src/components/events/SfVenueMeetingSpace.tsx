@@ -108,9 +108,6 @@ export function SfVenueMeetingSpace() {
             <a href={plan.vectorUrl} download={`InterContinental-SF-floor-${plan.floor}-vector.svg`} className="font-semibold text-[#003FC7] hover:underline">Download vector plan (SVG)</a>
             <span className="text-[#666666]">Drawn paths from the hotel&rsquo;s 2017 sheet — confirm with the hotel before printing.</span>
           </div>
-          {(SF_VENUE_ZONES[plan.floor] ?? []).some((z) => z.provisional) && (
-            <p className="mt-1 text-[11px] text-[#666666]">‡ First-pass placement — confirm against the event team&rsquo;s marked-up plan.</p>
-          )}
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-[12px] text-[#03002C]">
