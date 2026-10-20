@@ -13,6 +13,7 @@ import { BRAND } from "@/lib/brand-colors";
 import {
   SJB_BACKGROUNDS,
   SJB_CLEAR_SPACE,
+  SJB_COLOR_NOTES,
   SJB_CONSTRUCTION,
   SJB_COLORS,
   SJB_EVENT,
@@ -315,6 +316,29 @@ function ConstructionSection() {
         </div>
       </div>
     </div>
+  );
+}
+
+function CopyCode({ value, label }: { value: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      aria-label={`Copy ${label} value ${value}`}
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(value);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500);
+        } catch {
+          /* clipboard unavailable — value stays visible for manual copy */
+        }
+      }}
+      className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/20 px-2 py-0.5 text-[11px] font-semibold text-[#03002C]/70 hover:bg-[#F2F2F2]"
+    >
+      {copied ? <Check className="h-3 w-3 text-[#003FC7]" /> : <Copy className="h-3 w-3" />}
+      {copied ? "Copied" : "Copy"}
+    </button>
   );
 }
 
