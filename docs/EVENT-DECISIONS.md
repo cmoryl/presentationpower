@@ -300,3 +300,15 @@ placeholders; leaving the slots blank with a named blocker.
 - Rejected: straight resize (cuts ~38% of width through lockups/headlines); crop-centre (cuts logos); fit-whole-with-extended-background (art too small, clashes with the TV).
 - Trial Interactive has no London final in the pack and keeps the native re-lay.
 - Reopen when: the SF venue confirms kiosk count/sizes differ, or a partner supplies kiosk-native artwork.
+
+### 2026-10 — SF event zones are an overlay, never edits to the hotel vectors
+**Area:** InterContinental SF floor plans (`/events/next/san-francisco` meeting space).
+**Options tested:** tinting room paths inside the hotel's SVGs; transparent
+colour rectangles over the plan (`src/lib/next-sf-venue-zones.ts`, percent of
+plan box).
+**Chosen:** overlay rectangles + legend; the hotel vectors stay byte-for-byte.
+**Why:** the plans are the hotel's drawn artwork and must never be redrawn;
+zones are event decisions that change without touching the source.
+**Would change if:** the hotel issues new plans (re-split vectors, re-measure
+zone rectangles).
+**Applies to:** every venue map that marks event zones on supplied plans.
