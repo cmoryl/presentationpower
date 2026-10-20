@@ -96,7 +96,7 @@ function SingleColourPage() {
             <div className="space-y-1 p-4 text-sm">
               <h3 className="font-semibold">{x.ink} on {x.ground}</h3>
               <p className="font-mono text-xs text-muted-foreground">{x.inkHex} on {x.groundHex} · {r.toFixed(1)}:1</p>
-              <p className={x.supplied ? "text-foreground" : "text-muted-foreground"}>{x.supplied ? "Supplied file — approved." : "Event-colour option — needs designer sign-off."}</p>
+              <p className={x.supplied ? "text-foreground" : "text-muted-foreground"}>{x.supplied ? "Supplied file — approved." : r < 3 ? "Low contrast — large signage only, needs designer sign-off." : "Event-colour option — needs designer sign-off."}</p>
             </div>
           </article>; })}
         </div>
