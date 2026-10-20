@@ -67,7 +67,7 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
       <h4 className="mt-6 text-base font-semibold">Inside layer 2: badge and scene elements</h4>
       <p className="mt-1 text-sm text-muted-foreground">The composite scene separated by its original shapes. Each file keeps only that element's paths at their source position, so the files stack back into the exact badge.</p>
       <div className="mt-3 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">{SJB_SCENE_ELEMENTS.map((e, n) => <article key={e.id} className="min-w-0 rounded-md border border-border">
-        <div className={`aspect-square p-3 ${e.id === "base" || e.id === "scene-bird" ? "bg-muted" : "bg-foreground"}`}><CroppedSvg url={e.url} label={e.name} /></div>
+        <div className={`aspect-square p-3 ${e.id === "base" || e.id === "scene-bird" || e.id === "banner" ? "bg-muted" : "bg-foreground"}`}><CroppedSvg url={e.url} label={e.name} /></div>
         <div className="space-y-1 p-3"><h5 className="text-sm font-semibold">2.{n + 1} {e.name}</h5><p className="text-xs text-muted-foreground">{e.detail}</p><p className="font-mono text-[11px] text-muted-foreground">{e.paths.length} paths</p>
         <Button asChild size="sm" variant="outline"><a href={e.url} download><Download />SVG</a></Button></div>
       </article>)}</div>
@@ -153,26 +153,26 @@ function ExplodedView() {
   </div>;
 }
 /** Inlines an element SVG and zooms its viewBox to the painted shapes, so tiny parts fill the preview. */
-function CroppedSvg({ url, label, under }: { url: string; label: string; under?: string }) {
+function CroppedSvg({ url, label, over }: { url: string; label: string; over?: string }) {
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     let live = true;
-    Promise.all([fetch(url).then(r => r.text()), under ? fetch(under).then(r => r.text()) : Promise.resolve("")]).then(([t, u]) => {
+    Promise.all([fetch(url).then(r => r.text()), over ? fetch(over).then(r => r.text()) : Promise.resolve("")]).then(([t, u]) => {
       const el = ref.current; if (!live || !el) return;
       el.innerHTML = t;
       const svg = el.querySelector("svg"); if (!svg) return;
       let box: SVGGraphicsElement = svg;
-      if (u) { // banner letters are holes: show the badge base through them, crop to the banner only
+      if (u) { // most banner letters are drawn in the badge-base shape, which sits above the ribbon: overlay it, crop to the banner
         const top = document.createElementNS("http://www.w3.org/2000/svg", "g"); while (svg.firstChild) top.appendChild(svg.firstChild);
         const base = new DOMParser().parseFromString(u, "image/svg+xml").documentElement;
         const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); Array.from(base.childNodes).forEach(n => g.appendChild(document.importNode(n, true)));
-        svg.appendChild(g); svg.appendChild(top); box = top; }
+        svg.appendChild(top); svg.appendChild(g); box = top; }
       svg.setAttribute("width", "100%"); svg.setAttribute("height", "100%");
       svg.setAttribute("role", "img"); svg.setAttribute("aria-label", label);
       try { const b = box.getBBox(); const pad = Math.max(b.width, b.height) * 0.08;
         if (b.width > 0) svg.setAttribute("viewBox", `${b.x - pad} ${b.y - pad} ${b.width + pad * 2} ${b.height + pad * 2}`); } catch { /* keep source viewBox */ }
     }).catch(() => {});
     return () => { live = false; };
-  }, [url, label, under]);
+  }, [url, label, over]);
   return <div ref={ref} className="h-full w-full" />;
 }
