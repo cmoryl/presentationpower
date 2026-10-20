@@ -303,13 +303,13 @@ function ConvertPage() {
   return (
     <AppShell>
       <main className="mx-auto w-full max-w-[1200px] px-5 py-10">
-        <p className="text-[11px] font-semibold tracking-[0.18em] text-[#666] uppercase">
+        <p className="text-[11px] font-semibold tracking-[0.18em] text-[var(--tp-dark-gray)] uppercase">
           Cross-format adapter
         </p>
-        <h1 className="mt-2 text-[34px] leading-[1.1] font-bold tracking-[-0.02em] text-[#03002C]">
+        <h1 className="mt-2 text-[34px] leading-[1.1] font-bold tracking-[-0.02em] text-[var(--tp-ink)]">
           One piece of content, every medium
         </h1>
-        <p className="mt-2 max-w-[70ch] text-[14px] leading-[1.5] text-[#03002C]/75">
+        <p className="mt-2 max-w-[70ch] text-[14px] leading-[1.5] text-[var(--tp-ink)]/75">
           Convert a slide into a social card, a 1-page print brief, or a case study page. The
           headline, body copy, supporting points, figure and photography carry across; the layout
           structure and type hierarchy are the target medium's own. Anything shortened or left out is
@@ -319,7 +319,7 @@ function ConvertPage() {
         <div className="mt-8 grid gap-8 lg:grid-cols-[360px_1fr]">
           {/* ── Source ─────────────────────────────────────────── */}
           <section className="space-y-4">
-            <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[#666] uppercase">
+            <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
               Source content
             </h2>
 
@@ -464,12 +464,12 @@ function ConvertPage() {
                 />
               </div>
             ) : decks.length === 0 ? (
-              <p className="rounded-lg border border-black/10 bg-muted p-3 text-[12.5px] text-[#03002C]">
+              <p className="rounded-lg border border-black/10 bg-muted p-3 text-[12.5px] text-[var(--tp-ink)]">
                 {cloud.isLoading ? "Loading your decks…" : "No decks yet — open or save a deck, or switch to “Type the copy”."}
               </p>
             ) : (
               <div className="space-y-2">
-                <label className="block text-[11px] font-medium text-[#666]">Deck</label>
+                <label className="block text-[11px] font-medium text-[var(--tp-dark-gray)]">Deck</label>
                 <select
                   value={deckId}
                   onChange={(e) => {
@@ -484,7 +484,7 @@ function ConvertPage() {
                     </option>
                   ))}
                 </select>
-                <label className="block text-[11px] font-medium text-[#666]">Slide</label>
+                <label className="block text-[11px] font-medium text-[var(--tp-dark-gray)]">Slide</label>
                 <select
                   value={String(Math.min(slideIndex, (deck?.slides.length ?? 1) - 1))}
                   onChange={(e) => setSlideIndex(Number(e.target.value))}
@@ -502,14 +502,14 @@ function ConvertPage() {
 
             {manual ? null : <InfoBuilder source={rawSource} selection={selection} onChange={setSelection} />}
 
-            <h2 className="pt-2 text-[12px] font-semibold tracking-[0.12em] text-[#666] uppercase">
+            <h2 className="pt-2 text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
               Convert to
             </h2>
             <div className="grid gap-1">
               {ADAPT_TARGETS.map((t, i) => (
                 <Fragment key={t.id}>
                 {i === 0 || (ADAPT_TARGETS[i - 1].surface ?? ADAPT_TARGETS[i - 1].medium) !== (t.surface ?? t.medium) ? (
-                  <h3 className="pt-2 text-[11px] font-semibold tracking-[0.1em] text-[#666] uppercase">
+                  <h3 className="pt-2 text-[11px] font-semibold tracking-[0.1em] text-[var(--tp-dark-gray)] uppercase">
                     {t.surface === "event" ? "Event signage" : t.medium === "print" ? "Print" : "Social"}
                   </h3>
                 ) : null}
@@ -517,10 +517,10 @@ function ConvertPage() {
                   key={t.id}
                   type="button"
                   onClick={() => setTargetId(t.id)}
-                  className={`rounded-lg border px-3 py-2 text-left text-[12.5px] ${targetId === t.id ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]" : "border-black/15 text-[#03002C] hover:border-[#003FC7]"}`}
+                  className={`rounded-lg border px-3 py-2 text-left text-[12.5px] ${targetId === t.id ? "border-[var(--tp-blue)] bg-[var(--tp-blue-white)] text-[var(--tp-ink)]" : "border-black/15 text-[var(--tp-ink)] hover:border-[var(--tp-blue)]"}`}
                 >
                   <span className="font-semibold">{t.label}</span>
-                  <span className="mt-0.5 block text-[11px] text-[#666]">
+                  <span className="mt-0.5 block text-[11px] text-[var(--tp-dark-gray)]">
                     {t.medium === "print"
                       ? `${Math.round((t.trimIn?.width ?? 0) * 25.4)} × ${Math.round((t.trimIn?.height ?? 0) * 25.4)} mm · headline ${t.type.headlinePx}px`
                       : `${adaptTargetFormat(t)?.width} × ${adaptTargetFormat(t)?.height} px · headline ${t.type.headlinePx}px`}
@@ -534,7 +534,7 @@ function ConvertPage() {
           {/* ── Adapted preview ────────────────────────────────── */}
           <section className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[#666] uppercase">
+              <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
                 {result.target.label}
               </h2>
               <div className="flex flex-wrap items-center gap-2">
@@ -782,7 +782,7 @@ division={brandId}
               </div>
             ) : null}
 
-            <div className={`flex justify-center rounded-sm border border-black/10 bg-[#F2F2F2] p-6 ${view === "all" ? "hidden" : ""}`}>
+            <div className={`flex justify-center rounded-sm border border-black/10 bg-[var(--tp-light-gray)] p-6 ${view === "all" ? "hidden" : ""}`}>
               {drawn && drawnSource ? (
                 format ? (
                   <div ref={socialWrapRef}>
@@ -842,10 +842,10 @@ division={brandId}
             </div>
 
             <div>
-              <h3 className="text-[12px] font-semibold tracking-[0.12em] text-[#666] uppercase">
+              <h3 className="text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
                 What carried across
               </h3>
-              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#03002C]/80">
+              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[var(--tp-ink)]/80">
                 {result.target.structure
                   .filter((f) => {
                     const c = result.content as Record<string, unknown>;
@@ -864,7 +864,7 @@ division={brandId}
                   c.pointIcons ? `${Object.values(c.pointIcons).filter((v, i, a) => a.indexOf(v) === i).length} icon(s): ${[...new Set(Object.values(c.pointIcons))].slice(0, 6).join(", ")}` : null,
                 ].filter(Boolean);
                 return extras.length ? (
-                  <p data-carried-visuals="true" className="mt-1 text-[12.5px] leading-[1.5] text-[#03002C]/80">
+                  <p data-carried-visuals="true" className="mt-1 text-[12.5px] leading-[1.5] text-[var(--tp-ink)]/80">
                     Visuals: {extras.join(" · ")}
                   </p>
                 ) : null;
@@ -875,7 +875,7 @@ division={brandId}
                 </p>
               ) : null}
               {result.notes.length === 0 ? (
-                <p className="mt-3 rounded-lg border border-[#A6FA87] bg-[#F1FEEC] p-3 text-[12.5px] text-[#03002C]">
+                <p className="mt-3 rounded-lg border border-[var(--tp-green)] bg-[#F1FEEC] p-3 text-[12.5px] text-[var(--tp-ink)]">
                   Everything fitted — nothing shortened, nothing left out.
                 </p>
               ) : (
@@ -883,9 +883,9 @@ division={brandId}
                   {(format && socialGrid && !drawn ? [...result.notes.filter((n) => n.field !== "points" && n.field !== "body"), ...(gridPoints.length > socialGridCapacity(format) ? [{ severity: "dropped" as const, field: "points", detail: `${gridPoints.length - socialGridCapacity(format)} tile(s) left out — this size holds ${socialGridCapacity(format)}.` }] : [])] : result.notes).map((n, i) => (
                     <li
                       key={`${n.field}-${i}`}
-                      className={`rounded-lg border p-2.5 text-[12.5px] leading-[1.45] text-[#03002C] ${SEVERITY_STYLE[n.severity] ?? "border-black/10 bg-white"}`}
+                      className={`rounded-lg border p-2.5 text-[12.5px] leading-[1.45] text-[var(--tp-ink)] ${SEVERITY_STYLE[n.severity] ?? "border-black/10 bg-white"}`}
                     >
-                      <span className="font-semibold uppercase tracking-[0.1em] text-[10px] text-[#666]">
+                      <span className="font-semibold uppercase tracking-[0.1em] text-[10px] text-[var(--tp-dark-gray)]">
                         {n.severity} · {n.field}
                       </span>
                       <span className="mt-0.5 block">{n.detail}</span>
@@ -1079,10 +1079,10 @@ function BrickList({ bricks }: { bricks: ContentBrick[] }) {
   if (!bricks.length) return null;
   return (
     <div className="space-y-1.5 pt-2">
-      <h3 className="text-[11px] font-semibold tracking-[0.1em] text-[#666] uppercase">Content bricks</h3>
+      <h3 className="text-[11px] font-semibold tracking-[0.1em] text-[var(--tp-dark-gray)] uppercase">Content bricks</h3>
       <ul className="space-y-1.5">
         {bricks.map((b) => (
-          <li key={b.id} className="rounded-md border border-black/10 p-2 text-[12px] text-[#03002C]">
+          <li key={b.id} className="rounded-md border border-black/10 p-2 text-[12px] text-[var(--tp-ink)]">
             <div className="flex items-center justify-between gap-2">
               <span className="font-semibold">{b.label}</span>
               <button
@@ -1091,13 +1091,13 @@ function BrickList({ bricks }: { bricks: ContentBrick[] }) {
                   void navigator.clipboard?.writeText(b.text);
                   setCopied(b.id);
                 }}
-                className="rounded border border-black/15 px-2 py-0.5 text-[11px] hover:border-[#003FC7]"
+                className="rounded border border-black/15 px-2 py-0.5 text-[11px] hover:border-[var(--tp-blue)]"
               >
                 {copied === b.id ? "Copied" : "Copy"}
               </button>
             </div>
-            <p className="mt-0.5 line-clamp-2 text-[11.5px] text-[#666]">{b.text}</p>
-            <p className="mt-1 text-[10.5px] text-[#666]">Feeds: {b.surfaces.join(" · ")}</p>
+            <p className="mt-0.5 line-clamp-2 text-[11.5px] text-[var(--tp-dark-gray)]">{b.text}</p>
+            <p className="mt-1 text-[10.5px] text-[var(--tp-dark-gray)]">Feeds: {b.surfaces.join(" · ")}</p>
           </li>
         ))}
       </ul>
