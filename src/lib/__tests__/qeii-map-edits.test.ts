@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   EMPTY_QEII_MAP_EDITS,
+  qeiiFloorMapEdits,
   qeiiApplyRoomEdit,
   qeiiClearRoomEdit,
   qeiiMapEditsEmpty,
@@ -12,6 +13,21 @@ import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { qeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 
 describe("live map edits", () => {
+  it("defaults San Francisco room names to stacked lines without changing saved choices", () => {
+    const defaults = qeiiFloorMapEdits("san-francisco:level-3");
+    expect(defaults.rooms['coat room']?.name).toBe("Coat\nRoom");
+    expect(defaults.rooms['golden gate']?.name).toBe("Golden\nGate");
+    expect(defaults.rooms['grand ballroom']?.name).toBe("Grand\nBallroom");
+    const saved = sanitizeQeiiMapEdits({ rooms: { "Coat Room": { name: "Coat Room", scale: 0.7 } } });
+    expect(qeiiFloorMapEdits("san-francisco:level-3", saved).rooms['coat room']?.name).toBe("Coat Room");
+    expect(qeiiFloorMapEdits("ground").rooms).toEqual({});
+  });
+
+  it("turns the long Level 3 foyer name in the shared preview/export layout", () => {
+    const floor = { id: "san-francisco:level-3", marker: "3", title: "Level 3", page: 1, kind: "vector" as const, w: 500, h: 300, shapes: [], labels: [{ text: "Grand Ballroom Foyer", x: 250, y: 150, size: 12 }] };
+    expect(qeiiPlanLayout(floor).blocks[0]?.angle).toBe(90);
+  });
+
   it("preserves label resizing and rotation through saved edits", () => {
     const edits = sanitizeQeiiMapEdits({ rooms: { "Telegraph Hill": { scale: 0.8, angle: 90 } } });
     expect(edits.rooms['telegraph hill']).toEqual({ scale: 0.8, angle: 90 });

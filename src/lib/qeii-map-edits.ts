@@ -36,6 +36,36 @@ export type QeiiMapEdits = {
 
 export const EMPTY_QEII_MAP_EDITS: QeiiMapEdits = { rooms: {}, colours: {}, keyLabels: {} };
 
+/** Event-specific typesetting defaults; saved user choices always take precedence. */
+export function qeiiFloorMapEdits(floorId: string, saved?: QeiiMapEdits): QeiiMapEdits {
+  if (!/^(san-francisco|next-sf):level-[3-6]$/.test(floorId)) return saved ?? EMPTY_QEII_MAP_EDITS;
+  const names: Record<string, string> = {
+    "Yerba Buena": "Yerba\nBuena", "Business Center": "Business\nCenter",
+    "Coat Room": "Coat\nRoom", "Golden Gate": "Golden\nGate",
+    "Grand Ballroom": "Grand\nBallroom",
+    "Grand Ballroom A": "Grand\nBallroom A", "Grand Ballroom B": "Grand\nBallroom B",
+    "Grand Ballroom C": "Grand\nBallroom C",
+    "Twin Peaks": "Twin\nPeaks", "Russian Hill": "Russian\nHill", "Potrero Hill": "Potrero\nHill",
+    "Executive Boardroom": "Executive\nBoardroom", "Nob Hill": "Nob\nHill",
+    "Laurel Hill": "Laurel\nHill", "Cathedral Hill": "Cathedral\nHill",
+    "InterContinental Ballroom": "InterContinental\nBallroom",
+    "InterContinental Ballroom A": "InterContinental\nBallroom A",
+    "InterContinental Ballroom B": "InterContinental\nBallroom B",
+    "InterContinental Ballroom C": "InterContinental\nBallroom C",
+    "Indoor Swimming Pool": "Indoor\nSwimming Pool", "Fitness Center": "Fitness\nCenter",
+    "Spa Terrace": "Spa\nTerrace", "Guest Rooms": "Guest\nRooms",
+  };
+  const rooms: Record<string, QeiiRoomEdit> = {};
+  for (const [room, name] of Object.entries(names)) rooms[qeiiRoomKey(room)] = { name };
+  if (floorId.endsWith("level-3")) {
+    rooms[qeiiRoomKey("Grand Ballroom Foyer")] = { angle: 90, scale: 0.85 };
+  }
+  for (const [key, edit] of Object.entries(saved?.rooms ?? {})) {
+    rooms[key] = { ...rooms[key], ...edit };
+  }
+  return { rooms, colours: saved?.colours ?? {}, keyLabels: saved?.keyLabels ?? {} };
+}
+
 /** Rooms are matched by name, case and spacing ignored. */
 export function qeiiRoomKey(room: string): string {
   return room.trim().toLowerCase().replace(/\s+/g, " ");

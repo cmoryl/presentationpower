@@ -5,7 +5,7 @@
 import { Button } from "@/design-system/element";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
 import { listVenueMapEdits, saveVenueMapEdits } from "@/lib/qeii-map-edits.functions";
-import { EMPTY_QEII_MAP_EDITS, qeiiApplyRoomEdit, qeiiClearRoomEdit, qeiiRoomEdit, type QeiiMapEdits, type QeiiRoomEdit } from "@/lib/qeii-map-edits";
+import { EMPTY_QEII_MAP_EDITS, qeiiFloorMapEdits, qeiiApplyRoomEdit, qeiiClearRoomEdit, qeiiRoomEdit, type QeiiMapEdits, type QeiiRoomEdit } from "@/lib/qeii-map-edits";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { eventDisplayName } from "@/lib/event-names";
 import { trimFloorToContent } from "@/lib/venue-floor-normalise";
@@ -120,7 +120,7 @@ function MapsPage() {
     () => (floor ? [...new Set(qeiiRoomShapes(floor).map((r) => r.room))].sort() : []),
     [floor],
   );
-  const labelEdits = current ? labelDrafts[current.floor_key] ?? labelQuery.data?.floors.find((f) => f.floorId === current.floor_key)?.edits ?? EMPTY_QEII_MAP_EDITS : EMPTY_QEII_MAP_EDITS;
+  const labelEdits = useMemo(() => current ? qeiiFloorMapEdits(eventFloorId(eventId, current.floor_key), labelDrafts[current.floor_key] ?? labelQuery.data?.floors.find((f) => f.floorId === current.floor_key)?.edits) : EMPTY_QEII_MAP_EDITS, [current, eventId, labelDrafts, labelQuery.data]);
   const labelLayout = useMemo(() => floor ? qeiiPlanLayout(floor, { edits: labelEdits }) : null, [floor, labelEdits]);
   const labelRoom = labelLayout?.blocks.find((b) => b.room === selectedLabel)?.room ?? labelLayout?.blocks[0]?.room ?? "";
   const labelEdit = qeiiRoomEdit(labelEdits, labelRoom);
