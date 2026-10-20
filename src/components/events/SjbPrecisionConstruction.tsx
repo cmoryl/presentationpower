@@ -61,14 +61,14 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
       <p className="mt-2 text-sm text-muted-foreground">Six original drawing layers, stacked in source order at the same origin and scale. Component files are production references, not approved standalone marks. The fortress, palms, football and banner share one composite scene; separating them into complete symbols would require designer work.</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{SJB_COMPONENTS.map(p => <article key={p.id} className="min-w-0 rounded-md border border-border">
         <div className={`aspect-square p-4 ${p.id === 'bird-accent' || p.id === 'white-underlay' ? 'bg-muted' : 'bg-foreground'}`}>{p.id === 'white-underlay' ? <p className="flex h-full items-center justify-center text-center text-sm text-muted-foreground">Original unpainted paths (fill: none). Preserved in the source pack.</p> : <img src={p.url} alt={p.name} className="h-full w-full object-contain" />}</div>
-        <div className="space-y-2 p-4"><h4 className="text-sm font-semibold">{p.order}. {p.name}</h4>{p.definition ? <><p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{p.definition.role}</p><p className="text-sm">{p.definition.detail}</p><p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">Rule: </span>{p.definition.rule}</p></> : null}<p className="font-mono text-xs text-muted-foreground">{p.paths} original paths · {fmt(p.bounds.w)} × {fmt(p.bounds.h)} u</p>
+        <div className="space-y-2 p-4"><h4 className="text-sm font-semibold">{p.order}. {p.name}</h4>{p.definition ? <><p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{p.definition.role}</p><p className="text-sm">{p.definition.detail}</p><p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">Rule: </span>{p.definition.rule}</p></> : null}<p className="font-mono text-xs text-muted-foreground">{p.paths} original shapes · {fmt(p.bounds.w)} × {fmt(p.bounds.h)} u</p>
         <Button asChild size="sm" variant="outline"><a href={p.url} download><Download />Layer SVG</a></Button></div>
       </article>)}</div>
       <h4 className="mt-6 text-base font-semibold">Inside layer 2: badge and scene elements</h4>
       <p className="mt-1 text-sm text-muted-foreground">The composite scene separated by its original shapes. Each file keeps only that element's paths at their source position, so the files stack back into the exact badge.</p>
       <div className="mt-3 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">{SJB_SCENE_ELEMENTS.map((e, n) => <article key={e.id} className="min-w-0 rounded-md border border-border">
         <div className={`aspect-square p-3 ${e.id === "base" || e.id === "scene-bird" || e.id === "banner" ? "bg-muted" : "bg-foreground"}`}><CroppedSvg url={e.url} label={e.name} /></div>
-        <div className="space-y-1 p-3"><h5 className="text-sm font-semibold">2.{n + 1} {e.name}</h5><p className="text-xs text-muted-foreground">{e.detail}</p><p className="font-mono text-[11px] text-muted-foreground">{e.paths.length} paths</p>
+        <div className="space-y-1 p-3"><h5 className="text-sm font-semibold">2.{n + 1} {e.name}</h5><p className="text-xs text-muted-foreground">{e.detail}</p><p className="font-mono text-[11px] text-muted-foreground">{e.paths.length} shapes</p>
         <Button asChild size="sm" variant="outline"><a href={e.url} download><Download />SVG</a></Button></div>
       </article>)}</div>
     </div>
@@ -145,7 +145,7 @@ function ExplodedView() {
         {active ? <div className="space-y-1 border-t border-border pt-3" aria-live="polite">
           <p className="font-medium">{active.definition?.role}</p>
           <p className="text-muted-foreground">{active.definition?.detail}</p>
-          <p className="font-mono text-xs text-muted-foreground">{active.paths} paths · {active.bounds.w.toFixed(1)} × {active.bounds.h.toFixed(1)} u</p>
+          <p className="font-mono text-xs text-muted-foreground">{active.paths} shapes · {active.bounds.w.toFixed(1)} × {active.bounds.h.toFixed(1)} u</p>
         </div> : null}
       </div>
     </div>

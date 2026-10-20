@@ -45,16 +45,16 @@ import sBird from "@/assets/san-juan-bowl/scene-bird.svg.asset.json";
  * only those paths at source coordinates — nothing redrawn. Bottom to top.
  */
 export const SJB_SCENE_ELEMENTS = [
-  { id: "base", name: "Badge base", detail: "Navy badge body. Also carries the dark outlines and silhouettes of the palms and fortress, so it sits under every element.", paths: [84], url: sBase.url },
-  { id: "sky", name: "Sky", detail: "Sky-blue field behind the fortress, with the cut-outs for the tower and clouds.", paths: [112, 113], url: sSky.url },
-  { id: "trim", name: "Gold top trim", detail: "Gold chevron border along the top of the badge.", paths: [57, 61], url: sTrim.url },
-  { id: "clouds", name: "Clouds", detail: "White clouds either side of the tower.", paths: [76, 78, 79, 80], url: sClouds.url },
-  { id: "fortress", name: "El Morro fortress", detail: "Tower, dome, walls, battlements and windows.", paths: [63, 64, 65, 66, 67, 69, 70, 72, 73, 74, 75, 77, 82, 85, 86, 87, 88, 89, 90, 91, 96, 97, 100, 101, 102, 103, 104, 107, 108, 109, 110, 111], url: sFort.url },
-  { id: "football", name: "Football", detail: "The ball rising behind the walls, with its laces and ground line.", paths: [31, 32, 33, 68, 71, 92, 93, 94, 95, 98, 99, 105, 106], url: sBall.url },
-  { id: "palm-left", name: "Left palm", detail: "Sky-blue fronds and gold trunk highlights of the left palm.", paths: [34, 35, 36, 40, 44, 45, 46, 51, 54, 55, 58, 83], url: sPalmL.url },
-  { id: "palm-right", name: "Right palm", detail: "Sky-blue fronds and gold trunk highlights of the right palm.", paths: [37, 38, 42, 43, 47, 48, 49, 50, 52, 53, 56, 81], url: sPalmR.url },
-  { id: "banner", name: "TRANSPERFECT banner", detail: "Gold ribbon, sky-blue tail folds, both white stars and all twelve TRANSPERFECT letters. Five letters (R, S, P, R, C) are curved shapes; the other seven and the stars are straight-sided shapes the first split missed, now included.", paths: [39, 41, 59, 60, 62, 114, 115, 116, 117, 118], url: sBanner.url },
-  { id: "scene-bird", name: "Scene bird", detail: "Navy bird in the sky. Its pair is layer 6, Bird accent, drawn as a separate shape in the source file; treat both birds as one decorative pair.", paths: [30], url: sBird.url },
+  { id: "base", name: "Badge base", detail: "Navy badge body. Also carries the dark outlines and silhouettes of the palms and fortress, so it sits under every element.", paths: [99], url: sBase.url },
+  { id: "sky", name: "Sky", detail: "Sky-blue field behind the fortress, with the cut-outs for the tower and clouds.", paths: [129, 130], url: sSky.url },
+  { id: "trim", name: "Gold top trim", detail: "Gold chevron border along the top of the badge.", paths: [67, 71], url: sTrim.url },
+  { id: "clouds", name: "Clouds", detail: "White clouds either side of the tower.", paths: [91, 93, 94, 95], url: sClouds.url },
+  { id: "fortress", name: "El Morro fortress", detail: "Tower, dome, walls, battlements and windows.", paths: [34, 35, 36, 37, 41, 42, 73, 74, 75, 76, 77, 78, 79, 80, 82, 83, 86, 87, 89, 90, 92, 97, 100, 101, 102, 103, 104, 105, 106, 111, 112, 114, 115, 117, 118, 119, 120, 121, 124, 125, 126, 127, 128], url: sFort.url },
+  { id: "football", name: "Football", detail: "The ball rising behind the walls, with its laces and ground line.", paths: [39, 40, 43, 81, 84, 107, 108, 109, 110, 113, 116, 122, 123], url: sBall.url },
+  { id: "palm-left", name: "Left palm", detail: "Sky-blue fronds and gold trunk highlights of the left palm.", paths: [44, 45, 46, 50, 54, 55, 56, 61, 64, 65, 68, 98], url: sPalmL.url },
+  { id: "palm-right", name: "Right palm", detail: "Sky-blue fronds and gold trunk highlights of the right palm.", paths: [47, 48, 52, 53, 57, 58, 59, 60, 62, 63, 66, 96], url: sPalmR.url },
+  { id: "banner", name: "TRANSPERFECT banner", detail: "Gold ribbon, sky-blue tail folds, both white stars and all twelve TRANSPERFECT letters. Twelve letters and two stars in total.", paths: [49, 51, 69, 70, 72, 85, 88, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142], url: sBanner.url },
+  { id: "scene-bird", name: "Scene bird", detail: "Navy bird in the sky. Its pair is layer 6, Bird accent, drawn as a separate shape in the source file; treat both birds as one decorative pair.", paths: [38], url: sBird.url },
 ] as const;
 
 export const SJB_SCENE_ELEMENT_OF: Record<number, string> = Object.fromEntries(
