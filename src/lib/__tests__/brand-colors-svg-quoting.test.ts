@@ -17,7 +17,7 @@ function files(dir: string, out: string[] = []): string[] {
 describe("brand colours in markup strings", () => {
   it("never write an unquoted {BRAND.x} attribute inside a template string", () => {
     const bad: string[] = [];
-    for (const f of files("src")) {
+    for (const f of files("src").filter((p) => !p.endsWith("brand-colors-svg-quoting.test.ts"))) {
       const src = readFileSync(f, "utf8");
       for (const m of src.matchAll(/`[^`]*`/g)) {
         if (/[a-z-]+=\{BRAND\.\w+\}/.test(m[0])) bad.push(f);
