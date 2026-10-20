@@ -507,7 +507,7 @@ export function martPriceListSvg(
     : "";
 
   const guides = options.withBleed
-    ? `<g id="07_GUIDES" data-export-ignore="true"><rect x="${bleed}" y="${bleed}" width="${S.trimW}" height="${S.trimH}" fill="none" stroke={BRAND.pink} stroke-width="0.2" stroke-dasharray="2 2"/></g>`
+    ? `<g id="07_GUIDES" data-export-ignore="true"><rect x="${bleed}" y="${bleed}" width="${S.trimW}" height="${S.trimH}" fill="none" stroke="${BRAND.pink}" stroke-width="0.2" stroke-dasharray="2 2"/></g>`
     : "";
 
   return [

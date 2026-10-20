@@ -36,6 +36,9 @@ describe("venue floor import", () => {
     const paint = qeiiColourPaint(floor, { "Ballroom A": "#003FC7" });
     expect([...paint.fills.values()]).toContain("#003FC7");
     expect(qeiiPlanSvg(floor, { roomColours: { "Ballroom A": "#003FC7" } })).toContain("#003FC7");
+    // The downloaded sheet must open in Illustrator: every attribute quoted.
+    const sheet = qeiiPlanSvg(floor, { face: "signage", roomColours: { "Ballroom A": "#003FC7" } });
+    expect(sheet).not.toMatch(/=\{/);
   });
 
   it("reports a picture-only file instead of faking a plan", () => {

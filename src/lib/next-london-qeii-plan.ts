@@ -549,7 +549,7 @@ function qeiiSignageSheet(
     return `<path d="M${x} ${footY} L${x + cw * 0.55} ${footY} L${x + cw * 0.55 + kk} ${footY + footH / 2} L${x + cw * 0.55} ${footY + footH} L${x} ${footY + footH} L${x + kk} ${footY + footH / 2} Z" fill="${c}"/>`;
   }).join("");
   const foot =
-    `<rect x="0" y="${footY}" width="${SW - tabW}" height="${footH}" fill={BRAND.blue}/>` + footChevrons +
+    `<rect x="0" y="${footY}" width="${SW - tabW}" height="${footH}" fill="${BRAND.blue}"/>` + footChevrons +
     (showText
       ? `<text x="${m}" y="${footY + footH / 2}" dominant-baseline="middle" ${font} font-weight="700" font-size="${footH * 0.34}" letter-spacing="${footH * 0.03}" fill="#FFFFFF">${venueBar}</text>`
       : "");
@@ -561,7 +561,7 @@ function qeiiSignageSheet(
   const px = areaX + (areaW - W * k) / 2;
   const py = areaY + (areaH - H * k) / 2;
   const heading = showText
-    ? `<text x="${m}" y="${m + titleSize * 0.8}" ${font} font-weight="400" font-size="${titleSize}" fill={BRAND.ink}>${floor.title.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text>`
+    ? `<text x="${m}" y="${m + titleSize * 0.8}" ${font} font-weight="400" font-size="${titleSize}" fill="${BRAND.ink}">${floor.title.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text>`
     : "";
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${SW}" height="${SH}" viewBox="0 0 ${SW} ${SH}">`,
