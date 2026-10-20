@@ -82,9 +82,9 @@ export function SjbLayerViewer({ className }: SjbLayerViewerProps) {
   const [focus, setFocus] = useState("");
   const [full, setFull] = useState(false);
   const [reset, setReset] = useState(0);
-  const controls = <div className="flex flex-wrap items-end gap-4">
-    <label className="min-w-40 flex-1 space-y-1 text-sm"><span className="block font-medium">Layer spread</span><input type="range" aria-label="Layer spread" min={0} max={160} value={spread} onChange={e => setSpread(Number(e.target.value))} className="w-full" /></label>
-    <label className="min-w-0 flex-1 space-y-1 text-sm"><span className="block font-medium">Isolate layer</span><select aria-label="Isolate layer" className="h-9 w-full rounded-md border border-input bg-background px-2" value={focus} onChange={e => setFocus(e.target.value)}><option value="">All layers</option>{layers.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+  const controls = <div className="grid grid-cols-[1fr_auto] items-end gap-3 sm:flex sm:flex-wrap">
+    <label className="col-span-2 min-w-0 space-y-1 text-sm sm:flex-1"><span className="block font-medium">Layer spread</span><input type="range" aria-label="Layer spread" min={0} max={160} value={spread} onChange={e => setSpread(Number(e.target.value))} className="w-full" /></label>
+    <label className="col-span-2 min-w-0 space-y-1 text-sm sm:flex-1"><span className="block font-medium">Isolate layer</span><select aria-label="Isolate layer" className="h-9 w-full rounded-md border border-input bg-background px-2" value={focus} onChange={e => setFocus(e.target.value)}><option value="">All layers</option>{layers.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
     <Button size="sm" variant="outline" onClick={() => { setSpread(0); setFocus(""); }}>Assemble</Button>
     <Button variant="outline" size="icon" title="Center camera" aria-label="Center logo camera" onClick={() => setReset(v => v + 1)}><RotateCcw /></Button>
   </div>;

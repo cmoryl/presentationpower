@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] San Juan Bowl: audit palm highlights, expose every source shape as a separate SVG with element filtering, center the layer viewer and add an enlarged interactive dialog.
+- [x] San Juan Bowl: original white palm highlights verified; all 293 micro-extracted SVGs match source geometry, downloadable individually/ZIP; centered 3D orbit and enlarged interactive dialog tested.
 
 - [x] San Juan Bowl: source-coordinate grid, measured sizing calculator, six preserved original layers and verified ZIP download; composite scene elements are not falsely offered as independent symbols.
 
