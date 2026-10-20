@@ -1,5 +1,7 @@
 # Events, kiosks, signage, venue maps
 
+- Map SVG downloads pass through `selfContainedSvg` before delivery; SVG logos are nested vector paths with unique IDs, raster images embedded, and missing assets block export — why: Illustrator cannot reliably resolve linked web logos.
+
 - Map previews reuse `PlanZoomFrame` for zoom, pan and an accessible enlarged dialog — why: venue and event pages should share the same inspection controls without altering exports.
 
 - QEII symbol cleanup applies only to the issued QEII floor IDs; imported venues retain every symbol path — why: restroom heads also resemble structural pillar dots.

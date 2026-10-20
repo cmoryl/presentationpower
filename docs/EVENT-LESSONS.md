@@ -1,5 +1,11 @@
 # Event lessons log
 
+### 2026-10-20 — Linked logos do not travel with SVGs
+**Context:** downloaded event floor maps opened in Illustrator.
+**What happened:** logos referenced website URLs; Illustrator reported missing images.
+**Rule now:** embed SVG logos as nested vector artwork before download, keeping placement and unique gradient/clip IDs. Missing artwork blocks the download rather than disappearing silently.
+**Enforced by:** `export-self-contained-svg.test.ts` and downloaded SF floor verification.
+
 ### 2026-10-20 — Bathroom heads are not pillar dots
 **Context:** San Francisco Levels 4–5.
 **What happened:** QEII-specific pillar cleanup suppressed circular head paths in imported hotel bathroom figures.
