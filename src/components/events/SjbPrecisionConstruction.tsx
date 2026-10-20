@@ -66,23 +66,73 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
 }
 
 function ExplodedView() {
-  const [open, setOpen] = useState(true);
   const layers = SJB_COMPONENTS.filter(p => p.id !== "white-underlay");
+  const [spread, setSpread] = useState(90);
+  const [rot, setRot] = useState({ x: 58, z: -38 });
+  const [focus, setFocus] = useState<string | null>(null);
+  const [xray, setXray] = useState(false);
+  const [drag, setDrag] = useState<{ px: number; py: number; x: number; z: number } | null>(null);
+  const open = spread > 0;
+  const active = layers.find(l => l.id === focus);
+  const presets = { Exploded: { x: 58, z: -38, s: 90 }, Side: { x: 82, z: 0, s: 110 }, Top: { x: 0, z: 0, s: 0 } } as const;
+  const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+  const onKey = (e: React.KeyboardEvent) => {
+    const d = e.shiftKey ? 10 : 3;
+    if (e.key === "ArrowLeft") setRot(r => ({ ...r, z: r.z - d }));
+    else if (e.key === "ArrowRight") setRot(r => ({ ...r, z: r.z + d }));
+    else if (e.key === "ArrowUp") setRot(r => ({ ...r, x: clamp(r.x - d, 0, 85) }));
+    else if (e.key === "ArrowDown") setRot(r => ({ ...r, x: clamp(r.x + d, 0, 85) }));
+    else return;
+    e.preventDefault();
+  };
   return <div className="border-t border-border pt-5">
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div><h3 className="text-lg font-semibold">Dissected logo</h3>
-        <p className="mt-1 text-sm text-muted-foreground">The original drawing layers pulled apart in depth, bottom to top. Toggle to watch them assemble.</p></div>
-      <Button variant="outline" onClick={() => setOpen(o => !o)} aria-pressed={open}>{open ? "Assemble" : "Dissect"}</Button>
-    </div>
-    <div className="mt-4 overflow-hidden rounded-md bg-foreground py-16" style={{ perspective: "1600px" }}>
-      <div className="relative mx-auto aspect-square w-[min(60%,380px)] transition-transform duration-700 motion-reduce:transition-none" style={{ transformStyle: "preserve-3d", transform: open ? "rotateX(58deg) rotateZ(-38deg)" : "none" }}>
-        {layers.map((p, i) => <div key={p.id} className="absolute inset-0 transition-transform duration-700 motion-reduce:transition-none" style={{ transformStyle: "preserve-3d", transform: `translateZ(${open ? i * 90 : 0}px)` }}>
-          {open ? <div className="absolute inset-0 rounded-sm border border-background/25 bg-background/5" /> : null}
-          <img src={p.url} alt={p.name} className="relative h-full w-full object-contain" />
-          {open ? <span className="absolute -right-2 top-0 translate-x-full whitespace-nowrap font-mono text-[11px] text-background/80">{p.order}. {p.definition?.role ?? p.name}</span> : null}
-        </div>)}
+        <p className="mt-1 text-sm text-muted-foreground">Drag (or use arrow keys) to orbit. Pick a layer to isolate it. Slide to assemble.</p></div>
+      <div className="flex flex-wrap gap-2">
+        {Object.entries(presets).map(([k, v]) => <Button key={k} size="sm" variant="outline" onClick={() => { setRot({ x: v.x, z: v.z }); setSpread(v.s); }}>{k}</Button>)}
+        <Button size="sm" variant={xray ? "default" : "outline"} aria-pressed={xray} onClick={() => setXray(v => !v)}>X-ray</Button>
       </div>
     </div>
-    <p className="mt-2 text-xs text-muted-foreground">Display view only. The foundation layer has no paint, so it is not shown. Never reproduce the logo separated like this.</p>
+    <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_240px]">
+      <div tabIndex={0} role="application" aria-label="Rotatable dissected logo. Arrow keys orbit, Shift for larger steps."
+        onKeyDown={onKey}
+        onPointerDown={e => { (e.target as Element).setPointerCapture?.(e.pointerId); setDrag({ px: e.clientX, py: e.clientY, ...rot }); }}
+        onPointerMove={e => drag && setRot({ z: drag.z + (e.clientX - drag.px) * 0.4, x: clamp(drag.x - (e.clientY - drag.py) * 0.3, 0, 85) })}
+        onPointerUp={() => setDrag(null)} onPointerCancel={() => setDrag(null)}
+        className="relative touch-none select-none overflow-hidden rounded-md bg-foreground py-16 outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-grab active:cursor-grabbing"
+        style={{ perspective: "1600px" }}>
+        <div className={`relative mx-auto aspect-square w-[min(60%,380px)] ${drag ? "" : "transition-transform duration-700"} motion-reduce:transition-none`}
+          style={{ transformStyle: "preserve-3d", transform: `rotateX(${rot.x}deg) rotateZ(${rot.z}deg)` }}>
+          {layers.map((p, i) => {
+            const dim = focus && focus !== p.id;
+            const lift = focus === p.id && open ? 40 : 0;
+            return <div key={p.id} className="absolute inset-0 transition-all duration-500 motion-reduce:transition-none"
+              style={{ transformStyle: "preserve-3d", transform: `translateZ(${i * spread + lift}px)`, opacity: dim ? 0.12 : 1 }}>
+              {open ? <div className={`absolute inset-0 rounded-sm border ${focus === p.id ? "border-primary bg-primary/10" : "border-background/25 bg-background/5"}`} /> : null}
+              {open && xray ? <div className="absolute border border-dashed border-destructive" style={{ left: `${p.bounds.x / 12.54}%`, top: `${p.bounds.y / 12.54}%`, width: `${p.bounds.w / 12.54}%`, height: `${p.bounds.h / 12.54}%` }} /> : null}
+              <img src={p.url} alt="" draggable={false} className="pointer-events-none relative h-full w-full object-contain" style={{ filter: xray ? "grayscale(1) contrast(2) invert(1)" : undefined }} />
+              {open ? <span className="absolute -right-2 top-0 translate-x-full whitespace-nowrap font-mono text-[11px] text-background/80">{p.order}. {p.definition?.role ?? p.name} · z{i * spread}</span> : null}
+            </div>;
+          })}
+        </div>
+        <p className="absolute bottom-2 left-3 font-mono text-[10px] text-background/60">rotX {rot.x.toFixed(0)}° · rotZ {rot.z.toFixed(0)}° · spread {spread}px</p>
+      </div>
+      <div className="space-y-4 text-sm">
+        <label className="block space-y-1"><span className="font-medium">Layer spread</span>
+          <input type="range" min={0} max={160} value={spread} onChange={e => setSpread(Number(e.target.value))} className="w-full" aria-label="Layer spread" /></label>
+        <fieldset className="space-y-1"><legend className="font-medium">Isolate layer</legend>
+          <Button size="sm" variant={focus ? "outline" : "default"} className="w-full justify-start" onClick={() => setFocus(null)}>All layers</Button>
+          {layers.map(p => <Button key={p.id} size="sm" variant={focus === p.id ? "default" : "outline"} className="w-full justify-start"
+            onMouseEnter={() => setFocus(p.id)} onFocus={() => setFocus(p.id)} onClick={() => setFocus(p.id)}>{p.order}. {p.definition?.role ?? p.name}</Button>)}
+        </fieldset>
+        {active ? <div className="space-y-1 border-t border-border pt-3" aria-live="polite">
+          <p className="font-medium">{active.definition?.role}</p>
+          <p className="text-muted-foreground">{active.definition?.detail}</p>
+          <p className="font-mono text-xs text-muted-foreground">{active.paths} paths · {active.bounds.w.toFixed(1)} × {active.bounds.h.toFixed(1)} u</p>
+        </div> : null}
+      </div>
+    </div>
+    <p className="mt-2 text-xs text-muted-foreground">Display view only. The foundation layer has no paint, so it is not shown. X-ray shows each layer's measured bounds. Never reproduce the logo separated like this.</p>
   </div>;
 }
