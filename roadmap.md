@@ -30,3 +30,4 @@
 - [x] Restore original bathroom people symbols on San Francisco Levels 4–5 and verify map previews and SVG downloads.
 - [x] Add larger map views with zoom and pan to event maps and San Francisco venue plans; verify enlargement and closing.
 - [x] Apply stacked San Francisco room-name defaults and turn the long Level 3 foyer name in previews and SVGs.
+- [x] Add TransPerfect San Juan Bowl event: directory card, event home, brand kit with supplied logo variants and palette.
