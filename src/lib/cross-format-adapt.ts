@@ -659,6 +659,32 @@ function pickStat(content: Record<string, unknown>): { value: string; label: str
 }
 
 /**
+ * Every figure the source prints, in reading order. The first becomes the
+ * payload's `stat`; the rest ride in `stats` so a figure grid or KPI strip is
+ * not flattened to a single number when it crosses formats.
+ */
+export function pickStats(content: Record<string, unknown>): { value: string; label: string }[] {
+  const first = pickStat(content);
+  const out = first ? [first] : [];
+  for (const key of ["stats", "items", "metrics", "kpis"]) {
+    const stats = asList(content[key]);
+    if (!stats) continue;
+    for (const s of stats) {
+      if (!s || typeof s !== "object") continue;
+      const rec = s as Record<string, unknown>;
+      const raw = rec.value ?? rec.stat ?? rec.number;
+      const value = typeof raw === "number" ? String(raw) : str(raw);
+      if (!value) continue;
+      const unit = str(rec.unit) ?? "";
+      const joined = unit && !/^[%+x×]/.test(unit) ? `${value} ${unit}` : `${value}${unit}`;
+      const label = str(rec.label) ?? str(rec.caption) ?? "";
+      if (!out.some((o) => o.value === joined && o.label === label)) out.push({ value: joined, label });
+    }
+  }
+  return out;
+}
+
+/**
  * Background/media travel rule. A photograph or curated image asset travels as
  * itself; a solid brand token travels as a token. Anything generated as vector
  * artwork is refused — backgrounds stay on approved photography, solid tokens
@@ -756,7 +782,8 @@ export function contentFromSlide(
   fallbackHeadline = "Untitled slide",
 ): AdaptContent {
   const c = (slide.content ?? {}) as Record<string, unknown>;
-  const stat = pickStat(c);
+  const stats = pickStats(c);
+  const stat = stats[0];
   const statLine = stat ? [stat.value, stat.label].filter(Boolean).join(" ") : undefined;
   const headline = pick(c, HEADLINE_KEYS) ?? statLine ?? fallbackHeadline;
   // Never repeat the headline as the eyebrow or body (a cover's client name
