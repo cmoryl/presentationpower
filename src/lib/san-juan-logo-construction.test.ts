@@ -1,4 +1,4 @@
-import { expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { SJB_COMPONENTS, SJB_MEASUREMENTS, sjbProductionSize } from "./san-juan-logo-construction";
 
 it("preserves every original path across the six source layers", () => {
