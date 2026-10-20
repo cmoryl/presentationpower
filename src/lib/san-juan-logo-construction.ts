@@ -54,7 +54,7 @@ export const SJB_SCENE_ELEMENTS = [
   { id: "palm-left", name: "Left palm", detail: "Sky-blue fronds and gold trunk highlights of the left palm.", paths: [34, 35, 36, 40, 44, 45, 46, 51, 54, 55, 58, 83], url: sPalmL.url },
   { id: "palm-right", name: "Right palm", detail: "Sky-blue fronds and gold trunk highlights of the right palm.", paths: [37, 38, 42, 43, 47, 48, 49, 50, 52, 53, 56, 81], url: sPalmR.url },
   { id: "banner", name: "TRANSPERFECT banner", detail: "Gold ribbon and sky-blue tail folds. The TRANSPERFECT letters are cut out of the ribbon, so the navy badge base shows through as the lettering.", paths: [39, 41, 59, 60, 62, 114, 115, 116, 117, 118], url: sBanner.url },
-  { id: "scene-bird", name: "Scene bird", detail: "Navy bird in the sky (the second bird is the separate Bird accent layer).", paths: [30], url: sBird.url },
+  { id: "scene-bird", name: "Scene bird", detail: "Navy bird in the sky. Its pair is layer 6, Bird accent, drawn as a separate shape in the source file; treat both birds as one decorative pair.", paths: [30], url: sBird.url },
 ] as const;
 
 export const SJB_SCENE_ELEMENT_OF: Record<number, string> = Object.fromEntries(
