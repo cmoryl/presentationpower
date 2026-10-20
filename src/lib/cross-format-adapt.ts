@@ -37,6 +37,8 @@ export type AdaptContent = {
   body?: string;
   points?: string[];
   stat?: { value: string; label: string };
+  /** Every further figure the source prints (the first is `stat`). */
+  stats?: { value: string; label: string }[];
   cta?: string;
   footnote?: string;
   media?: AdaptMedia;
@@ -173,6 +175,9 @@ export type AdaptTargetId =
   | "social-card"
   | "social-portrait"
   | "social-story"
+  | "social-landscape"
+  | "social-wide"
+  | "email-header"
   | "print-brief"
   | "case-study"
   | "print-letter"
