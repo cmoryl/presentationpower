@@ -818,6 +818,7 @@ export function contentFromSlide(
     body,
     points,
     stat,
+    stats: stats.length > 1 ? stats.slice(1, 5) : undefined,
     cta,
     footnote,
     media: adaptMediaFrom(c),
@@ -951,11 +952,23 @@ export function adaptContent(content: AdaptContent, targetId: AdaptTargetId): Ad
 
   if (content.stat && !target.structure.includes("stat")) {
     out.stat = undefined;
+    out.stats = undefined;
     notes.push({
       severity: "dropped",
       field: "stat",
-      detail: `Figure "${content.stat.value}" not shown — ${target.label} has no figure block.`,
+      detail: `Figure "${content.stat.value}"${content.stats?.length ? ` and ${content.stats.length} more` : ""} not shown — ${target.label} has no figure block.`,
     });
+  } else if (content.stats?.length) {
+    // A figure strip holds the lead figure plus three more.
+    const kept = content.stats.slice(0, 3);
+    out.stats = kept;
+    if (content.stats.length > kept.length) {
+      notes.push({
+        severity: "dropped",
+        field: "stat",
+        detail: `${content.stats.length - kept.length} figure(s) did not fit — the figure strip holds the lead figure plus ${kept.length}.`,
+      });
+    }
   }
 
   if (content.footnote && !target.structure.includes("footnote")) {
@@ -1077,6 +1090,7 @@ export function applySelection(source: AdaptContent, sel: AdaptSelection): Adapt
     body: text("body"),
     points: points && points.length ? points : undefined,
     stat,
+    stats: off.has("stat") || !stat ? undefined : source.stats,
     cta: text("cta"),
     footnote: text("footnote"),
     media: off.has("media") ? undefined : source.media,
