@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { saveRoomsVersion, useEventAssets, useRefreshEventAssets } from "@/lib/event-assets-data";
 import { SF_VENUE_FACT_SHEET, SF_VENUE_FLOORS, SF_VENUE_ROOMS, sfVenueRoomList } from "@/lib/next-sf-venue-rooms";
 import { SF_VENUE_ZONES } from "@/lib/next-sf-venue-zones";
+import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
 
 const n = (v: number | null) => (v == null ? "–" : v.toLocaleString("en-US"));
 
@@ -70,6 +71,7 @@ export function SfVenueMeetingSpace() {
       <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         <div>
           <div className="rounded-md border border-[#03002C]/10 bg-white p-2">
+            <PlanZoomFrame key={floor} label={plan.title}>
             <div className="relative">
               <a href={plan.vectorUrl} target="_blank" rel="noreferrer" className="block">
                 <img src={plan.vectorUrl} alt={`InterContinental San Francisco ${plan.title.toLowerCase()} plan`} className="h-auto w-full" loading="lazy" />
@@ -92,6 +94,7 @@ export function SfVenueMeetingSpace() {
                 </div>
               ))}
             </div>
+            </PlanZoomFrame>
           </div>
           {(SF_VENUE_ZONES[plan.floor] ?? []).length > 0 && (
             <ul aria-label={`${plan.title} event zones`} className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-[12px] text-[#03002C]">

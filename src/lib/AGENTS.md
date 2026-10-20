@@ -1,5 +1,7 @@
 # Events, kiosks, signage, venue maps
 
+- Map previews reuse `PlanZoomFrame` for zoom, pan and an accessible enlarged dialog — why: venue and event pages should share the same inspection controls without altering exports.
+
 - QEII symbol cleanup applies only to the issued QEII floor IDs; imported venues retain every symbol path — why: restroom heads also resemble structural pillar dots.
 
 - Event label patches reuse `venue_map_edits` with scope `event-<eventId>` and floor keys; `qeiiPlanLayout` measures Geist advances and rotated bounds for preview/export — why: text edits do not change shared venue drawings or diverge in SVG downloads.

@@ -28,3 +28,4 @@
 - [x] H5. GitHub sync — owner connected
 - [x] Map labels: resizing, rotation and positioning controls with saved adjustments; fix clipped San Francisco labels and verify SVG export.
 - [x] Restore original bathroom people symbols on San Francisco Levels 4–5 and verify map previews and SVG downloads.
+- [x] Add larger map views with zoom and pan to event maps and San Francisco venue plans; verify enlargement and closing.
