@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/design-system/element";
 import bSvg from "@/assets/san-juan-bowl/1c-black.svg.asset.json";
 import bPng from "@/assets/san-juan-bowl/1c-black.png.asset.json";
@@ -43,6 +44,7 @@ export function SjbSingleColour({ className }: SjbSingleColourProps) {
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant={framed ? "outline" : "default"} aria-pressed={!framed} onClick={() => setFramed(false)}>Unframed</Button>
         <Button size="sm" variant={framed ? "default" : "outline"} aria-pressed={framed} onClick={() => setFramed(true)}>Framed</Button>
+        <Button asChild size="sm" variant="outline"><Link to="/events/san-juan-bowl/brand-kit/single-colour">Usage by process</Link></Button>
         <Button asChild size="sm" variant="outline"><a href={pack.url} download><Download />Full pack (SVG, PDF, EPS, AI, PNG)</a></Button>
       </div>
     </div>
