@@ -2,6 +2,8 @@
 // and a zip of one install card per asset.
 
 import { jsPDF } from "jspdf";
+import { selfContainedSvg } from "@/lib/export-self-contained-svg";
+import { saveFile } from "@/lib/save-file";
 
 import { loadSvgImage } from "@/lib/london-panel-raster";
 import {
@@ -64,17 +66,12 @@ function scaleOf(opts: MapExportOptions): number {
 }
 
 function save(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  saveFile(blob, filename);
 }
 
 /** Rasterise a map SVG at a print-friendly multiplier. */
 export async function mapPngBlob(svg: string, w: number, h: number, scale = 2): Promise<Blob> {
-  const img = await loadSvgImage(svg);
+  const img = await loadSvgImage(await selfContainedSvg(svg));
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(w * scale);
   canvas.height = Math.round(h * scale);
@@ -98,9 +95,9 @@ async function pngDataUrl(svg: string, w: number, h: number, scale = 2): Promise
   });
 }
 
-export function downloadFloorMapSvg(floor: LondonFloorId, opts: MapExportOptions) {
+export async function downloadFloorMapSvg(floor: LondonFloorId, opts: MapExportOptions) {
   const sheet = { ...opts, plan: planOf(opts, floor) };
-  const svg = floorMapSvg(floor, sheet);
+  const svg = await selfContainedSvg(floorMapSvg(floor, sheet));
   const kind = opts.roomsOnly ? "rooms" : "map";
   save(
     new Blob([svg], { type: "image/svg+xml" }),
@@ -125,8 +122,8 @@ export async function downloadAttendeeMapPdf(opts: MapExportOptions) {
   );
 }
 
-export function downloadAssetMapSvg(panel: LondonPanel, opts: MapExportOptions) {
-  const svg = assetMapSvg(panel, opts);
+export async function downloadAssetMapSvg(panel: LondonPanel, opts: MapExportOptions) {
+  const svg = await selfContainedSvg(assetMapSvg(panel, opts));
   save(new Blob([svg], { type: "image/svg+xml" }), `next-london-location-${panelSlug(panel)}.svg`);
 }
 
@@ -205,22 +202,23 @@ export async function downloadAssetMapPack(opts: MapExportOptions) {
   const mapped = new Set(LONDON_FLOOR_PLANS.map((p) => p.floor));
   for (const panel of opts.panels) {
     if (!mapped.has(panel.floor)) continue;
-    zip
-      .folder(panel.floor.toLowerCase())!
-      .file(`${panelSlug(panel)}-location.svg`, assetMapSvg(panel, opts));
+    const folder = zip.folder(panel.floor.toLowerCase());
+    if (!folder) throw new Error("Could not create map folder.");
+    folder.file(`${panelSlug(panel)}-location.svg`, await selfContainedSvg(assetMapSvg(panel, opts)));
   }
   // Directory sheets for the whole floor sit alongside the per-asset cards, in the
   // same visual language, so a crew can print either from one pack.
-  const sheets = zip.folder("floor-directory")!;
+  const sheets = zip.folder("floor-directory");
+  if (!sheets) throw new Error("Could not create directory folder.");
   for (const plan of LONDON_FLOOR_PLANS) {
     if (!opts.panels.some((p) => p.floor === plan.floor)) continue;
     sheets.file(
       `next-london-directory-${plan.floor.toLowerCase()}.svg`,
-      floorMapSvg(plan.floor, {
+      await selfContainedSvg(floorMapSvg(plan.floor, {
         ...opts,
         labels: true,
         footerNote: `${plan.label} · install plan`,
-      }),
+      })),
     );
   }
 
