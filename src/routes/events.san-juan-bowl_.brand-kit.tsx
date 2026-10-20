@@ -9,6 +9,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { SjbPrecisionConstruction } from "@/components/events/SjbPrecisionConstruction";
 import { BRAND } from "@/lib/brand-colors";
 import {
   SJB_BACKGROUNDS,
@@ -306,7 +307,7 @@ function ConstructionSection() {
         </a>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <ConstructionDiagram />
+        <SjbPrecisionConstruction className="lg:col-span-2" />
         <div className="space-y-3">
           <table className="w-full text-left text-[13px]">
             <thead>
@@ -327,7 +328,7 @@ function ConstructionSection() {
             </tbody>
           </table>
           <ul className="list-disc space-y-1 pl-5 text-[12px] text-[#03002C]/80">
-            <li>{c.centerNote}</li>
+            <li>Use the measured source-coordinate bounds above for exact placement; the ratios below are rounded reference values.</li>
             <li>{c.scaleNote}</li>
             <li>The supplied file is a square artboard; keep that square intact when placing the artwork.</li>
           </ul>
