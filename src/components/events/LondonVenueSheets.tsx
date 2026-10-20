@@ -1,4 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { selfContainedSvg } from "@/lib/export-self-contained-svg";
+import { saveFile } from "@/lib/save-file";
 import { getVenueFloors } from "@/lib/venues.functions";
 import { setQeiiVenueFloors, qeiiVenueFloorsVersion, qeiiFloorVectorBundledPage, type QeiiFloorVector as VenueFloorVector } from "@/lib/next-london-qeii-vectors";
 // Interactive viewer for the issued QEII Centre floor sheets.
@@ -471,27 +473,13 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
     });
     // Linked lockups are swapped for the approved artwork's own outlines, so the
     // file carries live vector logos instead of a link only this site can follow.
-    let svg = plain;
-    const notes: string[] = [];
     try {
-      const { qeiiVectoriseSvgLockups } = await import("@/lib/next-london-qeii-mark-art");
-      const done = await qeiiVectoriseSvgLockups(plain);
-      svg = done.svg;
-      if (done.placed)
-        notes.push(
-          `${done.placed} division lockup${done.placed === 1 ? " is" : "s are"} embedded as editable vector artwork.`,
-        );
-      if (done.dropped.length)
-        notes.push(
-          `${done.dropped.length} division lockup${done.dropped.length === 1 ? "" : "s"} could not be read as outlines, so ${done.dropped.length === 1 ? "it stays" : "they stay"} linked to the site.`,
-        );
-    } catch {
-      notes.push("The division lockups stay linked to the site in this file.");
+      const svg = await selfContainedSvg(plain);
+      saveFile(new Blob([svg], { type: "image/svg+xml" }), qeiiPlanFilename(plan.floor, face));
+      setExportNote("SVG downloaded with embedded vector logos.");
+    } catch (error) {
+      setExportNote(`SVG not downloaded: ${error instanceof Error ? error.message : "Could not embed the logos."}`);
     }
-    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
-    download(url, qeiiPlanFilename(plan.floor, face));
-    URL.revokeObjectURL(url);
-    if (notes.length) setExportNote(notes.join(" "));
   }
 
   /** Every export builds from the plan exactly as it reads on screen right now. */
@@ -617,13 +605,8 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
       if (kind === "zip") {
         const JSZip = (await import("jszip")).default;
         const zip = new JSZip();
-        const { qeiiVectoriseSvgLockups } = await import("@/lib/next-london-qeii-mark-art");
-        const vector = await qeiiVectoriseSvgLockups(qeiiPlanSvg(plan.floor, options));
-        zip.file(qeiiPlanFilename(plan.floor, face), vector.svg);
-        if (vector.dropped.length)
-          notes.push(
-            `${vector.dropped.length} division lockup${vector.dropped.length === 1 ? "" : "s"} could not be read as outlines, so ${vector.dropped.length === 1 ? "it stays" : "they stay"} linked in the SVG.`,
-          );
+        const vector = await selfContainedSvg(qeiiPlanSvg(plan.floor, options));
+        zip.file(qeiiPlanFilename(plan.floor, face), vector);
         for (const file of files) zip.file(file.name, file.blob);
         const blob = await zip.generateAsync({ type: "blob" });
         const name = `TP-NEXT-2026-London-QEII-${plan.floor.title.replace(/\s+/g, "-")}-map-pack.zip`;
@@ -1125,14 +1108,13 @@ function LondonVenueSheetsInner({ initialSheetId, initialRoom }: LondonVenueShee
             <button
               type="button"
               className={btn}
-              onClick={() => {
-                const url = URL.createObjectURL(
-                  new Blob([qeiiDirectorySvg({ face, showMarks, groundId: directoryGround })], {
-                    type: "image/svg+xml",
-                  }),
-                );
-                download(url, qeiiDirectoryFilename(face, directoryGround));
-                URL.revokeObjectURL(url);
+              onClick={async () => {
+                try {
+                  const svg = await selfContainedSvg(qeiiDirectorySvg({ face, showMarks, groundId: directoryGround }));
+                  saveFile(new Blob([svg], { type: "image/svg+xml" }), qeiiDirectoryFilename(face, directoryGround));
+                } catch (error) {
+                  setExportNote(`SVG not downloaded: ${error instanceof Error ? error.message : "Could not embed the logos."}`);
+                }
               }}
             >
               <Download className="h-4 w-4" /> This page (editable SVG)
