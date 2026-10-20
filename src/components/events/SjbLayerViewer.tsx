@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Maximize2, RotateCcw } from "lucide-react";
 import { Button } from "@/design-system/element";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { SJB_COMPONENTS, SJB_SCENE_ELEMENTS } from "@/lib/san-juan-logo-construction";
+import { SJB_COMPONENTS, SJB_SCENE_VIEW_LAYERS } from "@/lib/san-juan-logo-construction";
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
 import type * as THREE from "three";
 
-const layers = SJB_COMPONENTS.filter(p => p.id !== "white-underlay").flatMap(p => p.id !== "badge-scene-banner" ? [{ id: p.id, name: p.name, url: p.url }] : SJB_SCENE_ELEMENTS.map(e => ({ id: e.id, name: e.name, url: e.url })));
+const layers = SJB_COMPONENTS.filter(p => p.id !== "white-underlay").flatMap(p => p.id !== "badge-scene-banner" ? [{ id: p.id, name: p.name, url: p.url }] : SJB_SCENE_VIEW_LAYERS());
 export interface SjbLayerViewerProps { className?: string }
 
 function LayerScene({ spread, focus, reset }: { spread: number; focus: string; reset: number }) {

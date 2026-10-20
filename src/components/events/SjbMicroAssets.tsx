@@ -38,7 +38,7 @@ export function SjbMicroAssets({ className }: SjbMicroAssetsProps) {
     if(mode==="major") {
       SJB_MAJOR_PIECES.forEach(piece=>zip.file(`${piece.id}.svg`,new XMLSerializer().serializeToString(groupSjbPiece(extractSjbShapes(svg,piece.indices),piece))));
       zip.file("manifest.json",JSON.stringify(SJB_MAJOR_PIECES,null,2));
-      zip.file("README.txt","13 named major groups plus the source foundation reference. Each SVG contains one named selectable outer group with unchanged original detail paths and source coordinates. Shared navy silhouettes remain in the badge base. These are component studies, not replacement approved logos.\n");
+      zip.file("README.txt","14 named major groups plus the source foundation reference. TRANSPERFECT lettering is separate from the ribbon and stars. Each SVG contains one named selectable outer group with unchanged original detail paths and source coordinates. Shared navy silhouettes remain in the badge base. These are component studies, not replacement approved logos.\n");
     } else {
     shapes.forEach(p => zip.file(filename(p.index), new XMLSerializer().serializeToString(extractSjbShapes(svg, [p.index]))));
     zip.file("manifest.json", JSON.stringify(shapes.map(({ markup, ...p }) => ({ ...p, file: filename(p.index) })), null, 2));
@@ -49,7 +49,7 @@ export function SjbMicroAssets({ className }: SjbMicroAssetsProps) {
   return <section className={`space-y-4 border-t border-border pt-5 ${className ?? ""}`} aria-label="Micro-extracted source assets">
     <div className="flex flex-wrap items-center justify-between gap-3"><h3 className="text-lg font-semibold">Logo pieces</h3><Button variant="outline" size="sm" disabled={!shapes.length || busy} onClick={pack}><Download />{busy ? "Preparing…" : mode==="major" ? "Major pieces (ZIP)" : "All 293 shapes (ZIP)"}</Button></div>
     <div role="group" aria-label="Logo detail level" className="flex flex-wrap gap-2"><Button size="sm" variant={mode==="major"?"default":"outline"} aria-pressed={mode==="major"} onClick={()=>setMode("major")}>Major pieces</Button><Button size="sm" variant={mode==="micro"?"default":"outline"} aria-pressed={mode==="micro"} onClick={()=>setMode("micro")}>Individual shapes</Button></div>
-    <p className="text-sm text-muted-foreground">13 named pieces, with original details kept together. White palm highlights are original; the shared navy silhouette remains in the badge base. Component studies—not approved standalone logos.</p>
+    <p className="text-sm text-muted-foreground">14 named pieces, including separate TRANSPERFECT lettering and ribbon with stars. White palm highlights are original; the shared navy silhouette remains in the badge base. Component studies—not approved standalone logos.</p>
     {mode==="major" ? <>
       <Button variant="outline" size="sm" aria-pressed={dark} onClick={()=>setDark(v=>!v)}>{dark ? "Light ground" : "Dark ground"}</Button>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">{major.map(p=> {
