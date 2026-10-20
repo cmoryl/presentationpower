@@ -114,7 +114,7 @@ function ExplodedView() {
               {open ? <div className={`absolute inset-0 rounded-sm border ${focus === p.id ? "border-primary bg-primary/10" : "border-background/25 bg-background/5"}`} /> : null}
               {open && xray ? <div className="absolute border border-dashed border-destructive" style={{ left: `${p.bounds.x / 12.54}%`, top: `${p.bounds.y / 12.54}%`, width: `${p.bounds.w / 12.54}%`, height: `${p.bounds.h / 12.54}%` }} /> : null}
               <img src={p.url} alt="" draggable={false} className="pointer-events-none relative h-full w-full object-contain" style={{ filter: xray ? "grayscale(1) contrast(2) invert(1)" : undefined }} />
-              {open ? <span className="absolute -right-2 top-0 translate-x-full whitespace-nowrap font-mono text-[11px] text-background/80">{p.order}. {p.definition?.role ?? p.name} · z{i * spread}</span> : null}
+              {open ? <span className="absolute -right-2 top-0 hidden translate-x-full whitespace-nowrap sm:inline font-mono text-[11px] text-background/80">{p.order}. {p.definition?.role ?? p.name} · z{i * spread}</span> : null}
             </div>;
           })}
         </div>
