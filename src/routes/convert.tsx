@@ -332,6 +332,12 @@ function ConvertPage() {
   const brandId = sourceKind === "print" ? (piece?.divisionId ?? BRAND_MODES[0].id) : sourceKind === "module" ? moduleBrand : (deck?.brandModeId ?? BRAND_MODES[0].id);
   const mode: "light" | "dark" = sourceKind === "deck" ? (slide?.mode ?? "light") : "light";
   const result = useMemo(() => adaptContent(source, targetId), [source, targetId]);
+  // How much each size has to change the copy — shown on the format picker so
+  // people can pick a size that fits before they open it.
+  const fitNotes = useMemo(
+    () => new Map(ADAPT_TARGETS.map((t) => [t.id, adaptContent(source, t.id).notes.length] as const)),
+    [source],
+  );
   const format = adaptTargetFormat(result.target);
   // Modules with a set of cells (bento, cards, figures) rebuild as a tile grid on social sizes.
   const chartLabels = new Set((source.chart?.data ?? []).map((d) => d.label.trim().toLowerCase()));
@@ -368,7 +374,7 @@ function ConvertPage() {
           {/* ── Source ─────────────────────────────────────────── */}
           <section className="space-y-4">
             <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
-              Source content
+              Step 1 · Choose your content
             </h2>
 
             <div role="group" aria-label="Source" className="grid grid-cols-3 gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5 sm:grid-cols-5">
@@ -599,7 +605,7 @@ function ConvertPage() {
             {manual ? null : <InfoBuilder source={rawSource} selection={selection} onChange={setSelection} />}
 
             <h2 className="pt-2 text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
-              Convert to
+              Step 3 · Choose a format
             </h2>
             <div className="grid gap-1">
               {ADAPT_TARGETS.map((t, i) => (
