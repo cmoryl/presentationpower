@@ -10,6 +10,7 @@ import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { SjbPrecisionConstruction } from "@/components/events/SjbPrecisionConstruction";
+import { SjbSingleColour } from "@/components/events/SjbSingleColour";
 import { BRAND } from "@/lib/brand-colors";
 import {
   SJB_BACKGROUNDS,
@@ -436,6 +437,8 @@ function SjbBrandKit() {
             <ClearSpaceDiagram />
             <MinSizeCard />
           </div>
+
+          <SjbSingleColour className="pt-2" />
 
           <ConstructionSection />
 
