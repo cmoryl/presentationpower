@@ -621,11 +621,20 @@ function ConvertPage() {
                   onClick={() => setTargetId(t.id)}
                   className={`rounded-lg border px-3 py-2 text-left text-[12.5px] ${targetId === t.id ? "border-[var(--tp-blue)] bg-[var(--tp-blue-white)] text-[var(--tp-ink)]" : "border-black/15 text-[var(--tp-ink)] hover:border-[var(--tp-blue)]"}`}
                 >
-                  <span className="font-semibold">{t.label}</span>
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="font-semibold">{t.label}</span>
+                    {(fitNotes.get(t.id) ?? 0) === 0 ? (
+                      <span className="shrink-0 rounded-sm bg-[var(--tp-green)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--tp-ink)]">Fits as-is</span>
+                    ) : (
+                      <span className="shrink-0 rounded-sm bg-[var(--tp-surface)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--tp-dark-gray)]">
+                        {fitNotes.get(t.id)} change{(fitNotes.get(t.id) ?? 0) === 1 ? "" : "s"} to fit
+                      </span>
+                    )}
+                  </span>
                   <span className="mt-0.5 block text-[11px] text-[var(--tp-dark-gray)]">
                     {t.medium === "print"
-                      ? `${Math.round((t.trimIn?.width ?? 0) * 25.4)} × ${Math.round((t.trimIn?.height ?? 0) * 25.4)} mm · headline ${t.type.headlinePx}px`
-                      : `${adaptTargetFormat(t)?.width} × ${adaptTargetFormat(t)?.height} px · headline ${t.type.headlinePx}px`}
+                      ? `${Math.round((t.trimIn?.width ?? 0) * 25.4)} × ${Math.round((t.trimIn?.height ?? 0) * 25.4)} mm`
+                      : `${adaptTargetFormat(t)?.width} × ${adaptTargetFormat(t)?.height} px`}
                   </span>
                 </button>
                 </Fragment>
@@ -1050,7 +1059,7 @@ function InfoBuilder({
     <div className="space-y-3 border-t border-[color:var(--color-border)] pt-4">
       <div className="flex items-baseline justify-between">
         <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[color:var(--color-muted-foreground)] uppercase">
-          Info to carry across
+          Step 2 · Pick what carries across
         </h2>
         <button type="button" className="text-[11px] font-semibold text-[color:var(--color-primary)] hover:underline" onClick={() => onChange(EMPTY_SELECTION)}>
           Reset
