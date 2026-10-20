@@ -1,5 +1,7 @@
 # Events, kiosks, signage, venue maps
 
+- QEII symbol cleanup applies only to the issued QEII floor IDs; imported venues retain every symbol path — why: restroom heads also resemble structural pillar dots.
+
 - Event label patches reuse `venue_map_edits` with scope `event-<eventId>` and floor keys; `qeiiPlanLayout` measures Geist advances and rotated bounds for preview/export — why: text edits do not change shared venue drawings or diverge in SVG downloads.
 
 - Designer-supplied SF kiosk CMYK masters (SWOP v2) live in `src/assets/california-kiosks/cmyk/` and are served byte-for-byte via `next-california-kiosk-cmyk-masters.ts` — why: CMYK must never be re-rendered or converted by the app.
