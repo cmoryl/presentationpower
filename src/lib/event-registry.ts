@@ -6,6 +6,7 @@
 import type { LinkOptions } from "@tanstack/react-router";
 import { NEXT_EVENT } from "./next-event";
 import { SF_READINESS, SF_VENUE } from "./next-sf-event";
+import { SJB_EVENT } from "./san-juan-bowl";
 
 export type EventTabId =
   | "checklist"
@@ -318,7 +319,77 @@ export function startedEntry(row: StartedEventRow): EventEntry {
   };
 }
 
-export const BUILT_IN_EVENTS: readonly EventEntry[] = [londonEntry(), sfEntry()];
+function sanJuanBowlEntry(): EventEntry {
+  return {
+    id: SJB_EVENT.id,
+    kind: "edition",
+    name: SJB_EVENT.name,
+    venue: SJB_EVENT.venue,
+    city: SJB_EVENT.city,
+    dates: SJB_EVENT.datesLabel,
+    tabs: [
+      {
+        id: "checklist",
+        tools: [
+          {
+            label: "Brand kit",
+            detail: "The supplied logo variants, event palette, typography and usage rules, with downloads.",
+            link: { to: "/events/san-juan-bowl/brand-kit" },
+          },
+          {
+            label: "Venue checklist and research",
+            detail: "What the venue and organisers still need to send, and what the web search found.",
+            link: { to: "/events/next/intake/$eventId", params: { eventId: SJB_EVENT.id } },
+          },
+        ],
+      },
+      {
+        id: "maps",
+        tools: [
+          {
+            label: "Venue maps",
+            detail: "Load each floor's plan as SVG, colour rooms and download.",
+            link: { to: "/events/next/maps/$eventId", params: { eventId: SJB_EVENT.id } },
+          },
+        ],
+        waitingOn: "the venue's floor plans",
+      },
+      { id: "schedule", tools: [], waitingOn: "the issued programme with rooms and times" },
+      {
+        id: "signage",
+        tools: [
+          {
+            label: "Sign set",
+            detail: "Build every sign on the venue's sign list from approved templates, review and download them.",
+            link: { to: "/events/next/signs/$eventId", params: { eventId: SJB_EVENT.id } },
+          },
+        ],
+        waitingOn: "the venue's sign list and site survey",
+      },
+      {
+        id: "badges",
+        tools: [
+          { label: "Name badges", detail: "The approved badge family.", link: { to: "/events/next/badges" } },
+          { label: "Pillars", detail: "The approved pillar faces.", link: { to: "/events/next/pillars" } },
+        ],
+      },
+      knowledge,
+    ],
+    readiness: [
+      {
+        label: "Logo and brand kit",
+        state: "ready",
+        detail: "Supplied FINAL_LOGO_26 package: colour and dark-background variants.",
+        link: { to: "/events/san-juan-bowl/brand-kit" },
+      },
+      { label: "Venue and dates", state: "waiting", blockedOn: "the organisers' announcement" },
+      { label: "Floor plans", state: "waiting", blockedOn: "the venue's vector plans" },
+      { label: "Sign list", state: "waiting", blockedOn: "the site survey" },
+    ],
+  };
+}
+
+export const BUILT_IN_EVENTS: readonly EventEntry[] = [londonEntry(), sfEntry(), sanJuanBowlEntry()];
 
 export function builtInEvent(id: string): EventEntry | undefined {
   return BUILT_IN_EVENTS.find((e) => e.id === id);
