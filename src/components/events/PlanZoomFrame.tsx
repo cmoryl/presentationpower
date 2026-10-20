@@ -8,6 +8,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Maximize2, Minus, Plus, RotateCcw, X } from "lucide-react";
+import { Button } from "@/design-system/element";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 8;
@@ -33,26 +35,14 @@ export function PlanZoomFrame({ children, label, className }: PlanZoomFrameProps
       <ZoomSurface label={label} className={className} onFull={() => setFull(true)} full={false}>
         {children}
       </ZoomSurface>
-      {full ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${label} plan, full screen`}
-          className="fixed inset-0 z-50 bg-[#03002C]/95 p-4 dark:bg-card"
-        >
-          <button
-            type="button"
-            aria-label="Close full screen"
-            className="absolute right-5 top-5 z-10 rounded-full bg-white/15 p-2 text-white hover:bg-white/25"
-            onClick={() => setFull(false)}
-          >
-            <X className="h-5 w-5" />
-          </button>
-          <ZoomSurface label={label} full className="h-full">
+      <Dialog open={full} onOpenChange={setFull}>
+        <DialogContent aria-describedby={undefined} className="h-[96dvh] w-[96vw] max-w-none gap-0 p-2 sm:max-w-none">
+          <DialogTitle className="sr-only">{label} plan, full screen</DialogTitle>
+          <ZoomSurface label={label} full className="h-full min-h-0">
             {children}
           </ZoomSurface>
-        </div>
-      ) : null}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
@@ -158,44 +148,45 @@ function ZoomSurface({
             transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
             transformOrigin: "0 0",
           }}
-          className={full ? "flex h-full items-center justify-center" : ""}
+          className={full ? "flex h-full items-center justify-center [&>div]:max-h-full [&>div]:max-w-full [&_svg]:max-h-[calc(96dvh-1rem)] [&_svg]:w-auto [&_svg]:max-w-full [&_img]:max-h-[calc(96dvh-1rem)] [&_img]:w-auto [&_img]:max-w-full" : ""}
         >
           {children}
         </div>
       </div>
 
-      <div className="absolute right-3 top-3 flex items-center gap-1.5">
+      <div className={`absolute top-3 flex items-center gap-1.5 ${full ? "left-3" : "right-3"}`}>
         <span className="rounded-full bg-white/95 px-2.5 py-1 font-mono text-[10.5px] font-semibold text-[#03002C]/70 shadow-sm">
           {zoom.toFixed(1)}×
         </span>
-        <button
+        <Button
           type="button"
           className={pill}
           aria-label={`Zoom out of the ${label} plan`}
           onClick={() => centreZoom(1 / 1.4)}
         >
           <Minus className="h-4 w-4" />
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           className={pill}
           aria-label={`Zoom into the ${label} plan`}
           onClick={() => centreZoom(1.4)}
         >
           <Plus className="h-4 w-4" />
-        </button>
-        <button type="button" className={pill} aria-label="Reset the view" onClick={reset}>
+        </Button>
+        <Button type="button" size="icon" variant="outline" className={pill} title="Reset view" aria-label="Reset the view" onClick={reset}>
           <RotateCcw className="h-4 w-4" />
-        </button>
+        </Button>
         {onFull ? (
-          <button
+          <Button
             type="button"
             className={pill}
             aria-label={`Open the ${label} plan full screen`}
+            title="Enlarge map"
             onClick={onFull}
           >
             <Maximize2 className="h-4 w-4" />
-          </button>
+          </Button>
         ) : null}
       </div>
     </div>

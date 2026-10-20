@@ -3,6 +3,7 @@
 // exports them with the same looks, room cuts and approved palette.
 
 import { Button } from "@/design-system/element";
+import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
 import { listVenueMapEdits, saveVenueMapEdits } from "@/lib/qeii-map-edits.functions";
 import { EMPTY_QEII_MAP_EDITS, qeiiApplyRoomEdit, qeiiClearRoomEdit, qeiiRoomEdit, type QeiiMapEdits, type QeiiRoomEdit } from "@/lib/qeii-map-edits";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
@@ -352,11 +353,13 @@ function MapsPage() {
                   Traced from a picture — lower quality than the venue's own drawing.
                 </p>
               )}
+              <PlanZoomFrame key={current.floor_key} label={current.title}>
               <div
                 className="overflow-hidden rounded-2xl border border-[#03002C]/12 bg-white [&_svg]:h-auto [&_svg]:w-full"
                 // Our own renderer's output from the venue's geometry.
                 dangerouslySetInnerHTML={{ __html: svg }}
               />
+              </PlanZoomFrame>
               <p className="text-[12px] text-[#666666]">Draft — file names use “rdraft-” until a revision is published.</p>
             </div>
 
