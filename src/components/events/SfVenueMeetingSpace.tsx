@@ -76,7 +76,7 @@ export function SfVenueMeetingSpace() {
               </a>
               {(SF_VENUE_ZONES[plan.floor] ?? []).map((z) => (
                 <div
-                  key={z.label}
+                  key={`${z.label}-${z.x}-${z.y}`}
                   title={z.space ? `${z.label} — ${z.space}` : z.label}
                   className="pointer-events-none absolute flex items-center justify-center rounded-[2px] border-2"
                   style={{
@@ -84,19 +84,21 @@ export function SfVenueMeetingSpace() {
                     borderColor: z.color, backgroundColor: `${z.color}59`,
                   }}
                 >
-                  <span className="rounded-sm bg-white/85 px-1 py-px text-center text-[10px] font-bold leading-tight text-[#03002C]">
-                    {z.label}{z.provisional ? " ‡" : ""}
-                  </span>
+                  {z.chip !== false && (
+                    <span className="rounded-sm bg-white/85 px-1 py-px text-center text-[10px] font-bold leading-tight text-[#03002C]">
+                      {z.label}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
           </div>
           {(SF_VENUE_ZONES[plan.floor] ?? []).length > 0 && (
             <ul aria-label={`${plan.title} event zones`} className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-[12px] text-[#03002C]">
-              {(SF_VENUE_ZONES[plan.floor] ?? []).map((z) => (
+              {(SF_VENUE_ZONES[plan.floor] ?? []).filter((z) => z.legend !== false).map((z) => (
                 <li key={z.label} className="inline-flex items-center gap-1.5">
                   <span aria-hidden className="inline-block h-3 w-3 rounded-[2px] border" style={{ backgroundColor: z.color, borderColor: z.color }} />
-                  <span className="font-semibold">{z.label}{z.provisional ? " ‡" : ""}</span>
+                  <span className="font-semibold">{z.label}</span>
                   {z.space && <span className="text-[#666666]">— {z.space}</span>}
                 </li>
               ))}
@@ -106,9 +108,6 @@ export function SfVenueMeetingSpace() {
             <a href={plan.vectorUrl} download={`InterContinental-SF-floor-${plan.floor}-vector.svg`} className="font-semibold text-[#003FC7] hover:underline">Download vector plan (SVG)</a>
             <span className="text-[#666666]">Drawn paths from the hotel&rsquo;s 2017 sheet — confirm with the hotel before printing.</span>
           </div>
-          {(SF_VENUE_ZONES[plan.floor] ?? []).some((z) => z.provisional) && (
-            <p className="mt-1 text-[11px] text-[#666666]">‡ First-pass placement — confirm against the event team&rsquo;s marked-up plan.</p>
-          )}
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-[12px] text-[#03002C]">
