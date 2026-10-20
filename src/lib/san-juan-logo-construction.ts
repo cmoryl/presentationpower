@@ -45,7 +45,7 @@ import sBird from "@/assets/san-juan-bowl/scene-bird.svg.asset.json";
  * only those paths at source coordinates — nothing redrawn. Bottom to top.
  */
 export const SJB_SCENE_ELEMENTS = [
-  { id: "base", name: "Badge base", detail: "Navy badge body. Also carries the dark outlines and silhouettes of the palms, fortress and banner, so it sits under every element.", paths: [84], url: sBase.url },
+  { id: "base", name: "Badge base", detail: "Navy badge body. Also carries the dark outlines and silhouettes of the palms and fortress, plus seven of the TRANSPERFECT letters; it is drawn on top of the ribbon.", paths: [84], url: sBase.url },
   { id: "sky", name: "Sky", detail: "Sky-blue field behind the fortress, with the cut-outs for the tower and clouds.", paths: [112, 113], url: sSky.url },
   { id: "trim", name: "Gold top trim", detail: "Gold chevron border along the top of the badge.", paths: [57, 61], url: sTrim.url },
   { id: "clouds", name: "Clouds", detail: "White clouds either side of the tower.", paths: [76, 78, 79, 80], url: sClouds.url },
@@ -53,7 +53,7 @@ export const SJB_SCENE_ELEMENTS = [
   { id: "football", name: "Football", detail: "The ball rising behind the walls, with its laces and ground line.", paths: [31, 32, 33, 68, 71, 92, 93, 94, 95, 98, 99, 105, 106], url: sBall.url },
   { id: "palm-left", name: "Left palm", detail: "Sky-blue fronds and gold trunk highlights of the left palm.", paths: [34, 35, 36, 40, 44, 45, 46, 51, 54, 55, 58, 83], url: sPalmL.url },
   { id: "palm-right", name: "Right palm", detail: "Sky-blue fronds and gold trunk highlights of the right palm.", paths: [37, 38, 42, 43, 47, 48, 49, 50, 52, 53, 56, 81], url: sPalmR.url },
-  { id: "banner", name: "TRANSPERFECT banner", detail: "Gold ribbon and sky-blue tail folds. Gold ribbon and sky-blue tail folds. Only five letters (R, S, P, R, C) are banner shapes; the other seven are drawn as part of the badge base, which sits on top of the ribbon. The preview shows both together; never separate them, or the word breaks up.", paths: [39, 41, 59, 60, 62, 114, 115, 116, 117, 118], url: sBanner.url },
+  { id: "banner", name: "TRANSPERFECT banner", detail: "Gold ribbon and sky-blue tail folds. Only five letters (R, S, P, R, C) are banner shapes; the other seven are drawn as part of the badge base, which sits on top of the ribbon. The preview shows both together; never separate them, or the word breaks up.", paths: [39, 41, 59, 60, 62, 114, 115, 116, 117, 118], url: sBanner.url },
   { id: "scene-bird", name: "Scene bird", detail: "Navy bird in the sky. Its pair is layer 6, Bird accent, drawn as a separate shape in the source file; treat both birds as one decorative pair.", paths: [30], url: sBird.url },
 ] as const;
 
