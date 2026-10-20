@@ -415,6 +415,18 @@ export const PrintBriefPreview = forwardRef<HTMLDivElement, PrintBriefPreviewPro
             </div>
           ) : null}
 
+          {/* Further figures from the source, as a quiet strip under the lead figure. */}
+          {content.stats?.length ? (
+            <div data-adapt-stat-strip="true" style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(3, content.stats.length)}, 1fr)`, gap: u(12), ...(land ? { gridColumn: "1 / -1" } : {}) }}>
+              {content.stats.slice(0, 3).map((s, i) => (
+                <div key={`${s.value}-${i}`} style={{ ...printGlass(accent, u(12), u(3)), padding: u(12) }}>
+                  <div style={{ fontSize: t.statPx * 0.42 * bb, fontWeight: 700, lineHeight: 1, letterSpacing: "-0.02em", color: ink }}>{s.value}</div>
+                  <div style={{ fontSize: t.eyebrowPx * 1.1 * bb, color: "#666666", marginTop: u(4), lineHeight: 1.3 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
           {detailsBlock}
 
           <div
