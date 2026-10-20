@@ -21,13 +21,61 @@ export const SJB_EVENT = {
   datesLabel: "",
 } as const;
 
-/** Colours read from the supplied logo file, not picked by eye. */
+/**
+ * Colours read from the supplied logo file, not picked by eye.
+ * HEX/RGB/HSL are exact. CMYK values are standard-conversion working builds
+ * for coated stock — unproofed, so vendors must proof before print. Pantone
+ * references are matched by the vendor from the supplied artwork, never guessed.
+ */
 export const SJB_COLORS = [
-  { id: "navy", name: "Bowl Navy", hex: "#0D0E21", role: "Badge, outlines and dark backgrounds" },
-  { id: "sky", name: "Caribbean Sky", hex: "#00AAE7", role: "Sky, waves and accent fills" },
-  { id: "gold", name: "Banner Gold", hex: "#FFD600", role: "Banner, sun and highlights" },
-  { id: "white", name: "White", hex: "#FFFFFF", role: "Type and artwork on navy" },
+  {
+    id: "navy",
+    name: "Bowl Navy",
+    hex: "#0D0E21",
+    rgb: "13 · 14 · 33",
+    hsl: "237° · 43% · 9%",
+    cmyk: "61 · 58 · 0 · 87",
+    textOn: "White",
+    role: "Badge, outlines and dark backgrounds",
+  },
+  {
+    id: "sky",
+    name: "Caribbean Sky",
+    hex: "#00AAE7",
+    rgb: "0 · 170 · 231",
+    hsl: "196° · 100% · 45%",
+    cmyk: "100 · 26 · 0 · 9",
+    textOn: "Bowl Navy",
+    role: "Sky, waves and accent fills",
+  },
+  {
+    id: "gold",
+    name: "Banner Gold",
+    hex: "#FFD600",
+    rgb: "255 · 214 · 0",
+    hsl: "50° · 100% · 50%",
+    cmyk: "0 · 16 · 100 · 0",
+    textOn: "Bowl Navy",
+    role: "Banner, sun and highlights",
+  },
+  {
+    id: "white",
+    name: "White",
+    hex: "#FFFFFF",
+    rgb: "255 · 255 · 255",
+    hsl: "0° · 0% · 100%",
+    cmyk: "0 · 0 · 0 · 0",
+    textOn: "Bowl Navy",
+    role: "Type and artwork on navy",
+  },
 ] as const;
+
+export const SJB_COLOR_NOTES = [
+  "HEX, RGB and HSL values are exact, taken from the supplied artwork — use them as-is on screen and web.",
+  "CMYK values are working builds for coated stock from a standard conversion. They are not proofed: always run a vendor proof before print and adjust on press if needed.",
+  "Pantone (spot) references are matched by the print vendor from the supplied artwork — never substitute a guessed swatch.",
+  "Body text on San Juan Bowl print is solid black (100K), same as every TransPerfect print piece.",
+];
 
 export type SjbLogoVariantId = "color" | "dark";
 
