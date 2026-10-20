@@ -3,6 +3,7 @@
 // exports them with the same looks, room cuts and approved palette.
 
 import { saveFile } from "@/lib/save-file";
+import { selfContainedSvg } from "@/lib/export-self-contained-svg";
 import { Button } from "@/design-system/element";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
 import { listVenueMapEdits, saveVenueMapEdits } from "@/lib/qeii-map-edits.functions";
@@ -10,7 +11,7 @@ import { EMPTY_QEII_MAP_EDITS, qeiiFloorMapEdits, qeiiApplyRoomEdit, qeiiClearRo
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { eventDisplayName } from "@/lib/event-names";
 import { trimFloorToContent } from "@/lib/venue-floor-normalise";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -143,6 +144,18 @@ function MapsPage() {
     () => (floor ? qeiiPlanSvg(floor, { face, roomColours, sheet, edits: labelEdits }) : ""),
     [floor, face, roomColours, sheet, labelEdits],
   );
+  const [preparedSvg, setPreparedSvg] = useState<{ source: string; file: string } | null>(null);
+  const [svgError, setSvgError] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    setSvgError("");
+    if (svg) void selfContainedSvg(svg).then((file) => {
+      if (!cancelled) setPreparedSvg({ source: svg, file });
+    }).catch((error) => {
+      if (!cancelled) setSvgError(error instanceof Error ? error.message : "Could not embed the logo.");
+    });
+    return () => { cancelled = true; };
+  }, [svg]);
 
   async function onFile(file: File) {
     if (!title.trim()) return toast.error("Name the floor first, e.g. “Third floor”.");
@@ -212,11 +225,11 @@ function MapsPage() {
   }
 
   function download() {
-    if (!current || !svg) {
+    if (!current || !preparedSvg || preparedSvg.source !== svg) {
       toast.error("The map is still drawing — try again in a moment.");
       return;
     }
-    saveFile(new Blob([svg], { type: "image/svg+xml" }), `rdraft-${eventId}-${current.floor_key}-${face}.svg`);
+    saveFile(new Blob([preparedSvg.file], { type: "image/svg+xml" }), `rdraft-${eventId}-${current.floor_key}-${face}.svg`);
   }
 
   const paint = (room: string) => {
@@ -333,9 +346,9 @@ function MapsPage() {
                     </option>
                   ))}
                 </select>
-                <button type="button" className={btn} onClick={download}>
+                <Button variant="outline" onClick={download} disabled={preparedSvg?.source !== svg}>
                   <Download className="h-4 w-4" /> SVG
-                </button>
+                </Button>
                 <button
                   type="button"
                   className={btn}
@@ -349,6 +362,7 @@ function MapsPage() {
                   <Trash2 className="h-4 w-4" /> Remove floor
                 </button>
               </div>
+              {svgError && <p role="alert" className="text-sm text-destructive">SVG unavailable: {svgError} No file was downloaded.</p>}
               {current.source_kind === "scan" && (
                 <p className="rounded-lg bg-[#FFEB66]/50 px-3 py-2 text-[13px]">
                   Traced from a picture — lower quality than the venue's own drawing.

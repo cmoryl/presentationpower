@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Embed logos in map SVG downloads and verify downloaded files contain no external image links.
+
 - [x] 1. Access lockdown: deny-by-default sign-in wall, @transperfect.com sign-up trigger, buckets private, signed-out probe
 - [x] 2. Compliance check: banned words + unsourced figures check, "Needs source" admin page
 - [x] 2b. Downloads blocked on banned words / unsourced figures (deck PowerPoint + image/PDF/ZIP menu); live character counter on slide text
