@@ -38,6 +38,15 @@ import sPalmL from "@/assets/san-juan-bowl/scene-palmL.svg.asset.json";
 import sPalmR from "@/assets/san-juan-bowl/scene-palmR.svg.asset.json";
 import sBanner from "@/assets/san-juan-bowl/scene-banner.svg.asset.json";
 import sBird from "@/assets/san-juan-bowl/scene-bird.svg.asset.json";
+import sRibbon from "@/assets/san-juan-bowl/scene-ribbon-stars.svg.asset.json";
+import sTransperfect from "@/assets/san-juan-bowl/transperfect-lettering.svg.asset.json";
+
+/** The twelve original outlined letters, distinct from ribbon folds and stars. */
+export const SJB_TRANSPERFECT_INDICES = Array.from({ length: 12 }, (_, i) => 131 + i);
+export const SJB_SCENE_VIEW_LAYERS = () => SJB_SCENE_ELEMENTS.flatMap(e => e.id === "banner" ? [
+  { id: "banner", name: "Ribbon and stars", url: sRibbon.url },
+  { id: "transperfect-lettering", name: "TRANSPERFECT lettering", url: sTransperfect.url },
+] : [{ id: e.id, name: e.name, url: e.url }]);
 
 /**
  * The composite "Badge and scene" layer split into its elements by original path

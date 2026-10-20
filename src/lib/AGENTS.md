@@ -1,7 +1,7 @@
 # Events, kiosks, signage, venue maps
 
 - San Juan Bowl micro extracts clone unchanged source shapes with inherited styles and coordinates; its client-loaded Three.js viewer orbits the stack midpoint — why: fused silhouettes must not be invented, and layer spread must not move the camera target.
-- San Juan Bowl major-piece exports wrap unchanged detail paths in one named group per piece; micro view is optional — why: grouping reduces selection clutter without altering approved geometry or overlapping paint order.
+- San Juan Bowl major-piece exports wrap unchanged detail paths in one named group per piece; viewer lettering assets and exports use the same original shape indices, and micro view is optional — why: grouping and separate lettering selection must preserve approved geometry without duplicating ribbon details.
 
 - San Juan Bowl component assets preserve original top-level SVG drawing order and source coordinates, and count every shape element (path, polygon, polyline — 293 total); `san-juan-logo-measurements.json` records measured geometry and feeds the production calculator — why: exact inspection must not redraw composite shapes or confuse artboard width with badge width.
 

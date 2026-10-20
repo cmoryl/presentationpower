@@ -2,12 +2,17 @@
 import { expect, it } from "vitest";
 import { SJB_MAJOR_PIECES, groupSjbPiece } from "./sjb-major-pieces";
 
-it("organizes all 293 source shapes exactly once into 13 major pieces plus the foundation reference", () => {
-  expect(SJB_MAJOR_PIECES.filter(p => !p.reference)).toHaveLength(13);
+it("organizes all 293 source shapes exactly once into 14 major pieces plus the foundation reference", () => {
+  expect(SJB_MAJOR_PIECES.filter(p => !p.reference)).toHaveLength(14);
   const indices = SJB_MAJOR_PIECES.flatMap(p => p.indices).sort((a,b) => a-b);
   expect(indices).toEqual(Array.from({length:293},(_,i)=>i));
   expect(SJB_MAJOR_PIECES.find(p=>p.id==="fortress")?.indices).toHaveLength(43);
   expect(SJB_MAJOR_PIECES.find(p=>p.id==="birds")?.indices).toEqual([38,292]);
+});
+
+it("extracts all twelve TRANSPERFECT letters separately from the ribbon and two stars", () => {
+  expect(SJB_MAJOR_PIECES.find(p => p.id === "transperfect-lettering")?.indices).toEqual([131,132,133,134,135,136,137,138,139,140,141,142]);
+  expect(SJB_MAJOR_PIECES.find(p => p.id === "banner")?.indices).toEqual([49,51,69,70,72,85,88]);
 });
 
 it("creates one named selectable group without changing source order, styles or shape geometry", () => {
