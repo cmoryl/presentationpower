@@ -2,6 +2,10 @@
 // from the venue's own vector files; the London map engine draws, colours and
 // exports them with the same looks, room cuts and approved palette.
 
+import { Button } from "@/design-system/element";
+import { listVenueMapEdits, saveVenueMapEdits } from "@/lib/qeii-map-edits.functions";
+import { EMPTY_QEII_MAP_EDITS, qeiiApplyRoomEdit, qeiiClearRoomEdit, qeiiRoomEdit, type QeiiMapEdits, type QeiiRoomEdit } from "@/lib/qeii-map-edits";
+import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { eventDisplayName } from "@/lib/event-names";
 import { trimFloorToContent } from "@/lib/venue-floor-normalise";
 import { useMemo, useState } from "react";
@@ -85,6 +89,12 @@ function MapsPage() {
   const saveRooms = useServerFn(updateEventMapRooms);
   const saveToVenue = useServerFn(saveVenueFloor);
   const remove = useServerFn(deleteEventMapFloor);
+  const listLabelEdits = useServerFn(listVenueMapEdits);
+  const saveLabelEdits = useServerFn(saveVenueMapEdits);
+  const labelScope = `event-${eventId}`;
+  const labelQuery = useQuery({ queryKey: ["map-label-edits", labelScope], queryFn: () => listLabelEdits({ data: { venueSlug: labelScope } }) });
+  const [labelDrafts, setLabelDrafts] = useState<Record<string, QeiiMapEdits>>({});
+  const [selectedLabel, setSelectedLabel] = useState("");
   const q = useQuery({ queryKey: ["event-map-floors", eventId], queryFn: () => list({ data: { eventId } }) });
 
   const rows = (q.data?.floors ?? []) as Row[];
@@ -109,6 +119,14 @@ function MapsPage() {
     () => (floor ? [...new Set(qeiiRoomShapes(floor).map((r) => r.room))].sort() : []),
     [floor],
   );
+  const labelEdits = current ? labelDrafts[current.floor_key] ?? labelQuery.data?.floors.find((f) => f.floorId === current.floor_key)?.edits ?? EMPTY_QEII_MAP_EDITS : EMPTY_QEII_MAP_EDITS;
+  const labelLayout = useMemo(() => floor ? qeiiPlanLayout(floor, { edits: labelEdits }) : null, [floor, labelEdits]);
+  const labelRoom = labelLayout?.blocks.find((b) => b.room === selectedLabel)?.room ?? labelLayout?.blocks[0]?.room ?? "";
+  const labelEdit = qeiiRoomEdit(labelEdits, labelRoom);
+  const patchLabel = (patch: QeiiRoomEdit) => {
+    if (!current || !labelRoom) return;
+    setLabelDrafts((d) => ({ ...d, [current.floor_key]: qeiiApplyRoomEdit(labelEdits, labelRoom, patch) }));
+  };
   const plan = q.data?.plan;
   const sheet = useMemo(
     () => ({
@@ -118,8 +136,8 @@ function MapsPage() {
     [plan, rows, eventId, q.data?.venue],
   );
   const svg = useMemo(
-    () => (floor ? qeiiPlanSvg(floor, { face, roomColours, sheet }) : ""),
-    [floor, face, roomColours, sheet],
+    () => (floor ? qeiiPlanSvg(floor, { face, roomColours, sheet, edits: labelEdits }) : ""),
+    [floor, face, roomColours, sheet, labelEdits],
   );
 
   async function onFile(file: File) {
@@ -343,6 +361,34 @@ function MapsPage() {
             </div>
 
             <aside className={`${card} h-fit space-y-4`}>
+              <section className="space-y-3 border-b border-border pb-4">
+                <h2 className="text-[15px] font-bold">Map text</h2>
+                <label className="block text-sm">Label
+                  <select aria-label="Map label" className={field} value={labelRoom} onChange={(e) => setSelectedLabel(e.target.value)}>
+                    {labelLayout?.blocks.map((b) => <option key={b.key} value={b.room}>{b.room}</option>)}
+                  </select>
+                </label>
+                <label className="block text-sm">Text
+                  <input className={field} value={labelEdit?.name ?? labelRoom} onChange={(e) => patchLabel({ name: e.target.value })} />
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="text-sm">Size (%)<input aria-label="Label size percent" className={field} type="number" min="25" max="300" step="5" value={Math.round((labelEdit?.scale ?? 1) * 100)} onChange={(e) => { if (e.target.value) patchLabel({ scale: Math.max(0.25, Math.min(3, Number(e.target.value) / 100)) }); }} /></label>
+                  <label className="text-sm">Rotation (°)<input aria-label="Label rotation degrees" className={field} type="number" min="-180" max="180" step="5" value={labelEdit?.angle ?? labelLayout?.blocks.find((b) => b.room === labelRoom)?.angle ?? 0} onChange={(e) => { if (e.target.value) patchLabel({ angle: Math.max(-180, Math.min(180, Number(e.target.value))) }); }} /></label>
+                  <label className="text-sm">Horizontal offset<input aria-label="Label horizontal offset" className={field} type="number" min="-400" max="400" value={labelEdit?.dx ?? 0} onChange={(e) => patchLabel({ dx: Number(e.target.value) })} /></label>
+                  <label className="text-sm">Vertical offset<input aria-label="Label vertical offset" className={field} type="number" min="-400" max="400" value={labelEdit?.dy ?? 0} onChange={(e) => patchLabel({ dy: Number(e.target.value) })} /></label>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setLabelDrafts((d) => ({ ...d, [current.floor_key]: qeiiClearRoomEdit(labelEdits, labelRoom) }))}>Reset label</Button>
+                  <Button size="sm" disabled={labelQuery.isLoading || !!labelQuery.error} onClick={async () => {
+                    try {
+                      await saveLabelEdits({ data: { venueSlug: labelScope, floorId: current.floor_key, edits: labelEdits } });
+                      await qc.invalidateQueries({ queryKey: ["map-label-edits", labelScope] });
+                      toast.success("Map text saved.");
+                    } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save map text."); }
+                  }}><Save />Save text</Button>
+                </div>
+                {labelQuery.error && <p role="alert" className="text-sm text-destructive">Couldn't load saved map text.</p>}
+              </section>
               <div>
                 <h2 className="text-[15px] font-bold">Room colours</h2>
                 <div className="mt-2 flex flex-wrap gap-1.5">
