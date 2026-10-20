@@ -10,12 +10,12 @@ import pack from "@/assets/san-juan-bowl/original-components.zip.asset.json";
 export const SJB_MEASUREMENTS = measurements;
 /** Plain-language definition of each original drawing layer, in stacking order. */
 export const SJB_SECTION_DEFINITIONS: Record<string, { role: string; detail: string; rule: string }> = {
-  "white-underlay": { role: "Foundation layer", detail: "Unpainted outline paths beneath the badge that set the knock-out shape the colour sits on.", rule: "Never remove or fill in; it keeps the badge silhouette clean on every ground." },
+  "white-underlay": { role: "Source reference geometry", detail: "The first source group contains mostly unpainted contours plus a small navy polygon. It is not a painted white underlay or an independently verified knock-out layer.", rule: "Retain this group in the original master; do not fill its unpainted contours or treat them as a white background." },
   "badge-scene-banner": { role: "Badge and scene", detail: "The diamond badge holding El Morro fortress, palm trees, the football and the yellow TRANSPERFECT banner, drawn as one composite scene.", rule: "Treat as one unit; do not lift the fortress, palms, football or banner out on their own." },
   "waves-sun-trim": { role: "Waves, sun and lower trim", detail: "The ocean waves, sun rays and lower border that close the base of the badge.", rule: "Keep attached to the badge; at stadium scale this detail is expected to read as texture." },
   "san-juan-lettering": { role: "SAN JUAN wordmark", detail: "Custom outlined lettering naming the host city, the largest type in the mark.", rule: "Never retype in a font; reproduce only from the supplied paths." },
   "bowl-lettering": { role: "BOWL wordmark", detail: "Outlined lettering under SAN JUAN completing the event name.", rule: "Always paired with SAN JUAN at its fixed size and position." },
-  "bird-accent": { role: "Bird accent", detail: "A small bird shape adding movement to the sky of the scene.", rule: "Decorative detail; never enlarge, move or use as a standalone icon." },
+  "bird-accent": { role: "Second bird", detail: "The final source shape completes the bird pair; the other bird is inside the badge-and-scene group. The major-piece pack collects both into one named group.", rule: "Keep both birds at their original positions in the complete logo; the grouped pair is an inspection reference." },
 };
 
 export const SJB_COMPONENTS = measurements.parts.map((part, index) => ({
@@ -42,10 +42,11 @@ import sBird from "@/assets/san-juan-bowl/scene-bird.svg.asset.json";
 /**
  * The composite "Badge and scene" layer split into its elements by original path
  * (0-based path index in the full-colour master, document order). Each file keeps
- * only those paths at source coordinates — nothing redrawn. Bottom to top.
+ * only those shapes at source coordinates — nothing redrawn. Semantic groups
+ * are not a replacement for the interleaved drawing order of the original.
  */
 export const SJB_SCENE_ELEMENTS = [
-  { id: "base", name: "Badge base", detail: "Navy badge body. Also carries the dark outlines and silhouettes of the palms and fortress, so it sits under every element.", paths: [99], url: sBase.url },
+  { id: "base", name: "Badge base", detail: "One shared navy shape carries the badge body and parts of the palm and fortress silhouettes. Its original position among the scene details must be preserved; it is not simply a background beneath every shape.", paths: [99], url: sBase.url },
   { id: "sky", name: "Sky", detail: "Sky-blue field behind the fortress, with the cut-outs for the tower and clouds.", paths: [129, 130], url: sSky.url },
   { id: "trim", name: "Gold top trim", detail: "Gold chevron border along the top of the badge.", paths: [67, 71], url: sTrim.url },
   { id: "clouds", name: "Clouds", detail: "White clouds either side of the tower.", paths: [91, 93, 94, 95], url: sClouds.url },

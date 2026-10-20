@@ -60,21 +60,29 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
     <SjbLayerViewer />
     <SjbMicroAssets />
     <details className="border-t border-border pt-4"><summary className="cursor-pointer text-sm font-semibold">Advanced · individual shape editor</summary><SjbElementExplorer /></details>
-    <div className="border-t border-border pt-5"><h3 className="text-lg font-semibold">How the supplied logo is assembled</h3>
-      <p className="mt-2 text-sm text-muted-foreground">Six original drawing layers, stacked in source order at the same origin and scale. Component files are production references, not approved standalone marks. The fortress, palms, football and banner share one composite scene; separating them into complete symbols would require designer work.</p>
+    <section aria-label="Logo assembly guide" className="border-t border-border pt-5"><h3 className="text-lg font-semibold">How the logo is assembled</h3>
+      <p className="mt-2 text-sm text-muted-foreground">One supplied master, six original drawing groups and 293 source shapes. The new 13 major pieces organize those details into recognizable groups—they do not simplify, redraw or replace the approved logo.</p>
+      <dl className="mt-5 grid gap-5 sm:grid-cols-3">
+        <div className="border-t border-border pt-3"><dt className="text-sm font-semibold">Original master · reproduction</dt><dd className="mt-2 text-sm text-muted-foreground">The definitive complete artwork. Preserve the six-group drawing order and the shape order within each group, on the 1254 × 1254 source artboard.</dd></div>
+        <div className="border-t border-border pt-3"><dt className="text-sm font-semibold">13 major pieces · organization</dt><dd className="mt-2 text-sm text-muted-foreground">Badge base, sky, trim, clouds, fortress, football, two palms, banner, waves, SAN JUAN, BOWL and the bird pair. Each grouped SVG keeps its original detail paths. The pack also retains a separate foundation reference.</dd></div>
+        <div className="border-t border-border pt-3"><dt className="text-sm font-semibold">293 shapes · close inspection</dt><dd className="mt-2 text-sm text-muted-foreground">Paths, polygons and polylines include letters, windows, highlights and unpainted contours. Grouping makes selection easier; it does not delete small details or merge different inks into one path.</dd></div>
+      </dl>
+      <div className="mt-5 border-y border-border py-4"><h4 className="text-sm font-semibold">Why some pieces look incomplete on their own</h4><p className="mt-2 text-sm text-muted-foreground">The navy badge base also carries shared palm and fortress silhouettes. The palm groups contain blue fronds, gold and white highlights; their white areas are intentional artwork, not unwanted backgrounds. A complete independent palm or fortress would require new designer-approved geometry.</p></div>
+      <h4 className="mt-6 text-base font-semibold">Original drawing order · first to last</h4>
+      <p className="mt-1 text-sm text-muted-foreground">These six groups describe the supplied file—not a suggested order for rebuilding it from the 13 semantic pieces. Scale the complete artwork uniformly; keep every group at its original coordinates.</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{SJB_COMPONENTS.map(p => <article key={p.id} className="min-w-0 rounded-md border border-border">
-        <div className={`aspect-square p-4 ${p.id === 'bird-accent' || p.id === 'white-underlay' ? 'bg-muted' : 'bg-foreground'}`}>{p.id === 'white-underlay' ? <p className="flex h-full items-center justify-center text-center text-sm text-muted-foreground">Original unpainted paths (fill: none). Preserved in the source pack.</p> : <img src={p.url} alt={p.name} className="h-full w-full object-contain" />}</div>
+        <div className={`aspect-square p-4 ${p.id === 'bird-accent' || p.id === 'white-underlay' ? 'bg-muted' : 'bg-foreground'}`}>{p.id === 'white-underlay' ? <p className="flex h-full items-center justify-center text-center text-sm text-muted-foreground">Mostly unpainted reference contours, plus a tiny navy polygon. Retained in the original file.</p> : <img src={p.url} alt={p.name} className="h-full w-full object-contain" />}</div>
         <div className="space-y-2 p-4"><h4 className="text-sm font-semibold">{p.order}. {p.name}</h4>{p.definition ? <><p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{p.definition.role}</p><p className="text-sm">{p.definition.detail}</p><p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">Rule: </span>{p.definition.rule}</p></> : null}<p className="font-mono text-xs text-muted-foreground">{p.paths} original shapes · {fmt(p.bounds.w)} × {fmt(p.bounds.h)} u</p>
         <Button asChild size="sm" variant="outline"><a href={p.url} download><Download />Layer SVG</a></Button></div>
       </article>)}</div>
       <h4 className="mt-6 text-base font-semibold">Inside layer 2: badge and scene elements</h4>
-      <p className="mt-1 text-sm text-muted-foreground">The composite scene separated by its original shapes. Each file keeps only that element's paths at their source position, so the files stack back into the exact badge.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Ten inspection groups extracted from the 109 scene shapes. Original coordinates and colours are preserved, but shapes from different elements are interleaved in the master. Stacking these whole groups is not guaranteed to reproduce every overlap; use the original master for the finished logo.</p>
       <div className="mt-3 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">{SJB_SCENE_ELEMENTS.map((e, n) => <article key={e.id} className="min-w-0 rounded-md border border-border">
         <div className={`aspect-square p-3 ${e.id === "base" || e.id === "scene-bird" || e.id === "banner" || e.id === "fortress" ? "bg-muted" : "bg-foreground"}`}><CroppedSvg url={e.url} label={e.name} /></div>
         <div className="space-y-1 p-3"><h5 className="text-sm font-semibold">2.{n + 1} {e.name}</h5><p className="text-xs text-muted-foreground">{e.detail}</p><p className="font-mono text-[11px] text-muted-foreground">{e.paths.length} shapes</p>
         <Button asChild size="sm" variant="outline"><a href={e.url} download><Download />SVG</a></Button></div>
       </article>)}</div>
-    </div>
+    </section>
   </section>;
 }
 
