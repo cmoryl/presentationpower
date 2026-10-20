@@ -13,3 +13,13 @@ it("scales from badge bounds rather than the square artboard", () => {
   expect(size.artboard).toBeCloseTo(1254,8);
   expect(SJB_MEASUREMENTS.bounds.x).toBeCloseTo(33.69975280761719,8);
 });
+import { SJB_SCENE_ELEMENTS } from "./san-juan-logo-construction";
+describe("scene elements", () => {
+  it("cover all 89 scene paths exactly once", () => {
+    const all = SJB_SCENE_ELEMENTS.flatMap(e => [...e.paths]);
+    expect(all.length).toBe(89);
+    expect(new Set(all).size).toBe(89);
+    expect(Math.min(...all)).toBe(30);
+    expect(Math.max(...all)).toBe(118);
+  });
+});
