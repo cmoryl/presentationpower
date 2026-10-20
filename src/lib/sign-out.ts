@@ -31,6 +31,7 @@ const PUBLIC_NO_LOGIN_PATHS = [
   "/share", // shared decks + partner brand kit (token-gated)
   "/events/next/london", // print vendors: revision in force
   "/events/next/kiosk-editor", // opened inside BoothHub
+  "/convert", // cross-format adapter: shared with clients; account-bound features stay gated
   "/api",
   "/mcp",
   "/.well-known",

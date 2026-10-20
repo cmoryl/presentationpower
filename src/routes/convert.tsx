@@ -216,7 +216,7 @@ function ConvertPage() {
       return;
     }
     if (kind !== "svg" && !userId) {
-      setUpload({ status: "error", name: file.name, message: "Sign in first — reading Illustrator, PDF and Office files needs your account." });
+      setUpload({ status: "error", name: file.name, message: "Reading Illustrator, PDF and Office files needs a TransPerfect sign-in — SVG artwork and typed copy work for everyone." });
       return;
     }
     setUpload({ status: "reading", name: file.name });
