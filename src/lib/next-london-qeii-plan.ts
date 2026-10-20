@@ -138,7 +138,8 @@ export type QeiiPlanOptions = {
    * Venue framing for the sheet. Defaults to the QEII Centre; another event
    * passes its own venue name and floor tabs so nothing London prints on it.
    */
-  sheet?: { venueName: string; tabs: { id: string; label: string }[] };
+  /** `lockup` = file name in /next-2026/logos; defaults to the TransPerfect NEXT lockup. */
+  sheet?: { venueName: string; tabs: { id: string; label: string }[]; lockup?: string };
 };
 
 /**
@@ -523,7 +524,8 @@ function qeiiSignageSheet(
     const colour = qeiiMixToWhite(BRAND.blue, 0.9 - (0.9 * i) / (n - 1));
     return `<path d="M${x} ${bandY} L${x + step * 0.55} ${bandY} L${x + step * 0.55 + k} ${bandY + bandH / 2} L${x + step * 0.55} ${bandY + bandH} L${x} ${bandY + bandH} L${x + k} ${bandY + bandH / 2} Z" fill="${colour}"/>`;
   }).join("");
-  const lockup = `<image href="${NEXT_APP_ORIGIN}/next-2026/logos/transperfect-side-by-side-color.svg" x="${SW - m - lockW}" y="${bandY}" width="${lockW}" height="${bandH}" preserveAspectRatio="xMidYMid meet"/>`;
+  const lockupFile = sheet?.lockup ?? "transperfect-side-by-side-color.svg";
+  const lockup = `<image href="${NEXT_APP_ORIGIN}/next-2026/logos/${lockupFile}" x="${SW - m - lockW}" y="${bandY}" width="${lockW}" height="${bandH}" preserveAspectRatio="xMidYMid meet"/>`;
   const footH = SW * 0.075;
   const footY = SH - footH;
   const tabW = SW * 0.075;
