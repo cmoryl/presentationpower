@@ -148,7 +148,7 @@ function ZoomSurface({
             transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
             transformOrigin: "0 0",
           }}
-          className={full ? "flex h-full items-center justify-center [&>div]:max-h-full [&>div]:max-w-full [&_svg]:max-h-[calc(96dvh-1rem)] [&_svg]:w-auto [&_svg]:max-w-full [&_img]:max-h-[calc(96dvh-1rem)] [&_img]:w-auto [&_img]:max-w-full" : ""}
+          className={full ? "flex h-full items-center justify-center [&>div]:h-full [&>div]:w-full [&_svg]:h-full! [&_svg]:w-full! [&_img]:h-full! [&_img]:w-full! [&_img]:object-contain" : ""}
         >
           {children}
         </div>
