@@ -1,0 +1,15 @@
+import { expect, it } from "vitest";
+import { SJB_COMPONENTS, SJB_MEASUREMENTS, sjbProductionSize } from "./san-juan-logo-construction";
+
+it("preserves every original path across the six source layers", () => {
+  expect(SJB_COMPONENTS).toHaveLength(6);
+  expect(SJB_COMPONENTS.reduce((sum,p) => sum+p.paths,0)).toBe(218);
+  expect(SJB_COMPONENTS.map(p => p.order)).toEqual([1,2,3,4,5,6]);
+});
+it("scales from badge bounds rather than the square artboard", () => {
+  const size = sjbProductionSize(1186.7000732421875);
+  expect(size.height).toBeCloseTo(1161.7000732421875,8);
+  expect(size.clearSpace).toBeCloseTo(171.7,8);
+  expect(size.artboard).toBeCloseTo(1254,8);
+  expect(SJB_MEASUREMENTS.bounds.x).toBeCloseTo(33.69975280761719,8);
+});
