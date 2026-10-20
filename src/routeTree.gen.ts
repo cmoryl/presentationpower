@@ -226,6 +226,7 @@ import { Route as EventsNextMartPriceListRouteImport } from './routes/events.nex
 import { Route as EventsNextSignEditorSignIdRouteImport } from './routes/events.next_.sign-editor.$signId'
 import { Route as EventsNextSignSetEditorSignIdRouteImport } from './routes/events.next_.sign-set-editor.$signId'
 import { Route as EventsNextSignsEventIdRouteImport } from './routes/events.next_.signs.$eventId'
+import { Route as EventsSanJuanBowlBrandKitSingleColourRouteImport } from './routes/events.san-juan-bowl_.brand-kit_.single-colour'
 import { Route as KnowledgeBrandGuidesSlugEditRouteImport } from './routes/knowledge.brand-guides.$slug_.edit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -1334,6 +1335,12 @@ const EventsNextSignsEventIdRoute = EventsNextSignsEventIdRouteImport.update({
   path: '/next/signs/$eventId',
   getParentRoute: () => EventsRoute,
 } as any)
+const EventsSanJuanBowlBrandKitSingleColourRoute =
+  EventsSanJuanBowlBrandKitSingleColourRouteImport.update({
+    id: '/san-juan-bowl_/brand-kit_/single-colour',
+    path: '/san-juan-bowl/brand-kit/single-colour',
+    getParentRoute: () => EventsRoute,
+  } as any)
 const KnowledgeBrandGuidesSlugEditRoute =
   KnowledgeBrandGuidesSlugEditRouteImport.update({
     id: '/brand-guides/$slug_/edit',
@@ -1558,6 +1565,7 @@ export interface FileRoutesByFullPath {
   '/events/next/sign-editor/$signId': typeof EventsNextSignEditorSignIdRoute
   '/events/next/sign-set-editor/$signId': typeof EventsNextSignSetEditorSignIdRoute
   '/events/next/signs/$eventId': typeof EventsNextSignsEventIdRoute
+  '/events/san-juan-bowl/brand-kit/single-colour': typeof EventsSanJuanBowlBrandKitSingleColourRoute
   '/knowledge/brand-guides/$slug/edit': typeof KnowledgeBrandGuidesSlugEditRoute
   '/events/next/divisions/': typeof EventsNextDivisionsIndexRoute
 }
@@ -1774,6 +1782,7 @@ export interface FileRoutesByTo {
   '/events/next/sign-editor/$signId': typeof EventsNextSignEditorSignIdRoute
   '/events/next/sign-set-editor/$signId': typeof EventsNextSignSetEditorSignIdRoute
   '/events/next/signs/$eventId': typeof EventsNextSignsEventIdRoute
+  '/events/san-juan-bowl/brand-kit/single-colour': typeof EventsSanJuanBowlBrandKitSingleColourRoute
   '/knowledge/brand-guides/$slug/edit': typeof KnowledgeBrandGuidesSlugEditRoute
   '/events/next/divisions': typeof EventsNextDivisionsIndexRoute
 }
@@ -1995,6 +2004,7 @@ export interface FileRoutesById {
   '/events/next_/sign-editor/$signId': typeof EventsNextSignEditorSignIdRoute
   '/events/next_/sign-set-editor/$signId': typeof EventsNextSignSetEditorSignIdRoute
   '/events/next_/signs/$eventId': typeof EventsNextSignsEventIdRoute
+  '/events/san-juan-bowl_/brand-kit_/single-colour': typeof EventsSanJuanBowlBrandKitSingleColourRoute
   '/knowledge/brand-guides/$slug_/edit': typeof KnowledgeBrandGuidesSlugEditRoute
   '/events/next_/divisions/': typeof EventsNextDivisionsIndexRoute
 }
@@ -2217,6 +2227,7 @@ export interface FileRouteTypes {
     | '/events/next/sign-editor/$signId'
     | '/events/next/sign-set-editor/$signId'
     | '/events/next/signs/$eventId'
+    | '/events/san-juan-bowl/brand-kit/single-colour'
     | '/knowledge/brand-guides/$slug/edit'
     | '/events/next/divisions/'
   fileRoutesByTo: FileRoutesByTo
@@ -2433,6 +2444,7 @@ export interface FileRouteTypes {
     | '/events/next/sign-editor/$signId'
     | '/events/next/sign-set-editor/$signId'
     | '/events/next/signs/$eventId'
+    | '/events/san-juan-bowl/brand-kit/single-colour'
     | '/knowledge/brand-guides/$slug/edit'
     | '/events/next/divisions'
   id:
@@ -2653,6 +2665,7 @@ export interface FileRouteTypes {
     | '/events/next_/sign-editor/$signId'
     | '/events/next_/sign-set-editor/$signId'
     | '/events/next_/signs/$eventId'
+    | '/events/san-juan-bowl_/brand-kit_/single-colour'
     | '/knowledge/brand-guides/$slug_/edit'
     | '/events/next_/divisions/'
   fileRoutesById: FileRoutesById
@@ -4290,6 +4303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsNextSignsEventIdRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/san-juan-bowl_/brand-kit_/single-colour': {
+      id: '/events/san-juan-bowl_/brand-kit_/single-colour'
+      path: '/san-juan-bowl/brand-kit/single-colour'
+      fullPath: '/events/san-juan-bowl/brand-kit/single-colour'
+      preLoaderRoute: typeof EventsSanJuanBowlBrandKitSingleColourRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/knowledge/brand-guides/$slug_/edit': {
       id: '/knowledge/brand-guides/$slug_/edit'
       path: '/brand-guides/$slug/edit'
@@ -4434,6 +4454,7 @@ interface EventsRouteChildren {
   EventsNextSignEditorSignIdRoute: typeof EventsNextSignEditorSignIdRoute
   EventsNextSignSetEditorSignIdRoute: typeof EventsNextSignSetEditorSignIdRoute
   EventsNextSignsEventIdRoute: typeof EventsNextSignsEventIdRoute
+  EventsSanJuanBowlBrandKitSingleColourRoute: typeof EventsSanJuanBowlBrandKitSingleColourRoute
   EventsNextDivisionsIndexRoute: typeof EventsNextDivisionsIndexRoute
 }
 
@@ -4485,6 +4506,8 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextSignEditorSignIdRoute: EventsNextSignEditorSignIdRoute,
   EventsNextSignSetEditorSignIdRoute: EventsNextSignSetEditorSignIdRoute,
   EventsNextSignsEventIdRoute: EventsNextSignsEventIdRoute,
+  EventsSanJuanBowlBrandKitSingleColourRoute:
+    EventsSanJuanBowlBrandKitSingleColourRoute,
   EventsNextDivisionsIndexRoute: EventsNextDivisionsIndexRoute,
 }
 
