@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [x] San Juan Bowl: default to 13 named major pieces; grouped SVG/ZIP downloads preserve all 293 source shapes; individual-shape view and editor remain optional.
+
 - [x] San Juan Bowl: original white palm highlights verified; all 293 micro-extracted SVGs match source geometry, downloadable individually/ZIP; centered 3D orbit and enlarged interactive dialog tested.
 
 - [x] San Juan Bowl: source-coordinate grid, measured sizing calculator, six preserved original layers and verified ZIP download; composite scene elements are not falsely offered as independent symbols.
