@@ -54,6 +54,15 @@ import {
   type AdaptTargetId,
 } from "@/lib/cross-format-adapt";
 import { CSS_DPI } from "@/lib/print-proof-export";
+import {
+  CONVERT_UPLOAD_ACCEPT,
+  CONVERT_UPLOAD_MAX_BYTES,
+  contentFromSvgMarkup,
+  fileToBase64,
+  uploadKindLabel,
+  uploadKindOf,
+} from "@/lib/convert-upload";
+import { structureConvertUpload } from "@/lib/convert-upload.functions";
 import { seedContent, useDeckStore, type Brief } from "@/lib/deck-store";
 import { BRAND_MODES, byId, MODULE_FAMILIES, MODULE_VARIANTS } from "@/lib/taxonomy";
 
@@ -108,7 +117,13 @@ const MASTER_BRIEF: Brief = {
   clientFacts: "",
 };
 
-type SourceKind = "module" | "deck" | "manual" | "print";
+type SourceKind = "module" | "deck" | "manual" | "print" | "upload";
+
+type UploadState =
+  | { status: "idle" }
+  | { status: "reading"; name: string }
+  | { status: "done"; name: string; kindLabel: string; content: AdaptContent }
+  | { status: "error"; name: string; message: string };
 
 function ConvertPage() {
   const search = Route.useSearch();
