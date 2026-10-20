@@ -16,6 +16,9 @@ export type QeiiRoomEdit = {
   /** Nudge off the printed anchor, in plan units. */
   dx?: number;
   dy?: number;
+  /** Relative text size and absolute rotation in degrees. */
+  scale?: number;
+  angle?: number;
   /**
    * Division lockups to print beside the name, chosen by hand. An empty list
    * means "no lockup here"; absent means the schedule's own reading stands.
@@ -73,6 +76,8 @@ export function sanitizeQeiiMapEdits(raw: unknown): QeiiMapEdits {
       if (dx !== undefined && dx !== 0) edit.dx = dx;
       const dy = num(v['dy']);
       if (dy !== undefined && dy !== 0) edit.dy = dy;
+      if (typeof v['scale'] === "number" && Number.isFinite(v['scale'])) edit.scale = Math.max(0.25, Math.min(3, v['scale']));
+      if (typeof v['angle'] === "number" && Number.isFinite(v['angle'])) edit.angle = Math.max(-180, Math.min(180, v['angle']));
       // A hand-picked lockup set: only approved division ids survive, and an
       // empty list is kept because it means "print no lockup on this room".
       const marks = v['marks'];

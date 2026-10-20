@@ -1,3 +1,4 @@
+import GEIST_ADVANCES from "@/lib/geist-advances.json";
 // Layout engine for the natively rebuilt QEII Centre floor plans.
 //
 // The issued artwork records each room name with the font size the venue's own
@@ -109,7 +110,8 @@ function advance(ch: string): number {
 /** Estimated printed width of a line at a given em size. */
 export function qeiiTextWidth(text: string, size: number): number {
   let em = 0;
-  for (const ch of text) em += advance(ch);
+  const widths = GEIST_ADVANCES["Geist-SemiBold"] as Record<string, number>;
+  for (const ch of text) em += widths[ch] ?? advance(ch);
   return em * size;
 }
 
@@ -237,14 +239,16 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
 
   for (const group of groups) {
     const head = group.labels[0]!;
-    const baseSize = qeiiFontSize(head, floor, scale);
-    const minSize = Math.max(floor.w * QEII_LABEL_MIN_SHARE * scale, 0.01);
+    const roomScale = qeiiRoomEdit(options.edits, group.labels.map((l) => l.text).join(" ").replace(/-\s/g, "-"))?.scale ?? 1;
+    const baseSize = qeiiFontSize(head, floor, scale * roomScale);
+    const minSize = Math.max(floor.w * QEII_LABEL_MIN_SHARE * scale * Math.min(1, roomScale), 0.01);
     const issuedLines = group.labels.map((l) => l.text);
     const room = issuedLines.join(" ").replace(/-\s/g, "-");
     // A live correction replaces the printed name and the line beneath it; the
     // schedule is still read against the name the venue issued.
     const edit = qeiiRoomEdit(options.edits, room);
     const lines = edit?.name ? [edit.name] : issuedLines;
+    const angle = edit?.angle ?? group.angle;
     const issuedUse = options.showUse ? spaceUseLine(room, floor.id) : undefined;
     // A hand-picked lockup set replaces the schedule's own reading, including an
     // empty set, which prints no lockup on the room at all.
@@ -335,7 +339,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
         variant,
         lines: ls,
         useLines: us,
-        box: boxFor(group.x + dx, group.y + dy, group.angle, width, above, below),
+        box: boxFor(group.x + dx, group.y + dy, angle, width, above, below),
         dx,
         dy,
         size: Math.round(size * 100) / 100,
@@ -527,8 +531,9 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
 
     // A saved nudge is a deliberate human correction, so it is applied after the
     // automatic placement and moves the whole block, ring and all.
-    const nx = edit?.dx ?? 0;
-    const ny = edit?.dy ?? 0;
+    // Human nudges are constrained by the complete rotated text box, not its centre.
+    const nx = Math.max(2 - chosen.box.x0, Math.min(edit?.dx ?? 0, floor.w - 2 - chosen.box.x1));
+    const ny = Math.max(2 - chosen.box.y0, Math.min(edit?.dy ?? 0, floor.h - 2 - chosen.box.y1));
     const box = {
       x0: chosen.box.x0 + nx,
       y0: chosen.box.y0 + ny,
@@ -541,7 +546,7 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
       room,
       x: group.x + chosen.dx + nx,
       y: group.y + chosen.dy + ny,
-      angle: group.angle,
+      angle,
       size: chosen.size,
       lines: chosen.lines,
 
