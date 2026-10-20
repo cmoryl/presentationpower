@@ -507,17 +507,30 @@ function ConvertPage() {
                   <div className="rounded-lg border border-dashed border-[var(--tp-blue)] bg-[var(--tp-surface)] p-4 text-center">
                     <span className="block text-[13px] font-semibold text-[var(--tp-ink)]">Checking your sign-in…</span>
                   </div>
-                ) : userId === null ? (
-                  <div className="rounded-lg border border-dashed border-[var(--tp-blue)] bg-[var(--tp-surface)] p-4 text-center">
-                    <span className="block text-[13px] font-semibold text-[var(--tp-ink)]">Sign in to upload artwork files</span>
-                    <span className="mt-1 block text-[11.5px] leading-snug text-[var(--tp-dark-gray)]">
-                      Reading Illustrator, PDF and Office files needs your account.
-                    </span>
-                    <Link to="/auth" className="mt-2 inline-block rounded-md bg-[var(--tp-blue)] px-3 py-1.5 text-[12.5px] font-semibold text-white hover:opacity-90">
-                      Sign in
-                    </Link>
-                  </div>
-                ) : (
+                 ) : userId === null ? (
+                <label
+                  htmlFor="convert-upload"
+                  className="block cursor-pointer rounded-lg border border-dashed border-[var(--tp-blue)] bg-[var(--tp-surface)] p-4 text-center hover:bg-[var(--tp-blue-white)]"
+                >
+                  <span className="block text-[13px] font-semibold text-[var(--tp-ink)]">
+                    {upload.status === "reading" ? "Reading your file…" : "Choose an artwork file"}
+                  </span>
+                  <span className="mt-1 block text-[11.5px] leading-snug text-[var(--tp-dark-gray)]">
+                    SVG artwork works for everyone. Illustrator, PDF and Office files need a TransPerfect sign-in — up to 20 MB.
+                  </span>
+                  <input
+                    id="convert-upload"
+                    type="file"
+                    accept={CONVERT_UPLOAD_ACCEPT}
+                    className="sr-only"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) void onUploadFile(f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+                 ) : (
                 <label
                   htmlFor="convert-upload"
                   className="block cursor-pointer rounded-lg border border-dashed border-[var(--tp-blue)] bg-[var(--tp-surface)] p-4 text-center hover:bg-[var(--tp-blue-white)]"
