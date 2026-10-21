@@ -7,14 +7,16 @@
 // are reported so the file is never mistaken for an all-CMYK master.
 
 import { BRAND } from "@/lib/brand-colors";
-import { londonCmykBuild, type Cmyk } from "@/lib/next-london-cmyk";
+import { APPROVED_CMYK_HEXES, londonCmykBuild, type Cmyk } from "@/lib/next-london-cmyk";
 
 const TOL = 0.025;
 
+// Brand palette first so a tint resolves to the house colour it came from.
 const CANDIDATES = Array.from(
   new Set(
     [BRAND.blue, BRAND.ink, BRAND.aqua, BRAND.lavender, BRAND.yellow, BRAND.green, BRAND.peach, BRAND.pink, BRAND.red]
-      .map((h) => h.toLowerCase()),
+      .map((h) => h.toLowerCase())
+      .concat(APPROVED_CMYK_HEXES.filter((h) => /^#[0-9a-f]{6}$/.test(h) && h !== "#ffffff" && h !== "#000000")),
   ),
 );
 

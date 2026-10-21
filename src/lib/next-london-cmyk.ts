@@ -70,6 +70,9 @@ const APPROVED: Record<string, Cmyk> = {
   [BRAND.red.toLowerCase()]: { c: 0, m: 0.83, y: 0.85, k: 0 },
 };
 
+/** Every colour with a signed-off build (lower-case hex). */
+export const APPROVED_CMYK_HEXES: readonly string[] = Object.keys(APPROVED);
+
 function clamp01(n: number): number {
   return !Number.isFinite(n) ? 0 : n < 0 ? 0 : n > 1 ? 1 : n;
 }
