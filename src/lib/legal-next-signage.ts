@@ -4,6 +4,7 @@ import { demoBoothCardUrl } from "@/lib/demo-booth-cards";
 // these templates; the supplied copy is used exactly as received.
 
 import financeDeskPreview from "@/assets/finance-pillars/reg-desk.jpg.asset.json";
+import vipDinnerPreview from "@/assets/next-vip-dinner/vip-dinner.jpg.asset.json";
 import globallinkDeskPreview from "@/assets/globallink-desk/reg-desk.jpg.asset.json";
 import { GLOBALLINK_PILLARS } from "@/lib/next-globallink-pillars";
 import { isSignId, liveLayoutById, venueFirstFaceId, type LiveLayout } from "@/lib/next-california-kiosk-live";
@@ -112,6 +113,13 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
       ? "The supplied page has the arrow and no headline. The file has no bleed, so the ground is stretched 1/8 in past the trim."
       : "The headline is live text you can retype. The file has no bleed, so the ground is stretched 1/8 in past the trim.",
   })),
+  {
+    // GlobalLink NEXT VIP dinner invitation — supplied Canva PDF Print (21 Oct 2026), 11.25 in square.
+    id: "globallink-vip-dinner", title: "GlobalLink NEXT VIP dinner invitation", size: "11.25 × 11.25 in", master: "VIP_Dinner.pdf",
+    faces: [{ id: "divsign-globallink-vip-dinner", label: "Invitation" }], division: "globallink", preview: vipDinnerPreview.url,
+    sizes: [{ w: 11.25, h: 11.25, label: "Supplied · 11.25 × 11.25 in" }, { w: 5, h: 5, label: "Card · 5 × 5 in" }, { w: 7, h: 7, label: "Card · 7 × 7 in" }],
+    note: "The date, time, event name and address are live text you can retype. The NEXT logo, \"You are invited\" script and venue logo are movable pieces; swap the venue logo for each city. The file has no bleed, so the ground is stretched 1/8 in past the trim.",
+  },
   {
     id: "finance-pillar-arrow", title: "FinanceNEXT pillar arrow sign", size: "23.5 × 72 in + 23.5 × 23.8 in arrow", master: "Finance_Pillar_Arro_Sign.ai",
     faces: [{ id: "divsign-finance-pillar-arrow-pillar", label: "Pillar" }, { id: "divsign-finance-pillar-arrow-arrow", label: "Arrow" }],
