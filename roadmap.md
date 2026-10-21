@@ -46,4 +46,4 @@
 - [x] Main menu trimmed: "Create", "Review" (one reviewer door), Demos admin-only.
 - [ ] Stadium 3D view — BLOCKED: BoothHUB's /showcase/san-juan-bowl returns BRAND_NOT_FOUND; must be fixed and published in BoothHUB.
 - [x] Plain-language labels on everyday screens (Brand, Approved layouts, Layout).
-- [ ] One-sentence whole-event-kit demo — needs your go-ahead (larger build).
+- [x] One-sentence event kit: already exists in Events agent; tested, reply rules tightened. Open: San Juan Bowl has no own look in the agent (uses NEXT City).
