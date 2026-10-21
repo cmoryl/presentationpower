@@ -89,6 +89,21 @@ export const NEXUS_EVENT = {
   datesLabel: "",
 } as const;
 
+/** The Hackathon is its own event; venue and dates wait on the organisers. */
+export const HACKATHON_EVENT = {
+  id: "hackathon-london",
+  name: "GlobalLink Hackathon London ’26",
+  city: "London",
+  venue: "",
+  datesLabel: "",
+} as const;
+
+/** The event each supplied kit belongs to. */
+export const KIT_EVENT: Record<SuppliedKit["id"], { id: string; name: string }> = {
+  nexus: NEXUS_EVENT,
+  hackathon: HACKATHON_EVENT,
+};
+
 export function kitFileSize(bytes: number): string {
   return bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
 }
