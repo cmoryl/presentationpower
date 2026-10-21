@@ -2,7 +2,10 @@
 // share view. `shared` hides editors and internal links.
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Download, ExternalLink, Loader2, PencilRuler } from "lucide-react";
+import { Download, ExternalLink, FileText, Loader2, PencilRuler } from "lucide-react";
+import { DESIGNER_PACK_CHANGELOG, DESIGNER_PACK_VERSION, logoFormats } from "@/lib/next-designer-pack";
+import { SendToVendorDialog } from "@/components/events/SendToVendorDialog";
+import { PartnerSubmissionBox } from "@/components/events/PartnerSubmissionBox";
 import { toast } from "sonner";
 import { Button } from "@/design-system/element";
 import { BrandKitGuideSections, GUIDE_SECTIONS, PLANNING_GUIDE_SECTIONS } from "@/components/events/brand-kit/BrandKitGuideSections";
@@ -39,7 +42,7 @@ const SHARED_SECTIONS = [
   ["new-city", "Starting a new city"],
 ] as const;
 
-export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
+export function NextBrandKitView({ shared = false, shareToken }: { shared?: boolean; shareToken?: string }) {
   const [families, setFamilies] = useState<KitFamily[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [ground, setGround] = useState<"light" | "dark">("light");
@@ -73,6 +76,30 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
     }
   }
 
+  async function downloadGuide() {
+    if (!families) return;
+    setBusy("Building PDF…");
+    try {
+      const { buildDesignerGuidePdf } = await import("@/lib/next-designer-guide-pdf");
+      const bytes = await buildDesignerGuidePdf({
+        families,
+        shareUrl: shared ? window.location.href : undefined,
+        onProgress: (l) => setBusy(l),
+      });
+      const blob = new Blob([bytes as BlobPart], { type: "application/pdf" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `NEXT-2026-Designer-Guide-v${DESIGNER_PACK_VERSION}.pdf`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+      toast.success("Designer guide PDF downloaded.");
+    } catch (e) {
+      toast.error(`PDF failed: ${(e as Error).message}`);
+    } finally {
+      setBusy(null);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
@@ -82,13 +109,33 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
             The NEXT look every city starts from: logos, colours, type, sign templates and digital formats.
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">Kit version {BRAND_KIT_VERSION.replace(/-kit$/, "")}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Designer pack v{DESIGNER_PACK_VERSION} · kit {BRAND_KIT_VERSION.replace(/-kit$/, "")} · latest
+          </p>
+          <details className="mt-1 text-xs text-muted-foreground">
+            <summary className="cursor-pointer">What changed</summary>
+            <ul className="mt-1 space-y-1">
+              {DESIGNER_PACK_CHANGELOG.map((c) => (
+                <li key={c.version}>
+                  <span className="font-semibold">v{c.version}</span> ({c.date}): {c.notes.join(" ")}
+                </li>
+              ))}
+            </ul>
+          </details>
         </div>
-        <Button onClick={download} disabled={!families || !!busy}>
-          {busy ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Download className="size-4" aria-hidden />}
-          {busy ? `Building pack ${busy}` : "Download the full kit"}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {!shared && families ? <SendToVendorDialog families={families} /> : null}
+          <Button variant="outline" onClick={downloadGuide} disabled={!families || !!busy}>
+            <FileText className="size-4" aria-hidden />
+            Designer guide (PDF)
+          </Button>
+          <Button onClick={download} disabled={!families || !!busy}>
+            {busy ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Download className="size-4" aria-hidden />}
+            {busy ? busy : "Download the full pack"}
+          </Button>
+        </div>
       </header>
+      {shared && shareToken ? <PartnerSubmissionBox token={shareToken} /> : null}
 
       <div className="lg:grid lg:grid-cols-[200px_1fr] lg:gap-10">
       <nav aria-label="Brand kit sections" className="sticky top-0 z-10 -mx-6 flex gap-4 overflow-x-auto bg-background/95 px-6 py-3 text-sm lg:top-6 lg:mx-0 lg:h-fit lg:flex-col lg:gap-2 lg:px-0 lg:py-8">
@@ -118,11 +165,21 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
               <article key={d.id} className="rounded-lg border border-border p-4">
                 <h3 className="text-sm font-semibold">{d.name}</h3>
                 <div className={`mt-3 grid gap-3 rounded-md p-4 ${ground === "light" ? "bg-white" : "bg-[#03002C]"}`}>
-                  {shown.map((l) => (
-                    <a key={l.src} href={l.src} download title={`${l.lockupLabel} · ${l.variantLabel}`} className="block">
-                      <img src={l.src} alt={`${d.name} ${l.lockupLabel} ${l.variantLabel}`} className="mx-auto max-h-16 w-auto object-contain" />
-                    </a>
-                  ))}
+                  {shown.map((l) => {
+                    const f = logoFormats(l.src);
+                    return (
+                      <div key={l.src}>
+                        <img src={l.src} alt={`${d.name} ${l.lockupLabel} ${l.variantLabel}`} className="mx-auto max-h-16 w-auto object-contain" />
+                        <div className={`mt-2 flex justify-center gap-2 text-[11px] ${ground === "light" ? "text-[#003FC7]" : "text-white"}`}>
+                          {(["svg", "eps", "png"] as const).map((k) => (
+                            <a key={k} href={f[k]} download className="underline underline-offset-2">
+                              {k.toUpperCase()}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </article>
             );

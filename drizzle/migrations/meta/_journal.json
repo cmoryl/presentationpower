@@ -92,6 +92,20 @@
       "when": 1792541477534,
       "tag": "0012_restrict_signed_in_reads_to_team",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792588447440,
+      "tag": "0013_vendor_handoffs_partner_submissions",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792588504406,
+      "tag": "0014_partner_submissions_storage",
+      "breakpoints": true
     }
   ]
 }

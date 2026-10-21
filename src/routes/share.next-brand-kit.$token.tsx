@@ -42,7 +42,7 @@ function SharedKit() {
     );
   return (
     <main>
-      <NextBrandKitView shared />
+      <NextBrandKitView shared shareToken={token} />
     </main>
   );
 }

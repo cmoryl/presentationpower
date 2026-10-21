@@ -29,6 +29,7 @@ const PUBLIC_NO_LOGIN_PATHS = [
   "/auth",
   "/reset-password",
   "/share", // shared decks + partner brand kit (token-gated)
+  "/vendor", // vendor hand-off packs (token-gated, expiring)
   "/events/next/london", // print vendors: revision in force
   "/events/next/kiosk-editor", // opened inside BoothHub
   "/convert", // cross-format adapter: shared with clients; account-bound features stay gated

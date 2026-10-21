@@ -151,6 +151,7 @@ import { Route as SocialNewRouteImport } from './routes/social.new'
 import { Route as SocialPresetsRouteImport } from './routes/social.presets'
 import { Route as TestPrintDndRouteImport } from './routes/test.print-dnd'
 import { Route as TestPrintHeroRouteImport } from './routes/test.print-hero'
+import { Route as VendorTokenRouteImport } from './routes/vendor.$token'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns_.kit'
@@ -187,6 +188,7 @@ import { Route as EventsNextPlanningGuideRouteImport } from './routes/events.nex
 import { Route as EventsNextPlaybookRouteImport } from './routes/events.next_.playbook'
 import { Route as EventsNextSanFranciscoRouteImport } from './routes/events.next_.san-francisco'
 import { Route as EventsNextStartRouteImport } from './routes/events.next_.start'
+import { Route as EventsNextVendorHandoffsRouteImport } from './routes/events.next_.vendor-handoffs'
 import { Route as EventsNextVenueRouteImport } from './routes/events.next_.venue'
 import { Route as EventsNextVenuesRouteImport } from './routes/events.next_.venues'
 import { Route as EventsSanJuanBowlBrandKitRouteImport } from './routes/events.san-juan-bowl_.brand-kit'
@@ -947,6 +949,11 @@ const TestPrintHeroRoute = TestPrintHeroRouteImport.update({
   path: '/test/print-hero',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VendorTokenRoute = VendorTokenRouteImport.update({
+  id: '/vendor/$token',
+  path: '/vendor/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   id: '/.lovable/oauth/consent',
   path: '/.lovable/oauth/consent',
@@ -1129,6 +1136,12 @@ const EventsNextStartRoute = EventsNextStartRouteImport.update({
   path: '/next/start',
   getParentRoute: () => EventsRoute,
 } as any)
+const EventsNextVendorHandoffsRoute =
+  EventsNextVendorHandoffsRouteImport.update({
+    id: '/next_/vendor-handoffs',
+    path: '/next/vendor-handoffs',
+    getParentRoute: () => EventsRoute,
+  } as any)
 const EventsNextVenueRoute = EventsNextVenueRouteImport.update({
   id: '/next_/venue',
   path: '/next/venue',
@@ -1506,6 +1519,7 @@ export interface FileRoutesByFullPath {
   '/social/presets': typeof SocialPresetsRoute
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
+  '/vendor/$token': typeof VendorTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/agent/': typeof AgentIndexRoute
   '/decks/': typeof DecksIndexRoute
@@ -1552,6 +1566,7 @@ export interface FileRoutesByFullPath {
   '/events/next/playbook': typeof EventsNextPlaybookRoute
   '/events/next/san-francisco': typeof EventsNextSanFranciscoRoute
   '/events/next/start': typeof EventsNextStartRoute
+  '/events/next/vendor-handoffs': typeof EventsNextVendorHandoffsRoute
   '/events/next/venue': typeof EventsNextVenueRoute
   '/events/next/venues': typeof EventsNextVenuesRoute
   '/events/san-juan-bowl/brand-kit': typeof EventsSanJuanBowlBrandKitRoute
@@ -1727,6 +1742,7 @@ export interface FileRoutesByTo {
   '/social/presets': typeof SocialPresetsRoute
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
+  '/vendor/$token': typeof VendorTokenRoute
   '/admin': typeof AdminIndexRoute
   '/agent': typeof AgentIndexRoute
   '/decks': typeof DecksIndexRoute
@@ -1773,6 +1789,7 @@ export interface FileRoutesByTo {
   '/events/next/playbook': typeof EventsNextPlaybookRoute
   '/events/next/san-francisco': typeof EventsNextSanFranciscoRoute
   '/events/next/start': typeof EventsNextStartRoute
+  '/events/next/vendor-handoffs': typeof EventsNextVendorHandoffsRoute
   '/events/next/venue': typeof EventsNextVenueRoute
   '/events/next/venues': typeof EventsNextVenuesRoute
   '/events/san-juan-bowl/brand-kit': typeof EventsSanJuanBowlBrandKitRoute
@@ -1953,6 +1970,7 @@ export interface FileRoutesById {
   '/social/presets': typeof SocialPresetsRoute
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
+  '/vendor/$token': typeof VendorTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/agent/': typeof AgentIndexRoute
   '/decks/': typeof DecksIndexRoute
@@ -1999,6 +2017,7 @@ export interface FileRoutesById {
   '/events/next_/playbook': typeof EventsNextPlaybookRoute
   '/events/next_/san-francisco': typeof EventsNextSanFranciscoRoute
   '/events/next_/start': typeof EventsNextStartRoute
+  '/events/next_/vendor-handoffs': typeof EventsNextVendorHandoffsRoute
   '/events/next_/venue': typeof EventsNextVenueRoute
   '/events/next_/venues': typeof EventsNextVenuesRoute
   '/events/san-juan-bowl_/brand-kit': typeof EventsSanJuanBowlBrandKitRoute
@@ -2180,6 +2199,7 @@ export interface FileRouteTypes {
     | '/social/presets'
     | '/test/print-dnd'
     | '/test/print-hero'
+    | '/vendor/$token'
     | '/admin/'
     | '/agent/'
     | '/decks/'
@@ -2226,6 +2246,7 @@ export interface FileRouteTypes {
     | '/events/next/playbook'
     | '/events/next/san-francisco'
     | '/events/next/start'
+    | '/events/next/vendor-handoffs'
     | '/events/next/venue'
     | '/events/next/venues'
     | '/events/san-juan-bowl/brand-kit'
@@ -2401,6 +2422,7 @@ export interface FileRouteTypes {
     | '/social/presets'
     | '/test/print-dnd'
     | '/test/print-hero'
+    | '/vendor/$token'
     | '/admin'
     | '/agent'
     | '/decks'
@@ -2447,6 +2469,7 @@ export interface FileRouteTypes {
     | '/events/next/playbook'
     | '/events/next/san-francisco'
     | '/events/next/start'
+    | '/events/next/vendor-handoffs'
     | '/events/next/venue'
     | '/events/next/venues'
     | '/events/san-juan-bowl/brand-kit'
@@ -2626,6 +2649,7 @@ export interface FileRouteTypes {
     | '/social/presets'
     | '/test/print-dnd'
     | '/test/print-hero'
+    | '/vendor/$token'
     | '/admin/'
     | '/agent/'
     | '/decks/'
@@ -2672,6 +2696,7 @@ export interface FileRouteTypes {
     | '/events/next_/playbook'
     | '/events/next_/san-francisco'
     | '/events/next_/start'
+    | '/events/next_/vendor-handoffs'
     | '/events/next_/venue'
     | '/events/next_/venues'
     | '/events/san-juan-bowl_/brand-kit'
@@ -2798,6 +2823,7 @@ export interface RootRouteChildren {
   SocialAgentThreadIdRoute: typeof SocialAgentThreadIdRoute
   TestPrintDndRoute: typeof TestPrintDndRoute
   TestPrintHeroRoute: typeof TestPrintHeroRoute
+  VendorTokenRoute: typeof VendorTokenRoute
   AgentIndexRoute: typeof AgentIndexRoute
   DecksIndexRoute: typeof DecksIndexRoute
   EventsAgentIndexRoute: typeof EventsAgentIndexRoute
@@ -3829,6 +3855,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TestPrintHeroRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vendor/$token': {
+      id: '/vendor/$token'
+      path: '/vendor/$token'
+      fullPath: '/vendor/$token'
+      preLoaderRoute: typeof VendorTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.lovable/oauth/consent': {
       id: '/.lovable/oauth/consent'
       path: '/.lovable/oauth/consent'
@@ -4079,6 +4112,13 @@ declare module '@tanstack/react-router' {
       path: '/next/start'
       fullPath: '/events/next/start'
       preLoaderRoute: typeof EventsNextStartRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next_/vendor-handoffs': {
+      id: '/events/next_/vendor-handoffs'
+      path: '/next/vendor-handoffs'
+      fullPath: '/events/next/vendor-handoffs'
+      preLoaderRoute: typeof EventsNextVendorHandoffsRouteImport
       parentRoute: typeof EventsRoute
     }
     '/events/next_/venue': {
@@ -4512,6 +4552,7 @@ interface EventsRouteChildren {
   EventsNextPlaybookRoute: typeof EventsNextPlaybookRoute
   EventsNextSanFranciscoRoute: typeof EventsNextSanFranciscoRoute
   EventsNextStartRoute: typeof EventsNextStartRoute
+  EventsNextVendorHandoffsRoute: typeof EventsNextVendorHandoffsRoute
   EventsNextVenueRoute: typeof EventsNextVenueRoute
   EventsNextVenuesRoute: typeof EventsNextVenuesRoute
   EventsSanJuanBowlBrandKitRoute: typeof EventsSanJuanBowlBrandKitRoute
@@ -4567,6 +4608,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextPlaybookRoute: EventsNextPlaybookRoute,
   EventsNextSanFranciscoRoute: EventsNextSanFranciscoRoute,
   EventsNextStartRoute: EventsNextStartRoute,
+  EventsNextVendorHandoffsRoute: EventsNextVendorHandoffsRoute,
   EventsNextVenueRoute: EventsNextVenueRoute,
   EventsNextVenuesRoute: EventsNextVenuesRoute,
   EventsSanJuanBowlBrandKitRoute: EventsSanJuanBowlBrandKitRoute,
@@ -4743,6 +4785,7 @@ const rootRouteChildren: RootRouteChildren = {
   SocialAgentThreadIdRoute: SocialAgentThreadIdRoute,
   TestPrintDndRoute: TestPrintDndRoute,
   TestPrintHeroRoute: TestPrintHeroRoute,
+  VendorTokenRoute: VendorTokenRoute,
   AgentIndexRoute: AgentIndexRoute,
   DecksIndexRoute: DecksIndexRoute,
   EventsAgentIndexRoute: EventsAgentIndexRoute,
