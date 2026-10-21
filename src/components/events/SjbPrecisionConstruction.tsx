@@ -48,12 +48,12 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
         <dl className="grid grid-cols-2 gap-3 text-sm">
           {[["Left / top",`${fmt(bounds.x)} / ${fmt(bounds.y)}`],["Right / bottom",`${fmt(bounds.x+bounds.w)} / ${fmt(bounds.y+bounds.h)}`],["Centre X / Y",`${fmt(bounds.x+bounds.w/2)} / ${fmt(bounds.y+bounds.h/2)}`],["Aspect ratio",`${(bounds.w/bounds.h).toFixed(6)} : 1`],["Badge width / x",`${(m.bounds.w/m.unit).toFixed(6)}x`],["Banner reference",`${m.unit} units (rounded)`]].map(([label,value]) => <div key={label} className="border-b border-border pb-2"><dt className="text-muted-foreground">{label}</dt><dd className="mt-1 break-words font-mono text-xs">{value}</dd></div>)}
         </dl>
-        <p className="text-sm text-muted-foreground">Measured badge centre X is {fmt(m.bounds.x+m.bounds.w/2)}; artboard centre X is 627.000. The {fmt(m.bounds.x+m.bounds.w/2-627)}-unit difference is preserved—not corrected.</p>
+        <p className="text-sm text-muted-foreground">The badge centre is 627.000 / 627.000 — exactly the artboard centre; the artwork is mirror-exact about x = 627 outside the lettering.</p>
         <div className="space-y-3 border-t border-border pt-4">
           <label htmlFor="sjb-width" className="block text-sm font-medium">Finished badge width (mm)</label>
           <input id="sjb-width" type="number" min={1} value={width} onChange={e => setWidth(Math.max(1, Number(e.target.value) || 1))} className="h-9 w-full rounded-md border border-input bg-background px-3" />
-          <dl className="space-y-2 text-sm">{[["Badge height",size.height],["1x clear space / side",size.clearSpace],["Square source artboard",size.artboard],["Badge + clear space width",size.footprintWidth]].map(([name,value]) => <div key={String(name)} className="flex justify-between gap-3"><dt>{name}</dt><dd className="font-mono text-xs">{Number(value).toFixed(2)} mm</dd></div>)}</dl>
-          <p className="text-xs text-muted-foreground">Scale factor = finished badge width ÷ {fmt(m.bounds.w)}. The 1x spacing reference uses the previously measured 171.7-unit banner height.</p>
+          <dl className="space-y-2 text-sm">{[["Badge height",size.height],["1x clear space / side (at the width entered above)",size.clearSpace],["Square source artboard",size.artboard],["Badge + clear space width",size.footprintWidth]].map(([name,value]) => <div key={String(name)} className="flex justify-between gap-3"><dt>{name}</dt><dd className="font-mono text-xs">{Number(value).toFixed(2)} mm</dd></div>)}</dl>
+          <p className="text-xs text-muted-foreground">Scale factor = finished badge width ÷ {fmt(m.bounds.w)}. x = 171.7 units = the full height of the ribbon element, navy outline included = 0.1447 × the logo width.</p>
         </div>
       </div>
     </div>
@@ -61,7 +61,7 @@ export function SjbPrecisionConstruction({ className }: SjbPrecisionConstruction
     <SjbMicroAssets />
     <details className="border-t border-border pt-4"><summary className="cursor-pointer text-sm font-semibold">Advanced · individual shape editor</summary><SjbElementExplorer /></details>
     <section aria-label="Logo assembly guide" className="border-t border-border pt-5"><h3 className="text-lg font-semibold">How the logo is assembled</h3>
-      <p className="mt-2 text-sm text-muted-foreground">One supplied master, six original drawing groups and 293 source shapes. The 14 major pieces organize those details into recognizable groups—they do not simplify, redraw or replace the approved logo.</p>
+      <p className="mt-2 text-sm text-muted-foreground">One supplied master: 259 fills in the EPS, 293 shapes in the SVG export, six drawing groups. The 14 major pieces organize those details into recognizable groups—they do not simplify, redraw or replace the approved logo.</p>
       <dl className="mt-5 grid gap-5 sm:grid-cols-3">
         <div className="border-t border-border pt-3"><dt className="text-sm font-semibold">Original master · reproduction</dt><dd className="mt-2 text-sm text-muted-foreground">The definitive complete artwork. Preserve the six-group drawing order and the shape order within each group, on the 1254 × 1254 source artboard.</dd></div>
         <div className="border-t border-border pt-3"><dt className="text-sm font-semibold">14 major pieces · organization</dt><dd className="mt-2 text-sm text-muted-foreground">Badge base, sky, trim, clouds, fortress, football, two palms, ribbon with stars, TRANSPERFECT lettering, waves, SAN JUAN, BOWL and the bird pair. All twelve TRANSPERFECT letters stay together, separate from the ribbon. Each grouped SVG keeps its original detail paths. The pack also retains a separate foundation reference.</dd></div>
