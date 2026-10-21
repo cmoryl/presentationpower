@@ -210,6 +210,10 @@ import { Route as LibraryPrintHeroesRouteImport } from './routes/library.print_.
 import { Route as LibraryPrintModulesRouteImport } from './routes/library.print_.modules'
 import { Route as MastersGeneralSlidesLooksRouteImport } from './routes/masters.general-slides_.looks'
 import { Route as ShareNextBrandKitTokenRouteImport } from './routes/share.next-brand-kit.$token'
+import { Route as ShareSanJuanBowlIndexRouteImport } from './routes/share.san-juan-bowl.index'
+import { Route as ShareSanJuanBowlDesignersRouteImport } from './routes/share.san-juan-bowl.designers'
+import { Route as ShareSanJuanBowlSingleColourRouteImport } from './routes/share.san-juan-bowl.single-colour'
+import { Route as ShareSanJuanBowlStadiumRouteImport } from './routes/share.san-juan-bowl.stadium'
 import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
 import { Route as ApiPublicBoothsEventRouteImport } from './routes/api/public/booths.$event'
@@ -1257,6 +1261,28 @@ const ShareNextBrandKitTokenRoute = ShareNextBrandKitTokenRouteImport.update({
   path: '/share/next-brand-kit/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShareSanJuanBowlIndexRoute = ShareSanJuanBowlIndexRouteImport.update({
+  id: '/share/san-juan-bowl/',
+  path: '/share/san-juan-bowl/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShareSanJuanBowlDesignersRoute =
+  ShareSanJuanBowlDesignersRouteImport.update({
+    id: '/share/san-juan-bowl/designers',
+    path: '/share/san-juan-bowl/designers',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShareSanJuanBowlSingleColourRoute =
+  ShareSanJuanBowlSingleColourRouteImport.update({
+    id: '/share/san-juan-bowl/single-colour',
+    path: '/share/san-juan-bowl/single-colour',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShareSanJuanBowlStadiumRoute = ShareSanJuanBowlStadiumRouteImport.update({
+  id: '/share/san-juan-bowl/stadium',
+  path: '/share/san-juan-bowl/stadium',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SocialDemoPlaybookIdRoute = SocialDemoPlaybookIdRouteImport.update({
   id: '/demo/$playbookId',
   path: '/demo/$playbookId',
@@ -1598,10 +1624,14 @@ export interface FileRoutesByFullPath {
   '/library/print/modules': typeof LibraryPrintModulesRoute
   '/masters/general-slides/looks': typeof MastersGeneralSlidesLooksRoute
   '/share/next-brand-kit/$token': typeof ShareNextBrandKitTokenRoute
+  '/share/san-juan-bowl/designers': typeof ShareSanJuanBowlDesignersRoute
+  '/share/san-juan-bowl/single-colour': typeof ShareSanJuanBowlSingleColourRoute
+  '/share/san-juan-bowl/stadium': typeof ShareSanJuanBowlStadiumRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/events/venues/': typeof EventsVenuesIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
+  '/share/san-juan-bowl/': typeof ShareSanJuanBowlIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
@@ -1823,10 +1853,14 @@ export interface FileRoutesByTo {
   '/library/print/modules': typeof LibraryPrintModulesRoute
   '/masters/general-slides/looks': typeof MastersGeneralSlidesLooksRoute
   '/share/next-brand-kit/$token': typeof ShareNextBrandKitTokenRoute
+  '/share/san-juan-bowl/designers': typeof ShareSanJuanBowlDesignersRoute
+  '/share/san-juan-bowl/single-colour': typeof ShareSanJuanBowlSingleColourRoute
+  '/share/san-juan-bowl/stadium': typeof ShareSanJuanBowlStadiumRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
   '/events/venues': typeof EventsVenuesIndexRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
+  '/share/san-juan-bowl': typeof ShareSanJuanBowlIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
@@ -2053,10 +2087,14 @@ export interface FileRoutesById {
   '/library/print_/modules': typeof LibraryPrintModulesRoute
   '/masters/general-slides_/looks': typeof MastersGeneralSlidesLooksRoute
   '/share/next-brand-kit/$token': typeof ShareNextBrandKitTokenRoute
+  '/share/san-juan-bowl/designers': typeof ShareSanJuanBowlDesignersRoute
+  '/share/san-juan-bowl/single-colour': typeof ShareSanJuanBowlSingleColourRoute
+  '/share/san-juan-bowl/stadium': typeof ShareSanJuanBowlStadiumRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/events/venues/': typeof EventsVenuesIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
+  '/share/san-juan-bowl/': typeof ShareSanJuanBowlIndexRoute
   '/admin/modules_/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
@@ -2284,10 +2322,14 @@ export interface FileRouteTypes {
     | '/library/print/modules'
     | '/masters/general-slides/looks'
     | '/share/next-brand-kit/$token'
+    | '/share/san-juan-bowl/designers'
+    | '/share/san-juan-bowl/single-colour'
+    | '/share/san-juan-bowl/stadium'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/events/venues/'
     | '/knowledge/brand-guides/'
+    | '/share/san-juan-bowl/'
     | '/admin/modules/print/$moduleId'
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
@@ -2509,10 +2551,14 @@ export interface FileRouteTypes {
     | '/library/print/modules'
     | '/masters/general-slides/looks'
     | '/share/next-brand-kit/$token'
+    | '/share/san-juan-bowl/designers'
+    | '/share/san-juan-bowl/single-colour'
+    | '/share/san-juan-bowl/stadium'
     | '/social/demo/$playbookId'
     | '/decks/$deckId'
     | '/events/venues'
     | '/knowledge/brand-guides'
+    | '/share/san-juan-bowl'
     | '/admin/modules/print/$moduleId'
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
@@ -2738,10 +2784,14 @@ export interface FileRouteTypes {
     | '/library/print_/modules'
     | '/masters/general-slides_/looks'
     | '/share/next-brand-kit/$token'
+    | '/share/san-juan-bowl/designers'
+    | '/share/san-juan-bowl/single-colour'
+    | '/share/san-juan-bowl/stadium'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/events/venues/'
     | '/knowledge/brand-guides/'
+    | '/share/san-juan-bowl/'
     | '/admin/modules_/print/$moduleId'
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
@@ -2878,7 +2928,11 @@ export interface RootRouteChildren {
   LibraryPrintModulesRoute: typeof LibraryPrintModulesRoute
   MastersGeneralSlidesLooksRoute: typeof MastersGeneralSlidesLooksRoute
   ShareNextBrandKitTokenRoute: typeof ShareNextBrandKitTokenRoute
+  ShareSanJuanBowlDesignersRoute: typeof ShareSanJuanBowlDesignersRoute
+  ShareSanJuanBowlSingleColourRoute: typeof ShareSanJuanBowlSingleColourRoute
+  ShareSanJuanBowlStadiumRoute: typeof ShareSanJuanBowlStadiumRoute
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
+  ShareSanJuanBowlIndexRoute: typeof ShareSanJuanBowlIndexRoute
   ApiPublicBoothsEventRoute: typeof ApiPublicBoothsEventRoute
   ApiPublicCanvaCallbackRoute: typeof ApiPublicCanvaCallbackRoute
   ApiPublicVenueEventRoute: typeof ApiPublicVenueEventRoute
@@ -4293,6 +4347,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShareNextBrandKitTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/share/san-juan-bowl/': {
+      id: '/share/san-juan-bowl/'
+      path: '/share/san-juan-bowl'
+      fullPath: '/share/san-juan-bowl/'
+      preLoaderRoute: typeof ShareSanJuanBowlIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/san-juan-bowl/designers': {
+      id: '/share/san-juan-bowl/designers'
+      path: '/share/san-juan-bowl/designers'
+      fullPath: '/share/san-juan-bowl/designers'
+      preLoaderRoute: typeof ShareSanJuanBowlDesignersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/san-juan-bowl/single-colour': {
+      id: '/share/san-juan-bowl/single-colour'
+      path: '/share/san-juan-bowl/single-colour'
+      fullPath: '/share/san-juan-bowl/single-colour'
+      preLoaderRoute: typeof ShareSanJuanBowlSingleColourRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/san-juan-bowl/stadium': {
+      id: '/share/san-juan-bowl/stadium'
+      path: '/share/san-juan-bowl/stadium'
+      fullPath: '/share/san-juan-bowl/stadium'
+      preLoaderRoute: typeof ShareSanJuanBowlStadiumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/social/demo/$playbookId': {
       id: '/social/demo/$playbookId'
       path: '/demo/$playbookId'
@@ -4857,7 +4939,11 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryPrintModulesRoute: LibraryPrintModulesRoute,
   MastersGeneralSlidesLooksRoute: MastersGeneralSlidesLooksRoute,
   ShareNextBrandKitTokenRoute: ShareNextBrandKitTokenRoute,
+  ShareSanJuanBowlDesignersRoute: ShareSanJuanBowlDesignersRoute,
+  ShareSanJuanBowlSingleColourRoute: ShareSanJuanBowlSingleColourRoute,
+  ShareSanJuanBowlStadiumRoute: ShareSanJuanBowlStadiumRoute,
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
+  ShareSanJuanBowlIndexRoute: ShareSanJuanBowlIndexRoute,
   ApiPublicBoothsEventRoute: ApiPublicBoothsEventRoute,
   ApiPublicCanvaCallbackRoute: ApiPublicCanvaCallbackRoute,
   ApiPublicVenueEventRoute: ApiPublicVenueEventRoute,
