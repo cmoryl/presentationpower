@@ -219,6 +219,7 @@ import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.mo
 import { Route as ApiPublicBoothsEventRouteImport } from './routes/api/public/booths.$event'
 import { Route as ApiPublicCanvaCallbackRouteImport } from './routes/api/public/canva.callback'
 import { Route as ApiPublicVenueEventRouteImport } from './routes/api/public/venue.$event'
+import { Route as EventsKitsHackathonGuideRouteImport } from './routes/events.kits.hackathon.guide'
 import { Route as EventsKitsNexusGuideRouteImport } from './routes/events.kits.nexus.guide'
 import { Route as EventsNextBoothBoothIdRouteImport } from './routes/events.next_.booth.$boothId'
 import { Route as EventsNextDivisionsIndexRouteImport } from './routes/events.next_.divisions.index'
@@ -1310,6 +1311,12 @@ const ApiPublicVenueEventRoute = ApiPublicVenueEventRouteImport.update({
   path: '/api/public/venue/$event',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsKitsHackathonGuideRoute =
+  EventsKitsHackathonGuideRouteImport.update({
+    id: '/kits/hackathon/guide',
+    path: '/kits/hackathon/guide',
+    getParentRoute: () => EventsRoute,
+  } as any)
 const EventsKitsNexusGuideRoute = EventsKitsNexusGuideRouteImport.update({
   id: '/kits/nexus/guide',
   path: '/kits/nexus/guide',
@@ -1642,6 +1649,7 @@ export interface FileRoutesByFullPath {
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
+  '/events/kits/hackathon/guide': typeof EventsKitsHackathonGuideRoute
   '/events/kits/nexus/guide': typeof EventsKitsNexusGuideRoute
   '/events/next/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
@@ -1872,6 +1880,7 @@ export interface FileRoutesByTo {
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
+  '/events/kits/hackathon/guide': typeof EventsKitsHackathonGuideRoute
   '/events/kits/nexus/guide': typeof EventsKitsNexusGuideRoute
   '/events/next/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
@@ -2107,6 +2116,7 @@ export interface FileRoutesById {
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
+  '/events/kits/hackathon/guide': typeof EventsKitsHackathonGuideRoute
   '/events/kits/nexus/guide': typeof EventsKitsNexusGuideRoute
   '/events/next_/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next_/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
@@ -2343,6 +2353,7 @@ export interface FileRouteTypes {
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
     | '/api/public/venue/$event'
+    | '/events/kits/hackathon/guide'
     | '/events/kits/nexus/guide'
     | '/events/next/booth/$boothId'
     | '/events/next/divisions/$divisionId'
@@ -2573,6 +2584,7 @@ export interface FileRouteTypes {
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
     | '/api/public/venue/$event'
+    | '/events/kits/hackathon/guide'
     | '/events/kits/nexus/guide'
     | '/events/next/booth/$boothId'
     | '/events/next/divisions/$divisionId'
@@ -2807,6 +2819,7 @@ export interface FileRouteTypes {
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
     | '/api/public/venue/$event'
+    | '/events/kits/hackathon/guide'
     | '/events/kits/nexus/guide'
     | '/events/next_/booth/$boothId'
     | '/events/next_/divisions/$divisionId'
@@ -4422,6 +4435,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicVenueEventRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events/kits/hackathon/guide': {
+      id: '/events/kits/hackathon/guide'
+      path: '/kits/hackathon/guide'
+      fullPath: '/events/kits/hackathon/guide'
+      preLoaderRoute: typeof EventsKitsHackathonGuideRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/kits/nexus/guide': {
       id: '/events/kits/nexus/guide'
       path: '/kits/nexus/guide'
@@ -4700,6 +4720,7 @@ interface EventsRouteChildren {
   EventsSanJuanBowlStadiumRoute: typeof EventsSanJuanBowlStadiumRoute
   EventsVenuesSlugRoute: typeof EventsVenuesSlugRoute
   EventsVenuesIndexRoute: typeof EventsVenuesIndexRoute
+  EventsKitsHackathonGuideRoute: typeof EventsKitsHackathonGuideRoute
   EventsKitsNexusGuideRoute: typeof EventsKitsNexusGuideRoute
   EventsNextBoothBoothIdRoute: typeof EventsNextBoothBoothIdRoute
   EventsNextDivisionsDivisionIdRoute: typeof EventsNextDivisionsDivisionIdRoute
@@ -4758,6 +4779,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsSanJuanBowlStadiumRoute: EventsSanJuanBowlStadiumRoute,
   EventsVenuesSlugRoute: EventsVenuesSlugRoute,
   EventsVenuesIndexRoute: EventsVenuesIndexRoute,
+  EventsKitsHackathonGuideRoute: EventsKitsHackathonGuideRoute,
   EventsKitsNexusGuideRoute: EventsKitsNexusGuideRoute,
   EventsNextBoothBoothIdRoute: EventsNextBoothBoothIdRoute,
   EventsNextDivisionsDivisionIdRoute: EventsNextDivisionsDivisionIdRoute,
