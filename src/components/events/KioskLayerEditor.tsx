@@ -695,7 +695,9 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
 
   const save = async () => {
     setBusy("save"); setStatus(null);
-    const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: EK, edits: edits as never, updated_by: userId ?? null });
+    // Stamp the layout version like the autosave does; without it a reload parks the saved edits.
+    const toSave: KioskEdits = L.native ? { ...edits, layoutVersion: L.native.version } : edits;
+    const { error } = await supabase.from("kiosk_layer_edits").upsert({ booth_id: EK, edits: toSave as never, updated_by: userId ?? null, updated_at: new Date().toISOString() });
     setBusy(null);
     if (!error) { clearLocalDraft(EK); window.dispatchEvent(new CustomEvent("kiosk-edits-saved", { detail: EK })); }
     setStatus(error ? `Not saved: ${error.message}` : "All changes saved.");
