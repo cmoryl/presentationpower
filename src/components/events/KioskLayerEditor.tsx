@@ -1148,7 +1148,7 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                       <text x={TV.x + TV.w / 2} y={TV.y + TV.h / 2} textAnchor="middle" fontSize={12 * rs} fill={BRAND.yellow} fontFamily="Geist Mono, monospace">TV KEEP-CLEAR · NOT PRINTED</text>
                     </>
                   ) : null}
-                  {guides.safe ? <rect x={KIOSK_MARGIN} y={KIOSK_MARGIN} width={KIOSK_W - 2 * KIOSK_MARGIN} height={KIOSK_H - 2 * KIOSK_MARGIN} fill="none" stroke={BRAND.aqua} strokeOpacity={0.8} strokeDasharray={`${4 * rs} ${4 * rs}`} strokeWidth={rs} /> : null}
+                  {guides.safe ? <rect x={KIOSK_MARGIN} y={KIOSK_MARGIN} width={Math.max(0, KIOSK_W - 2 * KIOSK_MARGIN)} height={Math.max(0, KIOSK_H - 2 * KIOSK_MARGIN)} fill="none" stroke={BRAND.aqua} strokeOpacity={0.8} strokeDasharray={`${4 * rs} ${4 * rs}`} strokeWidth={rs} /> : null}
                   {guides.steps && L.stepGuides ? L.stepGuides.map(([x1, y1, x2, y2], i) => <line key={`st${i}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke={BRAND.yellow} strokeOpacity={0.9} strokeWidth={1.5 * rs} strokeDasharray={`${6 * rs} ${4 * rs}`} />) : null}
                   {isLiftLayout(L.id) ? liftDoors(KIOSK_W, KIOSK_H).map((d) => (
                     <g key={d.side}>
