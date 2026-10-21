@@ -12,7 +12,7 @@ ns = {"__file__": P}
 exec(compile(open(P).read().rsplit("\nbuild(sys.argv[1])", 1)[0].replace("T = 40.0", "T = -1e9").replace('if p["image"] or', 'if (p["image"] and a >= 0.25 * area) or'), P, "exec"), ns)
 analyse, filtered, svg_symbol, mark_forms, split, read_texts = (ns[k] for k in ("analyse", "filtered", "svg_symbol", "mark_forms", "split", "read_texts"))
 OUT = "/tmp/vip/out"; os.makedirs(OUT, exist_ok=True)
-LID = "next-vip-dinner-invite"
+LID = "divsign-globallink-vip-dinner"
 BLEED = 9.0
 
 def fix_texts(tpath, texts):
