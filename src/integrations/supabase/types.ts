@@ -5700,6 +5700,7 @@ export type Database = {
       }
       get_shared_print_asset: { Args: { _token: string }; Returns: Json }
       get_template_deck: { Args: { _deck_id: string }; Returns: Json }
+      has_any_role: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
