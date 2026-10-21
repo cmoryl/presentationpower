@@ -7,7 +7,8 @@
 import { useState } from "react";
 import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
 
-import { SjbLink, SjbShareLinkButton, SjbShell } from "@/components/events/SjbShare";
+import { KitSignList } from "@/components/events/KitSignList";
+import { SjbLink, SjbShareLinkButton, SjbShell, useSjbShare } from "@/components/events/SjbShare";
 import { SjbSingleColour } from "@/components/events/SjbSingleColour";
 import { BRAND } from "@/lib/brand-colors";
 import {
@@ -283,6 +284,7 @@ function CopyCode({ value, label }: { value: string; label: string }) {
 }
 
 export function SjbBrandKit() {
+  const share = useSjbShare();
   return (
     <SjbShell>
       <div className="mx-auto max-w-5xl space-y-10 px-6 py-8 text-[#03002C]">
@@ -564,6 +566,8 @@ export function SjbBrandKit() {
             ))}
           </dl>
         </section>
+
+        {!share && <KitSignList kit="san-juan-bowl" />}
 
         <section className={`${card} space-y-2`}>
           <h2 className="text-[17px] font-bold">What's next</h2>
