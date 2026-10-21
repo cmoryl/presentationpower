@@ -1,5 +1,13 @@
 # Event design decisions
 
+### 2026-10-21 — Bowl stadium target switched back to Hiram Bithorn
+**Area:** San Juan Bowl stadium reconstruction and BoothHUB handoff.
+**Options tested:** keep Juan Ramón Loubriel (chosen 2026-10-20) versus return to Hiram Bithorn.
+**Chosen:** Hiram Bithorn Stadium in San Juan, per direct user instruction on 21 October 2026.
+**Why:** the venue changed; the Loubriel model and its geometry are superseded and must not carry into the Hiram Bithorn build. Element's stadium page is gated to "Coming soon" until BoothHUB publishes the rebuilt model.
+**Would change if:** the organiser announces a different venue.
+**Applies to:** San Juan Bowl stadium study, BoothHUB handoff, stadium page copy and metadata; the event brand is unchanged.
+
 ### 2026-10-20 — Bowl stadium target switched to Juan Ramón Loubriel
 **Area:** San Juan Bowl stadium reconstruction and BoothHUB handoff.
 **Options tested:** Hiram Bithorn requested initially versus Juan Ramón Loubriel named by Discover Puerto Rico and ESPN for the Puerto Rico Bowl.
