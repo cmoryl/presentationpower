@@ -9,7 +9,17 @@ import json, os, sys
 import pikepdf
 P = os.path.join(os.path.dirname(__file__), "globallink-pillars-extract.py")
 ns = {"__file__": P}
-exec(compile(open(P).read().rsplit("\nbuild(sys.argv[1])", 1)[0], P, "exec"), ns)
+# A run also breaks where the next glyph is not next to the last one (a new line,
+# or a separate label in the same face), so stacked or scattered copy stays apart.
+_src = open(P).read().rsplit("\nbuild(sys.argv[1])", 1)[0].replace(
+    'if r and r["font"] == font and r["rot"] == rot and abs(r["size"] - size) < 0.5:',
+    'if r and r["font"] == font and r["rot"] == rot and abs(r["size"] - size) < 0.5 and near(r["chars"][-1], c, size):')
+def near(a, b, size):
+    import math
+    ma, mb = a["matrix"], b["matrix"]
+    return math.hypot(mb[4] - ma[4], mb[5] - ma[5]) < 1.6 * max(size, 1)
+ns["near"] = near
+exec(compile(_src, P, "exec"), ns)
 analyse, filtered, svg_symbol, mark_forms, split, read_texts = (ns[k] for k in ("analyse", "filtered", "svg_symbol", "mark_forms", "split", "read_texts"))
 BLEED = 9.0
 
