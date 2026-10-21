@@ -84,11 +84,12 @@ function KitPage() {
               <Link to="/events/kits/hackathon/guide">Open brand guide page</Link>
             </Button>
           )}
-          {kit.id === "legalweek" && (
-            <Button asChild variant="outline">
-              <Link to="/events/kits/legalweek/guide">Open brand guide page</Link>
-            </Button>
-          )}
+        </div>
+      ) : kit.id === "legalweek" ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button asChild variant="outline">
+            <Link to="/events/kits/legalweek/guide">Open brand guide page</Link>
+          </Button>
         </div>
       ) : null}
 

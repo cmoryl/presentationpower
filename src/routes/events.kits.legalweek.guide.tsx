@@ -5,7 +5,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SUPPLIED_KITS, LEGALWEEK_EVENT } from "@/lib/supplied-event-kits";
+import { SUPPLIED_KITS } from "@/lib/supplied-event-kits";
 
 const TITLE = "Legalweek 2026 brand guide — TransPerfect Element";
 const DESC = "TransPerfect Legal at Legalweek 2026: screen and print colours read from the live files, Poppins typography and supplied artwork.";
@@ -34,7 +34,6 @@ function LegalweekGuide() {
   const print = kit.colours.filter((c) => isPrint(c.source));
   const white = kit.colours.filter((c) => c.hex === "#FFFFFF");
   const examples = kit.pieces.filter((p) => p.preview).slice(0, 3);
-  void LEGALWEEK_EVENT;
   return (
     <main className="mx-auto max-w-6xl px-6 py-8">
       <Link to="/events/kits/$kitId" params={{ kitId: "legalweek" }} className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
