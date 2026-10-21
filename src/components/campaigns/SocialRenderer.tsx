@@ -18,7 +18,7 @@ import { useAutoRefit } from "@/components/text/AutoRefit";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
-import { sjbEventLogoFor } from "@/lib/san-juan-bowl";
+import { sjbEventLogoFor, sjbKitTokens } from "@/lib/san-juan-bowl";
 import type { BrandMode } from "@/lib/taxonomy";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import type { SocialFormat } from "@/lib/social-formats";
@@ -509,7 +509,9 @@ export function SocialRenderer({
   // sizes the WHOLE stack down together until it sits inside the band, which
   // keeps the authored rhythm instead of letting one block ride over the next.
   const { boxRef: stackBoxRef, stackRef, fit: stackFit } = useStackFit(copySignature);
-  const brand = findBrand(brandId);
+  const baseBrand = findBrand(brandId);
+  // San Juan Bowl assets wear the Bowl's own navy, sky and gold palette.
+  const brand = sjbEventLogoFor(copyProp?.title) ? { ...baseBrand, tokens: sjbKitTokens() } : baseBrand;
   const preset = presetFor(format);
   const tune = format.tune ?? {};
   // The caller wins; otherwise the platform preset decides bleed vs panel.
