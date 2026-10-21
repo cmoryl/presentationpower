@@ -1,0 +1,55 @@
+// /events/san-juan-bowl/stadium — the BoothHUB interactive stadium, embedded.
+// BoothHUB owns the model; Element only frames its public showcase page.
+
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft, ExternalLink } from "lucide-react";
+import { AppShell } from "@/components/AppShell";
+import { Button } from "@/design-system/element";
+import { BOOTHHUB_ORIGIN } from "@/lib/boothhub-3d";
+
+const STADIUM_URL = `${BOOTHHUB_ORIGIN}/showcase/san-juan-bowl`;
+
+export const Route = createFileRoute("/events/san-juan-bowl_/stadium")({
+  head: () => ({
+    meta: [
+      { title: "San Juan Bowl stadium 3D view · TransPerfect Element" },
+      { name: "description", content: "Interactive 3D view of Juan Ramón Loubriel Stadium in Bayamón for the TransPerfect San Juan Bowl, from BoothHUB." },
+      { property: "og:title", content: "San Juan Bowl stadium 3D view" },
+      { property: "og:description", content: "Explore the San Juan Bowl stadium and field in 3D." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: StadiumPage,
+});
+
+function StadiumPage() {
+  return (
+    <AppShell>
+      <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6">
+        <Link to="/events/$eventId" params={{ eventId: "san-juan-bowl" }} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" /> San Juan Bowl
+        </Link>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold">Stadium 3D view</h1>
+            <p className="text-sm text-muted-foreground">Juan Ramón Loubriel Stadium, Bayamón. Drag to orbit; the model is built and edited in BoothHUB.</p>
+          </div>
+          <Button asChild variant="outline">
+            <a href={STADIUM_URL} target="_blank" rel="noreferrer">
+              Open in BoothHUB <ExternalLink className="ml-1 h-4 w-4" />
+            </a>
+          </Button>
+        </div>
+        <iframe
+          src={STADIUM_URL}
+          title="San Juan Bowl stadium 3D view (BoothHUB)"
+          className="h-[78dvh] w-full rounded-md border bg-muted"
+          allow="fullscreen; xr-spatial-tracking"
+          allowFullScreen
+        />
+        <p className="text-xs text-muted-foreground">Stadium dimensions shown are from public sources until the venue supplies surveyed plans.</p>
+      </div>
+    </AppShell>
+  );
+}
