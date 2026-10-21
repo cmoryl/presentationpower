@@ -270,6 +270,17 @@ export const QEII_ROOM_CLOSING_RUNS: Record<string, Record<string, [number, numb
     Mountbatten: [[[472.6, 70], [472.6, 400]]],
     "General area": [[[472.6, 70], [472.6, 400]]],
   },
+  // Sheraton New York Times Square, 2nd floor: each ballroom ends at the hotel's
+  // own dashed air-wall line, carried along that line only. The Metropolitan
+  // ballroom's middle bay (between its two air walls) is not named on the sheet.
+  "legalnext-new-york:level-2": {
+    "Metropolitan East": [[[112.1, 80], [112.1, 200]]],
+    "Metropolitan West": [[[133.6, 80], [133.6, 200]]],
+    "Empire East": [[[156.1, 10], [156.1, 60]]],
+    "Empire West": [[[156.1, 10], [156.1, 60]]],
+    "Central Park East": [[[205.4, 98.9], [253.3, 173.7]]],
+    "Central Park West": [[[205.4, 98.9], [253.3, 173.7]]],
+  },
 };
 
 /**
