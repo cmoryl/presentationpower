@@ -85,6 +85,12 @@ function KitPage() {
             </Button>
           )}
         </div>
+      ) : kit.id === "legalweek" ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button asChild variant="outline">
+            <Link to="/events/kits/legalweek/guide">Open brand guide page</Link>
+          </Button>
+        </div>
       ) : null}
 
       <section className="mt-10">
