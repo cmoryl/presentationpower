@@ -79,7 +79,7 @@ export type DesignerGuideOptions = {
 
 export async function buildDesignerGuidePdf(opts: DesignerGuideOptions): Promise<Uint8Array> {
   const { families, shareUrl, onProgress } = opts;
-  const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "landscape" });
+  const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "landscape", compress: true });
   const [reg, bold] = await Promise.all([bytes("/fonts/Geist-Regular.ttf"), bytes("/fonts/Geist-Bold.ttf")]);
   doc.addFileToVFS("Geist-Regular.ttf", b64(reg));
   doc.addFont("Geist-Regular.ttf", "Geist", "normal");
