@@ -104,6 +104,24 @@ export function SjbLettering() {
         White letters: dark backgrounds only.
       </p>
       <SjbLetteringExact />
+      <div className="space-y-3 rounded-xl border border-[#03002C]/10 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="text-[14px] font-bold">Lettering specification</p>
+            <p className="text-[12px] text-[#666666]">The construction rules behind the master: horizon lines, units, strokes and angles, serifs, corners and shadow. 10 pages.</p>
+          </div>
+          <a href={`${BASE}/sjb-lettering-spec.pdf`} download="SJB-Lettering-Spec.pdf" className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/15 px-3 py-1 text-[12px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]">
+            <Download className="h-3.5 w-3.5" /> Spec PDF
+          </a>
+        </div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+          {Array.from({ length: 10 }, (_, i) => String(i + 1).padStart(2, "0")).map((n) => (
+            <a key={n} href={`${BASE}/spec-page-${n}.jpg`} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-lg border border-[#03002C]/10 hover:border-[#003FC7]">
+              <img src={`${BASE}/spec-page-${n}.jpg`} alt={`Lettering specification page ${Number(n)}`} loading="lazy" className="w-full" />
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
