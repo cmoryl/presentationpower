@@ -1178,7 +1178,9 @@ function DesignGround({
   short,
   copyAlign,
   panelSide,
+  deepHex = BRAND.ink,
 }: {
+  deepHex?: string;
   format: SocialFormat;
   accent: string;
   mode: "light" | "dark";
@@ -1186,6 +1188,7 @@ function DesignGround({
   copyAlign: "start" | "end";
   panelSide: "right" | "top" | null;
 }) {
+  const deep = (alpha: number) => tintRgba(deepHex, alpha);
   const cls = aspectClass(format);
   const wide = cls === "landscape-wide" || cls === "landscape";
   const unit = (short * 3.6) / 100;
