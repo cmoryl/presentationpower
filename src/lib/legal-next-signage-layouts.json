@@ -14786,7 +14786,7 @@
     "text": "UNITING MINDS",
     "font": "Poppins-Bold",
     "size": 320.0,
-    "color": "#000000",
+    "color": "#FFFFFF",
     "x": 1208.84,
     "y": 275.62,
     "w": 2358.72,
@@ -15107,7 +15107,7 @@
     "text": "WHERE IDEAS CONNECT",
     "font": "Poppins-Bold",
     "size": 320.0,
-    "color": "#000000",
+    "color": "#FFFFFF",
     "x": 571.89,
     "y": 276.3,
     "w": 3632.64,
@@ -15251,7 +15251,7 @@
     "text": "INNOVATION LOADING...",
     "font": "Poppins-Bold",
     "size": 320.0,
-    "color": "#000000",
+    "color": "#FFFFFF",
     "x": 537.0,
     "y": 275.47,
     "w": 3702.4,
@@ -17754,7 +17754,7 @@
    ]
   },
   "sign": {
-   "margin": 36
+   "margin": 8.5
   }
  },
  "divsign-nexus-judge-lanyard": {
@@ -17859,7 +17859,7 @@
    ]
   },
   "sign": {
-   "margin": 36
+   "margin": 8.5
   }
  },
  "divsign-nexus-hacker-lanyard": {
@@ -17964,7 +17964,7 @@
    ]
   },
   "sign": {
-   "margin": 36
+   "margin": 8.5
   }
  },
  "divsign-nexus-expert-lanyard": {
@@ -18069,7 +18069,7 @@
    ]
   },
   "sign": {
-   "margin": 36
+   "margin": 8.5
   }
  },
  "divsign-nexus-executive-lanyard": {
@@ -18174,7 +18174,7 @@
    ]
   },
   "sign": {
-   "margin": 36
+   "margin": 8.5
   }
  },
  "divsign-nexus-change-maker-lanyard": {
@@ -18279,7 +18279,7 @@
    ]
   },
   "sign": {
-   "margin": 36
+   "margin": 8.5
   }
  },
  "divsign-nexus-candlestick-maker-lanyard": {
@@ -18351,7 +18351,7 @@
    ]
   },
   "sign": {
-   "margin": 36
+   "margin": 8.5
   }
  },
  "divsign-hackathon-stage-hackathon-pillar-signs": {
