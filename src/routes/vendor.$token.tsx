@@ -52,7 +52,9 @@ function VendorPage() {
       </main>
     );
 
-  const log = (label: string) => void supabase.rpc("record_vendor_download", { _token: token, _label: label });
+  const log = (label: string) => {
+    void supabase.rpc("record_vendor_download", { _token: token, _label: label }).then(() => undefined);
+  };
 
   async function brief() {
     const { jsPDF } = await import("jspdf");
