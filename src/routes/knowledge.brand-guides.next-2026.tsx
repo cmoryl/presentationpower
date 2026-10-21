@@ -2,6 +2,7 @@ import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LONDON_PACK_GROUNDS, LONDON_PACK_GROUND_NOTE } from "@/lib/next-london-pack-grounds";
 import { LONDON_STYLES } from "@/lib/next-london-signage";
+import { londonCmykRamp, type CmykBuild } from "@/lib/next-london-cmyk";
 import { QEII_ROOM_GRADIENTS } from "@/lib/next-london-qeii-rooms";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
@@ -51,6 +52,27 @@ export const Route = createFileRoute("/knowledge/brand-guides/next-2026")({
 const NAVY = "#1B3E6F";
 
 /* ── small pieces ─────────────────────────────────────────────── */
+
+function CmykStops({ stops }: { stops: string[] }) {
+  const builds: CmykBuild[] = londonCmykRamp(stops);
+  const p = (n: number) => Math.round(n * 100);
+  return (
+    <ul className="mt-2 space-y-1 font-mono text-[11px] text-black/70 dark:text-white/70">
+      {stops.map((hex, i) => {
+        const b = builds[i];
+        return (
+          <li key={`${hex}-${i}`} className="flex flex-wrap items-center gap-x-2">
+            <span className="h-3 w-3 rounded-sm border border-black/10" style={{ background: hex }} />
+            {hex} · C{p(b.c)} M{p(b.m)} Y{p(b.y)} K{p(b.k)}
+            <span className={b.approved ? "text-black/50 dark:text-white/50" : "font-semibold"}>
+              {b.approved ? "approved" : "working build, proof first"}
+            </span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 function Section({
   id,
@@ -728,6 +750,9 @@ function NextBrandGuide() {
           </div>
 
           <h3 className="mt-10 text-lg font-semibold">Signage treatments</h3>
+          <p className="mt-1 max-w-3xl text-sm text-black/60 dark:text-white/60">
+            CMYK is listed for every stop. "Approved" builds come from the supplied live files or the signed-off brand registry. "Working build" values are calculated for offset (300% ink limit); get a printed proof signed off before running them.
+          </p>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
             {Object.entries(LONDON_STYLES).map(([id, st]) => (
               <div key={id} className="overflow-hidden rounded-2xl border border-black/10 dark:border-white/10">
@@ -735,7 +760,7 @@ function NextBrandGuide() {
                 <div className="p-4">
                   <div className="font-semibold">{st.label}</div>
                   <p className="mt-1 text-xs text-black/60 dark:text-white/60">{st.note}</p>
-                  <p className="mt-2 font-mono text-[11px] text-black/60 dark:text-white/60">{st.stops.join(" → ")}</p>
+                  <CmykStops stops={st.stops} />
                 </div>
               </div>
             ))}
@@ -751,7 +776,7 @@ function NextBrandGuide() {
                 <div className="h-14" style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }} />
                 <div className="p-3 text-xs">
                   <div className="font-semibold">{g.label}</div>
-                  <div className="font-mono text-black/60 dark:text-white/60">{g.from} → {g.to}</div>
+                  <CmykStops stops={[g.from, g.to]} />
                 </div>
               </div>
             ))}
