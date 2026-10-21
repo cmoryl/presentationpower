@@ -188,7 +188,8 @@ export function BrandKitGuideSections({
               <p className="mt-2 text-xs"><span className="font-medium">Face:</span> {f.orientation} · <span className="font-medium">Ground:</span> {f.ground.replace(/-/g, " ")}</p>
               <p className="mt-2 text-xs leading-relaxed">{f.printNote}</p>
             </li>
-          ))}
+            );
+          })}
         </ul>
         {reuse.unmatched.length ? (
           <p className="mt-4 text-xs text-muted-foreground">No family yet ({reuse.unmatched.length}): {reuse.unmatched.slice(0, 20).join(", ")}{reuse.unmatched.length > 20 ? "…" : ""}</p>
