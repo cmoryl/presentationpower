@@ -44,8 +44,12 @@ export function eventMapSheet(
   return {
     venueName: names.plan || names.venue || names.fallback || "Venue",
     tabs: rows.map((r) => ({ id: eventFloorId(eventId, r.floor_key), label: r.marker })),
-    // San Francisco is a GlobalLink NEXT edition: its maps carry the GlobalLink NEXT lockup.
-    lockup: /san-francisco|next-sf/i.test(eventId) ? "globallink-side-by-side-color.svg" : undefined,
+    // Division editions carry their division's NEXT lockup (SF = GlobalLink NEXT, LegalNEXT = Legal).
+    lockup: /san-francisco|next-sf/i.test(eventId)
+      ? "globallink-side-by-side-color.svg"
+      : /^legalnext/i.test(eventId)
+        ? "legal-side-by-side-color.svg"
+        : undefined,
   };
 }
 

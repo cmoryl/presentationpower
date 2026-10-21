@@ -4,6 +4,7 @@ const NAMES: Record<string, string> = {
   "san-francisco": "NEXT 2026 San Francisco",
   london: "NEXT 2026 London",
   "san-juan-bowl": "TransPerfect San Juan Bowl",
+  "legalnext-new-york": "LegalNEXT New York",
 };
 
 /** Readable event name; unknown ids are title-cased rather than shown raw. */
