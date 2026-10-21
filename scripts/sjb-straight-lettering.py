@@ -41,13 +41,17 @@ def envelope(fn):
         ys = np.nonzero(a[:, x])[0]
         if len(ys) > 3: xs.append(x); tops.append(ys.min()); bots.append(ys.max())
     xs, tops, bots = map(np.array, (xs, tops, bots))
+    # Only full-height columns describe the envelope: the L foot, J hook and
+    # letter crossbars would otherwise read as a low "top" edge.
+    hgt = bots - tops; full = hgt >= 0.8 * np.median(hgt)
+    xmin, xmax = xs.min(), xs.max(); xs, tops, bots = xs[full], tops[full], bots[full]
     # Robust smooth fit: letters with notches (J hook, A counters) pull single columns;
     # trim the worst 15 % residuals and refit.
     def fit(v):
-        c = np.polyfit(xs, v, 4)
+        c = np.polyfit(xs, v, 3)
         r = np.abs(np.polyval(c, xs) - v); keep = r <= np.quantile(r, 0.85)
-        return np.polyfit(xs[keep], v[keep], 4)
-    return fit(tops), fit(bots), xs.min(), xs.max()
+        return np.polyfit(xs[keep], v[keep], 3)
+    return fit(tops), fit(bots), xmin, xmax
 
 
 def flatten(fn, cap):
