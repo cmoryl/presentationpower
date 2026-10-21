@@ -2,7 +2,7 @@
 // (same floors, room colours, label edits and looks). Editing happens only in
 // the master editor at /events/next/maps/$eventId.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +12,7 @@ import { listEventMapFloors } from "@/lib/event-maps.functions";
 import { listVenueMapEdits } from "@/lib/qeii-map-edits.functions";
 import { eventMapEdits, eventMapFloor, eventMapSheet, eventMapSvg, type EventMapRow } from "@/lib/event-floor-plan";
 import { QEII_MAP_LOOKS, QEII_MAP_LOOK_ORDER, type QeiiPlanFace } from "@/lib/next-london-qeii-style";
+import { selfContainedSvg } from "@/lib/export-self-contained-svg";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
 
 export interface EventMapViewProps {
@@ -41,7 +42,16 @@ export function EventMapView({ eventId, marker, fallback }: EventMapViewProps) {
       face, sheet, edits, roomColours: (row.room_colours as Record<string, string>) ?? {},
     });
   }, [row, rows, q.data, e.data, eventId, face]);
-  const url = useMemo(() => (svg ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}` : ""), [svg]);
+  // Logos inside the sheet are linked files; embed them so the picture shows them.
+  const [url, setUrl] = useState("");
+  useEffect(() => {
+    let live = true;
+    const asUrl = (t: string) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(t)}`;
+    if (!svg) { setUrl(""); return; }
+    setUrl(asUrl(svg));
+    void selfContainedSvg(svg).then((t) => { if (live) setUrl(asUrl(t)); }).catch(() => undefined);
+    return () => { live = false; };
+  }, [svg]);
 
   if (q.isLoading) return <p className="p-4 text-[13px] text-[#666666]">Loading the map…</p>;
   if (!row) return <>{fallback}</>;
