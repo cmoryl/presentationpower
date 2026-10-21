@@ -10,6 +10,7 @@ import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { SjbPrecisionConstruction } from "@/components/events/SjbPrecisionConstruction";
+import { SjbMeasurementSheets } from "@/components/events/SjbMeasurementSheets";
 import { SjbSingleColour } from "@/components/events/SjbSingleColour";
 import { BRAND } from "@/lib/brand-colors";
 import {
@@ -309,6 +310,9 @@ function ConstructionSection() {
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <SjbPrecisionConstruction className="lg:col-span-2" />
+        <div className="lg:col-span-2">
+          <SjbMeasurementSheets />
+        </div>
         <div className="space-y-3">
           <table className="w-full text-left text-[13px]">
             <thead>
