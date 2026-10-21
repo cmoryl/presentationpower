@@ -68,7 +68,7 @@ function SjbGuide() {
 
       <Section n="01" title="Introduction">
         <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
-          The TransPerfect {SJB_EVENT.name}, {SJB_EVENT.city}. Dates are to be confirmed and are not printed until the organisers issue them.
+          The {SJB_EVENT.name}, {SJB_EVENT.city}. Dates are to be confirmed and are not printed until the organisers issue them.
         </p>
       </Section>
 
