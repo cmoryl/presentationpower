@@ -2,6 +2,7 @@
 // from the venue's own vector files; the London map engine draws, colours and
 // exports them with the same looks, room cuts and approved palette.
 
+import { inkJsPdfInCmyk, cmykGradientsAndReport } from "@/lib/map-pdf-cmyk";
 import { saveFile } from "@/lib/save-file";
 import { selfContainedSvg } from "@/lib/export-self-contained-svg";
 import { Button } from "@/design-system/element";
@@ -202,7 +203,7 @@ function MapsPage() {
   }
 
   const [pdfBusy, setPdfBusy] = useState(false);
-  async function downloadPdf() {
+  async function downloadPdf(cmyk = false) {
     if (!current || !preparedSvg || preparedSvg.source !== svg) {
       toast.error("The map is still drawing — try again in a moment.");
       return;
@@ -281,13 +282,29 @@ function MapsPage() {
           const w = t.style.fontWeight;
           if (w) t.style.fontWeight = w === "bold" || Number(w) >= 600 ? "bold" : "normal";
         });
+        const missing = cmyk ? inkJsPdfInCmyk(doc as never) : new Set<string>();
         await svg2pdf(el, doc, { x: 0, y: 0, width: w, height: h });
+        if (cmyk) {
+          doc.setProperties({
+            title: `${current.title} map (CMYK, proof first)`,
+            subject: "CMYK map from Element using approved print builds only. Proof with the printer before the run.",
+          });
+          const { pdf, rgbImages } = await cmykGradientsAndReport(doc.output("arraybuffer"), missing);
+          saveFile(new Blob([pdf as BlobPart], { type: "application/pdf" }), `rdraft-${eventId}-${current.floor_key}-${face}-CMYK-PROOF-FIRST.pdf`);
+          toast.success(
+            rgbImages
+              ? `CMYK PDF downloaded. ${rgbImages} placed picture${rgbImages > 1 ? "s" : ""} (e.g. the logo) stay in screen colour — ask for a press proof.`
+              : "CMYK PDF downloaded. Ask the printer for a proof before the run.",
+          );
+          return;
+        }
       } finally {
         host.remove();
       }
       doc.setProperties({ title: `${current.title} map`, subject: "Vector map from Element; walls, rooms and names are editable." });
       saveFile(doc.output("blob"), `rdraft-${eventId}-${current.floor_key}-${face}.pdf`);
     } catch (error) {
+      console.error("Map PDF not downloaded", error);
       toast.error(`PDF not downloaded: ${error instanceof Error ? error.message : "the map could not be drawn."}`);
     } finally {
       setPdfBusy(false);
@@ -411,8 +428,11 @@ function MapsPage() {
                 <Button variant="outline" onClick={download} disabled={preparedSvg?.source !== svg}>
                   <Download className="h-4 w-4" /> SVG
                 </Button>
-                <Button variant="outline" onClick={() => void downloadPdf()} disabled={preparedSvg?.source !== svg || pdfBusy} title="Proof PDF for sharing — use the SVG for print">
+                <Button variant="outline" onClick={() => void downloadPdf()} disabled={preparedSvg?.source !== svg || pdfBusy} title="Editable vector PDF in screen colour (RGB)">
                   <Download className="h-4 w-4" /> {pdfBusy ? "Making PDF…" : "PDF"}
+                </Button>
+                <Button variant="outline" onClick={() => void downloadPdf(true)} disabled={preparedSvg?.source !== svg || pdfBusy} title="CMYK PDF from approved print builds — proof first">
+                  <Download className="h-4 w-4" /> PDF (CMYK)
                 </Button>
                 <button
                   type="button"
