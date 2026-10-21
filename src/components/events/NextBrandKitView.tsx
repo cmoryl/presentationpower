@@ -43,6 +43,11 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
   const [families, setFamilies] = useState<KitFamily[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [ground, setGround] = useState<"light" | "dark">("light");
+  const [signDivision, setSignDivision] = useState<string>("");
+  const signDivisions = Array.from(
+    new Map((families ?? []).flatMap((f) => f.templates.map((t) => [t.divisionId, t.divisionName] as const))).entries(),
+  );
+  const activeSignDivision = signDivision || signDivisions[0]?.[0] || "";
 
   useEffect(() => {
     loadKitFamilies().then(setFamilies).catch(() => setFamilies([]));
@@ -190,14 +195,31 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
 
       <section id="templates" className="mt-12 scroll-mt-16">
         <h2 className="text-xl font-semibold">Sign templates</h2>
+        {signDivisions.length > 1 ? (
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <label htmlFor="sign-division" className="text-sm font-medium">Division</label>
+            <select
+              id="sign-division"
+              value={activeSignDivision}
+              onChange={(e) => setSignDivision(e.target.value)}
+              className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+            >
+              {signDivisions.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+            </select>
+            <span className="text-xs text-muted-foreground">Each design is shown once; pick a division to see its version.</span>
+          </div>
+        ) : null}
         {!families ? (
           <p className="mt-4 text-sm text-muted-foreground">Loading templates…</p>
         ) : (
-          families.map((f) => (
+          families.map((f) => {
+            const shown = f.templates.filter((t) => !activeSignDivision || t.divisionId === activeSignDivision);
+            if (!shown.length) return null;
+            return (
             <div key={f.id} className="mt-6">
-              <h3 className="text-sm font-semibold">{f.label} <span className="text-muted-foreground">({f.templates.length})</span></h3>
+              <h3 className="text-sm font-semibold">{f.label} <span className="text-muted-foreground">({shown.length})</span></h3>
               <ul className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {f.templates.map((t) => (
+                {shown.map((t) => (
                   <li key={`${t.divisionId}-${t.code}-${t.format}`} className="rounded-lg border border-border">
                     {t.exampleUrl ? (
                       <img src={t.exampleUrl} alt={t.format} loading="lazy" className="h-40 w-full rounded-t-lg bg-muted object-contain" />
@@ -224,7 +246,8 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
                 ))}
               </ul>
             </div>
-          ))
+            );
+          })
         )}
       </section>
 
