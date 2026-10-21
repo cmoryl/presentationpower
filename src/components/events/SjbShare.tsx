@@ -2,9 +2,11 @@
 // The same page bodies render inside the app (AppShell) and on the public
 // share link (/share/san-juan-bowl/*), where the only navigation is between
 // the guide pages themselves — no menu, no links into the rest of Element.
-import { createContext, forwardRef, useContext, type AnchorHTMLAttributes, type ReactNode } from "react";
+import { createContext, forwardRef, useContext, useState, type AnchorHTMLAttributes, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
+import { Check, Link2 } from "lucide-react";
+import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import logoColor from "@/assets/san-juan-bowl/sjb-logo-color.svg.asset.json";
 
 const SjbShareCtx = createContext(false);
@@ -84,4 +86,26 @@ export function SjbShell({ children }: { children: ReactNode }) {
 
 export function SjbShareProvider({ children }: { children: ReactNode }) {
   return <SjbShareCtx.Provider value>{children}</SjbShareCtx.Provider>;
+}
+
+/** In-app only: copies the public share link (guides + 3D, no Element menu). */
+export function SjbShareLinkButton() {
+  const share = useSjbShare();
+  const [copied, setCopied] = useState(false);
+  if (share) return null;
+  const url = `${NEXT_APP_ORIGIN}${SJB_SHARE_PATH}`;
+  return (
+    <button
+      type="button"
+      onClick={async () => {
+        try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 2000); }
+        catch { window.prompt("Copy this share link", url); }
+      }}
+      className="mt-3 ml-2 inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/25 px-4 py-2 text-[13px] font-semibold hover:bg-[#F2F2F2]"
+      title={url}
+    >
+      {copied ? <Check className="h-4 w-4 text-[#003FC7]" /> : <Link2 className="h-4 w-4" />}
+      {copied ? "Share link copied" : "Copy share link"}
+    </button>
+  );
 }

@@ -7,7 +7,7 @@
 import { useState } from "react";
 import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
 
-import { SjbLink, SjbShell } from "@/components/events/SjbShare";
+import { SjbLink, SjbShareLinkButton, SjbShell } from "@/components/events/SjbShare";
 import { SjbSingleColour } from "@/components/events/SjbSingleColour";
 import { BRAND } from "@/lib/brand-colors";
 import {
@@ -305,6 +305,7 @@ export function SjbBrandKit() {
           >
             <Download className="h-4 w-4" /> Full brand guide (PDF)
           </a>
+          <SjbShareLinkButton />
         </header>
 
         <section className="space-y-4">
