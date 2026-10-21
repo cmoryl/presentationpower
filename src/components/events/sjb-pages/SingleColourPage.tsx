@@ -3,7 +3,6 @@
 // Sizes are recommended starting points; the vendor's proof decides.
 
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Download } from "lucide-react";
 import { SjbLink, SjbShell } from "@/components/events/SjbShare";
 import { Button } from "@/design-system/element";
@@ -64,9 +63,9 @@ export function SingleColourPage() {
   const p = PROCESSES.find(x => x.id === proc)!;
   return <SjbShell>
     <div className="mx-auto max-w-5xl space-y-10 px-6 py-8 text-foreground">
-      <Link to="/events/san-juan-bowl/brand-kit" className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
+      <SjbLink page="kit" className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Brand kit
-      </Link>
+      </SjbLink>
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div><p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Brand kit · Single colour</p>
           <h1 className="mt-1 text-[32px] font-bold leading-tight">{SJB_EVENT.name}: one-colour usage</h1>

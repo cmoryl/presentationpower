@@ -1,7 +1,6 @@
 // /events/san-juan-bowl/stadium — the BoothHUB interactive stadium, embedded.
 // BoothHUB owns the model; Element only frames its public showcase page.
 
-import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { SjbLink, SjbShell } from "@/components/events/SjbShare";
 import { Button } from "@/design-system/element";
@@ -17,9 +16,9 @@ export function StadiumPage() {
   return (
     <SjbShell>
       <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6">
-        <Link to="/events/$eventId" params={{ eventId: "san-juan-bowl" }} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+        <SjbLink page="event" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> San Juan Bowl
-        </Link>
+        </SjbLink>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="text-2xl font-semibold">Stadium 3D view</h1>

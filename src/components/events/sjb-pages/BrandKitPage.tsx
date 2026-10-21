@@ -5,7 +5,6 @@
 // until issued.
 
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
 
 import { SjbLink, SjbShell } from "@/components/events/SjbShare";
@@ -287,13 +286,11 @@ export function SjbBrandKit() {
   return (
     <SjbShell>
       <div className="mx-auto max-w-5xl space-y-10 px-6 py-8 text-[#03002C]">
-        <Link
-          to="/events/$eventId"
-          params={{ eventId: SJB_EVENT.id }}
+        <SjbLink page="event"
           className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#03002C]/70 hover:text-[#03002C]"
         >
           <ArrowLeft className="h-4 w-4" /> {SJB_EVENT.name}
-        </Link>
+        </SjbLink>
 
         <header>
           <p className="font-mono text-[11px] uppercase tracking-wider text-[#666666]">Brand kit</p>
@@ -331,8 +328,7 @@ export function SjbBrandKit() {
 
           <SjbSingleColour className="pt-2" />
 
-          <Link
-            to="/events/san-juan-bowl/brand-kit/designers"
+          <SjbLink page="designers"
             className={`${card} flex flex-wrap items-center justify-between gap-3 hover:border-[#003FC7]`}
           >
             <div>
@@ -342,7 +338,7 @@ export function SjbBrandKit() {
               </p>
             </div>
             <span className="text-[13px] font-semibold text-[#003FC7]">Open designer pages →</span>
-          </Link>
+          </SjbLink>
 
           <div className={`${card} space-y-3`}>
             <h3 className="text-[15px] font-bold">Approved backgrounds</h3>
