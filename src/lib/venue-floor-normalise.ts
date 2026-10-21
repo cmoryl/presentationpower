@@ -14,14 +14,14 @@ function lum(hex: string): number | null {
   return 0.2126 * c[0]! + 0.7152 * c[1]! + 0.0722 * c[2]!;
 }
 
-function invert(hex: string | undefined): string | undefined {
+function invert(hex: string | undefined, darkBelow = 0.35): string | undefined {
   if (!hex) return hex;
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
   if (!m) return hex;
   // Any dark wall ink is a wall, whatever grey the venue drew it in — flipped
   // to pure white so every floor reads its walls the same way in styled looks.
   const l = lum(hex);
-  if (l != null && l < 0.35) return "#FFFFFF";
+  if (l != null && l < darkBelow) return "#FFFFFF";
   const n = 0xffffff - parseInt(m[1]!, 16);
   return `#${n.toString(16).padStart(6, "0").toUpperCase()}`;
 }
@@ -37,13 +37,37 @@ export function floorHasDarkWalls(floor: Pick<QeiiFloorVector, "shapes">): boole
     if (l < 0.35) dark += 1;
     else if (l > 0.65) light += 1;
   }
-  return dark > light && dark > 0;
+  if (dark || light) return dark > light && dark > 0;
+  return floorHasFilledDarkWalls(floor);
+}
+
+/**
+ * Some hotel sheets (e.g. the Sheraton New York) draw every wall as a filled
+ * mid-dark shape with no outlines at all. Those read as dark-wall sheets when
+ * most filled shapes are dark and the rooms are light.
+ */
+function floorHasFilledDarkWalls(floor: Pick<QeiiFloorVector, "shapes">): boolean {
+  if (floor.shapes.some((s) => s.stroke)) return false;
+  let dark = 0;
+  let light = 0;
+  for (const s of floor.shapes) {
+    const l = s.fill ? lum(s.fill) : null;
+    if (l == null) continue;
+    if (l < 0.5) dark += 1;
+    else if (l > 0.65) light += 1;
+  }
+  return dark > light && light > 0;
 }
 
 /** Flip a dark-wall sheet's tones so the styled looks read walls and rooms correctly. */
 export function floorForStyledLook<T extends QeiiFloorVector>(floor: T): T {
   if (!floorHasDarkWalls(floor)) return floor;
-  return { ...floor, shapes: floor.shapes.map((s) => ({ ...s, fill: invert(s.fill), stroke: invert(s.stroke) })) };
+  // Filled-wall sheets draw walls in a mid grey, so their wall cut-off is higher.
+  const darkBelow = floorHasFilledDarkWalls(floor) ? 0.5 : 0.35;
+  return {
+    ...floor,
+    shapes: floor.shapes.map((s) => ({ ...s, fill: invert(s.fill, darkBelow), stroke: invert(s.stroke, darkBelow) })),
+  };
 }
 
 /**
