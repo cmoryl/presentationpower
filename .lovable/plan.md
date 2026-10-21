@@ -30,7 +30,13 @@ NEXT-2026-Designer-Pack-v1.1/
 4. **Adobe-ready swatches.** Generate `.ase` swatch files (RGB, plus CMYK where an approved build exists) so Illustrator/InDesign users load the palette in one click. Unapproved CMYK stays labelled "proof first".
 5. **Partner share page upgrade.** Downloads are grouped by the folders above, with a "Download everything" button and single-file buttons, and links expire.
 6. **Hand-back loop.** Add an "Upload your design for review" box on the share page. Files go to a private store, then to the Brand tab on Approvals with the designer's name and the pack version they used. Approved work can become a new template in the kit.
-7. **Guardrails stay on.** No RGB-to-CMYK conversion that isn't flagged, no lockup redraws, and the "proof, not master" label on raster files.
+7. **Send live files to a vendor.** From any template, sign or division page, a team member picks the supplied live files (AI, PDF, PPTX, EPS), plus logos, fonts and colour sheets if needed, and clicks "Send to vendor". That creates a vendor pack with:
+   - the original files, byte-for-byte as supplied, never re-exported
+   - a one-page brief: job name, sizes, colour notes (CMYK approved or proof-first), deadline and contact
+   - an expiring link, 14 days by default and revocable, with no sign-in for the vendor
+   - a log of who sent what to which vendor and when, with download counts
+   The vendor can open, edit and output the files in their own tools, outside the system. Their finished file can come back through step 6.
+8. **Guardrails stay on.** No RGB-to-CMYK conversion that isn't flagged, no lockup redraws, and the "proof, not master" label on raster files.
 
 ## Questions to settle during the build
 - Should photography go to outside designers, or stay internal?
