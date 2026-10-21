@@ -133,93 +133,169 @@ export async function buildBrandKitZip(
   families: KitFamily[],
   onProgress?: (done: number, total: number) => void,
 ): Promise<{ blob: Blob; filename: string; missing: string[] }> {
+  const pack = await import("@/lib/next-designer-pack");
+  const { londonCmykRamp } = await import("@/lib/next-london-cmyk");
   const zip = new JSZip();
-  const root = zip.folder(`NEXT-brand-kit-${BRAND_KIT_VERSION}`)!;
+  const root = zip.folder(pack.PACK_ROOT)!;
   const missing: string[] = [];
+  const manifest: { path: string; source: string; sha256: string; bytes: number }[] = [];
+  const put = async (path: string, data: Uint8Array | string, source = "generated") => {
+    root.file(path, data);
+    const u = typeof data === "string" ? new TextEncoder().encode(data) : data;
+    manifest.push({ path, source, sha256: await pack.sha256Hex(u), bytes: u.length });
+  };
 
-  const logoUrls = [
-    ...NEXT_DIVISIONS.flatMap((d) => d.lockups.map((l) => ({ folder: safe(d.name), url: l.src }))),
-    ...NEXT_MARKS.map((m) => ({ folder: "marks", url: m.src })),
+  const logos = [
+    ...NEXT_DIVISIONS.flatMap((d) =>
+      d.lockups.map((l) => ({ dir: `01-logos/${safe(d.id)}`, division: d.id, asset: l.lockup, variant: l.variant, src: l.src })),
+    ),
+    ...NEXT_MARKS.map((m) => ({ dir: "02-marks", division: "next", asset: m.id, variant: m.src.match(/-(\w+)\.svg$/)?.[1] ?? "", src: m.src })),
   ];
   const masters = families.flatMap((f) =>
     f.templates
       .filter((t) => t.downloadUrl)
-      .map((t) => ({ folder: f.label, name: `${t.code}-${safe(t.format)}`, url: t.downloadUrl! })),
+      .map((t) => ({ folder: safe(f.label), t })),
   );
-  const total = logoUrls.length + masters.length + 3;
+  const { BRAND_ICON_SETS } = await import("@/lib/brand-icon-sets");
+  const iconSets = BRAND_ICON_SETS.filter((s) => s.slug.startsWith("next-2026"));
+  const total = logos.length + masters.length + iconSets.length + 4;
   let done = 0;
   const tick = () => onProgress?.(++done, total);
 
+  // 01 / 02 — every lockup and mark as SVG, EPS and transparent PNG
   const seen = new Set<string>();
-  for (const l of logoUrls) {
-    if (seen.has(l.url)) {
-      tick();
-      continue;
-    }
-    seen.add(l.url);
-    try {
-      root.file(`logos/${l.folder}/${l.url.split("/").pop()}`, await bytes(l.url));
-    } catch {
-      missing.push(`logo ${l.url}`);
+  for (const l of logos) {
+    if (!seen.has(l.src)) {
+      seen.add(l.src);
+      const f = pack.logoFormats(l.src);
+      for (const [ext, url] of [["svg", f.svg], ["eps", f.eps], ["png", f.png]] as const) {
+        try {
+          await put(`${l.dir}/${pack.designerFileName(l.division, l.asset, l.variant, ext)}`, await bytes(url), url);
+        } catch {
+          missing.push(`logo ${url}`);
+        }
+      }
     }
     tick();
   }
 
+  // 03 — colour
+  await put("03-colour/next-division-palette.csv", paletteCsv());
+  await put("03-colour/next-division-palette.json", paletteJson());
+  await put("03-colour/canva-brand-kit-values.txt", canvaCopyValues());
+  await put(
+    "03-colour/next26_division_swatches.ase",
+    pack.buildAse(
+      "NEXT 2026 divisions",
+      NEXT_DIVISIONS.map((d) => ({ name: d.name, hex: d.accent, cmyk: pack.parseCmykPercent(d.cmyk) })),
+    ),
+  );
+  tick();
+
+  // 04 — gradients with CMYK labelled approved / proof first
+  const grads = kitGradients();
+  const gradRows = ["id,label,family,stop,hex,cmyk,cmyk_status"];
+  const aseGrad: { name: string; hex: string; cmyk?: [number, number, number, number] }[] = [];
+  for (const g of grads) {
+    const hexes = g.stops.map((x) => x.hex);
+    const builds = londonCmykRamp(hexes);
+    hexes.forEach((h, i) => {
+      const measured = g.stops[i].cmyk;
+      const b = builds[i];
+      const cm = measured ?? [b.c, b.m, b.y, b.k].map((n) => Math.round(n * 100)).join(", ");
+      const status = measured ? "approved (measured)" : b.approved ? "approved" : "proof first";
+      gradRows.push([g.id, `"${g.label}"`, `"${g.family}"`, i + 1, h, `"${cm}"`, status].join(","));
+      aseGrad.push({ name: `${g.label} ${i + 1}`, hex: h, cmyk: measured || b.approved ? pack.parseCmykPercent(cm) : undefined });
+    });
+    await put(`04-gradients/${pack.designerFileName("next", g.id, "swatch", "svg")}`, pack.gradientSwatchSvg(hexes, g.label));
+  }
+  await put("04-gradients/next-gradients-cmyk.csv", gradRows.join("\n"));
+  await put("04-gradients/next-gradients.json", JSON.stringify(grads, null, 2));
+  await put("04-gradients/next26_gradient_swatches.ase", pack.buildAse("NEXT 2026 gradients", aseGrad));
+  tick();
+
+  // 05 — icons (SVG for every NEXT set, transparent PNG for the event set)
+  const { iconSvgString, iconPngBlob } = await import("@/lib/icon-export");
+  for (const set of iconSets) {
+    for (const area of set.subAreas)
+      for (const icon of area.icons) {
+        const svg = iconSvgString(icon.name);
+        if (!svg) continue;
+        const base = `05-icons/${safe(set.slug)}/${safe(area.name)}/${safe(icon.name).toLowerCase()}`;
+        await put(`${base}.svg`, svg);
+        if (set.slug === "next-2026-event") {
+          try {
+            await put(`${base}.png`, new Uint8Array(await (await iconPngBlob(svg, 512)).arrayBuffer()));
+          } catch {
+            missing.push(`icon png ${icon.name}`);
+          }
+        }
+      }
+    tick();
+  }
+
+  // 06 — supplied masters, byte-for-byte
+  for (const m of masters) {
+    try {
+      const ext = (m.t.downloadUrl!.split("?")[0].split(".").pop() ?? "bin").slice(0, 5);
+      await put(
+        `06-templates/${m.folder}/${pack.designerFileName(m.t.divisionId, m.t.format, m.t.code, ext)}`,
+        await bytes(m.t.downloadUrl!),
+        m.t.downloadUrl!,
+      );
+    } catch {
+      missing.push(`master ${m.folder} ${m.t.format}`);
+    }
+    tick();
+  }
+
+  // 07 / 08 — type and sizes
   for (const f of ["Geist-Regular.ttf", "Geist-Bold.ttf"]) {
     try {
-      root.file(`fonts/${f}`, await bytes(`/fonts/${f}`));
+      await put(`07-type/${f}`, await bytes(`/fonts/${f}`), `/fonts/${f}`);
     } catch {
       missing.push(`font ${f}`);
     }
   }
-  root.file("fonts/LICENSE.txt", "Geist is licensed under the SIL Open Font License 1.1 (https://openfontlicense.org).");
+  await put("07-type/LICENSE.txt", "Geist is licensed under the SIL Open Font License 1.1 (https://openfontlicense.org).");
+  await put("08-sizes/next-sign-sizes.csv", signSizesCsv());
+  await put("08-sizes/next-digital-formats.csv", digitalFormatsCsv());
   tick();
 
-  root.file("colour/next-division-palette.csv", paletteCsv());
-  root.file("colour/next-division-palette.json", paletteJson());
-  root.file("colour/canva-brand-kit-values.txt", canvaCopyValues());
-  root.file("gradients/next-gradients.csv", gradientsCsv());
-  root.file("gradients/next-gradients.json", JSON.stringify(kitGradients(), null, 2));
-  root.file("sizes/next-sign-sizes.csv", signSizesCsv());
-  root.file("sizes/next-digital-formats.csv", digitalFormatsCsv());
-  tick();
-
-  for (const m of masters) {
-    try {
-      const ext = (m.url.split("?")[0].split(".").pop() ?? "bin").slice(0, 5);
-      root.file(`templates/${m.folder}/${m.name}.${ext}`, await bytes(m.url));
-    } catch {
-      missing.push(`master ${m.folder} ${m.name}`);
-    }
-    tick();
-  }
-
+  // 00 — start-here guide with live links and real examples
   try {
-    root.file("NEXT-brand-rules.pdf", await buildBrandRulesPdf());
+    const { buildDesignerGuidePdf } = await import("@/lib/next-designer-guide-pdf");
+    await put("00-START-HERE.pdf", await buildDesignerGuidePdf({ families }));
+  } catch {
+    missing.push("start-here PDF");
+  }
+  try {
+    await put("NEXT-brand-rules.pdf", await buildBrandRulesPdf());
   } catch {
     missing.push("brand rules PDF");
   }
   tick();
 
-  root.file(
+  await put(
     "README.txt",
     [
-      `TransPerfect NEXT — Master event brand kit, version ${BRAND_KIT_VERSION}`,
+      `TransPerfect NEXT 2026 — Designer pack v${pack.DESIGNER_PACK_VERSION} (kit ${BRAND_KIT_VERSION})`,
       "",
-      "logos/      every division NEXT lockup (SVG) and the NEXT marks",
-      "colour/     division palette (CSV, JSON) and values for the Canva brand kit",
-      "gradients/ every approved ground with its stops (measured CMYK where supplied)",
-      "sizes/     sign sizes and ready-made sizes, digital formats by shape",
-      "fonts/      Geist Regular and Bold",
-      "templates/  supplied sign masters, exactly as supplied",
-      "NEXT-brand-rules.pdf  logo, colour, print and new-city rules",
+      ...pack.PACK_FOLDERS.map((f) => `${(f.dir || "00-START-HERE.pdf").padEnd(18)} ${f.body}`),
+      "manifest.json      every file with its source and SHA-256 checksum",
       "",
+      "File names: next26_<division>_<asset>_<variant>.<format>",
       BRAND_KIT_COLOUR_NOTE,
-      "Supplied masters are copied byte-for-byte. Check every print file with your printer before production.",
+      "CMYK marked \"proof first\" is a calculated build: get a signed printed proof before a run. Only approved builds are written into the .ase swatches as CMYK.",
+      "Supplied masters are copied byte-for-byte. PNG files are raster proofs, not vector masters.",
+      "",
+      "Changes:",
+      ...pack.DESIGNER_PACK_CHANGELOG.map((c) => `v${c.version} ${c.date}: ${c.notes.join(" ")}`),
     ].join("\n"),
   );
   if (missing.length) root.file("MISSING.txt", missing.join("\n"));
+  root.file("manifest.json", JSON.stringify({ pack: pack.PACK_ROOT, version: pack.DESIGNER_PACK_VERSION, built: new Date().toISOString(), files: manifest }, null, 2));
 
   const blob = await zip.generateAsync({ type: "blob" });
-  return { blob, filename: `NEXT-brand-kit-${BRAND_KIT_VERSION}.zip`, missing };
+  return { blob, filename: `${pack.PACK_ROOT}.zip`, missing };
 }

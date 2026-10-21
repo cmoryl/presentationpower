@@ -1,3 +1,4 @@
+import { PartnerSubmissionQueue } from "@/components/events/PartnerSubmissionQueue";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { ModuleReviewQueue } from "@/components/approvals/ModuleReviewQueue";
@@ -42,14 +43,14 @@ export const Route = createFileRoute("/approvals")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>): { tab?: "brand" | "modules" | "signs" | "booths" | "learning" } =>
-    s.tab === "learning" ? { tab: "learning" } : s.tab === "booths" ? { tab: "booths" } : s.tab === "modules" ? { tab: "modules" } : s.tab === "signs" ? { tab: "signs" } : {},
+  validateSearch: (s: Record<string, unknown>): { tab?: "brand" | "modules" | "signs" | "booths" | "learning" | "partners" } =>
+    s.tab === "partners" ? { tab: "partners" } : s.tab === "learning" ? { tab: "learning" } : s.tab === "booths" ? { tab: "booths" } : s.tab === "modules" ? { tab: "modules" } : s.tab === "signs" ? { tab: "signs" } : {},
   component: ApprovalsPage,
 });
 
 function ApprovalsPage() {
   const { tab } = Route.useSearch();
-  const active = tab === "learning" ? "learning" : tab === "modules" ? "modules" : tab === "signs" ? "signs" : tab === "booths" ? "booths" : "brand";
+  const active = tab === "partners" ? "partners" : tab === "learning" ? "learning" : tab === "modules" ? "modules" : tab === "signs" ? "signs" : tab === "booths" ? "booths" : "brand";
   const tabCls = (on: boolean) =>
     `-mb-px border-b-2 px-4 py-2.5 text-sm ${on ? "border-primary font-medium text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`;
   return (
@@ -67,11 +68,24 @@ function ApprovalsPage() {
         <Link to="/approvals" search={{ tab: "booths" }} className={tabCls(active === "booths")} aria-current={active === "booths" ? "page" : undefined}>
           Booths in 3D
         </Link>
+        <Link to="/approvals" search={{ tab: "partners" }} className={tabCls(active === "partners")} aria-current={active === "partners" ? "page" : undefined}>
+          Partner designs
+        </Link>
         <Link to="/approvals" search={{ tab: "learning" }} className={tabCls(active === "learning")} aria-current={active === "learning" ? "page" : undefined}>
           Learning
         </Link>
       </nav>
-      {active === "learning" ? (
+      {active === "partners" ? (
+        <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-10 sm:px-6">
+          <header>
+            <h1 className="text-3xl font-semibold">Partner designs</h1>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+              Work uploaded by outside designers from their NEXT brand kit link. Nothing is printed or published until a brand reviewer approves it.
+            </p>
+          </header>
+          <PartnerSubmissionQueue />
+        </div>
+      ) : active === "learning" ? (
         <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-10 sm:px-6">
           <header>
             <h1 className="text-3xl font-semibold">What the system is learning</h1>

@@ -4284,6 +4284,57 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_submissions: {
+        Row: {
+          created_at: string
+          designer_email: string | null
+          designer_name: string
+          file_name: string
+          file_path: string
+          id: string
+          note: string | null
+          pack_version: string | null
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          share_id: string | null
+          status: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          designer_email?: string | null
+          designer_name: string
+          file_name: string
+          file_path: string
+          id?: string
+          note?: string | null
+          pack_version?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          share_id?: string | null
+          status?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          designer_email?: string | null
+          designer_name?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          note?: string | null
+          pack_version?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          share_id?: string | null
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
       pdf_extractions: {
         Row: {
           category: string | null
@@ -5334,6 +5385,92 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_handoff_downloads: {
+        Row: {
+          created_at: string
+          file_label: string | null
+          handoff_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          file_label?: string | null
+          handoff_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          file_label?: string | null
+          handoff_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_handoff_downloads_handoff_id_fkey"
+            columns: ["handoff_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_handoffs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_handoffs: {
+        Row: {
+          contact: string | null
+          created_at: string
+          created_by: string | null
+          deadline: string | null
+          download_count: number
+          expires_at: string
+          files: Json
+          id: string
+          job_name: string
+          last_downloaded_at: string | null
+          notes: string | null
+          pack_version: string | null
+          revoked: boolean
+          token: string
+          vendor_email: string | null
+          vendor_name: string
+        }
+        Insert: {
+          contact?: string | null
+          created_at?: string
+          created_by?: string | null
+          deadline?: string | null
+          download_count?: number
+          expires_at?: string
+          files?: Json
+          id?: string
+          job_name: string
+          last_downloaded_at?: string | null
+          notes?: string | null
+          pack_version?: string | null
+          revoked?: boolean
+          token?: string
+          vendor_email?: string | null
+          vendor_name: string
+        }
+        Update: {
+          contact?: string | null
+          created_at?: string
+          created_by?: string | null
+          deadline?: string | null
+          download_count?: number
+          expires_at?: string
+          files?: Json
+          id?: string
+          job_name?: string
+          last_downloaded_at?: string | null
+          notes?: string | null
+          pack_version?: string | null
+          revoked?: boolean
+          token?: string
+          vendor_email?: string | null
+          vendor_name?: string
+        }
+        Relationships: []
+      }
       venue_floors: {
         Row: {
           created_at: string
@@ -5700,6 +5837,7 @@ export type Database = {
       }
       get_shared_print_asset: { Args: { _token: string }; Returns: Json }
       get_template_deck: { Args: { _deck_id: string }; Returns: Json }
+      get_vendor_handoff: { Args: { _token: string }; Returns: Json }
       has_any_role: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -5708,6 +5846,9 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_brand_reviewer: { Args: { _user_id: string }; Returns: boolean }
+      is_event_team: { Args: { _user_id: string }; Returns: boolean }
+      is_valid_kit_share: { Args: { _token: string }; Returns: boolean }
       match_brand_chunks: {
         Args: {
           filter_division?: string
@@ -5758,6 +5899,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      record_vendor_download: {
+        Args: { _label: string; _token: string }
+        Returns: undefined
+      }
       style_expansion_scan: {
         Args: { _min_obs?: number }
         Returns: {
@@ -5774,6 +5919,19 @@ export type Database = {
           samples: number
           style_code: string
         }[]
+      }
+      submit_partner_design: {
+        Args: {
+          _designer_email: string
+          _designer_name: string
+          _file_name: string
+          _file_path: string
+          _note: string
+          _pack_version: string
+          _title: string
+          _token: string
+        }
+        Returns: string
       }
     }
     Enums: {
