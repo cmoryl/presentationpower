@@ -249,7 +249,13 @@ function ApprovalQueuePage() {
       <header>
         <div className="text-xs uppercase tracking-[0.3em] text-foreground/50">Governance</div>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-          Brand approval queue
+          {queue.isLoading
+            ? "Brand approval queue"
+            : persona === "sales"
+              ? "Your submissions"
+              : counts.pending === 0
+                ? "Nothing needs you right now"
+                : `${counts.pending} ${counts.pending === 1 ? "thing needs" : "things need"} you`}
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-foreground/60">
           Brand and compliance sign-off before anything is exported or shared. Review the automated
