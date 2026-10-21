@@ -24,6 +24,9 @@ export const GUIDE_SECTIONS = [
   ["sizes", "Sizes & aspect ratios"],
   ["resizing", "Resizing"],
   ["reuse", "Using what we have"],
+] as const;
+/** Event-planning sections, shown on the NEXT planning guide, not the brand kit. */
+export const PLANNING_GUIDE_SECTIONS = [
   ["sections", "Event sections"],
   ["mart", "NEXT Mart"],
   ["brew", "NEXTbrew"],
@@ -40,7 +43,16 @@ const Rules = ({ items }: { items: { do: boolean; text: string }[] }) => (
   </ul>
 );
 
-export function BrandKitGuideSections({ shared }: { shared: boolean }) {
+export function BrandKitGuideSections({
+  shared,
+  part = "all",
+}: {
+  shared: boolean;
+  /** "brand" = look & sizing; "planning" = event sections, MART, NEXTbrew. */
+  part?: "brand" | "planning" | "all";
+}) {
+  const showBrand = part !== "planning";
+  const showPlanning = part !== "brand";
   const gradients = useMemo(kitGradients, []);
   const families = [...new Set(gradients.map((g) => g.family))];
   const sizes = useMemo(kitSignSizes, []);
@@ -53,6 +65,7 @@ export function BrandKitGuideSections({ shared }: { shared: boolean }) {
 
   return (
     <>
+      {showBrand && (<>
       <section id="gradients" className="mt-12 scroll-mt-16">
         <H2>Gradients</H2>
         <p className="mt-1 text-sm text-muted-foreground">{LONDON_PACK_GROUND_NOTE}</p>
@@ -146,6 +159,8 @@ export function BrandKitGuideSections({ shared }: { shared: boolean }) {
         ) : null}
       </section>
 
+      </>)}
+      {showPlanning && (<>
       <section id="sections" className="mt-12 scroll-mt-16">
         <H2>Event sections</H2>
         <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -224,6 +239,7 @@ export function BrandKitGuideSections({ shared }: { shared: boolean }) {
           <p className="mt-2 text-sm text-muted-foreground">Not set yet.</p>
         )}
       </section>
+      </>)}
     </>
   );
 }

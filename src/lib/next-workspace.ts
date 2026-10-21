@@ -22,6 +22,7 @@ export type NextWorkspaceScope = "every-city" | "london";
 export type NextWorkspacePath =
   | "/events/next"
   | "/events/next/brand-kit"
+  | "/events/next/planning-guide"
   | "/events/next/locations"
   | "/events/next/venues"
   | "/events/next/venue"
@@ -114,6 +115,13 @@ export const NEXT_WORKSPACE_PAGES: NextWorkspacePage[] = [
     to: "/events/next/brand-kit",
     label: "Brand kit",
     purpose: "The master NEXT look: logos, colours, type, templates, partner links and the download pack.",
+    group: "plan",
+    scope: "every-city",
+  },
+  {
+    to: "/events/next/planning-guide",
+    label: "Planning guide",
+    purpose: "Event sections, NEXT Mart, NEXTbrew, pillar and area options, and how to start a new city.",
     group: "plan",
     scope: "every-city",
   },
