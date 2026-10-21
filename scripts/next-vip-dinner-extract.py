@@ -15,6 +15,41 @@ OUT = "/tmp/vip/out"; os.makedirs(OUT, exist_ok=True)
 LID = "next-vip-dinner-invite"
 BLEED = 9.0
 
+def fix_texts(tpath, texts):
+    """Split stacked lines, keep the supplied letter spacing, and set the ink.
+
+    The copy is filled through an ICC colour space pdfplumber reads as 0; on the
+    page it prints white, so white is set explicitly.
+    """
+    import pdfplumber
+    from fontTools.ttLib import TTFont
+    fd = ns["FONT_DIR"]
+    with pdfplumber.open(tpath) as pp: chars = pp.pages[0].chars
+    out = []
+    for t in texts:
+        cs = [c for c in chars if c["x0"] >= t["x"] - 0.5 and c["x1"] <= t["x"] + t["w"] + 0.5 and c["top"] >= t["top"] - 0.5 and c["bottom"] <= t["bottom"] + 0.5]
+        rows = []
+        for c in sorted(cs, key=lambda c: (round(c["top"]), c["x0"])):
+            if rows and abs(rows[-1][0]["top"] - c["top"]) < 2: rows[-1].append(c)
+            else: rows.append([c])
+        f = TTFont(os.path.join(fd, f"{t['font']}.ttf")); cm = f.getBestCmap(); hm = f["hmtx"]; u = f["head"].unitsPerEm
+        tr = []
+        for r in rows:
+            if len(r) < 2: continue
+            span = r[-1]["x0"] - r[0]["x0"]
+            adv = sum(hm[cm[ord(c["text"])]][0] / u for c in r[:-1] if ord(c["text"]) in cm) * t["size"]
+            tr.append((span - adv) / (len(r) - 1) / t["size"] * 1000)
+        t["text"] = "\n".join("".join(c["text"] for c in r).strip() for r in rows)
+        t["color"] = "#FFFFFF"; t["cmyk"] = [0.0, 0.0, 0.0, 0.0]
+        t["align"] = "left"
+        if tr: t["track"] = round(sum(tr) / len(tr), 1)
+        if len(rows) > 1:
+            t["lead"] = round((rows[1][0]["top"] - rows[0][0]["top"]) / t["size"], 3)
+            t["wrap"] = round(t["w"] + t["size"], 2)
+        out.append(t)
+    return out
+
+
 def build(pdf_path):
     src = pikepdf.open(pdf_path); page = src.pages[0]
     ops, paints, W, H = analyse(src, page, set())
@@ -39,7 +74,7 @@ def build(pdf_path):
     tpdf = pikepdf.new(); tpdf.add_blank_page(page_size=(W, H)); tp = tpdf.pages[-1]; tp.Resources = tpdf.copy_foreign(res_ind)
     tp.Contents = tpdf.make_stream(b"q\n" + shift + pikepdf.unparse_content_stream(filtered(ops, {p["i"] for p in paints if p["kind"] == "text"})) + b"\nQ\n")
     tpath = f"/tmp/vip/{LID}-text.pdf"; tpdf.save(tpath)
-    texts = read_texts(tpath, H)
+    texts = fix_texts(tpath, read_texts(tpath, H))
     npath = f"{OUT}/{LID}-native.pdf"; nat.save(npath)
     syms = [svg_symbol(npath, bg_page, "bg", f"{LID}-bg")] + [svg_symbol(npath, parts[b["id"]]["page"], b["id"], f"{LID}-{b['id']}") for b in boxes]
     open(f"{OUT}/{LID}-native.svg", "w").write(f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {W:g} {H:g}">' + "".join(syms) + "</svg>")
