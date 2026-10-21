@@ -54,7 +54,9 @@ export type KitFamily = { id: string; label: string; templates: KitTemplate[] };
 
 export async function loadKitFamilies(): Promise<KitFamily[]> {
   const rows = await loadNextRegistry();
-  const name = (id: string) => NEXT_DIVISIONS.find((d) => d.id === id)?.name ?? id;
+  // Registry rows use "lifesci"; the guide uses "life-sci" — match either.
+  const norm = (id: string) => id.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const name = (id: string) => NEXT_DIVISIONS.find((d) => norm(d.id) === norm(id))?.name ?? id;
   return TEMPLATE_FAMILIES.map((f) => ({
     id: f.id,
     label: f.label,
