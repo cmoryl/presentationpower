@@ -19,6 +19,10 @@ def main(pdf, out):
     os.makedirs(out, exist_ok=True)
     tmp = tempfile.mktemp(suffix=".svg")
     subprocess.run(["pdftocairo", "-svg", "-f", "2", "-l", "2", pdf, tmp], check=True)
+    raw = open(tmp).read()
+    # Printed lettering arrives as glyph outlines; room names are live labels instead.
+    raw = re.sub(r"<use [^>]*glyph[^>]*/>", "", raw)
+    open(tmp, "w").write(raw)
     doc = SVG.parse(tmp, reify=True)
     k = 96 / 72
     px, py, pw, ph = WIN
