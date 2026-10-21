@@ -125,6 +125,7 @@ function HackathonGuide() {
               </div>
             </div>
           ))}
+        </div>
         <p className="mt-3 text-xs text-muted-foreground">Values as printed in the supplied guidelines, page 4. Print uses Pantone or CMYK; screens use RGB / Web.</p>
       </Section>
 
