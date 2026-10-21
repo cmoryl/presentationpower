@@ -18,6 +18,7 @@ import { useAutoRefit } from "@/components/text/AutoRefit";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
+import { sjbEventLogoFor } from "@/lib/san-juan-bowl";
 import type { BrandMode } from "@/lib/taxonomy";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import type { SocialFormat } from "@/lib/social-formats";
@@ -491,10 +492,12 @@ export function SocialRenderer({
   typeScale: typeScaleProp,
 
   styleId,
-  eventLogo,
+  eventLogo: eventLogoProp,
   edit,
   displayShortEdge = 320,
 }: SocialRendererProps) {
+  // San Juan Bowl kits always carry the Bowl badge, wherever they render.
+  const eventLogo = eventLogoProp ?? sjbEventLogoFor(copyProp?.title);
   const copy = applySocialCopyEdit(copyProp, edit);
   // Multilingual refit: translated headlines and summaries are sized down into
   // their boxes inside the approved type floors instead of clipping.
