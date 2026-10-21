@@ -201,6 +201,33 @@ function MapsPage() {
     saveFile(new Blob([preparedSvg.file], { type: "image/svg+xml" }), `rdraft-${eventId}-${current.floor_key}-${face}.svg`);
   }
 
+  const [pdfBusy, setPdfBusy] = useState(false);
+  async function downloadPdf() {
+    if (!current || !preparedSvg || preparedSvg.source !== svg) {
+      toast.error("The map is still drawing — try again in a moment.");
+      return;
+    }
+    setPdfBusy(true);
+    try {
+      const [{ jsPDF }, { qeiiRasteriseSvg }] = await Promise.all([
+        import("jspdf"),
+        import("@/lib/next-london-qeii-pdf"),
+      ]);
+      const art = await qeiiRasteriseSvg(preparedSvg.file);
+      // One page the shape of the map, sized in points from the drawing's own aspect.
+      const w = 842;
+      const h = (art.h / art.w) * w;
+      const doc = new jsPDF({ unit: "pt", format: [w, h], orientation: w > h ? "landscape" : "portrait" });
+      doc.addImage(art.dataUrl, "PNG", 0, 0, w, h, undefined, "FAST");
+      doc.setProperties({ title: `${current.title} map (proof)`, subject: "Proof rasterised from the Element map. Use the SVG for print." });
+      saveFile(doc.output("blob"), `rdraft-${eventId}-${current.floor_key}-${face}-PROOF.pdf`);
+    } catch (error) {
+      toast.error(`PDF not downloaded: ${error instanceof Error ? error.message : "the map could not be drawn."}`);
+    } finally {
+      setPdfBusy(false);
+    }
+  }
+
   const paint = (room: string) => {
     if (!current) return;
     const next = { ...roomColours };
@@ -317,6 +344,9 @@ function MapsPage() {
                 </select>
                 <Button variant="outline" onClick={download} disabled={preparedSvg?.source !== svg}>
                   <Download className="h-4 w-4" /> SVG
+                </Button>
+                <Button variant="outline" onClick={() => void downloadPdf()} disabled={preparedSvg?.source !== svg || pdfBusy} title="Proof PDF for sharing — use the SVG for print">
+                  <Download className="h-4 w-4" /> {pdfBusy ? "Making PDF…" : "PDF"}
                 </Button>
                 <button
                   type="button"
