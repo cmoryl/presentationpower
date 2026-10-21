@@ -2,51 +2,15 @@
 // capacity chart, plus a one-click copy into the event's room list as a draft
 // (admins / brand leads publish it on the Event assets page).
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Download, ListPlus } from "lucide-react";
 import { toast } from "sonner";
 
 import { saveRoomsVersion, useEventAssets, useRefreshEventAssets } from "@/lib/event-assets-data";
 import { SF_VENUE_FACT_SHEET, SF_VENUE_FLOORS, SF_VENUE_ROOMS, sfVenueRoomList } from "@/lib/next-sf-venue-rooms";
-import { SF_VENUE_ZONES } from "@/lib/next-sf-venue-zones";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
-import { importSvgFloor } from "@/lib/venue-map-import";
-import { qeiiPlanSvg } from "@/lib/next-london-qeii-plan";
-import { QEII_MAP_LOOKS, QEII_MAP_LOOK_ORDER, qeiiPlanGround, type QeiiPlanFace } from "@/lib/next-london-qeii-style";
-
-// Plan looks that keep the hotel's geometry in place ("signage" is a full
-// London sheet with its own frame, so it is not offered here).
-const SF_LOOKS = QEII_MAP_LOOK_ORDER.filter((f) => f !== "signage" && f !== "issued");
-
-type Styled = { url: string; svg: string; left: number; top: number; width: number; height: number };
-
-/** Draw one floor in a styled look, positioned over the hotel's own sheet box. */
-function useStyledPlan(vectorUrl: string, title: string, face: QeiiPlanFace | "hotel"): Styled | null {
-  const [out, setOut] = useState<Styled | null>(null);
-  useEffect(() => {
-    if (face === "hotel") { setOut(null); return; }
-    let live = true;
-    void fetch(vectorUrl).then((r) => r.text()).then((txt) => {
-      const vb = (txt.match(/viewBox="([^"]+)"/)?.[1] ?? "0 0 1 1").split(/[\s,]+/).map(Number);
-      const imp = importSvgFloor(txt, { id: `sf-${title}`, marker: title, title });
-      const { dx = 0, dy = 0 } = imp.shift ?? {};
-      const svg = qeiiPlanSvg(imp.floor, { face, showKey: false });
-      if (!live) return;
-      setOut({
-        svg,
-        url: URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" })),
-        left: ((-dx - vb[0]) / vb[2]) * 100, top: ((-dy - vb[1]) / vb[3]) * 100,
-        width: (imp.floor.w / vb[2]) * 100, height: (imp.floor.h / vb[3]) * 100,
-      });
-    }).catch(() => live && setOut(null));
-    return () => { live = false; };
-  }, [vectorUrl, title, face]);
-  useEffect(() => () => { if (out) URL.revokeObjectURL(out.url); }, [out]);
-  return out;
-}
-
-const n = (v: number | null) => (v == null ? "–" : v.toLocaleString("en-US"));
+import { EventMapView } from "@/components/events/EventMapView";
 
 export function SfVenueMeetingSpace() {
   const [floor, setFloor] = useState<number>(3);
@@ -55,8 +19,6 @@ export function SfVenueMeetingSpace() {
   const refresh = useRefreshEventAssets("san-francisco");
   const plan = SF_VENUE_FLOORS.find((f) => f.floor === floor)!;
   const rooms = SF_VENUE_ROOMS.filter((r) => r.floor === floor);
-  const [look, setLook] = useState<QeiiPlanFace | "hotel">("hotel");
-  const styled = useStyledPlan(plan.vectorUrl, plan.title, look);
 
   async function copyToRoomList() {
     setBusy(true);
@@ -103,65 +65,17 @@ export function SfVenueMeetingSpace() {
           </button>
         ))}
       </div>
-
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <label htmlFor="sf-look" className="text-[12px] font-semibold text-[#03002C]">Map look</label>
-        <select id="sf-look" value={look} onChange={(e) => setLook(e.target.value as QeiiPlanFace | "hotel")}
-          className="rounded-md border border-[#03002C]/20 px-2 py-1 text-[13px] text-[#03002C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">
-          <option value="hotel">Hotel sheet (as issued)</option>
-          {SF_LOOKS.map((id) => <option key={id} value={id}>{QEII_MAP_LOOKS[id].name}</option>)}
-        </select>
-        {look !== "hotel" && <span className="text-[12px] text-[#666666]">{QEII_MAP_LOOKS[look].note}</span>}
-      </div>
-
       <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         <div>
           <div className="rounded-md border border-[#03002C]/10 bg-white p-2">
-            <PlanZoomFrame key={floor} label={plan.title}>
-            <div className="relative overflow-hidden" style={styled && look !== "hotel" ? { backgroundColor: qeiiPlanGround(look) } : undefined}>
-              <a href={plan.vectorUrl} target="_blank" rel="noreferrer" className="block">
-                <img src={plan.vectorUrl} alt={`InterContinental San Francisco ${plan.title.toLowerCase()} plan`} className={`h-auto w-full ${styled ? "opacity-0" : ""}`} loading="lazy" />
-              </a>
-              {styled && (
-                <img src={styled.url} alt="" aria-hidden className="pointer-events-none absolute max-w-none"
-                  style={{ left: `${styled.left}%`, top: `${styled.top}%`, width: `${styled.width}%`, height: `${styled.height}%` }} />
-              )}
-              {(SF_VENUE_ZONES[plan.floor] ?? []).map((z) => (
-                <div
-                  key={`${z.label}-${z.x}-${z.y}`}
-                  title={z.space ? `${z.label} — ${z.space}` : z.label}
-                  className="pointer-events-none absolute flex items-center justify-center rounded-[2px] border-2"
-                  style={{
-                    left: `${z.x}%`, top: `${z.y}%`, width: `${z.w}%`, height: `${z.h}%`,
-                    borderColor: z.color, backgroundColor: `${z.color}59`,
-                  }}
-                >
-                  {z.chip !== false && (
-                    <span className="rounded-sm bg-white/85 px-1 py-px text-center text-[10px] font-bold leading-tight text-[#03002C]">
-                      {z.label}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-            </PlanZoomFrame>
+            <EventMapView eventId="san-francisco" marker={String(plan.floor)} fallback={
+              <PlanZoomFrame key={floor} label={plan.title}>
+                <img src={plan.vectorUrl} alt={`InterContinental San Francisco ${plan.title.toLowerCase()} plan`} className="h-auto w-full" loading="lazy" />
+              </PlanZoomFrame>
+            } />
           </div>
-          {(SF_VENUE_ZONES[plan.floor] ?? []).length > 0 && (
-            <ul aria-label={`${plan.title} event zones`} className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-[12px] text-[#03002C]">
-              {(SF_VENUE_ZONES[plan.floor] ?? []).filter((z) => z.legend !== false).map((z) => (
-                <li key={z.label} className="inline-flex items-center gap-1.5">
-                  <span aria-hidden className="inline-block h-3 w-3 rounded-[2px] border" style={{ backgroundColor: z.color, borderColor: z.color }} />
-                  <span className="font-semibold">{z.label}</span>
-                  {z.space && <span className="text-[#666666]">— {z.space}</span>}
-                </li>
-              ))}
-            </ul>
-          )}
           <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px]">
             <a href={plan.vectorUrl} download={`InterContinental-SF-floor-${plan.floor}-vector.svg`} className="font-semibold text-[#003FC7] hover:underline">Download vector plan (SVG)</a>
-            {styled && look !== "hotel" && (
-              <a href={styled.url} download={`rdraft-InterContinental-SF-floor-${plan.floor}-${look}.svg`} className="font-semibold text-[#003FC7] hover:underline">Download this look (SVG)</a>
-            )}
             <span className="text-[#666666]">Drawn paths from the hotel&rsquo;s 2017 sheet — confirm with the hotel before printing.</span>
           </div>
         </div>
