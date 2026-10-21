@@ -88,7 +88,7 @@ export async function cmykGradientsAndReport(
   bytes: ArrayBuffer,
   missing: Set<string>,
 ): Promise<{ pdf: Uint8Array; rgbImages: number }> {
-  const { PDFDocument, PDFName, PDFDict, PDFRawStream, PDFArray, PDFNumber } = await import("pdf-lib");
+  const { PDFDocument, PDFName, PDFDict, PDFRawStream, PDFArray, PDFNumber, decodePDFRawStream } = await import("pdf-lib");
   const pdf = await PDFDocument.load(bytes);
   const ctx = pdf.context;
   let rgbImages = 0;
@@ -106,8 +106,7 @@ export async function cmykGradientsAndReport(
     if (!(fn instanceof PDFRawStream) || fn.dict.get(PDFName.of("FunctionType"))?.toString() !== "0") {
       throw new Error("a colour fade in the map could not be read for print.");
     }
-    if (fn.dict.get(PDFName.of("Filter"))) throw new Error("a colour fade in the map is compressed and could not be re-inked.");
-    const src = fn.contents;
+    const src = fn.dict.get(PDFName.of("Filter")) ? decodePDFRawStream(fn).decode() : fn.contents;
     const out = new Uint8Array((src.length / 3) * 4);
     for (let i = 0, o = 0; i + 2 < src.length; i += 3, o += 4) {
       const [r, g, b] = [src[i]! / 255, src[i + 1]! / 255, src[i + 2]! / 255];
@@ -129,7 +128,10 @@ export async function cmykGradientsAndReport(
     fd.delete(PDFName.of("Length"));
     ctx.assign(fnRef as never, ctx.stream(out, Object.fromEntries([]) as never) as never);
     const ns = ctx.lookup(fnRef as never) as unknown as { dict: { set: (k: unknown, v: unknown) => void } };
-    for (const [k, v] of fd.entries()) if (k.toString() !== "/Length") ns.dict.set(k, v);
+    for (const [k, v] of fd.entries()) {
+      const key = k.toString();
+      if (key !== "/Length" && key !== "/Filter" && key !== "/DecodeParms") ns.dict.set(k, v);
+    }
     dict.set(PDFName.of("ColorSpace"), PDFName.of("DeviceCMYK"));
   }
   if (missing.size) {
