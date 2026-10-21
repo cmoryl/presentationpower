@@ -48,4 +48,4 @@
 - [x] Plain-language labels on everyday screens (Brand, Approved layouts, Layout).
 - [x] One-sentence event kit: already exists in Events agent; tested, reply rules tightened. Open: San Juan Bowl has no own look in the agent (uses NEXT City).
 - [x] San Juan Bowl kits: Bowl badge replaces the TP wordmark automatically; made-up hashtag removed.
-- [ ] Kit builder shows the kit's look colours (today it only takes the look's layout; palette stays brand blue) — next.
+- [x] Bowl kit assets tinted in Bowl colours (sky accents, navy ink tokens).

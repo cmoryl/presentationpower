@@ -284,3 +284,9 @@ export function sjbEventLogoFor(eventName: string | null | undefined) {
   if (!eventName || !/san\s*juan\s*bowl/i.test(eventName)) return undefined;
   return { url: logoColorSvg.url, urlDark: logoDarkSvg.url, ratio: 1186.7 / 1161.7 };
 }
+
+/** Bowl colours for kit assets (event-only palette, like NEXT's). */
+export function sjbKitTokens() {
+  const hex = (id: string) => SJB_COLORS.find((c) => c.id === id)!.hex;
+  return { primary: hex("navy"), accent: hex("sky"), surface: "#E6F7FD", ink: hex("navy") };
+}

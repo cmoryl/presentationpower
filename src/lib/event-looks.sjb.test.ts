@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { eventLookById } from "./event-looks";
-import { sjbEventLogoFor } from "./san-juan-bowl";
+import { sjbEventLogoFor, sjbKitTokens } from "./san-juan-bowl";
 
 describe("San Juan Bowl look", () => {
   it("uses the Bowl's own navy, sky and gold", () => {
@@ -11,5 +11,8 @@ describe("San Juan Bowl look", () => {
   it("Bowl kits get the Bowl badge; other events don't", () => {
     expect(sjbEventLogoFor("TransPerfect San Juan Bowl")).toBeDefined();
     expect(sjbEventLogoFor("NEXT London")).toBeUndefined();
+  });
+  it("Bowl kit assets use Bowl navy and sky", () => {
+    expect(sjbKitTokens()).toMatchObject({ primary: "#0D0E21", accent: "#00AAE7" });
   });
 });
