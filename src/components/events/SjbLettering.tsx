@@ -14,6 +14,13 @@ const EXACT = {
   pngWidths: [1200, 2400, 4800],
 };
 const ratio = EXACT.w / EXACT.h;
+
+/** Colourways from the supplied lettering board. Same geometry; only face/shadow fills change. */
+const COLOURWAYS = [
+  { suffix: "", name: "White on Navy", bg: "#0D0E21", use: "white letters, blue shadow · dark backgrounds" },
+  { suffix: "-navy", name: "Navy on White", bg: "#FFFFFF", use: "navy letters, blue shadow · white or light backgrounds" },
+  { suffix: "-navy-white", name: "Navy on Blue", bg: "#00AAE7", use: "navy letters, white shadow · Bowl blue backgrounds" },
+];
 const capPct = (u: number) => pct((u / EXACT.cap) * 100);
 
 function SjbLetteringExact() {
@@ -40,18 +47,28 @@ function SjbLetteringExact() {
         <p className="text-[14px] font-bold">Exact master — single line</p>
         <span className="text-[11px] font-semibold text-[#003FC7]">Use this version</span>
       </div>
-      <div className="flex aspect-[16/4] items-center justify-center rounded-xl bg-[#03002C] p-8">
-        <img src={`${BASE}/${EXACT.id}.svg`} alt="SAN JUAN BOWL lettering, exact master" className="max-h-full max-w-full object-contain" />
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <a href={`${BASE}/${EXACT.id}.svg`} download={`${EXACT.id}.svg`} className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/15 px-3 py-1 text-[12px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]">
-          <Download className="h-3.5 w-3.5" /> SVG (editable)
-        </a>
-        {EXACT.pngWidths.map((w) => (
-          <a key={w} href={`${BASE}/${EXACT.id}-${w}.png`} download={`${EXACT.id}-${w}.png`} className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/15 px-3 py-1 text-[12px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]">
-            <Download className="h-3.5 w-3.5" /> PNG transparent {w} × {Math.round(w / ratio)} px
-          </a>
-        ))}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {COLOURWAYS.map((c) => {
+          const id = `${EXACT.id}${c.suffix}`;
+          return (
+            <div key={c.suffix} className="space-y-2">
+              <div className="flex aspect-[16/4] items-center justify-center rounded-xl border border-[#03002C]/15 p-8" style={{ background: c.bg }}>
+                <img src={`${BASE}/${id}.svg`} alt={`SAN JUAN BOWL lettering, ${c.name}`} className="max-h-full max-w-full object-contain" />
+              </div>
+              <p className="text-[12px] font-semibold">{c.name} <span className="font-normal text-[#666666]">— {c.use}</span></p>
+              <div className="flex flex-wrap gap-2">
+                <a href={`${BASE}/${id}.svg`} download={`${id}.svg`} className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/15 px-3 py-1 text-[12px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]">
+                  <Download className="h-3.5 w-3.5" /> SVG (editable)
+                </a>
+                {EXACT.pngWidths.map((w) => (
+                  <a key={w} href={`${BASE}/${id}-${w}.png`} download={`${id}-${w}.png`} className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/15 px-3 py-1 text-[12px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]">
+                    <Download className="h-3.5 w-3.5" /> PNG {w} × {Math.round(w / ratio)} px
+                  </a>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <div>
