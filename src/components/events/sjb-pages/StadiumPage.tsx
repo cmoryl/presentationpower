@@ -10,7 +10,7 @@ const STADIUM_URL = `${BOOTHHUB_ORIGIN}/showcase/san-juan-bowl`;
 /** Flip to true once BoothHUB publishes the Hiram Bithorn model; the current
  *  showcase still shows the superseded Loubriel stadium, so we show
  *  "Coming soon" until the rebuilt model is live. */
-const STADIUM_READY = false;
+const STADIUM_READY = true;
 
 
 export function StadiumPage() {
