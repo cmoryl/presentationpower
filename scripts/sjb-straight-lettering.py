@@ -203,6 +203,104 @@ def normalised(L):
     return affinity.scale(g, 1, CAP / (y1 - y0), origin=(0, 0)), C
 
 
+# ---------- Type cleanup: every edge to a true angle, shared heights across letters ----------
+SNAP = [0.0, 45.0, 90.0, 135.0]   # horizontal, chamfer, vertical, chamfer
+SNAP_TOL = 9.0                     # degrees: edges this close to a true angle are set to it
+LEVEL_TOL = 1.6                    # cap %: horizontal edges this close share one height
+
+
+def ring_lines(coords, inner=False, counter=False):
+    """Corners of a ring -> straight lines (angle, offset, length), true angles snapped."""
+    pts = np.array(coords[:-1])
+    lines = []
+    for a, b in zip(pts, np.roll(pts, -1, axis=0)):
+        v = b - a; L = float(np.hypot(*v))
+        if L < 0.4: continue
+        ang = math.degrees(math.atan2(v[1], v[0])) % 180
+        for t in SNAP:
+            tol = SNAP_TOL if t in (0.0, 90.0) else 4.0
+            if t == 90.0: tol = 3.0 if inner else 12.0 if counter else 7.5
+            if min(abs(ang - t), 180 - abs(ang - t)) <= tol: ang = t; break
+        lines.append([ang, (a + b) / 2, L, v])
+    # merge neighbours that now run the same way (one edge drawn in pieces)
+    merged = []
+    for ln in lines:
+        same = merged and (abs(merged[-1][0] - ln[0]) < 0.01 or (
+            merged[-1][0] not in SNAP and ln[0] not in SNAP and min(abs(merged[-1][0] - ln[0]), 180 - abs(merged[-1][0] - ln[0])) < 6.0))
+        if same:
+            m = merged[-1]; w = m[2] + ln[2]
+            m[1] = (m[1] * m[2] + ln[1] * ln[2]) / w; m[2] = w; m[3] = m[3] + ln[3]
+            if m[0] not in SNAP: m[0] = math.degrees(math.atan2(m[3][1], m[3][0])) % 180
+        else: merged.append(ln)
+    if len(merged) > 2 and abs(merged[0][0] - merged[-1][0]) < 0.01:
+        a, b = merged[-1], merged.pop(0); w = a[2] + b[2]
+        a[1] = (a[1] * a[2] + b[1] * b[2]) / w; a[2] = w; a[3] = a[3] + b[3]
+    return merged
+
+
+def corners(lines):
+    out = []
+    n = len(lines)
+    for i in range(n):
+        a, b = lines[i - 1], lines[i]
+        da = np.array([math.cos(math.radians(a[0])), math.sin(math.radians(a[0]))])
+        db = np.array([math.cos(math.radians(b[0])), math.sin(math.radians(b[0]))])
+        M = np.array([da, -db]).T
+        if abs(np.linalg.det(M)) < 1e-6: out.append(tuple((a[1] + b[1]) / 2)); continue
+        t = np.linalg.solve(M, b[1] - a[1]); out.append(tuple(a[1] + t[0] * da))
+    return out
+
+
+def clean_letter(g, levels, diagonal=False):
+    polys = g.geoms if isinstance(g, MultiPolygon) else [g]
+    out = []
+    for p in polys:
+        rings = []
+        for ri, r in enumerate([p.exterior, *p.interiors]):
+            simp = shapely.simplify(shapely.LineString(r.coords), 0.55).coords
+            lines = ring_lines(list(simp), inner=diagonal and ri > 0, counter=(not diagonal) and ri > 0)
+            for ln in lines:  # shared heights: tops, bottoms, bars, serifs
+                if ln[0] == 0.0:
+                    y = ln[1][1]; k = min(levels, key=lambda v: abs(v - y))
+                    if abs(k - y) <= LEVEL_TOL: ln[1] = np.array([ln[1][0], k])
+            rings.append(corners(lines) if len(lines) >= 3 else list(r.coords))
+        q = Polygon(rings[0], rings[1:]).buffer(0)
+        out.append(q if q.is_valid and abs(q.area - p.area) / p.area < 0.05 else p)
+    return unary_union(out)
+
+
+def horizontal_levels(faces):
+    ys = []
+    for g in faces:
+        for p in (g.geoms if isinstance(g, MultiPolygon) else [g]):
+            for r in [p.exterior, *p.interiors]:
+                for ln in ring_lines(list(shapely.simplify(shapely.LineString(r.coords), 0.55).coords)):
+                    if ln[0] == 0.0: ys.append((ln[1][1], ln[2]))
+    ys.sort(); groups = []
+    for y, w in ys:
+        if groups and y - groups[-1][-1][0] <= LEVEL_TOL: groups[-1].append((y, w))
+        else: groups.append([(y, w)])
+    lv = [sum(y * w for y, w in g) / sum(w for _, w in g) for g in groups]
+    return [0.0 if abs(v) <= LEVEL_TOL else CAP if abs(v - CAP) <= LEVEL_TOL else v for v in lv]
+
+
+_raw = {}
+for L in sj + bw:
+    if L["name"] not in _raw:
+        C = canon[L["name"]]; x0, y0, x1, y1 = C["face"].bounds
+        _raw[L["name"]] = affinity.scale(affinity.translate(C["face"], -x0, -y0), 1, CAP / (y1 - y0), origin=(0, 0))
+LEVELS = horizontal_levels(_raw.values())
+CLEAN = {}
+for k, g in _raw.items():
+    c = clean_letter(g, LEVELS, diagonal=k in 'ANW')  # counters of A, N, W follow their legs
+    x0, y0, x1, y1 = c.bounds
+    CLEAN[k] = affinity.scale(affinity.translate(c, -x0, -y0), 1, CAP / (y1 - y0), origin=(0, 0))
+
+
+def normalised(L):  # noqa: F811 — cleaned drawing replaces the raw one
+    return CLEAN[L["name"]], canon[L["name"]]
+
+
 def gaps(seq): return [b["face"].bounds[0] - a["face"].bounds[2] for a, b in zip(seq, seq[1:])]
 sj_gaps, bw_gaps = gaps(sj), gaps(bw)
 GAP = float(np.median([g for i, g in enumerate(sj_gaps) if i != 2] + bw_gaps))
@@ -269,6 +367,7 @@ audit = dict(
                   shadow_fit=L["shadow_fit"]) for L in sj + bw],
     placed=[dict(letter=P["name"], x=round(P["face"].bounds[0], 3), width=round(P["face"].bounds[2] - P["face"].bounds[0], 3),
                  height=round(P["face"].bounds[3] - P["face"].bounds[1], 3)) for P in line],
+    shared_heights=[round(v, 2) for v in LEVELS], snap_angles=SNAP, snap_tolerance_deg=SNAP_TOL,
     viewbox=dict(single_line=vb1, stacked=vb2),
 )
 json.dump(audit, open(os.path.join(OUT, "sjb-lettering-audit.json"), "w"), indent=1)
