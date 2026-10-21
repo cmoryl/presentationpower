@@ -2,7 +2,7 @@
 // measured from the final colour master SJB-Logo-color.eps. Values are copied
 // verbatim from sheet 9; units are artboard px (1254 × 1254).
 import { useState } from "react";
-import { Download, Maximize2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, Maximize2, ZoomIn, ZoomOut } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import s01 from "@/assets/san-juan-bowl/measurements/sheet-01.png.asset.json";
 import s02 from "@/assets/san-juan-bowl/measurements/sheet-02.png.asset.json";
@@ -81,6 +81,7 @@ type Unit = "mm" | "in" | "ft" | "m";
 
 export function SjbMeasurementSheets() {
   const [open, setOpen] = useState<number | null>(null);
+  const [zoom, setZoom] = useState(false);
   const [width, setWidth] = useState(100);
   const [unit, setUnit] = useState<Unit>("mm");
   const digits = unit === "mm" ? 2 : 3;
@@ -115,7 +116,9 @@ export function SjbMeasurementSheets() {
           >
             <div className="relative aspect-[4/3] overflow-hidden rounded bg-[#F2F2F2]">
               <img src={s.src} alt={`${s.title} measurement sheet`} loading="lazy" className="h-full w-full object-contain" />
-              <Maximize2 className="absolute right-2 top-2 h-4 w-4 text-[#03002C] opacity-0 group-hover:opacity-100" />
+              <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded bg-white/90 px-2 py-1 text-[11px] font-semibold text-[#03002C] shadow-sm group-hover:bg-[#003FC7] group-hover:text-white">
+                <Maximize2 className="h-3.5 w-3.5" /> View larger
+              </span>
             </div>
             <p className="mt-2 text-[12px] font-semibold text-[#03002C]">{i + 1} · {s.title}</p>
             <p className="mt-0.5 text-[11px] leading-[1.4] text-[#666666]">{s.note}</p>
@@ -123,12 +126,28 @@ export function SjbMeasurementSheets() {
         ))}
       </div>
 
-      <Dialog open={open !== null} onOpenChange={(o) => !o && setOpen(null)}>
-        <DialogContent className="h-[94dvh] w-[96vw] max-w-[96vw] overflow-auto p-4">
+      <Dialog open={open !== null} onOpenChange={(o) => { if (!o) { setOpen(null); setZoom(false); } }}>
+        <DialogContent className="flex h-[94dvh] w-[96vw] max-w-[96vw] flex-col gap-3 p-4">
           {open !== null && (
             <>
-              <DialogTitle>{open + 1} · {SHEETS[open].title}</DialogTitle>
-              <img src={SHEETS[open].src} alt={`${SHEETS[open].title} measurement sheet, enlarged`} className="mx-auto w-full max-w-[1800px]" />
+              <div className="flex flex-wrap items-center gap-2 pr-8">
+                <DialogTitle className="mr-auto">{open + 1} · {SHEETS[open].title}</DialogTitle>
+                <button type="button" onClick={() => setOpen((open + SHEETS.length - 1) % SHEETS.length)} className="inline-flex items-center rounded border px-2 py-1 text-[12px]" aria-label="Previous sheet"><ChevronLeft className="h-4 w-4" /></button>
+                <button type="button" onClick={() => setOpen((open + 1) % SHEETS.length)} className="inline-flex items-center rounded border px-2 py-1 text-[12px]" aria-label="Next sheet"><ChevronRight className="h-4 w-4" /></button>
+                <button type="button" onClick={() => setZoom((z) => !z)} className="inline-flex items-center gap-1 rounded border px-2 py-1 text-[12px] font-semibold">
+                  {zoom ? <ZoomOut className="h-4 w-4" /> : <ZoomIn className="h-4 w-4" />} {zoom ? "Fit to screen" : "Zoom 200%"}
+                </button>
+                <a href={SHEETS[open].src} target="_blank" rel="noreferrer" className="rounded border px-2 py-1 text-[12px] font-semibold">Open full size</a>
+              </div>
+              <div className="min-h-0 flex-1 overflow-auto rounded bg-[#F2F2F2]">
+                <img
+                  src={SHEETS[open].src}
+                  alt={`${SHEETS[open].title} measurement sheet, enlarged`}
+                  onClick={() => setZoom((z) => !z)}
+                  className={zoom ? "max-w-none cursor-zoom-out" : "mx-auto h-full w-full cursor-zoom-in object-contain"}
+                  style={zoom ? { width: "200%" } : undefined}
+                />
+              </div>
             </>
           )}
         </DialogContent>
