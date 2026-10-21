@@ -39,7 +39,7 @@ def main(pdf, out):
         fill, stroke = col(s.fill), col(s.stroke)
         if fill == "none" and stroke == "none": continue
         # to local points
-        p = p * f"translate({-x},{-y}) scale({1/k})"
+        p = p * f"scale({1/k}) translate({-x},{-y})"
         d = p.d(relative=False)
         d = re.sub(r"-?\d+\.\d+", lambda m: f"{float(m.group()):.2f}".rstrip("0").rstrip("."), d)
         rec = {"d": d, "fill": fill}
