@@ -158,6 +158,7 @@ import { Route as AdminPrintLibraryItemIdRouteImport } from './routes/admin.prin
 import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/public/brandhub-seed-proxy'
 import { Route as ApiPublicCanvaAdRouteImport } from './routes/api/public/canva-ad'
 import { Route as ApiPublicDivisionImageRouteImport } from './routes/api/public/division-image'
+import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicPdfIndexProxyRouteImport } from './routes/api/public/pdf-index-proxy'
 import { Route as ApiPublicSkinBackdropRouteImport } from './routes/api/public/skin-backdrop'
 import { Route as DecksDeckIdIndexRouteImport } from './routes/decks.$deckId.index'
@@ -980,6 +981,11 @@ const ApiPublicDivisionImageRoute = ApiPublicDivisionImageRouteImport.update({
   path: '/api/public/division-image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
+  id: '/api/public/health',
+  path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPdfIndexProxyRoute = ApiPublicPdfIndexProxyRouteImport.update({
   id: '/api/public/pdf-index-proxy',
   path: '/api/public/pdf-index-proxy',
@@ -1498,6 +1504,7 @@ export interface FileRoutesByFullPath {
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/canva-ad': typeof ApiPublicCanvaAdRoute
   '/api/public/division-image': typeof ApiPublicDivisionImageRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/api/public/skin-backdrop': typeof ApiPublicSkinBackdropRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -1715,6 +1722,7 @@ export interface FileRoutesByTo {
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/canva-ad': typeof ApiPublicCanvaAdRoute
   '/api/public/division-image': typeof ApiPublicDivisionImageRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/api/public/skin-backdrop': typeof ApiPublicSkinBackdropRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -1937,6 +1945,7 @@ export interface FileRoutesById {
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/canva-ad': typeof ApiPublicCanvaAdRoute
   '/api/public/division-image': typeof ApiPublicDivisionImageRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/api/public/skin-backdrop': typeof ApiPublicSkinBackdropRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -2160,6 +2169,7 @@ export interface FileRouteTypes {
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/canva-ad'
     | '/api/public/division-image'
+    | '/api/public/health'
     | '/api/public/pdf-index-proxy'
     | '/api/public/skin-backdrop'
     | '/decks/$deckId/document'
@@ -2377,6 +2387,7 @@ export interface FileRouteTypes {
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/canva-ad'
     | '/api/public/division-image'
+    | '/api/public/health'
     | '/api/public/pdf-index-proxy'
     | '/api/public/skin-backdrop'
     | '/decks/$deckId/document'
@@ -2598,6 +2609,7 @@ export interface FileRouteTypes {
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/canva-ad'
     | '/api/public/division-image'
+    | '/api/public/health'
     | '/api/public/pdf-index-proxy'
     | '/api/public/skin-backdrop'
     | '/decks/$deckId/document'
@@ -2760,6 +2772,7 @@ export interface RootRouteChildren {
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
   ApiPublicCanvaAdRoute: typeof ApiPublicCanvaAdRoute
   ApiPublicDivisionImageRoute: typeof ApiPublicDivisionImageRoute
+  ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicPdfIndexProxyRoute: typeof ApiPublicPdfIndexProxyRoute
   ApiPublicSkinBackdropRoute: typeof ApiPublicSkinBackdropRoute
   DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
@@ -3827,6 +3840,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicDivisionImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/health': {
+      id: '/api/public/health'
+      path: '/api/public/health'
+      fullPath: '/api/public/health'
+      preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/pdf-index-proxy': {
       id: '/api/public/pdf-index-proxy'
       path: '/api/public/pdf-index-proxy'
@@ -4669,6 +4689,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
   ApiPublicCanvaAdRoute: ApiPublicCanvaAdRoute,
   ApiPublicDivisionImageRoute: ApiPublicDivisionImageRoute,
+  ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicPdfIndexProxyRoute: ApiPublicPdfIndexProxyRoute,
   ApiPublicSkinBackdropRoute: ApiPublicSkinBackdropRoute,
   DecksDeckIdDocumentRoute: DecksDeckIdDocumentRoute,
