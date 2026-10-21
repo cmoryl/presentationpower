@@ -337,6 +337,11 @@ function sanJuanBowlEntry(): EventEntry {
             link: { to: "/events/san-juan-bowl/brand-kit" },
           },
           {
+            label: "Stadium 3D view",
+            detail: "Juan Ramón Loubriel Stadium, Bayamón — the interactive BoothHUB stadium and field.",
+            link: { to: "/events/san-juan-bowl/stadium" },
+          },
+          {
             label: "Venue checklist and research",
             detail: "What the venue and organisers still need to send, and what the web search found.",
             link: { to: "/events/next/intake/$eventId", params: { eventId: SJB_EVENT.id } },
