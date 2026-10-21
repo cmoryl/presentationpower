@@ -83,6 +83,7 @@ function SignEditorWindow() {
     // Opened as a separate window from a card: close it and return to that tab.
     if (window.opener && !window.opener.closed) { window.close(); return; }
     if (window.history.length > 1) { window.history.back(); return; }
+    if (sign.kit) { void navigate({ to: "/events/kits/$kitId", params: { kitId: sign.kit } }); return; }
     void navigate({ to: "/events/next/divisions/$divisionId", params: { divisionId: homeDivision } });
   };
   return (

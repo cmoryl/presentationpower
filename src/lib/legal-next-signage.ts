@@ -29,6 +29,8 @@ export type LegalSign = {
   sizes?: { w: number; h: number; label: string }[];
   /** Division the sign belongs to (for the editor's Exit button). */
   division?: string;
+  /** Supplied event kit the sign belongs to (Exit returns to that kit). */
+  kit?: string;
 };
 
 /** San Francisco lift doors, as supplied by the team (41.5 in wide, 84 in high). */
@@ -211,6 +213,30 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
     note: "From the San Francisco live file: 41.5 in full width, about 21.3 in per door, 84 in high. Retype the headline, move pieces, then download the left and right door files. Confirm the door sizes on site before print.",
   })),
 ];
+/**
+ * Supplied event kits (Legalweek, NeXus, Hackathon): each page of the designers'
+ * files split into ground, movable pieces and live text by
+ * scripts/supplied-kit-signs-extract.py. Wording stays exactly as supplied.
+ */
+const kitSign = (kit: string, id: string, title: string, size: string, master: string, label: string, note?: string): LegalSign => ({
+  id, title, size, master, faces: [{ id: `divsign-${id}`, label }], kit, note,
+});
+export const SUPPLIED_KIT_SIGNS: LegalSign[] = [
+  kitSign("legalweek", "legalweek-pillar-welcome", "Legalweek Welcome pillar", "23.6 × 98.4 in", "TPLW_Pillar_Signs.pdf", "Pillar"),
+  kitSign("legalweek", "legalweek-pillar-meeting-room", "Legalweek Meeting Room pillar", "23.6 × 98.4 in", "TPLW_Pillar_Signs.pdf", "Pillar"),
+  kitSign("legalweek", "legalweek-pillar-reef-lounge", "Legalweek Reef Lounge pillar", "23.6 × 98.4 in", "TPLW_Pillar_Signs.pdf", "Pillar"),
+  kitSign("legalweek", "legalweek-pillar-logo", "Legalweek logo pillar", "23.6 × 98.4 in", "TPLW_Pillar_Signs.pdf", "Pillar"),
+  kitSign("legalweek", "legalweek-email-600x200", "Legalweek email header", "600 × 200 px", "TP_LW_Email_Hdr_600x200.pdf", "Header"),
+  kitSign("legalweek", "legalweek-story-1", "Legalweek story — Two months away", "1080 × 1920 px", "LW26_Post_And_Header.ai", "Story"),
+  kitSign("legalweek", "legalweek-story-2", "Legalweek story — Swipe up", "1080 × 1920 px", "LW26_Post_And_Header.ai", "Story"),
+  kitSign("legalweek", "legalweek-post-1", "Legalweek post — Two months away", "1200 × 1200 px", "LW26_Post_And_Header.ai", "Post"),
+  kitSign("legalweek", "legalweek-post-2", "Legalweek post — NYC, March 9–12", "1200 × 1200 px", "LW26_Post_And_Header.ai", "Post"),
+  kitSign("legalweek", "legalweek-banner-600x150", "Legalweek email banner 600 × 150", "600 × 150 px", "LW26_01_Email.ai", "Banner"),
+  kitSign("legalweek", "legalweek-banner-1400x280", "Legalweek email banner 1400 × 280", "1400 × 280 px", "LW26_01_Email.ai", "Banner"),
+];
+/** Editable signs of one supplied kit. */
+export const kitSigns = (kit: string) => SUPPLIED_KIT_SIGNS.filter((s) => s.kit === kit);
+
 // Demo booth cards show the left side, front and right side together.
 for (const s of DIVISION_LIVE_SIGNS) if (s.id.startsWith("demo-booth")) s.preview = demoBoothCardUrl(s.id) ?? s.preview;
 
@@ -231,7 +257,7 @@ function venueFirstSign(id: string): LegalSign | null {
   };
 }
 
-export const legalSign = (id: string) => [...LEGAL_NEXT_SIGNS, ...SF_SCREEN_SURROUNDS, ...DIVISION_LIVE_SIGNS].find((s) => s.id === id) ?? venueFirstSign(id);
+export const legalSign = (id: string) => [...LEGAL_NEXT_SIGNS, ...SF_SCREEN_SURROUNDS, ...DIVISION_LIVE_SIGNS, ...SUPPLIED_KIT_SIGNS].find((s) => s.id === id) ?? venueFirstSign(id);
 export const legalSignMasterUrl = (s: LegalSign) => masterUrl(s.master);
 /** A face's layout; `faceId` may carry a size (`<face>~<w>x<h>`) for a re-sized version. */
 export const legalSignLayout = (faceId: string): LiveLayout | null => (isSignId(faceId) ? liveLayoutById(faceId) ?? null : null);
