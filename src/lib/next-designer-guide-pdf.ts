@@ -12,6 +12,7 @@ import { GRADIENT_RULES, RESIZE_RULES, REUSE_RULES, kitGradients } from "@/lib/n
 import { NEXT_DROPBOX_URL } from "@/lib/next-brand-guide";
 import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import { londonCmykRamp } from "@/lib/next-london-cmyk";
+import { GLOBALLINK_PILLARS, GLOBALLINK_PILLARS_CANVA, GLOBALLINK_PILLARS_MASTER_URL } from "@/lib/next-globallink-pillars";
 import { LONDON_PACK_AREAS, LONDON_PACK_ISSUE } from "@/lib/next-london-pack-2281";
 import {
   DESIGNER_PACK_CHANGELOG,
@@ -279,6 +280,23 @@ export async function buildDesignerGuidePdf(opts: DesignerGuideOptions): Promise
       ] as [string, string][],
     })),
     "London",
+  );
+
+  section(
+    "Look and feel — San Francisco, InterContinental",
+    "GlobalLink NEXT pillar set for the San Francisco edition: the designer's supplied final, 23.5 × 72 in, RGB. Room names are the artwork copy only.",
+  );
+  await gallery(
+    GLOBALLINK_PILLARS.map((p) => ({
+      img: p.jpg.url,
+      title: `GlobalLink NEXT — ${p.name}`,
+      meta: "23.5 × 72 in · supplied master",
+      links: [
+        ["Master PDF", GLOBALLINK_PILLARS_MASTER_URL],
+        ["Canva", GLOBALLINK_PILLARS_CANVA],
+      ] as [string, string][],
+    })),
+    "San Francisco",
   );
 
   section("Look and feel — templates in use", "Every supplied template with a saved example, grouped by piece. Captions show division and size; links open the live master.");
