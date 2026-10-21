@@ -50,6 +50,9 @@ def one(it, OUT, version):
     tp.Contents = tpdf.make_stream(b"q\n" + shift + pikepdf.unparse_content_stream(filtered(ops, {p["i"] for p in paints if p["kind"] == "text"})) + b"\nQ\n")
     tpath = f"{OUT}/{lid}-text.pdf"; tpdf.save(tpath)
     texts = read_texts(tpath, H)
+    # Some files fill text through an ICC space pdfplumber reads as 0; set the ink seen in the render.
+    for t in texts:
+        if it.get("textColor") and t["color"] == "#000000": t["color"] = it["textColor"]
     npath = f"{OUT}/{lid}-native.pdf"; nat.save(npath)
     syms = [svg_symbol(npath, bg_page, "bg", f"{lid}-bg")] + [svg_symbol(npath, parts[b["id"]]["page"], b["id"], f"{lid}-{b['id']}") for b in boxes]
     open(f"{OUT}/{lid}-native.svg", "w").write(f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {W:g} {H:g}">' + "".join(syms) + "</svg>")
