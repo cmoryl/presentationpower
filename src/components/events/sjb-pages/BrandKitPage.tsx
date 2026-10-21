@@ -3,6 +3,7 @@
 // approved backgrounds, misuse gallery and badge anatomy, plus the palette,
 // type and usage rules, with downloads. Event facts stay "to be confirmed"
 // until issued.
+import { SjbLettering } from "@/components/events/SjbLettering";
 
 import { useState } from "react";
 import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
