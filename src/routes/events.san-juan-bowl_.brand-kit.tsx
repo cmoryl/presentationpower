@@ -318,6 +318,13 @@ function SjbBrandKit() {
           <p className="mt-1 text-[14px] text-[#666666]">
             {SJB_EVENT.city} · Venue and dates to be confirmed — nothing is printed until the organisers issue them.
           </p>
+          <a
+            href="/downloads/san-juan-bowl-brand-guide.pdf"
+            download="san-juan-bowl-brand-guide.pdf"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#003FC7]"
+          >
+            <Download className="h-4 w-4" /> Full brand guide (PDF)
+          </a>
         </header>
 
         <section className="space-y-4">
