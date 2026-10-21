@@ -194,7 +194,7 @@ function DocumentView() {
               </div>
               <div className="flex items-end justify-between text-xs text-black/50">
                 <div>
-                  <div className="uppercase tracking-widest">Brand mode</div>
+                  <div className="uppercase tracking-widest">Brand</div>
                   <div className="mt-1 text-black/80">{brand.name}</div>
                 </div>
                 <div className="text-right">

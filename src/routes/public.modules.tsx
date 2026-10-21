@@ -387,7 +387,7 @@ function PublicModuleLibrary() {
               value={brandId}
               onChange={(e) => setBrandId(e.target.value)}
               className="h-10 rounded-full border border-black/15 bg-white px-4 text-sm outline-none focus:border-[#003FC7]"
-              aria-label="Brand mode"
+              aria-label="Brand"
             >
               {BRAND_MODES.map((b) => (
                 <option key={b.id} value={b.id}>

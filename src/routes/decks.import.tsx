@@ -44,7 +44,7 @@ const INITIAL_STEPS: Step[] = [
   { key: "read", label: "Reading file", status: "pending" },
   { key: "upload", label: "Uploading to server", status: "pending" },
   { key: "parse", label: "Extracting slide content", status: "pending" },
-  { key: "map", label: "Mapping to module variants", status: "pending" },
+  { key: "map", label: "Matching slides to approved layouts", status: "pending" },
   { key: "create", label: "Assembling deck", status: "pending" },
 ];
 
@@ -616,7 +616,7 @@ function ReviewPanel({
             onChange={(v) => setMeta((m) => ({ ...m, industry: v }))}
           />
           <SelectField
-            label="Brand mode"
+            label="Brand"
             value={meta.brandModeId}
             onChange={(v) => setMeta((m) => ({ ...m, brandModeId: v }))}
             options={brandModes.map((b) => ({ value: b.id, label: b.name }))}

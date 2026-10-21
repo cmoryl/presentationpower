@@ -179,7 +179,7 @@ function SpotlightPreview() {
   if (!brand) {
     return (
       <AppShell>
-        <div className="p-10">Loading brand modes…</div>
+        <div className="p-10">Loading brands…</div>
       </AppShell>
     );
   }
