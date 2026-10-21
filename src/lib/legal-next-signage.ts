@@ -29,6 +29,8 @@ export type LegalSign = {
   sizes?: { w: number; h: number; label: string }[];
   /** Division the sign belongs to (for the editor's Exit button). */
   division?: string;
+  /** Supplied event kit the sign belongs to (Exit returns to that kit). */
+  kit?: string;
 };
 
 /** San Francisco lift doors, as supplied by the team (41.5 in wide, 84 in high). */
@@ -211,6 +213,76 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
     note: "From the San Francisco live file: 41.5 in full width, about 21.3 in per door, 84 in high. Retype the headline, move pieces, then download the left and right door files. Confirm the door sizes on site before print.",
   })),
 ];
+/**
+ * Supplied event kits (Legalweek, NeXus, Hackathon): each page of the designers'
+ * files split into ground, movable pieces and live text by
+ * scripts/supplied-kit-signs-extract.py. Wording stays exactly as supplied.
+ */
+const kitSign = (kit: string, id: string, title: string, size: string, master: string, label: string, note?: string): LegalSign => ({
+  id, title, size, master, faces: [{ id: `divsign-${id}`, label }], kit, note,
+});
+export const SUPPLIED_KIT_SIGNS: LegalSign[] = [
+  kitSign("legalweek", "legalweek-pillar-welcome", "Legalweek Welcome pillar", "23.6 × 98.4 in", "TPLW_Pillar_Signs.pdf", "Pillar"),
+  kitSign("legalweek", "legalweek-pillar-meeting-room", "Legalweek Meeting Room pillar", "23.6 × 98.4 in", "TPLW_Pillar_Signs.pdf", "Pillar"),
+  kitSign("legalweek", "legalweek-pillar-reef-lounge", "Legalweek Reef Lounge pillar", "23.6 × 98.4 in", "TPLW_Pillar_Signs.pdf", "Pillar"),
+  kitSign("legalweek", "legalweek-pillar-logo", "Legalweek logo pillar", "23.6 × 98.4 in", "TPLW_Pillar_Signs.pdf", "Pillar"),
+  kitSign("legalweek", "legalweek-email-600x200", "Legalweek email header", "600 × 200 px", "TP_LW_Email_Hdr_600x200.pdf", "Header"),
+  kitSign("legalweek", "legalweek-story-1", "Legalweek story — Two months away", "1080 × 1920 px", "LW26_Post_And_Header.ai", "Story"),
+  kitSign("legalweek", "legalweek-story-2", "Legalweek story — Swipe up", "1080 × 1920 px", "LW26_Post_And_Header.ai", "Story"),
+  kitSign("legalweek", "legalweek-post-1", "Legalweek post — Two months away", "1200 × 1200 px", "LW26_Post_And_Header.ai", "Post"),
+  kitSign("legalweek", "legalweek-post-2", "Legalweek post — NYC, March 9–12", "1200 × 1200 px", "LW26_Post_And_Header.ai", "Post"),
+  kitSign("legalweek", "legalweek-banner-600x150", "Legalweek email banner 600 × 150", "600 × 150 px", "LW26_01_Email.ai", "Banner"),
+  kitSign("nexus", "nexus-elevator-door-ground-1", "Elevator door (ground) · page 1", "43.9 × 82.7 in", "elevator-door-ground.pdf", "Artwork"),
+  kitSign("nexus", "nexus-elevator-door-ground-2", "Elevator door (ground) · page 2", "43.9 × 82.7 in", "elevator-door-ground.pdf", "Artwork"),
+  kitSign("nexus", "nexus-elevator-door-ground-3", "Elevator door (ground) · page 3", "43.9 × 82.7 in", "elevator-door-ground.pdf", "Artwork"),
+  kitSign("nexus", "nexus-elevator-door-ground-4", "Elevator door (ground) · page 4", "43.9 × 82.7 in", "elevator-door-ground.pdf", "Artwork"),
+  kitSign("nexus", "nexus-elevator-door-ground-5", "Elevator door (ground) · page 5", "43.9 × 82.7 in", "elevator-door-ground.pdf", "Artwork"),
+  kitSign("nexus", "nexus-elevator-door-ground-6", "Elevator door (ground) · page 6", "43.9 × 82.7 in", "elevator-door-ground.pdf", "Artwork"),
+  kitSign("nexus", "nexus-elevator-door-extra-1", "Elevator door (extra) · page 1", "43.9 × 82.7 in", "elevator-door-extra.pdf", "Artwork"),
+  kitSign("nexus", "nexus-elevator-door-extra-2", "Elevator door (extra) · page 2", "43.9 × 82.7 in", "elevator-door-extra.pdf", "Artwork"),
+  kitSign("nexus", "nexus-lift-internal-mirror", "Lift internal mirror", "72.8 × 47.2 in", "lift-internal-mirror.pdf", "Artwork"),
+  kitSign("nexus", "nexus-pillar-b", "Pillar B", "105.7 × 56.3 in", "pillar-b.pdf", "Pillar"),
+  kitSign("nexus", "nexus-stair-riser-1", "Stair riser · page 1", "66.3 × 4.5 in", "stair-riser.pdf", "Artwork"),
+  kitSign("nexus", "nexus-stair-riser-2", "Stair riser · page 2", "66.3 × 4.5 in", "stair-riser.pdf", "Artwork"),
+  kitSign("nexus", "nexus-stair-riser-3", "Stair riser · page 3", "66.3 × 4.5 in", "stair-riser.pdf", "Artwork"),
+  kitSign("nexus", "nexus-stair-riser-4", "Stair riser · page 4", "66.3 × 4.5 in", "stair-riser.pdf", "Artwork"),
+  kitSign("nexus", "nexus-stair-riser-5", "Stair riser · page 5", "66.3 × 4.5 in", "stair-riser.pdf", "Artwork"),
+  kitSign("nexus", "nexus-stair-riser-6", "Stair riser · page 6", "66.3 × 4.5 in", "stair-riser.pdf", "Artwork"),
+  kitSign("nexus", "nexus-stair-riser-7", "Stair riser · page 7", "66.3 × 4.5 in", "stair-riser.pdf", "Artwork"),
+  kitSign("nexus", "nexus-stair-riser-8", "Stair riser · page 8", "66.3 × 4.5 in", "stair-riser.pdf", "Artwork"),
+  kitSign("nexus", "nexus-stair-riser-9", "Stair riser · page 9", "66.3 × 4.5 in", "stair-riser.pdf", "Artwork"),
+  kitSign("nexus", "nexus-floor-graphic-a", "Floor graphic A", "23.6 × 23.6 in", "floor-graphic-a.pdf", "Artwork"),
+  kitSign("nexus", "nexus-floor-graphic-b", "Floor graphic B", "47.2 × 47.2 in", "floor-graphic-b.pdf", "Artwork"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-1", "Regular NeXus pillar signs · page 1", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-2", "Regular NeXus pillar signs · page 2", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-3", "Regular NeXus pillar signs · page 3", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-4", "Regular NeXus pillar signs · page 4", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-5", "Regular NeXus pillar signs · page 5", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-6", "Regular NeXus pillar signs · page 6", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-7", "Regular NeXus pillar signs · page 7", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-8", "Regular NeXus pillar signs · page 8", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-9", "Regular NeXus pillar signs · page 9", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-10", "Regular NeXus pillar signs · page 10", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-11", "Regular NeXus pillar signs · page 11", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-12", "Regular NeXus pillar signs · page 12", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-13", "Regular NeXus pillar signs · page 13", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-14", "Regular NeXus pillar signs · page 14", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-15", "Regular NeXus pillar signs · page 15", "15.7 × 18.4 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-stage-nexus-pillar-signs", "Stage NeXus pillar signs", "48.0 × 78.7 in", "stage-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-stage-nexus-pillar-sign-light", "Stage NeXus pillar sign (light)", "48.0 × 78.7 in", "stage-nexus-pillar-sign-light.pdf", "Pillar"),
+  kitSign("nexus", "nexus-staff-lanyard", "Staff lanyard", "15.3 × 0.8 in", "staff-lanyard.pdf", "Lanyard"),
+  kitSign("nexus", "nexus-judge-lanyard", "Judge lanyard", "15.2 × 0.8 in", "judge-lanyard.pdf", "Lanyard"),
+  kitSign("nexus", "nexus-hacker-lanyard", "Hacker lanyard", "15.3 × 0.8 in", "hacker-lanyard.pdf", "Lanyard"),
+  kitSign("nexus", "nexus-expert-lanyard", "Expert lanyard", "15.3 × 0.8 in", "expert-lanyard.pdf", "Lanyard"),
+  kitSign("nexus", "nexus-executive-lanyard", "Executive lanyard", "15.2 × 0.8 in", "executive-lanyard.pdf", "Lanyard"),
+  kitSign("nexus", "nexus-change-maker-lanyard", "Change Maker lanyard", "15.2 × 0.8 in", "change-maker-lanyard.pdf", "Lanyard"),
+  kitSign("nexus", "nexus-candlestick-maker-lanyard", "Candlestick Maker lanyard", "16.6 × 0.8 in", "candlestick-maker-lanyard.pdf", "Lanyard"),
+  kitSign("hackathon", "hackathon-stage-hackathon-pillar-signs", "Stage Hackathon pillar signs", "48.0 × 78.7 in", "stage-hackathon-pillar-signs.pdf", "Pillar"),
+  kitSign("legalweek", "legalweek-banner-1400x280", "Legalweek email banner 1400 × 280", "1400 × 280 px", "LW26_01_Email.ai", "Banner"),
+];
+/** Editable signs of one supplied kit. */
+export const kitSigns = (kit: string) => SUPPLIED_KIT_SIGNS.filter((s) => s.kit === kit);
+
 // Demo booth cards show the left side, front and right side together.
 for (const s of DIVISION_LIVE_SIGNS) if (s.id.startsWith("demo-booth")) s.preview = demoBoothCardUrl(s.id) ?? s.preview;
 
@@ -231,7 +303,7 @@ function venueFirstSign(id: string): LegalSign | null {
   };
 }
 
-export const legalSign = (id: string) => [...LEGAL_NEXT_SIGNS, ...SF_SCREEN_SURROUNDS, ...DIVISION_LIVE_SIGNS].find((s) => s.id === id) ?? venueFirstSign(id);
+export const legalSign = (id: string) => [...LEGAL_NEXT_SIGNS, ...SF_SCREEN_SURROUNDS, ...DIVISION_LIVE_SIGNS, ...SUPPLIED_KIT_SIGNS].find((s) => s.id === id) ?? venueFirstSign(id);
 export const legalSignMasterUrl = (s: LegalSign) => masterUrl(s.master);
 /** A face's layout; `faceId` may carry a size (`<face>~<w>x<h>`) for a re-sized version. */
 export const legalSignLayout = (faceId: string): LiveLayout | null => (isSignId(faceId) ? liveLayoutById(faceId) ?? null : null);
