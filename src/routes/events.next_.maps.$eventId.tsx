@@ -209,18 +209,30 @@ function MapsPage() {
     }
     setPdfBusy(true);
     try {
-      const [{ jsPDF }, { qeiiRasteriseSvg }] = await Promise.all([
-        import("jspdf"),
-        import("@/lib/next-london-qeii-pdf"),
-      ]);
-      const art = await qeiiRasteriseSvg(preparedSvg.file);
+      // The SVG goes into the PDF as vector artwork (walls, rooms and names stay
+      // editable in Illustrator/Acrobat), not as a picture.
+      const [{ jsPDF }, { svg2pdf }] = await Promise.all([import("jspdf"), import("svg2pdf.js")]);
+      const el = new DOMParser().parseFromString(preparedSvg.file, "image/svg+xml").documentElement as unknown as SVGSVGElement;
+      if (el.nodeName !== "svg") throw new Error("the map drawing could not be read.");
+      const vb = (el.getAttribute("viewBox") ?? "").split(/[\s,]+/).map(Number);
+      const vw = vb[2] || parseFloat(el.getAttribute("width") ?? "") || 842;
+      const vh = vb[3] || parseFloat(el.getAttribute("height") ?? "") || 595;
       // One page the shape of the map, sized in points from the drawing's own aspect.
       const w = 842;
-      const h = (art.h / art.w) * w;
+      const h = (vh / vw) * w;
       const doc = new jsPDF({ unit: "pt", format: [w, h], orientation: w > h ? "landscape" : "portrait" });
-      doc.addImage(art.dataUrl, "PNG", 0, 0, w, h, undefined, "FAST");
-      doc.setProperties({ title: `${current.title} map (proof)`, subject: "Proof rasterised from the Element map. Use the SVG for print." });
-      saveFile(doc.output("blob"), `rdraft-${eventId}-${current.floor_key}-${face}-PROOF.pdf`);
+      // svg2pdf measures in the live document, so the drawing is mounted off-screen briefly.
+      const host = document.createElement("div");
+      host.style.cssText = "position:fixed;left:-99999px;top:0;width:0;height:0;overflow:hidden";
+      host.appendChild(el);
+      document.body.appendChild(host);
+      try {
+        await svg2pdf(el, doc, { x: 0, y: 0, width: w, height: h });
+      } finally {
+        host.remove();
+      }
+      doc.setProperties({ title: `${current.title} map`, subject: "Vector map from Element; walls, rooms and names are editable." });
+      saveFile(doc.output("blob"), `rdraft-${eventId}-${current.floor_key}-${face}.pdf`);
     } catch (error) {
       toast.error(`PDF not downloaded: ${error instanceof Error ? error.message : "the map could not be drawn."}`);
     } finally {
