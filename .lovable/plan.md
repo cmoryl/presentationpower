@@ -36,7 +36,13 @@ NEXT-2026-Designer-Pack-v1.1/
    - an expiring link, 14 days by default and revocable, with no sign-in for the vendor
    - a log of who sent what to which vendor and when, with download counts
    The vendor can open, edit and output the files in their own tools, outside the system. Their finished file can come back through step 6.
-8. **Guardrails stay on.** No RGB-to-CMYK conversion that isn't flagged, no lockup redraws, and the "proof, not master" label on raster files.
+8. **Release-ready PDF guide.** One click turns the whole pack into a PDF you can hand to anyone:
+   - Every logo, template and file listed in the PDF has a live, clickable link to its download, including the share page, the vendor link and the Dropbox masters. The table of contents and section links also work inside the PDF.
+   - A look-and-feel section with as many real examples as we hold. For each city and venue already in the system (London QEII Centre, San Francisco InterContinental and any other NEXT city on file), it shows the real signage proofs, venue maps with room colours, gradient grounds, badges, social and slide examples, and booth art. Each is captioned with the city, venue, size and colour build.
+   - Only real, saved artwork is used. Nothing is mocked up or invented. Where a city has no artwork yet, the page says "not yet produced" instead of filling in.
+   - Colour pages list HEX, RGB and CMYK, with each build labelled "approved" or "proof first".
+   - A version number and date go on every page, and the PDF is regenerated whenever the pack version changes.
+9. **Guardrails stay on.** No RGB-to-CMYK conversion that isn't flagged, no lockup redraws, and the "proof, not master" label on raster files.
 
 ## Questions to settle during the build
 - Should photography go to outside designers, or stay internal?
@@ -47,4 +53,6 @@ NEXT-2026-Designer-Pack-v1.1/
 - Pre-render gradient swatch SVG/EPS into `public/next-2026/gradients/` (same rsvg pipeline as the logos).
 - Bump `BRAND_KIT_VERSION`; add a `CHANGELOG` constant shown on the share page.
 - Hand-back: a new `partner_submissions` table (create, GRANT, RLS, policies), a private bucket, and a public upload server route that checks the share token, file type and size. Submissions show on `/approvals` Brand tab; decisions are reviewer-only by trigger.
-- Tests: naming rule, manifest completeness (every logo has SVG/EPS/PNG), a token-expiry check on the upload route.
+- Vendor send: a new `vendor_handoffs` table (job, vendor name/email, file list, token, expiry, revoked, created_by) plus `vendor_handoff_downloads` (create, GRANT, RLS: team roles only, no anon). The public route `/api/public/vendor/$token` checks the token (16+ characters, expiry, not revoked), logs the download, and returns short-lived signed URLs for private files. A "Send to vendor" dialog goes on the template/sign/division pages, and an "Outgoing" list with Revoke goes on the event page.
+- PDF guide: build with pdf-lib in the browser from the pack manifest and saved proofs. Each listed file gets a URI link annotation, internal GoTo links power the contents, and the PDF bookmarks come from the sections. The example gallery pulls from saved kits, `booth_art`, signage revisions and venue map exports per event, as signed URLs fetched at build time. Images are embedded and every link is absolute to the live origin (`NEXT_APP_ORIGIN`). Each page is visually checked by rendering it to an image.
+- Tests: every PDF link resolves to a live origin URL; naming rule; manifest completeness (every logo has SVG/EPS/PNG); a token-expiry check on the upload and vendor routes.
