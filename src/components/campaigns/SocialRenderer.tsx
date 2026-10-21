@@ -497,7 +497,7 @@ export function SocialRenderer({
   displayShortEdge = 320,
 }: SocialRendererProps) {
   // San Juan Bowl kits always carry the Bowl badge, wherever they render.
-  const eventLogo = eventLogoProp ?? sjbEventLogoFor(facts?.name);
+  const eventLogo = eventLogoProp ?? sjbEventLogoFor(copyProp?.title);
   const copy = applySocialCopyEdit(copyProp, edit);
   // Multilingual refit: translated headlines and summaries are sized down into
   // their boxes inside the approved type floors instead of clipping.

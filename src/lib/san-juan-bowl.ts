@@ -279,7 +279,7 @@ export const SJB_NAMING = [
 
 
 /** The Bowl badge as a kit event lockup, when a kit is for the San Juan Bowl.
- *  Kits only store the event name, so the name is what identifies the event. */
+ *  The renderer only sees the copy, so the headline naming the Bowl identifies it. */
 export function sjbEventLogoFor(eventName: string | null | undefined) {
   if (!eventName || !/san\s*juan\s*bowl/i.test(eventName)) return undefined;
   return { url: logoColorSvg.url, urlDark: logoDarkSvg.url, ratio: 1186.7 / 1161.7 };
