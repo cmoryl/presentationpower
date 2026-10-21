@@ -251,14 +251,14 @@ def corners(lines):
     return out
 
 
-def clean_letter(g, levels):
+def clean_letter(g, levels, diagonal=False):
     polys = g.geoms if isinstance(g, MultiPolygon) else [g]
     out = []
     for p in polys:
         rings = []
         for ri, r in enumerate([p.exterior, *p.interiors]):
             simp = shapely.simplify(shapely.LineString(r.coords), 0.55).coords
-            lines = ring_lines(list(simp), inner=ri > 0)
+            lines = ring_lines(list(simp), inner=diagonal and ri > 0)
             for ln in lines:  # shared heights: tops, bottoms, bars, serifs
                 if ln[0] == 0.0:
                     y = ln[1][1]; k = min(levels, key=lambda v: abs(v - y))
@@ -292,7 +292,8 @@ for L in sj + bw:
 LEVELS = horizontal_levels(_raw.values())
 CLEAN = {}
 for k, g in _raw.items():
-    c = clean_letter(g, LEVELS); x0, y0, x1, y1 = c.bounds
+    c = clean_letter(g, LEVELS, diagonal=k in 'ANW');  # counters of A, N, W follow their legs
+     x0, y0, x1, y1 = c.bounds
     CLEAN[k] = affinity.scale(affinity.translate(c, -x0, -y0), 1, CAP / (y1 - y0), origin=(0, 0))
 
 
