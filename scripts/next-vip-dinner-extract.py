@@ -9,7 +9,7 @@ import json, os, sys
 import pikepdf
 P = os.path.join(os.path.dirname(__file__), "globallink-pillars-extract.py")
 ns = {"__file__": P}
-exec(compile(open(P).read().rsplit("\nbuild(sys.argv[1])", 1)[0].replace("T = 40.0", "T = 6.0").replace('if p["image"] or', 'if (p["image"] and a >= 0.25 * area) or'), P, "exec"), ns)
+exec(compile(open(P).read().rsplit("\nbuild(sys.argv[1])", 1)[0].replace("T = 40.0", "T = -1e9").replace('if p["image"] or', 'if (p["image"] and a >= 0.25 * area) or'), P, "exec"), ns)
 analyse, filtered, svg_symbol, mark_forms, split, read_texts = (ns[k] for k in ("analyse", "filtered", "svg_symbol", "mark_forms", "split", "read_texts"))
 OUT = "/tmp/vip/out"; os.makedirs(OUT, exist_ok=True)
 LID = "next-vip-dinner-invite"
