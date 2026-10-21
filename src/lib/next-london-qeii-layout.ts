@@ -40,7 +40,7 @@ import { qeiiRoomShapes } from "@/lib/next-london-qeii-rooms";
 function ringsBox(rings: QeiiRing[]): QeiiRect | undefined {
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (const ring of rings)
-    for (const [x, y] of ring) {
+    for (const [x, y] of ring.pts) {
       x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y);
     }
   return Number.isFinite(x0) ? { x0, y0, x1, y1 } : undefined;
