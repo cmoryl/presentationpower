@@ -304,6 +304,7 @@ function MapsPage() {
       doc.setProperties({ title: `${current.title} map`, subject: "Vector map from Element; walls, rooms and names are editable." });
       saveFile(doc.output("blob"), `rdraft-${eventId}-${current.floor_key}-${face}.pdf`);
     } catch (error) {
+      console.error("Map PDF not downloaded", error);
       toast.error(`PDF not downloaded: ${error instanceof Error ? error.message : "the map could not be drawn."}`);
     } finally {
       setPdfBusy(false);
