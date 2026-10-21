@@ -18,6 +18,9 @@ import { BRAND } from "@/lib/brand-colors";
 // ---------------------------------------------------------------------------
 
 import type { SocialStyleId } from "./social-styles";
+import { SJB_COLORS } from "./san-juan-bowl";
+
+const sjb = (id: string) => SJB_COLORS.find((c) => c.id === id)!.hex;
 
 export type EventMotif =
   | "chevron"
@@ -199,6 +202,24 @@ export const EVENT_LOOKS: EventLook[] = [
     radius: 8,
     uppercase: false,
     styleId: "minimal-rule",
+  },
+  {
+    id: "san-juan-bowl",
+    label: "San Juan Bowl",
+    tag: "Bowl game",
+    blurb:
+      "The TransPerfect San Juan Bowl's own colours: Bowl Navy plate, Caribbean Sky waves, Banner Gold highlights. Use for every San Juan Bowl kit.",
+    deep: sjb("navy"),
+    accent: sjb("sky"),
+    accentAlt: sjb("gold"),
+    ink: sjb("navy"),
+    lightFrom: "#FFFFFF",
+    lightTo: "#E6F7FD",
+    motif: "waves",
+    motifOpacity: 0.18,
+    radius: 10,
+    uppercase: true,
+    styleId: "bold-block",
   },
 ];
 
