@@ -1,7 +1,7 @@
 # Roadmap — build review (Week 1)
 
 - [x] San Juan Bowl: stadium target switched back to Hiram Bithorn, San Juan per user (21 Oct 2026); Loubriel handoff and geometry superseded.
-- [ ] San Juan Bowl stadium connection — BLOCKED: BoothHUB must rebuild/publish Hiram Bithorn and supply its public viewer URL; exact placement requires current venue survey and organiser-approved football conversion. Stadium page gated to "Coming soon" until then.
+- [x] San Juan Bowl stadium 3D view switched back on — BoothHUB published Hiram Bithorn (21 Oct 2026); its model is photo-based, not surveyed.
 
 - [x] San Juan Bowl: default to 14 named major pieces, with TRANSPERFECT lettering separated from ribbon/stars in the viewer and downloads; grouped SVG/ZIP downloads preserve all 293 source shapes; individual-shape view and editor remain optional.
 
@@ -44,7 +44,6 @@
 - [x] Add TransPerfect San Juan Bowl event: directory card, event home, brand kit with supplied logo variants and palette.
 - [x] Link check: 140 signed-in pages crawled, no broken pages; downloads start correctly.
 - [x] Main menu trimmed: "Create", "Review" (one reviewer door), Demos admin-only.
-- [ ] Stadium 3D view — BLOCKED: BoothHUB's /showcase/san-juan-bowl returns BRAND_NOT_FOUND; must be fixed and published in BoothHUB.
 - [x] Plain-language labels on everyday screens (Brand, Approved layouts, Layout).
 - [x] One-sentence event kit: already exists in Events agent; tested, reply rules tightened. Open: San Juan Bowl has no own look in the agent (uses NEXT City).
 - [x] San Juan Bowl kits: Bowl badge replaces the TP wordmark automatically; made-up hashtag removed.
