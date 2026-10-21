@@ -219,6 +219,7 @@ import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.mo
 import { Route as ApiPublicBoothsEventRouteImport } from './routes/api/public/booths.$event'
 import { Route as ApiPublicCanvaCallbackRouteImport } from './routes/api/public/canva.callback'
 import { Route as ApiPublicVenueEventRouteImport } from './routes/api/public/venue.$event'
+import { Route as EventsKitsNexusGuideRouteImport } from './routes/events.kits.nexus.guide'
 import { Route as EventsNextBoothBoothIdRouteImport } from './routes/events.next_.booth.$boothId'
 import { Route as EventsNextDivisionsIndexRouteImport } from './routes/events.next_.divisions.index'
 import { Route as EventsNextDivisionsDivisionIdRouteImport } from './routes/events.next_.divisions.$divisionId'
@@ -1309,6 +1310,11 @@ const ApiPublicVenueEventRoute = ApiPublicVenueEventRouteImport.update({
   path: '/api/public/venue/$event',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsKitsNexusGuideRoute = EventsKitsNexusGuideRouteImport.update({
+  id: '/kits/nexus/guide',
+  path: '/kits/nexus/guide',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsNextBoothBoothIdRoute = EventsNextBoothBoothIdRouteImport.update({
   id: '/next_/booth/$boothId',
   path: '/next/booth/$boothId',
@@ -1636,6 +1642,7 @@ export interface FileRoutesByFullPath {
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
+  '/events/kits/nexus/guide': typeof EventsKitsNexusGuideRoute
   '/events/next/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next/intake/$eventId': typeof EventsNextIntakeEventIdRoute
@@ -1865,6 +1872,7 @@ export interface FileRoutesByTo {
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
+  '/events/kits/nexus/guide': typeof EventsKitsNexusGuideRoute
   '/events/next/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next/intake/$eventId': typeof EventsNextIntakeEventIdRoute
@@ -2099,6 +2107,7 @@ export interface FileRoutesById {
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
+  '/events/kits/nexus/guide': typeof EventsKitsNexusGuideRoute
   '/events/next_/booth/$boothId': typeof EventsNextBoothBoothIdRoute
   '/events/next_/divisions/$divisionId': typeof EventsNextDivisionsDivisionIdRoute
   '/events/next_/intake/$eventId': typeof EventsNextIntakeEventIdRoute
@@ -2334,6 +2343,7 @@ export interface FileRouteTypes {
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
     | '/api/public/venue/$event'
+    | '/events/kits/nexus/guide'
     | '/events/next/booth/$boothId'
     | '/events/next/divisions/$divisionId'
     | '/events/next/intake/$eventId'
@@ -2563,6 +2573,7 @@ export interface FileRouteTypes {
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
     | '/api/public/venue/$event'
+    | '/events/kits/nexus/guide'
     | '/events/next/booth/$boothId'
     | '/events/next/divisions/$divisionId'
     | '/events/next/intake/$eventId'
@@ -2796,6 +2807,7 @@ export interface FileRouteTypes {
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
     | '/api/public/venue/$event'
+    | '/events/kits/nexus/guide'
     | '/events/next_/booth/$boothId'
     | '/events/next_/divisions/$divisionId'
     | '/events/next_/intake/$eventId'
@@ -4410,6 +4422,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicVenueEventRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events/kits/nexus/guide': {
+      id: '/events/kits/nexus/guide'
+      path: '/kits/nexus/guide'
+      fullPath: '/events/kits/nexus/guide'
+      preLoaderRoute: typeof EventsKitsNexusGuideRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/booth/$boothId': {
       id: '/events/next_/booth/$boothId'
       path: '/next/booth/$boothId'
@@ -4681,6 +4700,7 @@ interface EventsRouteChildren {
   EventsSanJuanBowlStadiumRoute: typeof EventsSanJuanBowlStadiumRoute
   EventsVenuesSlugRoute: typeof EventsVenuesSlugRoute
   EventsVenuesIndexRoute: typeof EventsVenuesIndexRoute
+  EventsKitsNexusGuideRoute: typeof EventsKitsNexusGuideRoute
   EventsNextBoothBoothIdRoute: typeof EventsNextBoothBoothIdRoute
   EventsNextDivisionsDivisionIdRoute: typeof EventsNextDivisionsDivisionIdRoute
   EventsNextIntakeEventIdRoute: typeof EventsNextIntakeEventIdRoute
@@ -4738,6 +4758,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsSanJuanBowlStadiumRoute: EventsSanJuanBowlStadiumRoute,
   EventsVenuesSlugRoute: EventsVenuesSlugRoute,
   EventsVenuesIndexRoute: EventsVenuesIndexRoute,
+  EventsKitsNexusGuideRoute: EventsKitsNexusGuideRoute,
   EventsNextBoothBoothIdRoute: EventsNextBoothBoothIdRoute,
   EventsNextDivisionsDivisionIdRoute: EventsNextDivisionsDivisionIdRoute,
   EventsNextIntakeEventIdRoute: EventsNextIntakeEventIdRoute,

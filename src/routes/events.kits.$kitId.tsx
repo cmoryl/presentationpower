@@ -74,6 +74,11 @@ function KitPage() {
               <Download className="h-4 w-4" /> Brand guidelines (PDF)
             </a>
           </Button>
+          {kit.id === "nexus" && (
+            <Button asChild variant="outline">
+              <Link to="/events/kits/nexus/guide">Open brand guide page</Link>
+            </Button>
+          )}
         </div>
       ) : null}
 
