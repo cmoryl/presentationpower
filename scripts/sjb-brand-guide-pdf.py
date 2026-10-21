@@ -143,8 +143,8 @@ for start in (0, 5):
     cw = (W - 2 * M - 4 * 12) / 5
     for i, s in enumerate(part):
         x = M + i * (cw + 12)
-        c.setStrokeColor("#D9DCE5"); c.rect(x, 200, cw, cw, stroke=1, fill=0); img(s + ".png", x, 200, cw, cw, "#FFFFFF")
-        link(f"Sheet {int(s[-2:])} — full size", URL[s], x, 184, 8)
+        c.setStrokeColor("#D9DCE5"); c.rect(x, 200, cw, cw, stroke=1, fill=0); img(s, x, 200, cw, cw, "#FFFFFF")
+        link(f"Sheet {int(s[6:8])} — full size", URL[s], x, 184, 8)
     para("Each sheet is a supplied measurement view of the master artwork. Click a sheet link to open it at full resolution.", M, 150, W - 2 * M)
     c.showPage()
 
