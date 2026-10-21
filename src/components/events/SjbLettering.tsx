@@ -81,7 +81,7 @@ export function SjbLettering() {
           </table>
           <p className="mt-2 text-[#666666]">
             The badge's shadow drifts from letter to letter because of the arch; the lettering uses the middle value for every
-            letter. Corners are the designer's own chamfers. <a href={`${BASE}/sjb-lettering-audit.json`} download className="font-semibold text-[#003FC7]">Full measurements (JSON)</a>
+            letter. Every edge within a few degrees of level, upright or 45° is set exactly to it, broken edges are joined into one line, and level edges that sit at nearly the same height across letters (tops, bars, serifs) share one height. <a href={`${BASE}/sjb-lettering-audit.json`} download className="font-semibold text-[#003FC7]">Full measurements (JSON)</a>
           </p>
         </div>
       </details>
