@@ -266,6 +266,8 @@ export type FloorImport = {
   floor: QeiiFloorVector;
   /** Plain-language notes on anything that could not be carried exactly. */
   notes: string[];
+  /** Shift applied to the source drawing's coordinates (floor = source + shift). */
+  shift?: { dx: number; dy: number };
 };
 
 export type FloorImportMeta = { id: string; marker: string; title: string; page?: number };
@@ -403,6 +405,7 @@ export function importSvgFloor(
       labels: placed,
     },
     notes,
+    shift: { dx, dy },
   };
 }
 
