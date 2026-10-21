@@ -7,7 +7,8 @@ import { GUIDE_GROUNDS } from "@/lib/next-guide-theme";
 import { LONDON_PACK_GROUNDS, LONDON_PACK_GROUND_NOTE } from "@/lib/next-london-pack-grounds";
 import { LONDON_PANELS, LONDON_STYLES } from "@/lib/next-london-signage";
 import { isBrewPanel } from "@/lib/next-london-brew";
-import { DIVISION_LIVE_SIGNS, LEGAL_NEXT_SIGNS } from "@/lib/legal-next-signage";
+import { DIVISION_LIVE_SIGNS, LEGAL_NEXT_SIGNS, legalSignMasterUrl } from "@/lib/legal-next-signage";
+import { londonPanelArtworkSrc } from "@/lib/next-london-supplied-masters";
 import { NEXT_FORMAT_GROUPS, NEXT_SCREENS_ENABLED } from "@/lib/next-event";
 import { NEXT_WORKSPACE_GROUPS, NEXT_WORKSPACE_PAGES } from "@/lib/next-workspace";
 import { NEXT_VENUE_TEMPLATES, venueTemplateAudit } from "@/lib/next-venue-templates";
@@ -75,13 +76,29 @@ export const gradientCss = (g: KitGradient, angle = 135) =>
 
 /* ── Sizes & aspect ratios ─────────────────────────────────────────────── */
 
-export type KitSignSize = { title: string; supplied: string; presets: string[] };
+export type KitSignSize = {
+  id: string;
+  title: string;
+  supplied: string;
+  presets: string[];
+  /** Picture of the supplied design, when one exists. */
+  preview: string | null;
+  /** Supplied master file, served unchanged. */
+  masterUrl: string | null;
+};
 
 export function kitSignSizes(): KitSignSize[] {
   const seen = new Set<string>();
   return [...DIVISION_LIVE_SIGNS, ...LEGAL_NEXT_SIGNS]
     .filter((s) => (seen.has(s.title) ? false : (seen.add(s.title), true)))
-    .map((s) => ({ title: s.title, supplied: s.size, presets: (s.sizes ?? []).map((z) => z.label) }));
+    .map((s) => ({
+      id: s.id,
+      title: s.title,
+      supplied: s.size,
+      presets: (s.sizes ?? []).map((z) => z.label),
+      preview: s.preview ?? null,
+      masterUrl: legalSignMasterUrl(s),
+    }));
 }
 
 export const ASPECT_LABELS: Record<AspectClass, string> = {
