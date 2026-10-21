@@ -42,3 +42,6 @@
 - [x] Add larger map views with zoom and pan to event maps and San Francisco venue plans; verify enlargement and closing.
 - [x] Apply stacked San Francisco room-name defaults and turn the long Level 3 foyer name in previews and SVGs.
 - [x] Add TransPerfect San Juan Bowl event: directory card, event home, brand kit with supplied logo variants and palette.
+- [x] Link check: 140 signed-in pages crawled, no broken pages; downloads start correctly.
+- [x] Main menu trimmed: "Create", "Review" (one reviewer door), Demos admin-only.
+- [ ] Stadium 3D view — BLOCKED: BoothHUB's /showcase/san-juan-bowl returns BRAND_NOT_FOUND; must be fixed and published in BoothHUB.

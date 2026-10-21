@@ -21,6 +21,11 @@ describe("role-split menu", () => {
     expect(showTopLink("/approvals", a)).toBe(false);
     expect(showElementItem("/admin/canvas", a)).toBe(true);
   });
+  it("only admins see Demos in the main menu", () => {
+    expect(showTopLink("/demos", audienceFor(["editor"], false))).toBe(false);
+    expect(showTopLink("/demos", audienceFor(["sales"], false))).toBe(false);
+    expect(showTopLink("/demos", audienceFor(["admin"], false))).toBe(true);
+  });
   it("nothing role-specific shows while loading", () => {
     const a = audienceFor(["admin"], true);
     expect(showTopLink("/admin", a)).toBe(false);
