@@ -17,7 +17,10 @@ _src = open(P).read().rsplit("\nbuild(sys.argv[1])", 1)[0].replace(
 def near(a, b, size):
     import math
     ma, mb = a["matrix"], b["matrix"]
-    return math.hypot(mb[4] - ma[4], mb[5] - ma[5]) < 1.6 * max(size, 1)
+    dx, dy = mb[4] - ma[4], mb[5] - ma[5]; ang = math.atan2(ma[1], ma[0])
+    along = math.cos(ang) * dx + math.sin(ang) * dy; perp = -math.sin(ang) * dx + math.cos(ang) * dy
+    sz = max(size, 1)
+    return abs(perp) < 0.5 * sz and -0.2 * sz < along < 1.6 * sz
 ns["near"] = near
 exec(compile(_src, P, "exec"), ns)
 analyse, filtered, svg_symbol, mark_forms, split, read_texts = (ns[k] for k in ("analyse", "filtered", "svg_symbol", "mark_forms", "split", "read_texts"))
