@@ -46,29 +46,42 @@ function b64(u: Uint8Array) {
 type Img = { data: string; w: number; h: number; fmt: "JPEG" | "PNG" };
 /** Load and downscale an image for embedding (keeps the PDF a sendable size). */
 async function loadImg(url: string, max = 900, png = false): Promise<Img | null> {
-  try {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = url.startsWith("https://brandhubcreator.lovable.app/")
-      ? `/api/public/brandhub-image?path=${encodeURIComponent(new URL(url).pathname)}`
-      : url;
-    await img.decode();
-    const k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
-    const c = document.createElement("canvas");
-    c.width = Math.max(1, Math.round(img.naturalWidth * k));
-    c.height = Math.max(1, Math.round(img.naturalHeight * k));
-    const g = c.getContext("2d")!;
-    if (!png) {
-      g.fillStyle = "#ffffff";
-      g.fillRect(0, 0, c.width, c.height);
+  const src = url.startsWith("https://brandhubcreator.lovable.app/")
+    ? `/api/public/brandhub-image?path=${encodeURIComponent(new URL(url).pathname)}`
+    : url;
+  // Tall sign examples (e.g. 1512×7559 pillars) can fail the browser's quick
+  // decode, so the file is fetched and decoded straight to the target size,
+  // with a retry, before a preview is ever marked unavailable.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const r = await fetch(src);
+      if (!r.ok) throw new Error(String(r.status));
+      const blob = await r.blob();
+      const probe = await createImageBitmap(blob);
+      const k = Math.min(1, max / Math.max(probe.width, probe.height));
+      const w = Math.max(1, Math.round(probe.width * k));
+      const h = Math.max(1, Math.round(probe.height * k));
+      probe.close();
+      const bmp = await createImageBitmap(blob, { resizeWidth: w, resizeHeight: h, resizeQuality: "high" });
+      const c = document.createElement("canvas");
+      c.width = w;
+      c.height = h;
+      const g = c.getContext("2d")!;
+      if (!png) {
+        g.fillStyle = "#ffffff";
+        g.fillRect(0, 0, w, h);
+      }
+      g.drawImage(bmp, 0, 0, w, h);
+      bmp.close();
+      return png
+        ? { data: c.toDataURL("image/png"), w, h, fmt: "PNG" }
+        : { data: c.toDataURL("image/jpeg", 0.72), w, h, fmt: "JPEG" };
+    } catch (error) {
+      if (attempt === 2) console.warn("Designer guide preview not loaded", url, error);
+      await new Promise((res) => setTimeout(res, 400 * (attempt + 1)));
     }
-    g.drawImage(img, 0, 0, c.width, c.height);
-    return png
-      ? { data: c.toDataURL("image/png"), w: c.width, h: c.height, fmt: "PNG" }
-      : { data: c.toDataURL("image/jpeg", 0.72), w: c.width, h: c.height, fmt: "JPEG" };
-  } catch {
-    return null;
   }
+  return null;
 }
 
 export type DesignerGuideOptions = {
