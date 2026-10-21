@@ -218,6 +218,7 @@ export const DIVISION_LIVE_SIGNS: LegalSign[] = [
  * files split into ground, movable pieces and live text by
  * scripts/supplied-kit-signs-extract.py. Wording stays exactly as supplied.
  */
+const FIRST_NOTE = "First version made in Element from the supplied logo and colours — get brand approval before it is used or printed.";
 const kitSign = (kit: string, id: string, title: string, size: string, master: string, label: string, note?: string): LegalSign => ({
   id, title, size, master, faces: [{ id: `divsign-${id}`, label }], kit, note,
 });
@@ -253,21 +254,21 @@ export const SUPPLIED_KIT_SIGNS: LegalSign[] = [
   kitSign("nexus", "nexus-stair-riser-9", "Stair riser · page 9", "66.3 × 4.5 in", "stair-riser.pdf", "Artwork"),
   kitSign("nexus", "nexus-floor-graphic-a", "Floor graphic A", "23.6 × 23.6 in", "floor-graphic-a.pdf", "Artwork"),
   kitSign("nexus", "nexus-floor-graphic-b", "Floor graphic B", "47.2 × 47.2 in", "floor-graphic-b.pdf", "Artwork"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-1", "Regular NeXus pillar signs · page 1", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-2", "Regular NeXus pillar signs · page 2", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-3", "Regular NeXus pillar signs · page 3", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-4", "Regular NeXus pillar signs · page 4", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-5", "Regular NeXus pillar signs · page 5", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-6", "Regular NeXus pillar signs · page 6", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-7", "Regular NeXus pillar signs · page 7", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-8", "Regular NeXus pillar signs · page 8", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-9", "Regular NeXus pillar signs · page 9", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-10", "Regular NeXus pillar signs · page 10", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-11", "Regular NeXus pillar signs · page 11", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-12", "Regular NeXus pillar signs · page 12", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-13", "Regular NeXus pillar signs · page 13", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-14", "Regular NeXus pillar signs · page 14", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
-  kitSign("nexus", "nexus-regular-nexus-pillar-signs-15", "Regular NeXus pillar signs · page 15", "15.7 × 18.4 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-1", "NeXus pillar — Covent Garden", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar", "Room name is live text in Poppins SemiBold — retype it for any room."),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-2", "NeXus pillar — Baker Street", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar", "Room name is live text in Poppins SemiBold — retype it for any room."),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-3", "NeXus pillar — Bank", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar", "Room name is live text in Poppins SemiBold — retype it for any room."),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-4", "NeXus pillar — Euston", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar", "Room name is live text in Poppins SemiBold — retype it for any room."),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-5", "NeXus pillar — Moorgate", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar", "Room name is live text in Poppins SemiBold — retype it for any room."),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-6", "NeXus pillar — Welcome", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar", "Room name is live text in Poppins SemiBold — retype it for any room."),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-7", "NeXus pillar — Richmond 1", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar", "Room name is live text in Poppins SemiBold — retype it for any room."),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-8", "NeXus pillar — Richmond 2", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar", "Room name is live text in Poppins SemiBold — retype it for any room."),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-9", "NeXus pillar — Richmond 4", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar", "Room name is live text in Poppins SemiBold — retype it for any room."),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-10", "NeXus pillar — Registration", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar", "Room name is live text in Poppins SemiBold — retype it for any room."),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-11", "NeXus pillar — Tyburn Kitchen", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar", "Room name is live text in Poppins SemiBold — retype it for any room."),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-12", "NeXus pillar — Mezzanine", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar", "Room name is live text in Poppins SemiBold — retype it for any room."),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-13", "NeXus pillar — blank (no room name)", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-14", "NeXus pillar — blank (no room name)", "15.7 × 78.7 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
+  kitSign("nexus", "nexus-regular-nexus-pillar-signs-15", "NeXus pillar — arrow", "15.7 × 18.4 in", "regular-nexus-pillar-signs.pdf", "Pillar"),
   kitSign("nexus", "nexus-stage-nexus-pillar-signs", "Stage NeXus pillar signs", "48.0 × 78.7 in", "stage-nexus-pillar-signs.pdf", "Pillar"),
   kitSign("nexus", "nexus-stage-nexus-pillar-sign-light", "Stage NeXus pillar sign (light)", "48.0 × 78.7 in", "stage-nexus-pillar-sign-light.pdf", "Pillar"),
   kitSign("nexus", "nexus-staff-lanyard", "Staff lanyard", "15.3 × 0.8 in", "staff-lanyard.pdf", "Lanyard"),
@@ -279,6 +280,16 @@ export const SUPPLIED_KIT_SIGNS: LegalSign[] = [
   kitSign("nexus", "nexus-candlestick-maker-lanyard", "Candlestick Maker lanyard", "16.6 × 0.8 in", "candlestick-maker-lanyard.pdf", "Lanyard"),
   kitSign("hackathon", "hackathon-stage-hackathon-pillar-signs", "Stage Hackathon pillar signs", "48.0 × 78.7 in", "stage-hackathon-pillar-signs.pdf", "Pillar"),
   kitSign("legalweek", "legalweek-banner-1400x280", "Legalweek email banner 1400 × 280", "1400 × 280 px", "LW26_01_Email.ai", "Banner"),
+  // First versions for kits that supplied no posts/headers (scripts/event-first-versions-build.py):
+  // drawn from each event's own logo and colours, wording limited to issued facts. Brand approval before use.
+  ...([
+    ["nexus", "nexus", "NeXus"], ["hackathon", "hackathon", "Hackathon"], ["san-juan-bowl", "sjb", "San Juan Bowl"],
+  ] as const).flatMap(([kit, k, name]) => [
+    kitSign(kit, `${k}-first-post`, `${name} social post — first version`, "1080 × 1080 px", "First version", "Post", FIRST_NOTE),
+    kitSign(kit, `${k}-first-story`, `${name} story — first version`, "1080 × 1920 px", "First version", "Story", FIRST_NOTE),
+    kitSign(kit, `${k}-first-email`, `${name} email header — first version`, "600 × 200 px", "First version", "Header", FIRST_NOTE),
+  ]),
+  kitSign("san-juan-bowl", "sjb-first-pillar", "San Juan Bowl pillar — first version", "24 × 96 in (confirm with venue)", "First version", "Pillar", FIRST_NOTE),
 ];
 /** Editable signs of one supplied kit. */
 export const kitSigns = (kit: string) => SUPPLIED_KIT_SIGNS.filter((s) => s.kit === kit);
