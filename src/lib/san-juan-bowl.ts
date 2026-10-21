@@ -34,7 +34,7 @@ export const SJB_COLORS = [
     hex: "#0D0E21",
     rgb: "13 · 14 · 33",
     hsl: "237° · 43% · 9%",
-    cmyk: "61 · 58 · 0 · 87",
+    cmyk: "87 · 81 · 55 · 75",
     textOn: "White",
     role: "Badge, outlines and dark backgrounds",
   },
@@ -44,7 +44,7 @@ export const SJB_COLORS = [
     hex: "#00AAE7",
     rgb: "0 · 170 · 231",
     hsl: "196° · 100% · 45%",
-    cmyk: "100 · 26 · 0 · 9",
+    cmyk: "86 · 8 · 0 · 0",
     textOn: "Bowl Navy",
     role: "Sky, waves and accent fills",
   },
@@ -54,7 +54,7 @@ export const SJB_COLORS = [
     hex: "#FFD600",
     rgb: "255 · 214 · 0",
     hsl: "50° · 100% · 50%",
-    cmyk: "0 · 16 · 100 · 0",
+    cmyk: "0 · 14 · 100 · 0",
     textOn: "Bowl Navy",
     role: "Banner, sun and highlights",
   },
@@ -72,7 +72,7 @@ export const SJB_COLORS = [
 
 export const SJB_COLOR_NOTES = [
   "HEX, RGB and HSL values are exact, taken from the supplied artwork — use them as-is on screen and web.",
-  "CMYK values are working builds for coated stock from a standard conversion. They are not proofed: always run a vendor proof before print and adjust on press if needed.",
+  "CMYK values are the inks set in the master EPS/AI files, so they match what the vector files print. They are not proofed: always run a vendor proof before print and adjust on press if needed.",
   "Pantone (spot) references are matched by the print vendor from the supplied artwork — never substitute a guessed swatch.",
   "Body text on San Juan Bowl print is solid black (100K), same as every TransPerfect print piece.",
 ];
@@ -112,7 +112,7 @@ export const SJB_LOGO_ANATOMY = [
  * (badge + ring), used to draw the diagram; measured from the supplied SVG.
  */
 export const SJB_CLEAR_SPACE = {
-  rule: "Keep clear space around the badge of at least the height of the yellow banner on every side.",
+  rule: "Keep clear space around the badge of at least x on every side, where x is the full height of the ribbon element, navy outline included (171.7 units, 14.47% of the logo width).",
   unitPct: 12,
   /** Banner height as a share of badge height, measured from the artwork. */
   bannerPctOfBadge: 14.8,
@@ -121,15 +121,15 @@ export const SJB_CLEAR_SPACE = {
 /**
  * Construction geometry, measured from the supplied SVG (viewBox 0 0 1254
  * 1254, Adobe Illustrator 29.8.11 export). All distances are expressed in x,
- * where x = the height of the yellow banner (171.7 artwork units).
+ * where x = the full height of the ribbon element, outline included (171.7 artwork units; the yellow band alone is 127.0).
  *
  *   badge  1186.7 × 1161.7  →  6.9x × 6.8x
  *   banner 1128.6 ×  171.7  →  6.6x × 1x
  *   artboard padding 33.7 / 46.1 units → 2.7% / 3.7% of the square file
- *   badge centre x = 627.05 = exactly half of the 1254-wide artboard
+ *   badge centre x = 627.00 = exactly half of the 1254-wide artboard
  */
 export const SJB_CONSTRUCTION = {
-  unit: "x = the height of the yellow banner",
+  unit: "x = the full height of the ribbon element (outline included)",
   grid: 12,
   badge: { w: 6.9, h: 6.8 },
   banner: { w: 6.6, h: 1 },
@@ -141,7 +141,7 @@ export const SJB_CONSTRUCTION = {
   centerNote:
     "The badge is exactly centred on the vertical axis of its square artboard — always align it on centre, never optically.",
   scaleNote:
-    "Every distance scales linearly with the badge. At the 25 mm print minimum, x = 3.7 mm and clear space is 3.7 mm per side.",
+    "Every distance scales linearly with the badge. At the 40 mm print minimum, x = 5.8 mm and clear space is 5.8 mm per side.",
 } as const;
 
 /**
@@ -150,7 +150,7 @@ export const SJB_CONSTRUCTION = {
  */
 export const SJB_LARGE_FORMAT = {
   intro:
-    "The badge is built to run from a 25 mm printed card to a 20 m midfield painting. Every rule below is the same construction math from the grid, scaled up — there is no separate 'large' version of the artwork.",
+    "The badge is built to run from a 40 mm printed card to a 20 m midfield painting. Every rule below is the same construction math from the grid, scaled up — there is no separate 'large' version of the artwork.",
   /** Scale table: badge width → x (clear space per side) → typical use. */
   scale: [
     { width: "1 m (3.3 ft)", x: "14.5 cm", use: "Concourse signage, press backdrops" },
@@ -172,9 +172,9 @@ export const SJB_LARGE_FORMAT = {
 
 /** Smallest sizes the badge may reproduce at before detail is lost. */
 export const SJB_MIN_SIZES = [
-  { context: "Print", minimum: "25 mm wide", note: "Below this the lettering inside the badge clogs." },
-  { context: "Screen", minimum: "96 px wide", note: "Below this use the badge alone, no supporting lockup." },
-  { context: "Embroidery / patch", minimum: "60 mm wide", note: "Stitching needs the extra room for the waves and sun." },
+  { context: "Print", minimum: "40 mm wide", note: "Keeps the 7.8-unit keyline at 0.26 mm; at 25 mm it drops to 0.16 mm and the lace and letter details to 0.07 mm, below what presses hold." },
+  { context: "Screen", minimum: "160 px wide", note: "Every line stays at or above 1 px. Below 160 px use the single-colour version; there is no badge-only lockup." },
+  { context: "Embroidery / patch", minimum: "90 mm wide", note: "Stitching needs about 1 mm per detail; at 60 mm the keyline is 0.39 mm. Ask for the simplified stitch version for anything smaller." },
 ] as const;
 
 /** Approved backgrounds and which variant sits on each. */
@@ -209,7 +209,7 @@ export const SJB_MISUSE: ReadonlyArray<{ id: SjbMisuseDemo; title: string; detai
   { id: "rotate", title: "Don't rotate", detail: "The badge sits upright on its point, never tilted." },
   { id: "busy", title: "Don't use busy backgrounds", detail: "No photography or patterns that fight the artwork." },
   { id: "lowContrast", title: "Don't lose contrast", detail: "Full colour never sits on Caribbean Sky or similar mid-tones." },
-  { id: "shadow", title: "Don't add effects", detail: "No drop shadows, glows, bevels or outlines." },
+  { id: "shadow", title: "Don't add effects", detail: "No drop shadows, glows, bevels or outlines on the resting logo. Motion graphics may use light and shadow for depth while the badge moves." },
   { id: "retype", title: "Don't retype the lettering", detail: "The words inside the badge are artwork, not live text." },
 ];
 
@@ -282,7 +282,7 @@ export const SJB_NAMING = [
  *  The renderer only sees the copy, so the headline naming the Bowl identifies it. */
 export function sjbEventLogoFor(eventName: string | null | undefined) {
   if (!eventName || !/san\s*juan\s*bowl/i.test(eventName)) return undefined;
-  return { url: logoColorSvg.url, urlDark: logoDarkSvg.url, ratio: 1186.7 / 1161.7 };
+  return { url: logoColorSvg.url, urlDark: logoDarkSvg.url, ratio: 1186.6021 / 1161.699 };
 }
 
 /** Bowl colours for kit assets (event-only palette, like NEXT's). */
