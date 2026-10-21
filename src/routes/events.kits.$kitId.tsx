@@ -109,14 +109,15 @@ function KitPage() {
                 <div className="text-sm">
                   <p className="font-semibold text-foreground">{c.name}</p>
                   <p className="text-muted-foreground">
-                    {c.hex} · RGB {c.rgb} · CMYK {c.cmyk} · Pantone {c.pantone}
+                    {[c.hex, c.rgb && `RGB ${c.rgb}`, c.cmyk && `CMYK ${c.cmyk}`, c.pantone && `Pantone ${c.pantone}`].filter(Boolean).join(" · ")}
                   </p>
+                  {c.source && <p className="text-xs text-muted-foreground">{c.source}</p>}
                 </div>
               </li>
             ))}
           </ul>
           {kit.gradientNote && <p className="mt-3 text-sm text-muted-foreground">{kit.gradientNote}</p>}
-          {kit.colours.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Values as printed in the supplied brand guide.</p>}
+          {kit.colours.length > 0 && <p className="mt-2 text-xs text-muted-foreground">{kit.colourNote ?? "Values as printed in the supplied brand guide."}</p>}
         </div>
         <div>
           <h2 className="text-xl font-bold text-foreground">Typography</h2>
