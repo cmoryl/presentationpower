@@ -2,7 +2,7 @@
 // The same page bodies render inside the app (AppShell) and on the public
 // share link (/share/san-juan-bowl/*), where the only navigation is between
 // the guide pages themselves — no menu, no links into the rest of Element.
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, forwardRef, useContext, type AnchorHTMLAttributes, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import logoColor from "@/assets/san-juan-bowl/sjb-logo-color.svg.asset.json";
@@ -27,14 +27,19 @@ const SHARE_PATHS = {
 
 /** Link between Bowl guide pages; in the share view it stays inside the share link
  *  and links to the app's event home are dropped. */
-export function SjbLink({ page, className, children }: { page: SjbPage; className?: string; children: ReactNode }) {
-  const share = useSjbShare();
-  if (page === "event") {
-    if (share) return null;
-    return <Link to="/events/$eventId" params={{ eventId: "san-juan-bowl" }} className={className}>{children}</Link>;
-  }
-  return <Link to={(share ? SHARE_PATHS : APP_PATHS)[page]} className={className}>{children}</Link>;
-}
+export const SjbLink = forwardRef<HTMLAnchorElement, { page: SjbPage } & AnchorHTMLAttributes<HTMLAnchorElement>>(
+  function SjbLink({ page, children, ...rest }, ref) {
+    const share = useSjbShare();
+    if (page === "event") {
+      if (share) return null;
+      return <Link ref={ref} {...rest} to="/events/$eventId" params={{ eventId: "san-juan-bowl" }}>{children}</Link>;
+    }
+    return <Link ref={ref} {...rest} to={(share ? SHARE_PATHS : APP_PATHS)[page]}>{children}</Link>;
+  },
+);
+
+/** Public address of the share link (works signed out). */
+export const SJB_SHARE_PATH = SHARE_PATHS.kit;
 
 const TABS: { page: Exclude<SjbPage, "event">; label: string }[] = [
   { page: "kit", label: "Brand kit" },
