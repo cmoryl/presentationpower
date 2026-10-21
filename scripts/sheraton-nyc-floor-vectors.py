@@ -42,18 +42,29 @@ def main(pdf, out):
         a = f'<path d="{d}" fill="{fill}"'
         if stroke != "none":
             sw = round((s.stroke_width or 1) / k, 3)
-            rec["stroke"] = stroke; rec["sw"] = sw
+            rec["stroke"] = stroke; rec["w"] = sw
             a += f' stroke="{stroke}" stroke-width="{sw}" stroke-linejoin="round"'
         shapes.append(rec); parts.append(a + "/>")
-    # labels from the PDF's own text
-    bbox = subprocess.run(["pdftotext", "-f", "2", "-l", "2", "-bbox-layout", pdf, "-"], capture_output=True, text=True).stdout
-    labels = []
-    for line in re.findall(r'<line xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</line>', bbox, re.S):
-        lx0, ly0, lx1, ly1 = map(float, line[:4])
-        if lx0 < px or ly0 < py or lx1 > px + pw or ly1 > py + ph: continue
-        words = re.findall(r">([^<]+)</word>", line[4])
-        text = html.unescape(" ".join(words)).replace("’", "'")
-        labels.append({"x": round(lx0 - px, 2), "y": round(ly1 - py - 1.2, 2), "size": round((ly1 - ly0) * 0.95, 2), "text": text})
+    # Room names at the positions the hotel printed them (centres, points).
+    # The sheet's "East"/"West" sub-labels are joined to their ballroom name so
+    # each room carries its full name; turned copy keeps its turn.
+    labels = [
+        {"text": "Empire East", "x": 117.1, "y": 33.4, "size": 5.5},
+        {"text": "Empire West", "x": 191.6, "y": 33.0, "size": 5.5},
+        {"text": "Lenox Ballroom", "x": 262.6, "y": 52.4, "size": 5.5},
+        {"text": "Metropolitan East", "x": 71.5, "y": 146.6, "size": 5.5},
+        {"text": "Metropolitan West", "x": 158.3, "y": 144.3, "size": 5.5},
+        {"text": "Central Park East", "x": 209.5, "y": 140.7, "size": 5.5},
+        {"text": "Central Park West", "x": 256.7, "y": 136.0, "size": 5.5},
+        {"text": "Metropolitan Foyer", "x": 107.0, "y": 92.0, "size": 4.6},
+        {"text": "Escalators", "x": 73.0, "y": 80.8, "size": 3.9},
+        {"text": "Elevators", "x": 127.3, "y": 67.5, "size": 3.9},
+        {"text": "Elevators", "x": 210.0, "y": 96.0, "size": 3.9, "angle": 90},
+        {"text": "Men's", "x": 158.6, "y": 57.4, "size": 3.9},
+        {"text": "Women's", "x": 192.6, "y": 50.5, "size": 3.9},
+        {"text": "Women's", "x": 226.1, "y": 62.8, "size": 3.9},
+        {"text": "Stage", "x": 18.0, "y": 142.2, "size": 4.6, "angle": -90},
+    ]
     svg = (f'<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="{pw}pt" height="{ph}pt" viewBox="0 0 {pw} {ph}">\n'
            "<!-- Sheraton New York Times Square, second floor. Vector paths copied from the hotel's meeting-space PDF (InDesign, 2015). Confirm with the hotel before printing. -->\n"
            + "\n".join(parts) + "\n</svg>\n")
