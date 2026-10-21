@@ -421,7 +421,7 @@ function nexusEntry(): EventEntry {
     readiness: [
       { label: "NeXus logo and brand kit", state: "ready", link: { to: "/events/kits/$kitId", params: { kitId: "nexus" } } },
       { label: "Hackathon logo and brand kit", state: "ready", link: { to: "/events/kits/$kitId", params: { kitId: "hackathon" } } },
-      { label: "Signage, badges and lanyards", state: "ready", detail: "Supplied finished files." },
+      { label: "Signage, badges and lanyards", state: "ready", detail: "Supplied finished files.", link: { to: "/events/kits/$kitId", params: { kitId: "nexus" } } },
       { label: "Dates", state: "waiting", blockedOn: "the organisers" },
     ],
   };

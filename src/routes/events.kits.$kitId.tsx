@@ -82,10 +82,10 @@ function KitPage() {
         <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{kit.logoNote}</p>
         <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {kit.logos.map((l) => {
-            const dark = /white|darkblue|dark_blue_bg|bg/i.test(l.name) && !/1ink_darkblue$/i.test(l.name);
+            const ground = /LightBlueBG/i.test(l.name) ? "bg-[#139DD8]" : /DarkBlueBG|White/i.test(l.name) ? "bg-[#003B71]" : "bg-muted";
             return (
               <li key={l.url} className="overflow-hidden rounded-md border border-border bg-card">
-                <div className={`flex h-28 items-center justify-center p-4 ${dark && l.format === "SVG" ? "bg-[#003B71]" : "bg-muted"}`}>
+                <div className={`flex h-28 items-center justify-center p-4 ${ground}`}>
                   <img src={l.url} alt={l.name} loading="lazy" className="max-h-full max-w-full object-contain" />
                 </div>
                 <div className="flex items-center justify-between gap-2 p-2">
