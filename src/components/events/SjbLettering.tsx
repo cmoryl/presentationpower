@@ -1,4 +1,5 @@
 import { Download } from "lucide-react";
+import { SjbLink } from "@/components/events/SjbShare";
 
 /** Straight-on "SAN JUAN BOWL" lettering rebuilt letter by letter from the badge by
  *  scripts/sjb-straight-lettering.py (one cap height, one gap, one shadow). Upright only. */
@@ -110,9 +111,14 @@ export function SjbLettering() {
             <p className="text-[14px] font-bold">Lettering specification</p>
             <p className="text-[12px] text-[#666666]">The construction rules behind the master: horizon lines, units, strokes and angles, serifs, corners and shadow. 10 pages.</p>
           </div>
-          <a href={`${BASE}/sjb-lettering-spec.pdf`} download="SJB-Lettering-Spec.pdf" className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/15 px-3 py-1 text-[12px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]">
-            <Download className="h-3.5 w-3.5" /> Spec PDF
-          </a>
+          <div className="flex flex-wrap gap-2">
+            <SjbLink page="lettering" className="inline-flex items-center gap-1 rounded-full bg-[#03002C] px-3 py-1 text-[12px] font-semibold text-white hover:bg-[#003FC7]">
+              Open the spec page →
+            </SjbLink>
+            <a href={`${BASE}/sjb-lettering-spec.pdf`} download="SJB-Lettering-Spec.pdf" className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/15 px-3 py-1 text-[12px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]">
+              <Download className="h-3.5 w-3.5" /> Spec PDF
+            </a>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
           {Array.from({ length: 10 }, (_, i) => String(i + 1).padStart(2, "0")).map((n) => (

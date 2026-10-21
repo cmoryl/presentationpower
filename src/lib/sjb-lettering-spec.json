@@ -1,0 +1,1563 @@
+{
+ "title": "SAN JUAN BOWL lettering specification",
+ "source": "SJB-Lettering-Exact.svg (public/downloads/sjb-lettering/sjb-lettering-exact.svg)",
+ "unit": "u = cap height / 120",
+ "files": {
+  "wordmark": "sjb-lettering-spec-wordmark-horizons.svg",
+  "lean": "sjb-lettering-spec-lean-7-24.svg",
+  "shadow": "sjb-lettering-spec-shadow-sweep.svg",
+  "clearA": "sjb-lettering-spec-clearance-a-foot.svg",
+  "clearU": "sjb-lettering-spec-clearance-u-opening.svg"
+ },
+ "horizonLines": [
+  {
+   "y": "0",
+   "name": "Cap line",
+   "usedBy": "Every letter top"
+  },
+  {
+   "y": "25.5",
+   "name": "Upper serif line",
+   "usedBy": "All top serifs and slabs; S top bar; B and O counter tops; U and J inner serifs"
+  },
+  {
+   "y": "37.5",
+   "name": "S upper terminal",
+   "usedBy": "S"
+  },
+  {
+   "y": "49.5",
+   "name": "Middle bar top",
+   "usedBy": "S, B (upper counter base)"
+  },
+  {
+   "y": "70.5",
+   "name": "Middle bar base",
+   "usedBy": "S, B (lower counter top); A counter base; J hook top"
+  },
+  {
+   "y": "82.5",
+   "name": "Crossbar line",
+   "usedBy": "A crossbar underside; L spur top; S lower terminal"
+  },
+  {
+   "y": "94.5",
+   "name": "Lower serif line",
+   "usedBy": "All foot serifs and slabs; B and O counter bases; U and J counter bases; L slab top"
+  },
+  {
+   "y": "120",
+   "name": "Baseline",
+   "usedBy": "Every letter bottom"
+  }
+ ],
+ "proportions": [
+  {
+   "parameter": "Unit",
+   "value": "1 u = cap ÷ 120",
+   "pctOfCap": "0.8333 %",
+   "exact": "—",
+   "rule": "Every value on this sheet is in u."
+  },
+  {
+   "parameter": "Cap height",
+   "value": "120",
+   "pctOfCap": "100 %",
+   "exact": "120",
+   "rule": "Cap line y 0, baseline y 120 (y runs down, as in SVG)."
+  },
+  {
+   "parameter": "Stem / stroke weight",
+   "value": "33",
+   "pctOfCap": "27.5 %",
+   "exact": "33",
+   "rule": "Every vertical stem and every 7:24 stroke, measured perpendicular to the stroke."
+  },
+  {
+   "parameter": "Slab / bar depth",
+   "value": "25.5",
+   "pctOfCap": "21.25 %",
+   "exact": "51/2",
+   "rule": "Top and bottom bars, serif slabs, B bowls, O and U bottoms."
+  },
+  {
+   "parameter": "Middle bar (S, B)",
+   "value": "21",
+   "pctOfCap": "17.5 %",
+   "exact": "21",
+   "rule": "49.5 → 70.5"
+  },
+  {
+   "parameter": "A crossbar",
+   "value": "12",
+   "pctOfCap": "10 %",
+   "exact": "12",
+   "rule": "70.5 → 82.5"
+  },
+  {
+   "parameter": "Serif overhang",
+   "value": "10.7265625",
+   "pctOfCap": "8.9388 %",
+   "exact": "1373/128",
+   "rule": "= 31/24 × shadow + 2 (see 4)."
+  },
+  {
+   "parameter": "Corner cut",
+   "value": "17 × 17",
+   "pctOfCap": "14.1667 %",
+   "exact": "17",
+   "rule": "Every chamfer, exactly 45°. B waist notch is the one exception."
+  },
+  {
+   "parameter": "Lean (A, W)",
+   "value": "7 across : 24 down",
+   "pctOfCap": "—",
+   "exact": "7:24:25",
+   "rule": "atan(7/24) = 16.260205°. Horizontal width of a 33 stroke = 34.375 exactly."
+  },
+  {
+   "parameter": "N diagonal",
+   "value": "30 across : 60 down",
+   "pctOfCap": "—",
+   "exact": "1:2",
+   "rule": "Parallel band, perpendicular weight √720 = 26.832816."
+  },
+  {
+   "parameter": "Shadow vector",
+   "value": "(6.5625, 6.5625)",
+   "pctOfCap": "5.4688 % each axis",
+   "exact": "105/16",
+   "rule": "Exactly 45°. Length 6.5625 × √2 = 9.280776."
+  },
+  {
+   "parameter": "Letter gap",
+   "value": "12",
+   "pctOfCap": "10 %",
+   "exact": "12",
+   "rule": "Face to face, bounding box. Also the U opening."
+  },
+  {
+   "parameter": "Word space",
+   "value": "29",
+   "pctOfCap": "24.1667 %",
+   "exact": "29",
+   "rule": "Face to face."
+  },
+  {
+   "parameter": "Overall, faces",
+   "value": "1440.4765625",
+   "pctOfCap": "1200.3971 %",
+   "exact": "184381/128",
+   "rule": "S left edge to L right edge."
+  },
+  {
+   "parameter": "Overall, with shadow",
+   "value": "1447.0390625 × 126.5625",
+   "pctOfCap": "—",
+   "exact": "—",
+   "rule": "Ratio 11.4334 : 1."
+  }
+ ],
+ "edgeDirections": [
+  {
+   "direction": "Horizontal",
+   "slope": "0",
+   "where": "bars, slabs, serifs",
+   "count": 86
+  },
+  {
+   "direction": "Vertical",
+   "slope": "∞",
+   "where": "stems, serif ends",
+   "count": 72
+  },
+  {
+   "direction": "45°",
+   "slope": "±1",
+   "where": "every corner cut, B waist",
+   "count": 18
+  },
+  {
+   "direction": "7:24",
+   "slope": "24/7 (73.7398° from horizontal)",
+   "where": "A legs, W strokes",
+   "count": 20
+  },
+  {
+   "direction": "1:2",
+   "slope": "2 (63.4349° from horizontal)",
+   "where": "N diagonal",
+   "count": 4
+  }
+ ],
+ "formulas": [
+  "stroke (perpendicular) = 33",
+  "7:24 stroke, horizontal = 33 × 25/24 = 34.375",
+  "N diagonal, perpendicular = 60/√5 = √720 = 26.832816",
+  "angle(7:24) = atan(7/24) = 16.260205° from vertical",
+  "shadow v = (6.5625, 6.5625), |v| = 9.280776, exactly 45°",
+  "serif s = 31/24 × 6.5625 + 2 = 10.7265625 (31/24 × v = 8.4765625 is where a 7:24 leg shadow reaches the foot; + 2 is the clearance kept at every serif)",
+  "corner cut = 17 × 17 at 45°",
+  "visible shadow strip = |v × d| / |d| for an edge of direction d"
+ ],
+ "shadowStrips": [
+  {
+   "edge": "Horizontal (faces up/down)",
+   "direction": "(1, 0)",
+   "formula": "|v_y| = 6.5625",
+   "width": "6.5625"
+  },
+  {
+   "edge": "Vertical (faces right)",
+   "direction": "(0, 1)",
+   "formula": "|v_x| = 6.5625",
+   "width": "6.5625"
+  },
+  {
+   "edge": "45° cut at a lower-right corner",
+   "direction": "(1, −1)",
+   "formula": "(6.5625 + 6.5625)/√2",
+   "width": "9.2808"
+  },
+  {
+   "edge": "45° cut at a lower-left or upper-right corner",
+   "direction": "(1, 1)",
+   "formula": "v ∥ edge, so 0",
+   "width": "0 (no shadow)"
+  },
+  {
+   "edge": "7:24 edge slanting down-right, facing right",
+   "direction": "(7, 24)",
+   "formula": "6.5625 × (24 − 7)/25",
+   "width": "4.4625"
+  },
+  {
+   "edge": "7:24 edge slanting down-left, facing right",
+   "direction": "(−7, 24)",
+   "formula": "6.5625 × (24 + 7)/25",
+   "width": "8.1375"
+  },
+  {
+   "edge": "N diagonal",
+   "direction": "(1, 2)",
+   "formula": "6.5625 × (2 − 1)/√5",
+   "width": "2.9348"
+  }
+ ],
+ "letters": [
+  {
+   "letter": "S",
+   "note": "",
+   "advance": "91.5",
+   "anchors": 22,
+   "svg": "sjb-lettering-spec-letter-S.svg",
+   "contours": [
+    {
+     "kind": "outline",
+     "anchors": [
+      {
+       "x": "33",
+       "y": "25.5",
+       "edge": "H",
+       "length": 25.5
+      },
+      {
+       "x": "58.5",
+       "y": "25.5",
+       "edge": "V",
+       "length": 12.0
+      },
+      {
+       "x": "58.5",
+       "y": "37.5",
+       "edge": "H",
+       "length": 33.0
+      },
+      {
+       "x": "91.5",
+       "y": "37.5",
+       "edge": "V",
+       "length": 20.5
+      },
+      {
+       "x": "91.5",
+       "y": "17",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "74.5",
+       "y": "0",
+       "edge": "H",
+       "length": 57.5
+      },
+      {
+       "x": "17",
+       "y": "0",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "0",
+       "y": "17",
+       "edge": "V",
+       "length": 36.5
+      },
+      {
+       "x": "0",
+       "y": "53.5",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "17",
+       "y": "70.5",
+       "edge": "H",
+       "length": 41.5
+      },
+      {
+       "x": "58.5",
+       "y": "70.5",
+       "edge": "V",
+       "length": 24.0
+      },
+      {
+       "x": "58.5",
+       "y": "94.5",
+       "edge": "H",
+       "length": 25.5
+      },
+      {
+       "x": "33",
+       "y": "94.5",
+       "edge": "V",
+       "length": 12.0
+      },
+      {
+       "x": "33",
+       "y": "82.5",
+       "edge": "H",
+       "length": 33.0
+      },
+      {
+       "x": "0",
+       "y": "82.5",
+       "edge": "V",
+       "length": 20.5
+      },
+      {
+       "x": "0",
+       "y": "103",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "17",
+       "y": "120",
+       "edge": "H",
+       "length": 57.5
+      },
+      {
+       "x": "74.5",
+       "y": "120",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "91.5",
+       "y": "103",
+       "edge": "V",
+       "length": 36.5
+      },
+      {
+       "x": "91.5",
+       "y": "66.5",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "74.5",
+       "y": "49.5",
+       "edge": "H",
+       "length": 41.5
+      },
+      {
+       "x": "33",
+       "y": "49.5",
+       "edge": "V",
+       "length": 24.0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "letter": "A",
+   "note": "A2 in JUAN is identical",
+   "advance": "120.828125",
+   "anchors": 19,
+   "svg": "sjb-lettering-spec-letter-A.svg",
+   "contours": [
+    {
+     "kind": "outline",
+     "anchors": [
+      {
+       "x": "0",
+       "y": "94.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "10.7265625",
+       "y": "94.5",
+       "edge": "7:24",
+       "length": 98.4375
+      },
+      {
+       "x": "38.2890625",
+       "y": "0",
+       "edge": "H",
+       "length": 44.25
+      },
+      {
+       "x": "82.5390625",
+       "y": "0",
+       "edge": "7:24",
+       "length": 98.4375
+      },
+      {
+       "x": "110.1015625",
+       "y": "94.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "120.828125",
+       "y": "94.5",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "120.828125",
+       "y": "120",
+       "edge": "H",
+       "length": 55.8281
+      },
+      {
+       "x": "65",
+       "y": "120",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "65",
+       "y": "94.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "75.7265625",
+       "y": "94.5",
+       "edge": "7:24",
+       "length": 12.5
+      },
+      {
+       "x": "72.2265625",
+       "y": "82.5",
+       "edge": "H",
+       "length": 23.625
+      },
+      {
+       "x": "48.6015625",
+       "y": "82.5",
+       "edge": "7:24",
+       "length": 12.5
+      },
+      {
+       "x": "45.1015625",
+       "y": "94.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "55.828125",
+       "y": "94.5",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "55.828125",
+       "y": "120",
+       "edge": "H",
+       "length": 55.8281
+      },
+      {
+       "x": "0",
+       "y": "120",
+       "edge": "V",
+       "length": 25.5
+      }
+     ]
+    },
+    {
+     "kind": "counter",
+     "anchors": [
+      {
+       "x": "52.1015625",
+       "y": "70.5",
+       "edge": "7:24",
+       "length": 29.6875
+      },
+      {
+       "x": "60.4140625",
+       "y": "42",
+       "edge": "7:24",
+       "length": 29.6875
+      },
+      {
+       "x": "68.7265625",
+       "y": "70.5",
+       "edge": "H",
+       "length": 16.625
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "letter": "N",
+   "note": "N2 in JUAN is identical",
+   "advance": "117.453125",
+   "anchors": 20,
+   "svg": "sjb-lettering-spec-letter-N.svg",
+   "contours": [
+    {
+     "kind": "outline",
+     "anchors": [
+      {
+       "x": "0",
+       "y": "0",
+       "edge": "H",
+       "length": 43.7266
+      },
+      {
+       "x": "43.7265625",
+       "y": "0",
+       "edge": "1:2",
+       "length": 67.082
+      },
+      {
+       "x": "73.7265625",
+       "y": "60",
+       "edge": "V",
+       "length": 34.5
+      },
+      {
+       "x": "73.7265625",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "63",
+       "y": "25.5",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "63",
+       "y": "0",
+       "edge": "H",
+       "length": 54.4531
+      },
+      {
+       "x": "117.453125",
+       "y": "0",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "117.453125",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "106.7265625",
+       "y": "25.5",
+       "edge": "V",
+       "length": 94.5
+      },
+      {
+       "x": "106.7265625",
+       "y": "120",
+       "edge": "H",
+       "length": 33.0
+      },
+      {
+       "x": "73.7265625",
+       "y": "120",
+       "edge": "1:2",
+       "length": 67.082
+      },
+      {
+       "x": "43.7265625",
+       "y": "60",
+       "edge": "V",
+       "length": 34.5
+      },
+      {
+       "x": "43.7265625",
+       "y": "94.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "54.453125",
+       "y": "94.5",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "54.453125",
+       "y": "120",
+       "edge": "H",
+       "length": 54.4531
+      },
+      {
+       "x": "0",
+       "y": "120",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "0",
+       "y": "94.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "10.7265625",
+       "y": "94.5",
+       "edge": "V",
+       "length": 69.0
+      },
+      {
+       "x": "10.7265625",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "0",
+       "y": "25.5",
+       "edge": "V",
+       "length": 25.5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "letter": "J",
+   "note": "",
+   "advance": "96.7265625",
+   "anchors": 14,
+   "svg": "sjb-lettering-spec-letter-J.svg",
+   "contours": [
+    {
+     "kind": "outline",
+     "anchors": [
+      {
+       "x": "42.2734375",
+       "y": "0",
+       "edge": "H",
+       "length": 54.4531
+      },
+      {
+       "x": "96.7265625",
+       "y": "0",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "96.7265625",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "86",
+       "y": "25.5",
+       "edge": "V",
+       "length": 77.5
+      },
+      {
+       "x": "86",
+       "y": "103",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "69",
+       "y": "120",
+       "edge": "H",
+       "length": 52.0
+      },
+      {
+       "x": "17",
+       "y": "120",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "0",
+       "y": "103",
+       "edge": "V",
+       "length": 32.5
+      },
+      {
+       "x": "0",
+       "y": "70.5",
+       "edge": "H",
+       "length": 33.0
+      },
+      {
+       "x": "33",
+       "y": "70.5",
+       "edge": "V",
+       "length": 24.0
+      },
+      {
+       "x": "33",
+       "y": "94.5",
+       "edge": "H",
+       "length": 20.0
+      },
+      {
+       "x": "53",
+       "y": "94.5",
+       "edge": "V",
+       "length": 69.0
+      },
+      {
+       "x": "53",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "42.2734375",
+       "y": "25.5",
+       "edge": "V",
+       "length": 25.5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "letter": "U",
+   "note": "",
+   "advance": "120.90625",
+   "anchors": 18,
+   "svg": "sjb-lettering-spec-letter-U.svg",
+   "contours": [
+    {
+     "kind": "outline",
+     "anchors": [
+      {
+       "x": "0",
+       "y": "0",
+       "edge": "H",
+       "length": 54.4531
+      },
+      {
+       "x": "54.453125",
+       "y": "0",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "54.453125",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "43.7265625",
+       "y": "25.5",
+       "edge": "V",
+       "length": 69.0
+      },
+      {
+       "x": "43.7265625",
+       "y": "94.5",
+       "edge": "H",
+       "length": 33.4531
+      },
+      {
+       "x": "77.1796875",
+       "y": "94.5",
+       "edge": "V",
+       "length": 69.0
+      },
+      {
+       "x": "77.1796875",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "66.453125",
+       "y": "25.5",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "66.453125",
+       "y": "0",
+       "edge": "H",
+       "length": 54.4531
+      },
+      {
+       "x": "120.90625",
+       "y": "0",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "120.90625",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "110.1796875",
+       "y": "25.5",
+       "edge": "V",
+       "length": 77.5
+      },
+      {
+       "x": "110.1796875",
+       "y": "103",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "93.1796875",
+       "y": "120",
+       "edge": "H",
+       "length": 65.4531
+      },
+      {
+       "x": "27.7265625",
+       "y": "120",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "10.7265625",
+       "y": "103",
+       "edge": "V",
+       "length": 77.5
+      },
+      {
+       "x": "10.7265625",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "0",
+       "y": "25.5",
+       "edge": "V",
+       "length": 25.5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "letter": "B",
+   "note": "",
+   "advance": "105.7265625",
+   "anchors": 21,
+   "svg": "sjb-lettering-spec-letter-B.svg",
+   "contours": [
+    {
+     "kind": "outline",
+     "anchors": [
+      {
+       "x": "0",
+       "y": "0",
+       "edge": "H",
+       "length": 86.7266
+      },
+      {
+       "x": "86.7265625",
+       "y": "0",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "103.7265625",
+       "y": "17",
+       "edge": "V",
+       "length": 25.7734
+      },
+      {
+       "x": "103.7265625",
+       "y": "42.7734375",
+       "edge": "45°",
+       "length": 24.362
+      },
+      {
+       "x": "86.5",
+       "y": "60",
+       "edge": "45°",
+       "length": 27.1905
+      },
+      {
+       "x": "105.7265625",
+       "y": "79.2265625",
+       "edge": "V",
+       "length": 23.7734
+      },
+      {
+       "x": "105.7265625",
+       "y": "103",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "88.7265625",
+       "y": "120",
+       "edge": "H",
+       "length": 88.7266
+      },
+      {
+       "x": "0",
+       "y": "120",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "0",
+       "y": "94.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "10.7265625",
+       "y": "94.5",
+       "edge": "V",
+       "length": 69.0
+      },
+      {
+       "x": "10.7265625",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "0",
+       "y": "25.5",
+       "edge": "V",
+       "length": 25.5
+      }
+     ]
+    },
+    {
+     "kind": "counter",
+     "anchors": [
+      {
+       "x": "43.7265625",
+       "y": "25.5",
+       "edge": "H",
+       "length": 27.0
+      },
+      {
+       "x": "70.7265625",
+       "y": "25.5",
+       "edge": "V",
+       "length": 24.0
+      },
+      {
+       "x": "70.7265625",
+       "y": "49.5",
+       "edge": "H",
+       "length": 27.0
+      },
+      {
+       "x": "43.7265625",
+       "y": "49.5",
+       "edge": "V",
+       "length": 24.0
+      }
+     ]
+    },
+    {
+     "kind": "counter",
+     "anchors": [
+      {
+       "x": "43.7265625",
+       "y": "70.5",
+       "edge": "H",
+       "length": 29.0
+      },
+      {
+       "x": "72.7265625",
+       "y": "70.5",
+       "edge": "V",
+       "length": 24.0
+      },
+      {
+       "x": "72.7265625",
+       "y": "94.5",
+       "edge": "H",
+       "length": 29.0
+      },
+      {
+       "x": "43.7265625",
+       "y": "94.5",
+       "edge": "V",
+       "length": 24.0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "letter": "O",
+   "note": "",
+   "advance": "96.5",
+   "anchors": 12,
+   "svg": "sjb-lettering-spec-letter-O.svg",
+   "contours": [
+    {
+     "kind": "outline",
+     "anchors": [
+      {
+       "x": "17",
+       "y": "0",
+       "edge": "H",
+       "length": 62.5
+      },
+      {
+       "x": "79.5",
+       "y": "0",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "96.5",
+       "y": "17",
+       "edge": "V",
+       "length": 86.0
+      },
+      {
+       "x": "96.5",
+       "y": "103",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "79.5",
+       "y": "120",
+       "edge": "H",
+       "length": 62.5
+      },
+      {
+       "x": "17",
+       "y": "120",
+       "edge": "45°",
+       "length": 24.0416
+      },
+      {
+       "x": "0",
+       "y": "103",
+       "edge": "V",
+       "length": 86.0
+      },
+      {
+       "x": "0",
+       "y": "17",
+       "edge": "45°",
+       "length": 24.0416
+      }
+     ]
+    },
+    {
+     "kind": "counter",
+     "anchors": [
+      {
+       "x": "33",
+       "y": "25.5",
+       "edge": "H",
+       "length": 30.5
+      },
+      {
+       "x": "63.5",
+       "y": "25.5",
+       "edge": "V",
+       "length": 69.0
+      },
+      {
+       "x": "63.5",
+       "y": "94.5",
+       "edge": "H",
+       "length": 30.5
+      },
+      {
+       "x": "33",
+       "y": "94.5",
+       "edge": "V",
+       "length": 69.0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "letter": "W",
+   "note": "",
+   "advance": "191.328125",
+   "anchors": 21,
+   "svg": "sjb-lettering-spec-letter-W.svg",
+   "contours": [
+    {
+     "kind": "outline",
+     "anchors": [
+      {
+       "x": "0",
+       "y": "0",
+       "edge": "H",
+       "length": 55.8281
+      },
+      {
+       "x": "55.828125",
+       "y": "0",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "55.828125",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "45.1015625",
+       "y": "25.5",
+       "edge": "7:24",
+       "length": 53.125
+      },
+      {
+       "x": "59.9765625",
+       "y": "76.5",
+       "edge": "7:24",
+       "length": 79.6875
+      },
+      {
+       "x": "82.2890625",
+       "y": "0",
+       "edge": "H",
+       "length": 26.75
+      },
+      {
+       "x": "109.0390625",
+       "y": "0",
+       "edge": "7:24",
+       "length": 79.6875
+      },
+      {
+       "x": "131.3515625",
+       "y": "76.5",
+       "edge": "7:24",
+       "length": 53.125
+      },
+      {
+       "x": "146.2265625",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "135.5",
+       "y": "25.5",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "135.5",
+       "y": "0",
+       "edge": "H",
+       "length": 55.8281
+      },
+      {
+       "x": "191.328125",
+       "y": "0",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "191.328125",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "180.6015625",
+       "y": "25.5",
+       "edge": "7:24",
+       "length": 98.4375
+      },
+      {
+       "x": "153.0390625",
+       "y": "120",
+       "edge": "H",
+       "length": 43.375
+      },
+      {
+       "x": "109.6640625",
+       "y": "120",
+       "edge": "7:24",
+       "length": 50.0
+      },
+      {
+       "x": "95.6640625",
+       "y": "72",
+       "edge": "7:24",
+       "length": 50.0
+      },
+      {
+       "x": "81.6640625",
+       "y": "120",
+       "edge": "H",
+       "length": 43.375
+      },
+      {
+       "x": "38.2890625",
+       "y": "120",
+       "edge": "7:24",
+       "length": 98.4375
+      },
+      {
+       "x": "10.7265625",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "0",
+       "y": "25.5",
+       "edge": "V",
+       "length": 25.5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "letter": "L",
+   "note": "",
+   "advance": "107.2265625",
+   "anchors": 14,
+   "svg": "sjb-lettering-spec-letter-L.svg",
+   "contours": [
+    {
+     "kind": "outline",
+     "anchors": [
+      {
+       "x": "0",
+       "y": "0",
+       "edge": "H",
+       "length": 54.4531
+      },
+      {
+       "x": "54.453125",
+       "y": "0",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "54.453125",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "43.7265625",
+       "y": "25.5",
+       "edge": "V",
+       "length": 69.0
+      },
+      {
+       "x": "43.7265625",
+       "y": "94.5",
+       "edge": "H",
+       "length": 30.5
+      },
+      {
+       "x": "74.2265625",
+       "y": "94.5",
+       "edge": "V",
+       "length": 12.0
+      },
+      {
+       "x": "74.2265625",
+       "y": "82.5",
+       "edge": "H",
+       "length": 33.0
+      },
+      {
+       "x": "107.2265625",
+       "y": "82.5",
+       "edge": "V",
+       "length": 37.5
+      },
+      {
+       "x": "107.2265625",
+       "y": "120",
+       "edge": "H",
+       "length": 107.2266
+      },
+      {
+       "x": "0",
+       "y": "120",
+       "edge": "V",
+       "length": 25.5
+      },
+      {
+       "x": "0",
+       "y": "94.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "10.7265625",
+       "y": "94.5",
+       "edge": "V",
+       "length": 69.0
+      },
+      {
+       "x": "10.7265625",
+       "y": "25.5",
+       "edge": "H",
+       "length": 10.7266
+      },
+      {
+       "x": "0",
+       "y": "25.5",
+       "edge": "V",
+       "length": 25.5
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "positions": [
+  {
+   "word": "SAN",
+   "letter": "S",
+   "xLeft": "0",
+   "xRight": "91.5",
+   "advance": "91.5"
+  },
+  {
+   "word": "SAN",
+   "letter": "A",
+   "xLeft": "103.5",
+   "xRight": "224.328125",
+   "advance": "120.828125"
+  },
+  {
+   "word": "SAN",
+   "letter": "N",
+   "xLeft": "236.328125",
+   "xRight": "353.78125",
+   "advance": "117.453125"
+  },
+  {
+   "word": "JUAN",
+   "letter": "J",
+   "xLeft": "382.78125",
+   "xRight": "479.5078125",
+   "advance": "96.7265625"
+  },
+  {
+   "word": "JUAN",
+   "letter": "U",
+   "xLeft": "491.5078125",
+   "xRight": "612.4140625",
+   "advance": "120.90625"
+  },
+  {
+   "word": "JUAN",
+   "letter": "A2",
+   "xLeft": "624.4140625",
+   "xRight": "745.2421875",
+   "advance": "120.828125"
+  },
+  {
+   "word": "JUAN",
+   "letter": "N2",
+   "xLeft": "757.2421875",
+   "xRight": "874.6953125",
+   "advance": "117.453125"
+  },
+  {
+   "word": "BOWL",
+   "letter": "B",
+   "xLeft": "903.6953125",
+   "xRight": "1009.421875",
+   "advance": "105.7265625"
+  },
+  {
+   "word": "BOWL",
+   "letter": "O",
+   "xLeft": "1021.421875",
+   "xRight": "1117.921875",
+   "advance": "96.5"
+  },
+  {
+   "word": "BOWL",
+   "letter": "W",
+   "xLeft": "1129.921875",
+   "xRight": "1321.25",
+   "advance": "191.328125"
+  },
+  {
+   "word": "BOWL",
+   "letter": "L",
+   "xLeft": "1333.25",
+   "xRight": "1440.4765625",
+   "advance": "107.2265625"
+  }
+ ],
+ "clearances": {
+  "shadowPiecesApart": 2.16,
+  "backgroundChannel": 2.609375,
+  "shortestShadowSegment": 2.25,
+  "uOpening": 12,
+  "smallestFeatureU": 2.16
+ },
+ "minimumSizes": [
+  {
+   "process": "Offset / digital print, finest line ≈ 0.10 mm",
+   "holds": "0.10 mm",
+   "minCap": "5.6 mm"
+  },
+  {
+   "process": "Screen print / vinyl cut ≈ 0.30 mm",
+   "holds": "0.30 mm",
+   "minCap": "16.7 mm"
+  },
+  {
+   "process": "Embroidery satin ≈ 1.0 mm",
+   "holds": "1.0 mm",
+   "minCap": "55.6 mm"
+  },
+  {
+   "process": "Screen, keep smallest gap ≥ 1 px",
+   "holds": "1 px",
+   "minCap": "56 px"
+  }
+ ],
+ "calculator": {
+  "capUnits": 120,
+  "widthWithShadow": 1447.0390625,
+  "heightWithShadow": 126.5625,
+  "stroke": 33,
+  "serif": 10.7265625,
+  "shadowOffset": 6.5625,
+  "smallestFeature": 2.16
+ },
+ "colour": [
+  {
+   "role": "Face",
+   "name": "White",
+   "hex": "#FFFFFF",
+   "cmyk": "C0 M0 Y0 K0"
+  },
+  {
+   "role": "Shadow",
+   "name": "SJB Cyan",
+   "hex": "#00AAE7",
+   "cmyk": "C86 M8 Y0 K0"
+  },
+  {
+   "role": "Ground",
+   "name": "SJB Navy",
+   "hex": "#0D0E21",
+   "cmyk": "C86.92 M81.16 Y55.29 K74.73"
+  }
+ ],
+ "editingRules": [
+  "File: SJB-Lettering-Exact.svg. Groups SAN, JUAN and BOWL, then one group per letter holding Shadow-X under Face-X. No strokes, masks, clips or transforms. Straight lines only.",
+  "Scale uniformly by cap height. Never stretch one axis, never redraw single letters, never recolour the shadow separately from the system.",
+  "Kern by moving a whole letter group (shadow and face together). Keep the 12 / 29 face-to-face rhythm.",
+  "Exactness: every coordinate is a multiple of 1/256 and is stored exactly in Illustrator and browsers. Avoid \"simplify path\" and snapping to pixel grid, which break it.",
+  "Changing a rule (stroke, serif, shadow) means regenerating all letters from the construction, not editing points by hand. The shadow is always the full sweep of the face."
+ ],
+ "verification": [
+  {
+   "check": "Every face sits on cap 0 and baseline 120",
+   "result": "PASS · 11 / 11"
+  },
+  {
+   "check": "Edge directions",
+   "result": "86 H · 72 V · 18 at 45° · 20 at 7:24 · 4 at 1:2 · nothing else"
+  },
+  {
+   "check": "Horizontal edges on the 8 horizon lines",
+   "result": "PASS · 0 off-line"
+  },
+  {
+   "check": "Stems and strokes",
+   "result": "33.000000 on every stem and 7:24 stroke (exact, width² = 1089)"
+  },
+  {
+   "check": "Serifs",
+   "result": "38 overhangs, all exactly 10.7265625"
+  },
+  {
+   "check": "Corner cuts",
+   "result": "all 17 × 17 at 45° (B waist excepted)"
+  },
+  {
+   "check": "Symmetry",
+   "result": "A, A2, U, W, O mirror-exact · S and O point-symmetric"
+  },
+  {
+   "check": "Repeats",
+   "result": "A2 = A and N2 = N, exact translations (face and shadow)"
+  },
+  {
+   "check": "Shadow",
+   "result": "equals the exact sweep of each face by (6.5625, 6.5625) · 0 mismatch"
+  },
+  {
+   "check": "Coordinates",
+   "result": "all finite decimals · faces on a 1/128 grid, shadows on 1/256 · nothing rounded"
+  },
+  {
+   "check": "Topology",
+   "result": "no repeated points, zero-length or collinear segments, self-intersections"
+  },
+  {
+   "check": "Fill rule",
+   "result": "outer contours one winding, counters the other · nonzero = evenodd (0 px differ)"
+  },
+  {
+   "check": "Narrow features",
+   "result": "shadow pieces ≥ 2.16 apart · background ≥ 2.609 · shadow segment ≥ 2.25"
+  },
+  {
+   "check": "Review",
+   "result": "own exact audit + 4 independent blind reviews · final review: 14 / 14 pass, no defects"
+  }
+ ]
+}

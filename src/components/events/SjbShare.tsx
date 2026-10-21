@@ -12,18 +12,20 @@ import logoColor from "@/assets/san-juan-bowl/sjb-logo-color.svg.asset.json";
 const SjbShareCtx = createContext(false);
 export const useSjbShare = () => useContext(SjbShareCtx);
 
-export type SjbPage = "event" | "kit" | "designers" | "single" | "stadium";
+export type SjbPage = "event" | "kit" | "designers" | "single" | "lettering" | "stadium";
 
 const APP_PATHS = {
   kit: "/events/san-juan-bowl/brand-kit",
   designers: "/events/san-juan-bowl/brand-kit/designers",
   single: "/events/san-juan-bowl/brand-kit/single-colour",
+  lettering: "/events/san-juan-bowl/brand-kit/lettering",
   stadium: "/events/san-juan-bowl/stadium",
 } as const;
 const SHARE_PATHS = {
   kit: "/share/san-juan-bowl",
   designers: "/share/san-juan-bowl/designers",
   single: "/share/san-juan-bowl/single-colour",
+  lettering: "/share/san-juan-bowl/lettering",
   stadium: "/share/san-juan-bowl/stadium",
 } as const;
 
@@ -47,6 +49,7 @@ const TABS: { page: Exclude<SjbPage, "event">; label: string }[] = [
   { page: "kit", label: "Brand kit" },
   { page: "designers", label: "For designers" },
   { page: "single", label: "Single colour" },
+  { page: "lettering", label: "Lettering spec" },
   { page: "stadium", label: "Stadium 3D" },
 ];
 
