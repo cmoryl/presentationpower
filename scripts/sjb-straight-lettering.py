@@ -1,116 +1,277 @@
-"""San Juan Bowl "SAN JUAN BOWL" lettering, straightened from the supplied badge artwork.
+"""San Juan Bowl "SAN JUAN BOWL" lettering, rebuilt letter by letter from the badge.
 
-The badge sets SAN JUAN and BOWL on an arched envelope. This script takes the original
-lettering paths (src/assets/san-juan-bowl/san-juan-lettering.svg + bowl-lettering.svg,
-unchanged source shapes and colours), measures the envelope from the artwork itself
-(top and bottom edge per column, smoothed), and maps every path point back onto a flat
-band of one cap height. Nothing is redrawn or retyped; shapes, fills and drawing order
-are the designer's. Angled versions are the straight wordmark under a uniform rotation
-or a skew only, so letter proportions never change.
+Source: the badge's own lettering (san-juan-lettering.svg, bowl-lettering.svg; white face
+shapes + #00AAE7 shadow shapes, unchanged). The badge sets the words on an arch, so every
+letter there is turned, stretched and shadowed slightly differently. This script:
 
+1. groups the white face shapes into letters (S A N J U A N / B O W L);
+2. turns each letter upright by the arch tangent at its centre (measured from the artwork);
+3. gives every letter the same cap height and the same horizontal scale;
+4. uses ONE drawing for repeated letters (both A's, both N's are the most central instance),
+   so equal letters are identical;
+5. sets every letter on one baseline with one exact gap between letter faces and one word
+   space, both measured from the badge's central letters;
+6. rebuilds the shadow as an exact sweep of each face along one offset, measured from the
+   badge (best fit over all letters), so depth and direction are the same on every letter.
+   Face corners are the designer's chamfers, untouched (only turned and scaled).
+
+Writes the SVG/PDF/PNG set plus sjb-lettering-audit.json (every measurement, per letter).
 Usage: PYTHONPATH=/tmp/pylib python3 scripts/sjb-straight-lettering.py SRC_DIR OUT_DIR
-(SRC_DIR holds the two lettering SVGs; needs svgelements, numpy, rsvg-convert)
+(needs svgelements, shapely, numpy, rsvg-convert)
 """
-import io, math, os, subprocess, sys
+import io, json, math, os, subprocess, sys
 import numpy as np
+import shapely
+import shapely.ops
 from PIL import Image
-from svgelements import SVG, Path, Shape, Move, Line, CubicBezier, QuadraticBezier, Close, Arc
+from shapely import affinity
+from shapely.geometry import Polygon, MultiPolygon
+from shapely.ops import unary_union
+from svgelements import SVG, Path, Shape, Move, Close
 
 SRC, OUT = sys.argv[1], sys.argv[2]
 os.makedirs(OUT, exist_ok=True)
+FACE, SHADOW = "#ffffff", "#00aae7"
 
 
-def shapes(fn):
+def geom(p):
+    """Path -> shapely geometry with even-odd counters, curves sampled finely."""
+    rings, cur = [], []
+    for s in p:
+        if isinstance(s, Move):
+            if len(cur) > 2: rings.append(cur)
+            cur = [(s.end.x, s.end.y)]
+        elif isinstance(s, Close):
+            if len(cur) > 2: rings.append(cur)
+            cur = []
+        else:
+            n = 1 if type(s).__name__ == "Line" else 24
+            cur += [(pt.x, pt.y) for pt in (s.point(t) for t in np.linspace(0, 1, n + 1)[1:])]
+    if len(cur) > 2: rings.append(cur)
+    g = None
+    for r in rings:
+        poly = Polygon(r).buffer(0)
+        g = poly if g is None else g.symmetric_difference(poly)
+    return g
+
+
+def load(fn):
     out = []
     for e in SVG.parse(os.path.join(SRC, fn)).elements():
-        if isinstance(e, Shape) and not isinstance(e, SVG):
-            fill = e.fill.hexrgb if e.fill is not None and e.fill.value is not None else None
-            if not fill: continue
+        if isinstance(e, Shape) and not isinstance(e, SVG) and e.fill is not None and e.fill.value is not None:
             p = Path(e); p.reify()
-            if len(p) == 0: continue
-            out.append((fill, p))
+            g = geom(p) if len(p) else None
+            if g is not None and not g.is_empty and g.area > 0.05: out.append((e.fill.hexrgb.lower(), g))
     return out
 
 
-def envelope(fn):
-    """Top/bottom edge of the lettering per artwork column, from a 1 unit = 1 px render."""
-    png = subprocess.run(["rsvg-convert", "-w", "1254", "-h", "1254", os.path.join(SRC, fn)], capture_output=True, check=True).stdout
-    a = np.array(Image.open(io.BytesIO(png)).convert("RGBA"))[:, :, 3] > 40
-    xs, tops, bots = [], [], []
-    for x in range(a.shape[1]):
-        ys = np.nonzero(a[:, x])[0]
-        if len(ys) > 3: xs.append(x); tops.append(ys.min()); bots.append(ys.max())
-    xs, tops, bots = map(np.array, (xs, tops, bots))
-    # Only full-height columns describe the envelope: the L foot, J hook and
-    # letter crossbars would otherwise read as a low "top" edge.
-    hgt = bots - tops; full = hgt >= 0.8 * np.median(hgt)
-    xmin, xmax = xs.min(), xs.max(); xs, tops, bots = xs[full], tops[full], bots[full]
-    # Robust smooth fit: letters with notches (J hook, A counters) pull single columns;
-    # trim the worst 15 % residuals and refit.
-    def fit(v):
-        c = np.polyfit(xs, v, 3)
-        r = np.abs(np.polyval(c, xs) - v); keep = r <= np.quantile(r, 0.85)
-        return np.polyfit(xs[keep], v[keep], 3)
-    return fit(tops), fit(bots), xmin, xmax
+def letters(fn, names):
+    shp = load(fn)
+    faces = [g for f, g in shp if f == FACE]
+    mains = sorted([g for g in faces if g.area > 1500], key=lambda g: g.bounds[0])
+    assert len(mains) == len(names), (fn, len(mains))
+    groups = [[m] for m in mains]
+    for g in faces:
+        if any(g is m for m in mains): continue
+        c = g.centroid
+        i = min(range(len(mains)), key=lambda k: mains[k].distance(c))
+        if mains[i].distance(c) < 12: groups[i].append(g)
+    return [(n, unary_union(gs)) for n, gs in zip(names, groups)], unary_union([g for f, g in shp if f == SHADOW])
 
 
-def flatten(fn, cap):
-    T, B, x0, x1 = envelope(fn)
-    def m(pt):
-        x, y = pt.x, pt.y; t, b = np.polyval(T, x), np.polyval(B, x)
-        return (x - x0, (y - t) / (b - t) * cap)
-    paths = []
-    for fill, p in shapes(fn):
-        d = []
-        for s in p:
-            if isinstance(s, Move): d.append("M%.2f,%.2f" % m(s.end))
-            elif isinstance(s, Close): d.append("Z")
-            elif isinstance(s, Line): d.append("L%.2f,%.2f" % m(s.end))
-            elif isinstance(s, CubicBezier): d.append("C%.2f,%.2f %.2f,%.2f %.2f,%.2f" % (*m(s.control1), *m(s.control2), *m(s.end)))
-            elif isinstance(s, QuadraticBezier): d.append("Q%.2f,%.2f %.2f,%.2f" % (*m(s.control), *m(s.end)))
-            elif isinstance(s, Arc):
-                for c in s.as_cubic_curves(): d.append("C%.2f,%.2f %.2f,%.2f %.2f,%.2f" % (*m(c.control1), *m(c.control2), *m(c.end)))
-        paths.append((fill, " ".join(d)))
-    return paths, x1 - x0
+def unwarp(shapes, sky):
+    """Undo the badge's arch: fit a circle to the word's midline, map every point to
+    (arc position, radius), then flatten the remaining top/bottom curve to one cap height.
+    Verticals of the arch (radial lines) become true verticals; nothing is redrawn."""
+    allg = unary_union([g for _, g in shapes])
+    x0, _, x1, _ = allg.bounds
+    pts = []
+    cols = []
+    for x in np.arange(x0 + 1, x1 - 1, 2.0):
+        cut = allg.intersection(Polygon([(x, -1e4), (x + 0.5, -1e4), (x + 0.5, 1e4), (x, 1e4)]))
+        if cut.is_empty: continue
+        _, y0, _, y1 = cut.bounds; cols.append((x, y0, y1))
+    h = np.array([c[2] - c[1] for c in cols]); keep = h >= 0.8 * np.median(h)
+    X = np.array([c[0] for c, k in zip(cols, keep) if k]); Y = np.array([(c[1] + c[2]) / 2 for c, k in zip(cols, keep) if k])
+    A = np.c_[2 * X, 2 * Y, np.ones_like(X)]; bb = X ** 2 + Y ** 2
+    cx, cy, c0 = np.linalg.lstsq(A, bb, rcond=None)[0]; R = math.sqrt(c0 + cx ** 2 + cy ** 2)
+
+    def polar(x, y):
+        xs, ys = np.asarray(x, float), np.asarray(y, float)
+        th = np.arctan2(xs - cx, cy - ys); r = np.hypot(xs - cx, ys - cy)
+        return th * R, R - r
+    def tf(g): return shapely.make_valid(shapely.ops.transform(lambda x, y, z=None: polar(x, y), shapely.segmentize(g, 0.75))).buffer(0)
+    P = [(n, tf(g)) for n, g in shapes]; S = tf(sky)
+    # remaining envelope in polar space
+    allp = unary_union([g for _, g in P]); u0, _, u1, _ = allp.bounds
+    us, ts, bs = [], [], []
+    for u in np.arange(u0 + 1, u1 - 1, 2.0):
+        cut = allp.intersection(Polygon([(u, -1e4), (u + 0.5, -1e4), (u + 0.5, 1e4), (u, 1e4)]))
+        if cut.is_empty: continue
+        _, a0, _, a1 = cut.bounds; us.append(u); ts.append(a0); bs.append(a1)
+    us, ts, bs = map(np.array, (us, ts, bs)); hh = bs - ts; k = hh >= 0.8 * np.median(hh)
+    T = np.polyfit(us[k], ts[k], 2); B = np.polyfit(us[k], bs[k], 2)
+    SX = CAP / float(np.median(hh[k]))
+    def flat(x, y):
+        xs, ys = np.asarray(x, float), np.asarray(y, float)
+        t, b = np.polyval(T, xs), np.polyval(B, xs)
+        return (xs - u0) * SX, (ys - t) / (b - t) * CAP
+    def tf2(g): return shapely.set_precision(shapely.ops.transform(lambda x, y, z=None: flat(x, y), g).buffer(0), 0.001)
+    return [(n, tf2(g)) for n, g in P], tf2(S), dict(circle_radius=round(R, 3), circle_centre=[round(cx, 3), round(cy, 3)], horizontal_scale=round(SX, 6))
 
 
-def bbox_of(svg_body, w, h):
-    """Exact ink box of a drawing, from a render (for tight, aspect-locked viewBoxes)."""
-    doc = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{-w} {-h} {3*w} {3*h}" width="{3*w*2:.0f}" height="{3*h*2:.0f}">{svg_body}</svg>'
-    png = subprocess.run(["rsvg-convert", "-"], input=doc.encode(), capture_output=True, check=True).stdout
-    a = np.array(Image.open(io.BytesIO(png)).convert("RGBA"))[:, :, 3] > 10
-    ys, xs = np.nonzero(a)
-    return xs.min() / 2 - w, ys.min() / 2 - h, xs.max() / 2 - w, ys.max() / 2 - h
+def sweep(g, dx, dy):
+    """Exact block shadow: the face dragged along (dx, dy)."""
+    parts = [g, affinity.translate(g, dx, dy)]
+    polys = g.geoms if isinstance(g, MultiPolygon) else [g]
+    for p in polys:
+        for ring in [p.exterior, *p.interiors]:
+            c = list(ring.coords)
+            for a, b in zip(c, c[1:]):
+                parts.append(Polygon([a, b, (b[0] + dx, b[1] + dy), (a[0] + dx, a[1] + dy)]).buffer(0))
+    return shapely.set_precision(unary_union([shapely.set_precision(q, 0.001) for q in parts if not q.is_empty]), 0.001)
+
+
+def deshear(g):
+    """Stand a letter upright: the shear (about its middle) that makes it narrowest.
+    Stems and sides then run vertical, as in the badge's centre letters."""
+    _, y0, _, y1 = g.bounds; ym = (y0 + y1) / 2
+    def w(k):
+        b = affinity.affine_transform(g, [1, -k, 0, 1, k * ym, 0]).bounds; return b[2] - b[0]
+    ks = np.arange(-0.30, 0.3001, 0.005); k = float(min(ks, key=w))
+    ks = np.arange(k - 0.005, k + 0.005, 0.0005); k = float(min(ks, key=w))
+    return k, ym
+
+
+def level(g):
+    """Level a letter's top and bottom: the vertical shear that makes it shortest."""
+    x0, _, x1, _ = g.bounds; xm = (x0 + x1) / 2
+    def h(m):
+        b = affinity.affine_transform(g, [1, 0, -m, 1, 0, m * xm]).bounds; return b[3] - b[1]
+    ms = np.arange(-0.30, 0.3001, 0.005); m = float(min(ms, key=h))
+    ms = np.arange(m - 0.005, m + 0.005, 0.0005); m = float(min(ms, key=h))
+    return m, xm
+
+
+def prep(name, face, sky):
+    f = face; sk = sky.intersection(face.envelope.buffer(10)); lean = tilt = 0.0
+    for _ in range(2):
+        k, ym = deshear(f); M = [1, -k, 0, 1, k * ym, 0]
+        f, sk = affinity.affine_transform(f, M), affinity.affine_transform(sk, M); lean += k
+        m, xm = level(f); M = [1, 0, -m, 1, 0, m * xm]
+        f, sk = affinity.affine_transform(f, M), affinity.affine_transform(sk, M); tilt += m
+    return dict(name=name, face=f, sky=sk, src_x=f.centroid.x, shear_deg=round(math.degrees(math.atan(lean)), 3),
+                tilt_deg=round(math.degrees(math.atan(tilt)), 3))
+
+
+def fit_offset(L):
+    """Shadow offset that best reproduces the badge's own shadow on this letter (IoU)."""
+    target = unary_union([L["face"], L["sky"]])
+    best = (0, 0, 0)
+    for dx in np.arange(0, 8.01, 0.5):
+        for dy in np.arange(0, 8.01, 0.5):
+            g = sweep(L["face"], dx, dy)
+            iou = g.intersection(target).area / g.union(target).area
+            if iou > best[0]: best = (iou, dx, dy)
+    return best
 
 
 CAP = 100.0
-sj, sj_w = flatten("san-juan-lettering.svg", CAP)
-bw, bw_w = flatten("bowl-lettering.svg", CAP)
-GAP = 0.42 * CAP  # one word space, as between SAN and JUAN in the supplied artwork
+sj_raw, sj_sky = letters("san-juan-lettering.svg", list("SANJUAN"))
+bw_raw, bw_sky = letters("bowl-lettering.svg", list("BOWL"))
+sj_u, sj_s, sj_geo = unwarp(sj_raw, sj_sky)
+bw_u, bw_s, bw_geo = unwarp(bw_raw, bw_sky)
+sj = [prep(n, g, sj_s) for n, g in sj_u]
+bw = [prep(n, g, bw_s) for n, g in bw_u]
+for L in sj: L["mid"] = abs(L["src_x"] - (sj[0]["face"].bounds[0] + sj[-1]["face"].bounds[2]) / 2)
+for L in bw: L["mid"] = abs(L["src_x"] - (bw[0]["face"].bounds[0] + bw[-1]["face"].bounds[2]) / 2)
+
+fits = [fit_offset(L) for L in sj + bw]
+for L, (iou, dx, dy) in zip(sj + bw, fits): L["shadow_fit"] = dict(dx=float(dx), dy=float(dy), iou=round(float(iou), 4))
+SHADOW_V = (float(np.median([f[1] for f in fits])), float(np.median([f[2] for f in fits])))
+
+# One drawing per letter: the instance nearest the middle of its word (least arch distortion).
+canon = {}
+for L in sj + bw:
+    if L["name"] not in canon or L["mid"] < canon[L["name"]]["mid"]: canon[L["name"]] = L
 
 
-def group(paths, dx=0.0, dy=0.0):
-    return f'<g transform="translate({dx:.2f} {dy:.2f})">' + "".join(f'<path fill="{f}" d="{d}"/>' for f, d in paths) + "</g>"
+def normalised(L):
+    C = canon[L["name"]]
+    x0, y0, x1, y1 = C["face"].bounds
+    g = affinity.translate(C["face"], -x0, -y0)
+    return affinity.scale(g, 1, CAP / (y1 - y0), origin=(0, 0)), C
 
 
-line_body = group(sj) + group(bw, sj_w + GAP)
-line_w = sj_w + GAP + bw_w
-stack_body = group(sj) + group(bw, (sj_w - bw_w) / 2, CAP * 1.22)
+def gaps(seq): return [b["face"].bounds[0] - a["face"].bounds[2] for a, b in zip(seq, seq[1:])]
+sj_gaps, bw_gaps = gaps(sj), gaps(bw)
+GAP = float(np.median([g for i, g in enumerate(sj_gaps) if i != 2] + bw_gaps))
+WORD = sj_gaps[2]
 
-variants = {
-    "sjb-lettering-straight": (line_body, line_w, CAP * 1.1, ""),
-    "sjb-lettering-straight-stacked": (stack_body, sj_w, CAP * 2.4, ""),
-    "sjb-lettering-angled-rise": (line_body, line_w, CAP * 1.1, f"rotate(-6 {line_w/2:.1f} {CAP/2:.1f})"),
-    "sjb-lettering-angled-forward": (line_body, line_w, CAP * 1.1, f"rotate(-4 {line_w/2:.1f} {CAP/2:.1f}) skewX(-10)"),
-}
-note = "<!-- TransPerfect San Juan Bowl lettering. Original badge paths, envelope straightened; do not redraw, recolour or stretch. -->"
-for name, (body, w, h, tf) in variants.items():
-    g = f'<g transform="{tf}">{body}</g>' if tf else body
-    x0, y0, x1, y1 = bbox_of(g, w, h)
-    pad = 0.02 * (x1 - x0)
-    vb = f"{x0 - pad:.2f} {y0 - pad:.2f} {x1 - x0 + 2 * pad:.2f} {y1 - y0 + 2 * pad:.2f}"
-    svg = f'<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb}" preserveAspectRatio="xMidYMid meet">\n{note}\n{g}\n</svg>\n'
-    open(os.path.join(OUT, name + ".svg"), "w").write(svg)
-    subprocess.run(["rsvg-convert", "-w", "2400", "-o", os.path.join(OUT, name + ".png"), os.path.join(OUT, name + ".svg")], check=True)
-    subprocess.run(["rsvg-convert", "-f", "pdf", "-o", os.path.join(OUT, name + ".pdf"), os.path.join(OUT, name + ".svg")], check=True)
-    print(name, vb)
+
+def set_word(seq, x=0.0, y=0.0):
+    placed = []
+    for L in seq:
+        g, C = normalised(L)
+        g = affinity.translate(g, x, y)
+        placed.append(dict(name=L["name"], face=g, canon_src_x=round(C["src_x"], 2)))
+        x = g.bounds[2] + GAP
+    return placed, x - GAP
+
+
+def d_of(g):
+    polys = g.geoms if isinstance(g, MultiPolygon) else [g]
+    out = []
+    for p in polys:
+        for ring in [p.exterior, *p.interiors]:
+            c = list(ring.coords)[:-1]
+            out.append("M" + " L".join(f"{a:.3f},{b:.3f}" for a, b in c) + " Z")
+    return " ".join(out)
+
+
+def svg(placed, name):
+    body = []
+    for i, P in enumerate(placed):
+        sh = sweep(P["face"], *SHADOW_V)
+        body.append(f'<g id="{P["name"]}{i + 1}"><path fill="#00AAE7" d="{d_of(sh)}"/>'
+                    f'<path fill="#FFFFFF" fill-rule="evenodd" d="{d_of(P["face"])}"/></g>')
+    u = unary_union([sweep(P["face"], *SHADOW_V) for P in placed])
+    x0, y0, x1, y1 = u.bounds; pad = 0.25 * GAP
+    vb = f"{x0 - pad:.3f} {y0 - pad:.3f} {x1 - x0 + 2 * pad:.3f} {y1 - y0 + 2 * pad:.3f}"
+    doc = (f'<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb}">\n'
+           "<!-- TransPerfect San Juan Bowl lettering, rebuilt from the badge letters: one cap height, one gap, one shadow. Do not redraw, recolour or stretch. -->\n"
+           + "\n".join(body) + "\n</svg>\n")
+    path = os.path.join(OUT, name + ".svg"); open(path, "w").write(doc)
+    subprocess.run(["rsvg-convert", "-w", "2400", "-o", os.path.join(OUT, name + ".png"), path], check=True)
+    subprocess.run(["rsvg-convert", "-f", "pdf", "-o", os.path.join(OUT, name + ".pdf"), path], check=True)
+    return vb
+
+
+sanP, san_end = set_word(sj[:3])
+juanP, sj_end = set_word(sj[3:], san_end + WORD)
+sjP = sanP + juanP
+bwP_line, _ = set_word(bw, sj_end + WORD)
+line = sjP + bwP_line
+LINE_GAP = 0.25 * CAP  # stacked: one quarter cap between lines
+bw_w = set_word(bw)[1]
+bwP_stack, _ = set_word(bw, (sj_end - bw_w) / 2, CAP + LINE_GAP)
+
+vb1 = svg(line, "sjb-lettering-straight")
+vb2 = svg(sjP + bwP_stack, "sjb-lettering-straight-stacked")
+
+audit = dict(
+    cap_height=CAP, arch_san_juan=sj_geo, arch_bowl=bw_geo, letter_gap=round(GAP, 3), word_space=round(WORD, 3),
+    stacked_line_gap=LINE_GAP, shadow_offset=dict(dx=round(SHADOW_V[0], 3), dy=round(SHADOW_V[1], 3)),
+    source_gaps_san_juan=[round(g, 3) for g in sj_gaps], source_gaps_bowl=[round(g, 3) for g in bw_gaps],
+    letters=[dict(letter=L["name"], unwarped_width=round(L["face"].bounds[2] - L["face"].bounds[0], 3),
+                  unwarped_height=round(L["face"].bounds[3] - L["face"].bounds[1], 3),
+                  lean_removed_deg=L["shear_deg"], tilt_removed_deg=L["tilt_deg"], drawing_used="own" if canon[L["name"]] is L else "same as the more central " + L["name"],
+                  shadow_fit=L["shadow_fit"]) for L in sj + bw],
+    placed=[dict(letter=P["name"], x=round(P["face"].bounds[0], 3), width=round(P["face"].bounds[2] - P["face"].bounds[0], 3),
+                 height=round(P["face"].bounds[3] - P["face"].bounds[1], 3)) for P in line],
+    viewbox=dict(single_line=vb1, stacked=vb2),
+)
+json.dump(audit, open(os.path.join(OUT, "sjb-lettering-audit.json"), "w"), indent=1)
+print(json.dumps({k: audit[k] for k in ("letter_gap", "word_space", "shadow_offset", "arch_san_juan", "arch_bowl")}))
+for r in audit["letters"]: print(r)
+print(audit["source_gaps_san_juan"], audit["source_gaps_bowl"])
