@@ -426,6 +426,15 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
         for (let w = 0; w < words.length; w += per) wrapped.push(words.slice(w, w + per).join(" "));
         if (wrapped.length > 1) lineSets.push(wrapped);
       }
+      // Event floors: a multi-word name that would fill more than 60% of its
+      // room's width is set over two lines first, as on the SF plans.
+      if (
+        floor.id.includes(":") &&
+        lineSets.length > 1 &&
+        holder &&
+        qeiiTextWidth(lines[0]!, baseSize) > (holder.x1 - holder.x0) * 0.6
+      )
+        lineSets.unshift(lineSets.splice(1, 1)[0]!);
     }
     let chosen: Fit | undefined;
     let insideHolder = true;
