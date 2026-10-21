@@ -128,7 +128,7 @@ export async function cmykGradientsAndReport(
     fd.set(PDFName.of("Decode"), decode);
     fd.delete(PDFName.of("Length"));
     ctx.assign(fnRef as never, ctx.stream(out, Object.fromEntries([]) as never) as never);
-    const ns = ctx.lookup(fnRef as never) as InstanceType<typeof PDFRawStream>;
+    const ns = ctx.lookup(fnRef as never) as unknown as { dict: { set: (k: unknown, v: unknown) => void } };
     for (const [k, v] of fd.entries()) if (k.toString() !== "/Length") ns.dict.set(k, v);
     dict.set(PDFName.of("ColorSpace"), PDFName.of("DeviceCMYK"));
   }
