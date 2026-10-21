@@ -35,14 +35,13 @@ def fix_texts(tpath, texts):
         f = TTFont(os.path.join(fd, f"{t['font']}.ttf")); cm = f.getBestCmap(); hm = f["hmtx"]; u = f["head"].unitsPerEm
         tr = []
         for r in rows:
-            if len(r) < 2: continue
-            span = r[-1]["x0"] - r[0]["x0"]
-            adv = sum(hm[cm[ord(c["text"])]][0] / u for c in r[:-1] if ord(c["text"]) in cm) * t["size"]
-            tr.append((span - adv) / (len(r) - 1) / t["size"] * 1000)
+            for a, b in zip(r, r[1:]):
+                if a["text"].strip() and b["text"].strip() and ord(a["text"]) in cm:
+                    tr.append((b["x0"] - a["x0"] - hm[cm[ord(a["text"])]][0] / u * t["size"]) / t["size"] * 1000)
         t["text"] = "\n".join("".join(c["text"] for c in r).strip() for r in rows)
         t["color"] = "#FFFFFF"; t["cmyk"] = [0.0, 0.0, 0.0, 0.0]
         t["align"] = "left"
-        if tr: t["track"] = round(sum(tr) / len(tr), 1)
+        if tr: t["track"] = round(sorted(tr)[len(tr) // 2], 1)  # median pair gap: missing space glyphs never count
         if len(rows) > 1:
             t["lead"] = round((rows[1][0]["top"] - rows[0][0]["top"]) / t["size"], 3)
             t["wrap"] = round(t["w"] + t["size"], 2)
