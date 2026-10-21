@@ -40,3 +40,4 @@
 - Brand colours live only in `src/lib/brand-colors.ts`; CSS tokens are generated into `src/styles/brand-tokens.css` (`bun scripts/gen-brand-css.ts`) and feeders import it; parity tests block drift — why: one change must reach every format.
 
 - Send to Canva: one shared team account, tokens only in service-role `canva_shared_connection`; sends the export page's checked .pptx — why: one QA-gated file for PowerPoint and Canva.
+- Outside-designer files follow one layout, naming rule and version in `src/lib/next-designer-pack.ts` (ZIP, guide PDF, vendor packs read it) — why: every hand-off surface must match.
