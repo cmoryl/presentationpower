@@ -60,7 +60,7 @@ def main(pdf, out):
         {"text": "Metropolitan West", "x": 158.3, "y": 144.3, "size": 5.5},
         {"text": "Central Park East", "x": 209.5, "y": 140.7, "size": 5.5},
         {"text": "Central Park West", "x": 256.7, "y": 136.0, "size": 5.5},
-        {"text": "Metropolitan Foyer", "x": 107.0, "y": 92.0, "size": 4.6},
+        {"text": "Metropolitan Foyer", "x": 110.0, "y": 80.0, "size": 4.6},
         {"text": "Escalators", "x": 73.0, "y": 80.8, "size": 3.9},
         {"text": "Elevators", "x": 127.3, "y": 67.5, "size": 3.9},
         {"text": "Elevators", "x": 210.0, "y": 96.0, "size": 3.9, "angle": 90},
