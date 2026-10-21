@@ -7,6 +7,7 @@ import type { LinkOptions } from "@tanstack/react-router";
 import { NEXT_EVENT } from "./next-event";
 import { SF_READINESS, SF_VENUE } from "./next-sf-event";
 import { SJB_EVENT } from "./san-juan-bowl";
+import { NEXUS_EVENT } from "./supplied-event-kits";
 
 export type EventTabId =
   | "checklist"
@@ -394,7 +395,39 @@ function sanJuanBowlEntry(): EventEntry {
   };
 }
 
-export const BUILT_IN_EVENTS: readonly EventEntry[] = [londonEntry(), sfEntry(), sanJuanBowlEntry()];
+function nexusEntry(): EventEntry {
+  return {
+    id: NEXUS_EVENT.id,
+    kind: "edition",
+    name: NEXUS_EVENT.name,
+    venue: NEXUS_EVENT.venue,
+    city: NEXUS_EVENT.city,
+    dates: NEXUS_EVENT.datesLabel,
+    tabs: [
+      {
+        id: "checklist",
+        tools: [
+          { label: "NeXus brand kit", detail: "Supplied logos, colours, event map, signage, badges, lanyards and screens.", link: { to: "/events/kits/$kitId", params: { kitId: "nexus" } } },
+          { label: "Hackathon brand kit", detail: "The GlobalLink Hackathon London ’26 logos, guide and pieces.", link: { to: "/events/kits/$kitId", params: { kitId: "hackathon" } } },
+        ],
+      },
+      {
+        id: "maps",
+        tools: [{ label: "Venue maps", detail: "Load each floor's plan as SVG, colour rooms and download.", link: { to: "/events/next/maps/$eventId", params: { eventId: NEXUS_EVENT.id } } }],
+        waitingOn: "the hotel's vector floor plans",
+      },
+      knowledge,
+    ],
+    readiness: [
+      { label: "NeXus logo and brand kit", state: "ready", link: { to: "/events/kits/$kitId", params: { kitId: "nexus" } } },
+      { label: "Hackathon logo and brand kit", state: "ready", link: { to: "/events/kits/$kitId", params: { kitId: "hackathon" } } },
+      { label: "Signage, badges and lanyards", state: "ready", detail: "Supplied finished files.", link: { to: "/events/kits/$kitId", params: { kitId: "nexus" } } },
+      { label: "Dates", state: "waiting", blockedOn: "the organisers" },
+    ],
+  };
+}
+
+export const BUILT_IN_EVENTS: readonly EventEntry[] = [londonEntry(), sfEntry(), sanJuanBowlEntry(), nexusEntry()];
 
 export function builtInEvent(id: string): EventEntry | undefined {
   return BUILT_IN_EVENTS.find((e) => e.id === id);

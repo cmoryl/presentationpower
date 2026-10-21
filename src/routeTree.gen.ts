@@ -171,6 +171,7 @@ import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.pri
 import { Route as DemoDeckDemoIdRouteImport } from './routes/demo.deck.$demoId'
 import { Route as DemoPrintDemoIdRouteImport } from './routes/demo.print.$demoId'
 import { Route as EventsDemoPlaybookIdRouteImport } from './routes/events.demo.$playbookId'
+import { Route as EventsKitsKitIdRouteImport } from './routes/events.kits.$kitId'
 import { Route as EventsNextAgendasRouteImport } from './routes/events.next_.agendas'
 import { Route as EventsNextAssetsRouteImport } from './routes/events.next_.assets'
 import { Route as EventsNextBadgesRouteImport } from './routes/events.next_.badges'
@@ -1052,6 +1053,11 @@ const EventsDemoPlaybookIdRoute = EventsDemoPlaybookIdRouteImport.update({
   path: '/demo/$playbookId',
   getParentRoute: () => EventsRoute,
 } as any)
+const EventsKitsKitIdRoute = EventsKitsKitIdRouteImport.update({
+  id: '/kits/$kitId',
+  path: '/kits/$kitId',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsNextAgendasRoute = EventsNextAgendasRouteImport.update({
   id: '/next_/agendas',
   path: '/next/agendas',
@@ -1555,6 +1561,7 @@ export interface FileRoutesByFullPath {
   '/demo/deck/$demoId': typeof DemoDeckDemoIdRoute
   '/demo/print/$demoId': typeof DemoPrintDemoIdRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
+  '/events/kits/$kitId': typeof EventsKitsKitIdRoute
   '/events/next/agendas': typeof EventsNextAgendasRoute
   '/events/next/assets': typeof EventsNextAssetsRoute
   '/events/next/badges': typeof EventsNextBadgesRoute
@@ -1779,6 +1786,7 @@ export interface FileRoutesByTo {
   '/demo/deck/$demoId': typeof DemoDeckDemoIdRoute
   '/demo/print/$demoId': typeof DemoPrintDemoIdRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
+  '/events/kits/$kitId': typeof EventsKitsKitIdRoute
   '/events/next/agendas': typeof EventsNextAgendasRoute
   '/events/next/assets': typeof EventsNextAssetsRoute
   '/events/next/badges': typeof EventsNextBadgesRoute
@@ -2008,6 +2016,7 @@ export interface FileRoutesById {
   '/demo/deck/$demoId': typeof DemoDeckDemoIdRoute
   '/demo/print/$demoId': typeof DemoPrintDemoIdRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
+  '/events/kits/$kitId': typeof EventsKitsKitIdRoute
   '/events/next_/agendas': typeof EventsNextAgendasRoute
   '/events/next_/assets': typeof EventsNextAssetsRoute
   '/events/next_/badges': typeof EventsNextBadgesRoute
@@ -2238,6 +2247,7 @@ export interface FileRouteTypes {
     | '/demo/deck/$demoId'
     | '/demo/print/$demoId'
     | '/events/demo/$playbookId'
+    | '/events/kits/$kitId'
     | '/events/next/agendas'
     | '/events/next/assets'
     | '/events/next/badges'
@@ -2462,6 +2472,7 @@ export interface FileRouteTypes {
     | '/demo/deck/$demoId'
     | '/demo/print/$demoId'
     | '/events/demo/$playbookId'
+    | '/events/kits/$kitId'
     | '/events/next/agendas'
     | '/events/next/assets'
     | '/events/next/badges'
@@ -2690,6 +2701,7 @@ export interface FileRouteTypes {
     | '/demo/deck/$demoId'
     | '/demo/print/$demoId'
     | '/events/demo/$playbookId'
+    | '/events/kits/$kitId'
     | '/events/next_/agendas'
     | '/events/next_/assets'
     | '/events/next_/badges'
@@ -4008,6 +4020,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsDemoPlaybookIdRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/kits/$kitId': {
+      id: '/events/kits/$kitId'
+      path: '/kits/$kitId'
+      fullPath: '/events/kits/$kitId'
+      preLoaderRoute: typeof EventsKitsKitIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/agendas': {
       id: '/events/next_/agendas'
       path: '/next/agendas'
@@ -4554,6 +4573,7 @@ interface EventsRouteChildren {
   EventsProductionRoute: typeof EventsProductionRoute
   EventsIndexRoute: typeof EventsIndexRoute
   EventsDemoPlaybookIdRoute: typeof EventsDemoPlaybookIdRoute
+  EventsKitsKitIdRoute: typeof EventsKitsKitIdRoute
   EventsNextAgendasRoute: typeof EventsNextAgendasRoute
   EventsNextAssetsRoute: typeof EventsNextAssetsRoute
   EventsNextBadgesRoute: typeof EventsNextBadgesRoute
@@ -4610,6 +4630,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsProductionRoute: EventsProductionRoute,
   EventsIndexRoute: EventsIndexRoute,
   EventsDemoPlaybookIdRoute: EventsDemoPlaybookIdRoute,
+  EventsKitsKitIdRoute: EventsKitsKitIdRoute,
   EventsNextAgendasRoute: EventsNextAgendasRoute,
   EventsNextAssetsRoute: EventsNextAssetsRoute,
   EventsNextBadgesRoute: EventsNextBadgesRoute,
