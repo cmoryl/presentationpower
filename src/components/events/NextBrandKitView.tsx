@@ -70,8 +70,9 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">TransPerfect NEXT</p>
           <h1 className="mt-1 text-3xl font-bold leading-tight">Master event brand kit</h1>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            The NEXT look every city starts from: logos, colours, type, sign templates and digital formats. Version {BRAND_KIT_VERSION}.
+            The NEXT look every city starts from: logos, colours, type, sign templates and digital formats.
           </p>
+          <p className="mt-1 text-xs text-muted-foreground">Kit version {BRAND_KIT_VERSION.replace(/-kit$/, "")}</p>
         </div>
         <Button onClick={download} disabled={!families || !!busy}>
           {busy ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Download className="size-4" aria-hidden />}
@@ -146,9 +147,10 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
               key={c.key}
               type="button"
               onClick={() => navigator.clipboard.writeText(c.hex).then(() => toast.success(`${c.hex} copied`))}
-              className="overflow-hidden rounded-lg border border-border text-left focus-visible:outline-2 focus-visible:outline-ring"
+              className="flex flex-col justify-start overflow-hidden rounded-lg border border-border text-left focus-visible:outline-2 focus-visible:outline-ring"
             >
-              <span className="block h-14" style={{ background: c.hex }} />
+              {/* Keyline so White (and other pale swatches) read on a white page. */}
+              <span className="block h-14 w-full border-b border-border" style={{ background: c.hex }} />
               <span className="block p-3">
                 <span className="block text-sm font-semibold">{c.name}</span>
                 <span className="block font-mono text-xs">{c.hex}</span>
