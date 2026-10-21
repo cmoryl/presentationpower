@@ -212,7 +212,18 @@ function MapsPage() {
       // The SVG goes into the PDF as vector artwork (walls, rooms and names stay
       // editable in Illustrator/Acrobat), not as a picture.
       const [{ jsPDF }, { svg2pdf }] = await Promise.all([import("jspdf"), import("svg2pdf.js")]);
-      const el = new DOMParser().parseFromString(preparedSvg.file, "image/svg+xml").documentElement as unknown as SVGSVGElement;
+      // PDF fills have no per-stop transparency, so a fade toward clear is written
+      // as the same fade toward white — identical on the map's white ground.
+      const flat = preparedSvg.file.replace(
+        /stop-color="#([0-9a-fA-F]{6})"([^>]*?)\sstop-opacity="([\d.]+)"/g,
+        (_m, hex: string, rest: string, op: string) => {
+          const a = Number(op);
+          const n = parseInt(hex, 16);
+          const mix = (v: number) => Math.round(v * a + 255 * (1 - a)).toString(16).padStart(2, "0");
+          return `stop-color="#${mix((n >> 16) & 255)}${mix((n >> 8) & 255)}${mix(n & 255)}"${rest}`;
+        },
+      );
+      const el = new DOMParser().parseFromString(flat, "image/svg+xml").documentElement as unknown as SVGSVGElement;
       if (el.nodeName !== "svg") throw new Error("the map drawing could not be read.");
       const vb = (el.getAttribute("viewBox") ?? "").split(/[\s,]+/).map(Number);
       const vw = vb[2] || parseFloat(el.getAttribute("width") ?? "") || 842;
@@ -221,6 +232,18 @@ function MapsPage() {
       const w = 842;
       const h = (vh / vw) * w;
       const doc = new jsPDF({ unit: "pt", format: [w, h], orientation: w > h ? "landscape" : "portrait" });
+      // Map names keep the Geist face, embedded in the file.
+      const toB64 = async (url: string) => {
+        const buf = new Uint8Array(await (await fetch(url)).arrayBuffer());
+        let bin = "";
+        for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+        return btoa(bin);
+      };
+      const [reg, bold] = await Promise.all([toB64("/fonts/Geist-Regular.ttf"), toB64("/fonts/Geist-Bold.ttf")]);
+      doc.addFileToVFS("Geist-Regular.ttf", reg);
+      doc.addFont("Geist-Regular.ttf", "Geist", "normal");
+      doc.addFileToVFS("Geist-Bold.ttf", bold);
+      doc.addFont("Geist-Bold.ttf", "Geist", "bold");
       // svg2pdf measures in the live document, so the drawing is mounted off-screen briefly.
       const host = document.createElement("div");
       host.style.cssText = "position:fixed;left:-99999px;top:0;width:0;height:0;overflow:hidden";
