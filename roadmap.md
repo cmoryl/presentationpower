@@ -53,3 +53,10 @@
 - [x] Jobs review: event page Plan → Design → Approve → Print → On site timeline
 - [x] Jobs review: split San Juan Bowl brand kit into simple front page + "For designers" page
 - [x] Jobs review: stadium page shows "Coming soon" until BoothHUB publishes
+
+# NEXT designer asset system
+- [x] One designer pack layout + naming rule (`next26_<division>_<asset>_<variant>`), version + changelog, manifest with checksums, Adobe .ase swatches, icons, EPS/PNG logos
+- [x] Designer guide PDF with live links, contents links, real London QEII / San Francisco / template examples, CMYK labelled approved or proof first
+- [x] Partner hand-back upload on the share page → /approvals "Partner designs"
+- [x] Send to vendor: expiring, revocable vendor links to supplied live files + brief PDF; /events/next/vendor-handoffs list
+- [ ] Decide: photography for outside designers; move Dropbox masters into the pack — waiting on owner
