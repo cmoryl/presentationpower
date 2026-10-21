@@ -1,7 +1,7 @@
+import { KitSignList } from "@/components/events/KitSignList";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Download, FileText, PencilRuler } from "lucide-react";
+import { ArrowLeft, Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { kitSigns } from "@/lib/legal-next-signage";
 import { SUPPLIED_KITS, KIT_EVENT, kitFileSize, type KitFile, type SuppliedKit } from "@/lib/supplied-event-kits";
 
 export const Route = createFileRoute("/events/kits/$kitId")({
@@ -145,27 +145,7 @@ function KitPage() {
         </section>
       )}
 
-      {kitSigns(kit.id).length > 0 && (
-        <section className="mt-10">
-          <h2 className="text-xl font-bold text-foreground">Edit in Element</h2>
-          <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-            These pieces open in the sign editor: retype the wording, move or hide pieces, make new sizes and download print files. The supplied files stay unchanged.
-          </p>
-          <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {kitSigns(kit.id).map((s) => (
-              <li key={s.id} className="flex items-center justify-between gap-3 rounded-md border border-border bg-card p-3">
-                <span className="text-sm">
-                  <span className="block font-semibold text-foreground">{s.title}</span>
-                  <span className="text-xs text-muted-foreground">{s.size}</span>
-                </span>
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/events/next/sign-editor/$signId" params={{ signId: s.id }}><PencilRuler className="h-4 w-4" /> Edit</Link>
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <KitSignList kit={kit.id} />
 
       {groups.map((g) => (
         <section key={g} className="mt-10">

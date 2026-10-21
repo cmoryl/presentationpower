@@ -118,7 +118,7 @@
   "texts": [
    {
     "id": "t0",
-    "text": "PREPARE FOR WHAT’S",
+    "text": "PREPARE FOR WHAT\u2019S",
     "font": "Geist-Regular",
     "size": 200.0,
     "color": "#FFFFFF",
@@ -422,7 +422,7 @@
    },
    {
     "id": "t1",
-    "text": "PREPARE FOR WHAT’S",
+    "text": "PREPARE FOR WHAT\u2019S",
     "font": "Geist-Regular",
     "size": 185.0,
     "color": "#FFFFFF",
@@ -737,7 +737,7 @@
    },
    {
     "id": "t1",
-    "text": "PREPARE FOR WHAT’S",
+    "text": "PREPARE FOR WHAT\u2019S",
     "font": "Geist-Regular",
     "size": 185.0,
     "color": "#FFFFFF",
@@ -869,7 +869,7 @@
   "texts": [
    {
     "id": "t0",
-    "text": "LEARN WHAT WORKS. PREPARE FOR WHAT’S",
+    "text": "LEARN WHAT WORKS. PREPARE FOR WHAT\u2019S",
     "font": "Geist-Regular",
     "size": 300.0,
     "color": "#FFFFFF",
@@ -5996,7 +5996,7 @@
    },
    {
     "id": "t3",
-    "text": "The Global Content Operating System™ that enables you\nto create AI-driven content using\nyour brand guidelines and campaign\nrequirements, from idea to publishing.",
+    "text": "The Global Content Operating System\u2122 that enables you\nto create AI-driven content using\nyour brand guidelines and campaign\nrequirements, from idea to publishing.",
     "font": "Geist-Regular",
     "size": 155.01,
     "color": "#FFFFFF",
@@ -7902,7 +7902,7 @@
   "texts": [
    {
     "id": "headline",
-    "text": "STEP\nINTO\nWHAT’S",
+    "text": "STEP\nINTO\nWHAT\u2019S",
     "font": "Geist-Bold",
     "size": 329.58,
     "color": "#FFFFFF",
@@ -8818,7 +8818,7 @@
   "texts": [
    {
     "id": "headline",
-    "text": "YOU CAN’T\nSPELL\nGLOBALLINK\nWITHOUT AI",
+    "text": "YOU CAN\u2019T\nSPELL\nGLOBALLINK\nWITHOUT AI",
     "font": "Geist-Bold",
     "size": 200.0,
     "color": "#FFFFFF",
@@ -9541,7 +9541,7 @@
   "texts": [
    {
     "id": "headline",
-    "text": "STEP\nINTO\nWHAT’S",
+    "text": "STEP\nINTO\nWHAT\u2019S",
     "font": "Geist-ExtraBold",
     "size": 330.24,
     "color": "#FFFFFF",
@@ -10485,7 +10485,7 @@
   "texts": [
    {
     "id": "headline",
-    "text": "YOU CAN’T\nSPELL\nGLOBALLINK\nWITHOUT AI",
+    "text": "YOU CAN\u2019T\nSPELL\nGLOBALLINK\nWITHOUT AI",
     "font": "Geist-ExtraBold",
     "size": 198.77,
     "color": "#FFFFFF",
@@ -15546,7 +15546,23 @@
   "originY": 0.0,
   "mediaW": 1133.86,
   "mediaH": 5669.29,
-  "texts": [],
+  "texts": [
+   {
+    "id": "r0",
+    "text": "COVENT GARDEN",
+    "font": "Poppins-Bold",
+    "size": 373.32,
+    "color": "#223D71",
+    "x": -772.25,
+    "y": 2829.23,
+    "w": 2953.93,
+    "top": 2566.04,
+    "bottom": 2829.23,
+    "align": "center",
+    "rot": -90,
+    "track": -52.7
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -15706,7 +15722,23 @@
   "originY": 0.0,
   "mediaW": 1133.86,
   "mediaH": 5669.29,
-  "texts": [],
+  "texts": [
+   {
+    "id": "r0",
+    "text": "BAKER STREET",
+    "font": "Poppins-Bold",
+    "size": 372.79,
+    "color": "#223D71",
+    "x": -482.67,
+    "y": 2842.77,
+    "w": 2384.93,
+    "top": 2579.96,
+    "bottom": 2842.77,
+    "align": "center",
+    "rot": -90,
+    "track": -57.4
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -15866,7 +15898,23 @@
   "originY": 0.0,
   "mediaW": 1133.86,
   "mediaH": 5669.29,
-  "texts": [],
+  "texts": [
+   {
+    "id": "r0",
+    "text": "BANK",
+    "font": "Poppins-Bold",
+    "size": 373.32,
+    "color": "#223D71",
+    "x": 216.11,
+    "y": 2842.67,
+    "w": 977.2,
+    "top": 2579.48,
+    "bottom": 2842.67,
+    "align": "center",
+    "rot": -90,
+    "track": -75.8
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -15982,7 +16030,23 @@
   "originY": 0.0,
   "mediaW": 1133.86,
   "mediaH": 5669.29,
-  "texts": [],
+  "texts": [
+   {
+    "id": "r0",
+    "text": "EUSTON",
+    "font": "Poppins-Bold",
+    "size": 376.52,
+    "color": "#223D71",
+    "x": 13.6,
+    "y": 2821.0,
+    "w": 1382.22,
+    "top": 2555.55,
+    "bottom": 2821.0,
+    "align": "center",
+    "rot": -90,
+    "track": -63.8
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -16098,7 +16162,23 @@
   "originY": 0.0,
   "mediaW": 1133.86,
   "mediaH": 5669.29,
-  "texts": [],
+  "texts": [
+   {
+    "id": "r0",
+    "text": "MOORGATE",
+    "font": "Poppins-Bold",
+    "size": 373.32,
+    "color": "#223D71",
+    "x": -287.21,
+    "y": 2831.39,
+    "w": 2009.09,
+    "top": 2568.2,
+    "bottom": 2831.39,
+    "align": "center",
+    "rot": -90,
+    "track": -55.9
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -16236,7 +16316,23 @@
   "originY": 0.0,
   "mediaW": 1133.86,
   "mediaH": 5669.29,
-  "texts": [],
+  "texts": [
+   {
+    "id": "r0",
+    "text": "WELCOME",
+    "font": "Poppins-Bold",
+    "size": 373.32,
+    "color": "#223D71",
+    "x": -175.47,
+    "y": 2823.29,
+    "w": 1766.77,
+    "top": 2560.1,
+    "bottom": 2823.29,
+    "align": "center",
+    "rot": -90,
+    "track": -57.4
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -16352,7 +16448,23 @@
   "originY": 0.0,
   "mediaW": 1133.86,
   "mediaH": 5669.29,
-  "texts": [],
+  "texts": [
+   {
+    "id": "r0",
+    "text": "RICHMOND 1",
+    "font": "Poppins-Bold",
+    "size": 372.03,
+    "color": "#223D71",
+    "x": -358.61,
+    "y": 2832.78,
+    "w": 2129.87,
+    "top": 2570.5,
+    "bottom": 2832.78,
+    "align": "center",
+    "rot": -90,
+    "track": -54.0
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -16490,7 +16602,23 @@
   "originY": 0.0,
   "mediaW": 1133.86,
   "mediaH": 5669.29,
-  "texts": [],
+  "texts": [
+   {
+    "id": "r0",
+    "text": "RICHMOND 2",
+    "font": "Poppins-Bold",
+    "size": 372.09,
+    "color": "#223D71",
+    "x": -403.32,
+    "y": 2851.39,
+    "w": 2213.18,
+    "top": 2589.07,
+    "bottom": 2851.39,
+    "align": "center",
+    "rot": -90,
+    "track": -50.9
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -16606,7 +16734,23 @@
   "originY": 0.0,
   "mediaW": 1133.86,
   "mediaH": 5669.29,
-  "texts": [],
+  "texts": [
+   {
+    "id": "r0",
+    "text": "RICHMOND 4",
+    "font": "Poppins-Bold",
+    "size": 372.03,
+    "color": "#223D71",
+    "x": -415.36,
+    "y": 2825.79,
+    "w": 2248.55,
+    "top": 2563.51,
+    "bottom": 2825.79,
+    "align": "center",
+    "rot": -90,
+    "track": -52.0
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -16733,7 +16877,23 @@
   "originY": 0.0,
   "mediaW": 1133.86,
   "mediaH": 5669.29,
-  "texts": [],
+  "texts": [
+   {
+    "id": "r0",
+    "text": "REGISTRATION",
+    "font": "Poppins-Bold",
+    "size": 373.32,
+    "color": "#223D71",
+    "x": -532.59,
+    "y": 2832.9,
+    "w": 2474.66,
+    "top": 2569.71,
+    "bottom": 2832.9,
+    "align": "center",
+    "rot": -90,
+    "track": -58.2
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -16893,7 +17053,23 @@
   "originY": 0.0,
   "mediaW": 1133.86,
   "mediaH": 5669.29,
-  "texts": [],
+  "texts": [
+   {
+    "id": "r0",
+    "text": "TYBURN KITCHEN",
+    "font": "Poppins-Bold",
+    "size": 372.79,
+    "color": "#223D71",
+    "x": -753.4,
+    "y": 2827.56,
+    "w": 2926.08,
+    "top": 2564.75,
+    "bottom": 2827.56,
+    "align": "center",
+    "rot": -90,
+    "track": -58.6
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -17053,7 +17229,23 @@
   "originY": 0.0,
   "mediaW": 1133.86,
   "mediaH": 5669.29,
-  "texts": [],
+  "texts": [
+   {
+    "id": "r0",
+    "text": "MEZZANINE",
+    "font": "Poppins-Bold",
+    "size": 373.32,
+    "color": "#223D71",
+    "x": -264.48,
+    "y": 2837.07,
+    "w": 1943.65,
+    "top": 2573.88,
+    "bottom": 2837.07,
+    "align": "center",
+    "rot": -90,
+    "track": -65.2
+   }
+  ],
   "blocks": [
    {
     "id": "b0",
@@ -18486,6 +18678,1043 @@
     -9.0,
     3467.27,
     5678.29
+   ]
+  },
+  "sign": {
+   "margin": 36
+  }
+ },
+ "divsign-nexus-first-post": {
+  "id": "divsign-nexus-first-post",
+  "source": "first version \u00b7 NeXus London",
+  "trimW": 1080.0,
+  "trimH": 1080.0,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1080.0,
+  "mediaH": 1080.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "Join us in London",
+    "font": "Poppins-Bold",
+    "size": 72.0,
+    "color": "#FFFFFF",
+    "x": 223.24,
+    "y": 760.0,
+    "w": 633.53,
+    "top": 713.2,
+    "bottom": 785.2,
+    "align": "center"
+   },
+   {
+    "id": "t1",
+    "text": "Date and venue to be confirmed",
+    "font": "Poppins-Regular",
+    "size": 38.0,
+    "color": "#FFFFFF",
+    "x": 231.52,
+    "y": 830.0,
+    "w": 616.97,
+    "top": 805.3,
+    "bottom": 843.3,
+    "align": "center"
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 1080.0,
+    "c0": 0,
+    "c1": 1080.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 475.2,
+      "y0": 655.0,
+      "x1": 604.8,
+      "y1": 663.64
+     },
+     {
+      "id": "n1",
+      "x0": 290.0,
+      "y0": 272.88,
+      "x1": 790.0,
+      "y1": 467.12
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#003B71"
+   },
+   {
+    "offset": 1,
+    "color": "#139DD8"
+   }
+  ],
+  "native": {
+   "version": "first-versions-2026-10-21",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1089.0,
+    1089.0
+   ]
+  },
+  "sign": {
+   "margin": 36
+  }
+ },
+ "divsign-nexus-first-story": {
+  "id": "divsign-nexus-first-story",
+  "source": "first version \u00b7 NeXus London",
+  "trimW": 1080.0,
+  "trimH": 1920.0,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1080.0,
+  "mediaH": 1920.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "Join us in London",
+    "font": "Poppins-Bold",
+    "size": 86.0,
+    "color": "#FFFFFF",
+    "x": 161.64,
+    "y": 1180.0,
+    "w": 756.71,
+    "top": 1124.1,
+    "bottom": 1210.1,
+    "align": "center"
+   },
+   {
+    "id": "t1",
+    "text": "Date and venue to be confirmed",
+    "font": "Poppins-Regular",
+    "size": 44.0,
+    "color": "#FFFFFF",
+    "x": 182.81,
+    "y": 1260.0,
+    "w": 714.38,
+    "top": 1231.4,
+    "bottom": 1275.4,
+    "align": "center"
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 1920.0,
+    "c0": 0,
+    "c1": 1920.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 475.2,
+      "y0": 1050.0,
+      "x1": 604.8,
+      "y1": 1058.64
+     },
+     {
+      "id": "n1",
+      "x0": 240.0,
+      "y0": 563.46,
+      "x1": 840.0,
+      "y1": 796.54
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#003B71"
+   },
+   {
+    "offset": 1,
+    "color": "#139DD8"
+   }
+  ],
+  "native": {
+   "version": "first-versions-2026-10-21",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1089.0,
+    1929.0
+   ]
+  },
+  "sign": {
+   "margin": 36
+  }
+ },
+ "divsign-nexus-first-email": {
+  "id": "divsign-nexus-first-email",
+  "source": "first version \u00b7 NeXus London",
+  "trimW": 600.0,
+  "trimH": 200.0,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 600.0,
+  "mediaH": 200.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "Join us in London",
+    "font": "Poppins-Bold",
+    "size": 22.0,
+    "color": "#FFFFFF",
+    "x": 260.0,
+    "y": 92.0,
+    "w": 193.58,
+    "top": 77.7,
+    "bottom": 99.7
+   },
+   {
+    "id": "t1",
+    "text": "Date and venue to be confirmed",
+    "font": "Poppins-Regular",
+    "size": 15.0,
+    "color": "#FFFFFF",
+    "x": 260.0,
+    "y": 122.0,
+    "w": 243.54,
+    "top": 112.25,
+    "bottom": 127.25
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 200.0,
+    "c0": 0,
+    "c1": 200.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 24.0,
+      "y0": 59.21,
+      "x1": 234.0,
+      "y1": 140.79
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#003B71"
+   },
+   {
+    "offset": 1,
+    "color": "#139DD8"
+   }
+  ],
+  "native": {
+   "version": "first-versions-2026-10-21",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    609.0,
+    209.0
+   ]
+  },
+  "sign": {
+   "margin": 12
+  }
+ },
+ "divsign-hackathon-first-post": {
+  "id": "divsign-hackathon-first-post",
+  "source": "first version \u00b7 GlobalLink Hackathon London",
+  "trimW": 1080.0,
+  "trimH": 1080.0,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1080.0,
+  "mediaH": 1080.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "Join us in London",
+    "font": "Poppins-Bold",
+    "size": 72.0,
+    "color": "#FFFFFF",
+    "x": 223.24,
+    "y": 760.0,
+    "w": 633.53,
+    "top": 713.2,
+    "bottom": 785.2,
+    "align": "center"
+   },
+   {
+    "id": "t1",
+    "text": "Date and venue to be confirmed",
+    "font": "Poppins-Regular",
+    "size": 38.0,
+    "color": "#FFFFFF",
+    "x": 231.52,
+    "y": 830.0,
+    "w": 616.97,
+    "top": 805.3,
+    "bottom": 843.3,
+    "align": "center"
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 1080.0,
+    "c0": 0,
+    "c1": 1080.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 475.2,
+      "y0": 655.0,
+      "x1": 604.8,
+      "y1": 663.64
+     },
+     {
+      "id": "n1",
+      "x0": 290.0,
+      "y0": 306.81,
+      "x1": 790.0,
+      "y1": 433.19
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#003B71"
+   },
+   {
+    "offset": 1,
+    "color": "#139DD8"
+   }
+  ],
+  "native": {
+   "version": "first-versions-2026-10-21",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1089.0,
+    1089.0
+   ]
+  },
+  "sign": {
+   "margin": 36
+  }
+ },
+ "divsign-hackathon-first-story": {
+  "id": "divsign-hackathon-first-story",
+  "source": "first version \u00b7 GlobalLink Hackathon London",
+  "trimW": 1080.0,
+  "trimH": 1920.0,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1080.0,
+  "mediaH": 1920.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "Join us in London",
+    "font": "Poppins-Bold",
+    "size": 86.0,
+    "color": "#FFFFFF",
+    "x": 161.64,
+    "y": 1180.0,
+    "w": 756.71,
+    "top": 1124.1,
+    "bottom": 1210.1,
+    "align": "center"
+   },
+   {
+    "id": "t1",
+    "text": "Date and venue to be confirmed",
+    "font": "Poppins-Regular",
+    "size": 44.0,
+    "color": "#FFFFFF",
+    "x": 182.81,
+    "y": 1260.0,
+    "w": 714.38,
+    "top": 1231.4,
+    "bottom": 1275.4,
+    "align": "center"
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 1920.0,
+    "c0": 0,
+    "c1": 1920.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 475.2,
+      "y0": 1050.0,
+      "x1": 604.8,
+      "y1": 1058.64
+     },
+     {
+      "id": "n1",
+      "x0": 240.0,
+      "y0": 604.17,
+      "x1": 840.01,
+      "y1": 755.83
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#003B71"
+   },
+   {
+    "offset": 1,
+    "color": "#139DD8"
+   }
+  ],
+  "native": {
+   "version": "first-versions-2026-10-21",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1089.0,
+    1929.0
+   ]
+  },
+  "sign": {
+   "margin": 36
+  }
+ },
+ "divsign-hackathon-first-email": {
+  "id": "divsign-hackathon-first-email",
+  "source": "first version \u00b7 GlobalLink Hackathon London",
+  "trimW": 600.0,
+  "trimH": 200.0,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 600.0,
+  "mediaH": 200.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "Join us in London",
+    "font": "Poppins-Bold",
+    "size": 22.0,
+    "color": "#FFFFFF",
+    "x": 260.0,
+    "y": 92.0,
+    "w": 193.58,
+    "top": 77.7,
+    "bottom": 99.7
+   },
+   {
+    "id": "t1",
+    "text": "Date and venue to be confirmed",
+    "font": "Poppins-Regular",
+    "size": 15.0,
+    "color": "#FFFFFF",
+    "x": 260.0,
+    "y": 122.0,
+    "w": 243.54,
+    "top": 112.25,
+    "bottom": 127.25
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 200.0,
+    "c0": 0,
+    "c1": 200.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 24.0,
+      "y0": 73.46,
+      "x1": 234.0,
+      "y1": 126.54
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#003B71"
+   },
+   {
+    "offset": 1,
+    "color": "#139DD8"
+   }
+  ],
+  "native": {
+   "version": "first-versions-2026-10-21",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    609.0,
+    209.0
+   ]
+  },
+  "sign": {
+   "margin": 12
+  }
+ },
+ "divsign-sjb-first-post": {
+  "id": "divsign-sjb-first-post",
+  "source": "first version \u00b7 TransPerfect San Juan Bowl",
+  "trimW": 1080.0,
+  "trimH": 1080.0,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1080.0,
+  "mediaH": 1080.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "San Juan Bowl",
+    "font": "Geist-Bold",
+    "size": 72.0,
+    "color": "#FFFFFF",
+    "x": 278.5,
+    "y": 760.0,
+    "w": 523.01,
+    "top": 709.24,
+    "bottom": 781.24,
+    "align": "center"
+   },
+   {
+    "id": "t1",
+    "text": "San Juan, Puerto Rico",
+    "font": "Geist-Regular",
+    "size": 38.0,
+    "color": "#FFFFFF",
+    "x": 346.35,
+    "y": 830.0,
+    "w": 387.3,
+    "top": 803.21,
+    "bottom": 841.21,
+    "align": "center"
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 1080.0,
+    "c0": 0,
+    "c1": 1080.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 290.0,
+      "y0": 120.0,
+      "x1": 790.0,
+      "y1": 663.64
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#0D0E21"
+   },
+   {
+    "offset": 1,
+    "color": "#0D0E21"
+   }
+  ],
+  "native": {
+   "version": "first-versions-2026-10-21",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1089.0,
+    1089.0
+   ]
+  },
+  "sign": {
+   "margin": 36
+  }
+ },
+ "divsign-sjb-first-story": {
+  "id": "divsign-sjb-first-story",
+  "source": "first version \u00b7 TransPerfect San Juan Bowl",
+  "trimW": 1080.0,
+  "trimH": 1920.0,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1080.0,
+  "mediaH": 1920.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "San Juan Bowl",
+    "font": "Geist-Bold",
+    "size": 86.0,
+    "color": "#FFFFFF",
+    "x": 227.65,
+    "y": 1180.0,
+    "w": 624.7,
+    "top": 1119.37,
+    "bottom": 1205.37,
+    "align": "center"
+   },
+   {
+    "id": "t1",
+    "text": "San Juan, Puerto Rico",
+    "font": "Geist-Regular",
+    "size": 44.0,
+    "color": "#FFFFFF",
+    "x": 315.78,
+    "y": 1260.0,
+    "w": 448.45,
+    "top": 1228.98,
+    "bottom": 1272.98,
+    "align": "center"
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 1920.0,
+    "c0": 0,
+    "c1": 1920.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 475.2,
+      "y0": 1050.0,
+      "x1": 604.8,
+      "y1": 1058.64
+     },
+     {
+      "id": "n1",
+      "x0": 240.0,
+      "y0": 380.0,
+      "x1": 840.0,
+      "y1": 980.0
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#0D0E21"
+   },
+   {
+    "offset": 1,
+    "color": "#0D0E21"
+   }
+  ],
+  "native": {
+   "version": "first-versions-2026-10-21",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1089.0,
+    1929.0
+   ]
+  },
+  "sign": {
+   "margin": 36
+  }
+ },
+ "divsign-sjb-first-email": {
+  "id": "divsign-sjb-first-email",
+  "source": "first version \u00b7 TransPerfect San Juan Bowl",
+  "trimW": 600.0,
+  "trimH": 200.0,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 600.0,
+  "mediaH": 200.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "TransPerfect San Juan Bowl",
+    "font": "Geist-Bold",
+    "size": 22.0,
+    "color": "#FFFFFF",
+    "x": 260.0,
+    "y": 92.0,
+    "w": 309.94,
+    "top": 76.49,
+    "bottom": 98.49
+   },
+   {
+    "id": "t1",
+    "text": "San Juan, Puerto Rico",
+    "font": "Geist-Regular",
+    "size": 15.0,
+    "color": "#FFFFFF",
+    "x": 260.0,
+    "y": 122.0,
+    "w": 152.88,
+    "top": 111.42,
+    "bottom": 126.42
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 200.0,
+    "c0": 0,
+    "c1": 200.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 57.0,
+      "y0": 28.0,
+      "x1": 201.0,
+      "y1": 172.0
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#0D0E21"
+   },
+   {
+    "offset": 1,
+    "color": "#0D0E21"
+   }
+  ],
+  "native": {
+   "version": "first-versions-2026-10-21",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    609.0,
+    209.0
+   ]
+  },
+  "sign": {
+   "margin": 12
+  }
+ },
+ "divsign-sjb-first-pillar": {
+  "id": "divsign-sjb-first-pillar",
+  "source": "first version \u00b7 TransPerfect San Juan Bowl",
+  "trimW": 1728.0,
+  "trimH": 6912.0,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 1728.0,
+  "mediaH": 6912.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "WELCOME",
+    "font": "Geist-Bold",
+    "size": 300.0,
+    "color": "#FFFFFF",
+    "x": 73.05,
+    "y": 3700.0,
+    "w": 1581.9,
+    "top": 3488.5,
+    "bottom": 3788.5,
+    "align": "center"
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 6912.0,
+    "c0": 0,
+    "c1": 6912.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 760.32,
+      "y0": 3240.0,
+      "x1": 967.68,
+      "y1": 3253.82
+     },
+     {
+      "id": "n1",
+      "x0": 214.0,
+      "y0": 500.0,
+      "x1": 1514.0,
+      "y1": 1800.0
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#0D0E21"
+   },
+   {
+    "offset": 1,
+    "color": "#0D0E21"
+   }
+  ],
+  "native": {
+   "version": "first-versions-2026-10-21",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    1737.0,
+    6921.0
    ]
   },
   "sign": {

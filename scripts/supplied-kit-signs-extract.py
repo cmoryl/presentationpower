@@ -43,6 +43,55 @@ def ink_from_render(tpath, texts, W, H):
             px.sort(key=lambda p: p[0] + p[1] + p[2]); m = px[len(px) // 2]
             t["color"] = "#%02X%02X%02X" % m[:3]
 
+def _font_metrics(name):
+    from fontTools.ttLib import TTFont
+    f = TTFont(os.path.join(os.environ.get("KIT_FONT_DIR", "/tmp/lwf"), name + ".ttf"))
+    upm = f["head"].unitsPerEm; cmap = f.getBestCmap(); hm = f["hmtx"]; gs = f.getGlyphSet()
+    from fontTools.pens.boundsPen import BoundsPen
+    def ink(ch):
+        g = cmap.get(ord(ch)); bp = BoundsPen(gs); gs[g].draw(bp); b = bp.bounds or (0, 0, 0, 0)
+        return hm[g][0] / upm, b[0] / upm, (hm[g][0] - b[2]) / upm
+    return f["OS/2"].sCapHeight / upm, ink
+
+def retype(paints, r, W, H):
+    """Outlined words -> live text: hide the glyph paths inside r["region"] (trim, top-down)
+    and return a LiveText set in the kit face at the size and place the glyphs were drawn."""
+    x0, y0, x1, y1 = r["region"]; rot = r.get("rot", 0)
+    long_ext = (y1 - y0) if rot else (x1 - x0)
+    gl = []
+    for p in paints:
+        if p.get("hidden") or not p["box"] or p["kind"] == "text": continue
+        b = p["box"]; bx0, bx1, by0, by1 = b[0], b[2], H - b[3], H - b[1]
+        if bx0 >= x0 and bx1 <= x1 and by0 >= y0 and by1 <= y1 and ((by1 - by0) if rot else (bx1 - bx0)) < 0.4 * long_ext:
+            gl.append((p, bx0, by0, bx1, by1))
+    if not gl: raise ValueError(f"no glyphs for {r['text']}")
+    # A short panel behind a short word also passes the length test; glyphs share one cap height.
+    perp = lambda g: (g[3] - g[1]) if rot else (g[4] - g[2])
+    med = sorted(perp(g) for g in gl)[len(gl) // 2]
+    gl = [g for g in gl if perp(g) <= 1.3 * med]
+    for g in gl: g[0]["hidden"] = True
+    ux0, uy0, ux1, uy1 = min(g[1] for g in gl), min(g[2] for g in gl), max(g[3] for g in gl), max(g[4] for g in gl)
+    cap_ratio, ink = _font_metrics(r["font"])
+    caps = sorted(((g[3] - g[1]) if rot else (g[4] - g[2])) for g in gl)
+    size = caps[len(caps) // 2] / cap_ratio
+    txt = r["text"]; adv = sum(ink(c)[0] for c in txt)
+    natural_ink = (adv - ink(txt[0])[1] - ink(txt[-1])[2]) * size
+    measured = (uy1 - uy0) if rot else (ux1 - ux0)
+    n = len(txt) - 1
+    track = round((measured - natural_ink) / n / size * 1000, 1) if n else 0
+    w = (adv + track / 1000 * n) * size
+    if rot == -90:   # reads bottom to top; baseline is the right edge of the caps
+        cx, cy = ux1, (uy0 + uy1) / 2 + (ink(txt[0])[1] - ink(txt[-1])[2]) * size / 2
+    elif rot == 90:
+        cx, cy = ux0, (uy0 + uy1) / 2 - (ink(txt[0])[1] - ink(txt[-1])[2]) * size / 2
+    else:
+        cx, cy = (ux0 + ux1) / 2 - (ink(txt[0])[1] - ink(txt[-1])[2]) * size / 2, uy1
+    t = {"id": r.get("id", "r0"), "text": txt, "font": r["font"], "size": round(size, 2), "color": r["color"],
+         "x": round(cx - w / 2, 2), "y": round(cy, 2), "w": round(w, 2), "top": round(cy - size * cap_ratio, 2), "bottom": round(cy, 2), "align": "center"}
+    if rot: t["rot"] = rot
+    if abs(track) >= 1: t["track"] = track
+    return t
+
 def one(it, OUT, version):
     lid = it["id"]; src = pikepdf.open(it["pdf"]); page = src.pages[it["page"]]
     ops, paints, W, H = analyse(src, page, set())
@@ -54,6 +103,7 @@ def one(it, OUT, version):
             p["box"] = [p["box"][0] - ox, p["box"][1] - oy, p["box"][2] - ox, p["box"][3] - oy]
             b = p["box"]
             if b[2] <= 0.5 or b[3] <= 0.5 or b[0] >= W - 0.5 or b[1] >= H - 0.5: p["hidden"] = True
+    retyped = [retype(paints, r, W, H) for r in it.get("retype", [])]
     shift = f"1 0 0 1 {-ox:.6f} {-oy:.6f} cm\n".encode()
     mark_forms(ops, page, paints)
     bg, objs = split(paints, W, H)
@@ -77,6 +127,7 @@ def one(it, OUT, version):
     for t in texts:
         if it.get("textColor") and t["color"] == "#000000": t["color"] = it["textColor"]
     if any(t["color"] == "#000000" for t in texts): ink_from_render(tpath, texts, W, H)
+    texts += retyped
     npath = f"{OUT}/{lid}-native.pdf"; nat.save(npath)
     syms = [svg_symbol(npath, bg_page, "bg", f"{lid}-bg")] + [svg_symbol(npath, parts[b["id"]]["page"], b["id"], f"{lid}-{b['id']}") for b in boxes]
     open(f"{OUT}/{lid}-native.svg", "w").write(f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {W:g} {H:g}">' + "".join(syms) + "</svg>")
