@@ -280,7 +280,7 @@ export const QEII_ROOM_CLOSING_RUNS: Record<string, Record<string, [number, numb
     "Empire West": [[[156.1, 10], [156.1, 60]]],
     "Central Park East": [[[205.4, 98.9], [253.3, 173.7]]],
     // and closed across the service passage that runs up to the Lenox Ballroom.
-    "Central Park West": [[[205.4, 98.9], [253.3, 173.7]], [[224, 101], [252, 101]]],
+    "Central Park West": [[[205.4, 98.9], [253.3, 173.7]], [[224, 96], [252, 96]]],
   },
 };
 
