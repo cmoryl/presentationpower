@@ -81,7 +81,28 @@ export const SUPPLIED_KITS: Record<SuppliedKit["id"], SuppliedKit> = {
     donts: DONTS,
     ...(hackathonFiles as unknown as Pick<SuppliedKit, "logos" | "guide" | "live" | "pieces">),
   },
+  legalweek: {
+    id: "legalweek",
+    name: "TransPerfect Legal at Legalweek 2026",
+    intro:
+      "Supplied artwork for TransPerfect Legal at Legalweek 2026, NYC, March 9–12, Javits Center (North). Theme: “Experience the next wave of legal technology.” Every piece is the designers’ own file, unchanged.",
+    colours: [],
+    typography: "Poppins (SemiBold supplied with the pillar signs and fabric walls).",
+    logoNote: "No separate logo files were supplied; the TransPerfect Legal mark appears inside each piece.",
+    donts: [],
+    logos: [],
+    ...(legalweekFiles as unknown as Pick<SuppliedKit, "live" | "pieces">),
+  },
 };
+
+/** Venue and dates as printed on the supplied pillar signs and posts. */
+export const LEGALWEEK_EVENT = {
+  id: "legalweek-2026",
+  name: "TransPerfect Legal at Legalweek 2026",
+  city: "New York",
+  venue: "Javits Center (North)",
+  datesLabel: "9–12 March 2026",
+} as const;
 
 export const NEXUS_EVENT = {
   id: "nexus-london",
@@ -104,6 +125,7 @@ export const HACKATHON_EVENT = {
 export const KIT_EVENT: Record<SuppliedKit["id"], { id: string; name: string }> = {
   nexus: NEXUS_EVENT,
   hackathon: HACKATHON_EVENT,
+  legalweek: LEGALWEEK_EVENT,
 };
 
 export function kitFileSize(bytes: number): string {

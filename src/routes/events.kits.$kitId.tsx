@@ -66,18 +66,20 @@ function KitPage() {
       </Link>
       <h1 className="mt-3 text-3xl font-bold leading-tight text-foreground">{kit.name} brand kit</h1>
       <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-muted-foreground">{kit.intro}</p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Button asChild>
-          <a href={kit.guide.file} download>
-            <Download className="h-4 w-4" /> Brand guidelines (PDF)
-          </a>
-        </Button>
-      </div>
+      {kit.guide ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button asChild>
+            <a href={kit.guide.file} download>
+              <Download className="h-4 w-4" /> Brand guidelines (PDF)
+            </a>
+          </Button>
+        </div>
+      ) : null}
 
       <section className="mt-10">
         <h2 className="text-xl font-bold text-foreground">Logos</h2>
         <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{kit.logoNote}</p>
-        <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {kit.logos.length > 0 && <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {kit.logos.map((l) => {
             const ground = /LightBlueBG/i.test(l.name) ? "bg-[#139DD8]" : /DarkBlueBG|White/i.test(l.name) ? "bg-[#003B71]" : "bg-muted";
             return (
@@ -92,12 +94,13 @@ function KitPage() {
               </li>
             );
           })}
-        </ul>
+        </ul>}
       </section>
 
       <section className="mt-10 grid gap-8 md:grid-cols-2">
         <div>
           <h2 className="text-xl font-bold text-foreground">Colours</h2>
+          {kit.colours.length === 0 && <p className="mt-2 text-sm text-muted-foreground">No brand guide was supplied, so no colour values are listed. Take colours from the live files.</p>}
           <ul className="mt-4 space-y-3">
             {kit.colours.map((c) => (
               <li key={c.hex} className="flex items-center gap-4">
@@ -112,15 +115,17 @@ function KitPage() {
             ))}
           </ul>
           {kit.gradientNote && <p className="mt-3 text-sm text-muted-foreground">{kit.gradientNote}</p>}
-          <p className="mt-2 text-xs text-muted-foreground">Values as printed in the supplied brand guide.</p>
+          {kit.colours.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Values as printed in the supplied brand guide.</p>}
         </div>
         <div>
           <h2 className="text-xl font-bold text-foreground">Typography</h2>
           <p className="mt-2 text-sm text-muted-foreground">{kit.typography}</p>
+          {kit.donts.length > 0 && <>
           <h2 className="mt-6 text-xl font-bold text-foreground">Logo don’ts</h2>
           <ul className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-muted-foreground">
             {kit.donts.map((d) => <li key={d}>{d}</li>)}
           </ul>
+          </>}
         </div>
       </section>
 
@@ -143,7 +148,7 @@ function KitPage() {
         <section key={g} className="mt-10">
           <h2 className="text-xl font-bold text-foreground">{g}</h2>
           <ul className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {kit.pieces.filter((p) => p.group === g).map((p) => <FileCard key={p.file} f={p} />)}
+            {kit.pieces.filter((p) => p.group === g).map((p) => <FileCard key={p.file + p.title} f={p} />)}
           </ul>
         </section>
       ))}
@@ -152,7 +157,7 @@ function KitPage() {
         <h2 className="text-xl font-bold text-foreground">Live files</h2>
         <p className="mt-1 text-sm text-muted-foreground">The designers’ own working files, unchanged.</p>
         <ul className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {kit.live.map((p) => <FileCard key={p.file} f={p} />)}
+          {kit.live.map((p) => <FileCard key={p.file + p.title} f={p} />)}
         </ul>
       </section>
     </main>
