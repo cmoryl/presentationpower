@@ -292,8 +292,8 @@ for L in sj + bw:
 LEVELS = horizontal_levels(_raw.values())
 CLEAN = {}
 for k, g in _raw.items():
-    c = clean_letter(g, LEVELS, diagonal=k in 'ANW');  # counters of A, N, W follow their legs
-     x0, y0, x1, y1 = c.bounds
+    c = clean_letter(g, LEVELS, diagonal=k in 'ANW')  # counters of A, N, W follow their legs
+    x0, y0, x1, y1 = c.bounds
     CLEAN[k] = affinity.scale(affinity.translate(c, -x0, -y0), 1, CAP / (y1 - y0), origin=(0, 0))
 
 
