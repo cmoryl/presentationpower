@@ -8,6 +8,7 @@ import { SjbLettering } from "@/components/events/SjbLettering";
 import { useState } from "react";
 import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
 
+import { Link } from "@tanstack/react-router";
 import { KitSignList } from "@/components/events/KitSignList";
 import { SjbLink, SjbShareLinkButton, SjbShell, useSjbShare } from "@/components/events/SjbShare";
 import { SjbSingleColour } from "@/components/events/SjbSingleColour";
