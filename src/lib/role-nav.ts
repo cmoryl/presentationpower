@@ -36,8 +36,9 @@ const AUTHORING_ITEMS = new Set([
 
 export function showTopLink(to: string, a: NavAudience): boolean {
   if (to === "/admin") return a.isAdmin;
-  if (to === "/approvals" || to === "/admin/approved-figures") return a.isBrandReviewer;
-  if (to === "/demos") return !a.createOnly;
+  if (to === "/approvals") return a.isBrandReviewer;
+  // Demos are a showcase for admins; everyone else gets a shorter menu.
+  if (to === "/demos") return a.isAdmin;
   return true;
 }
 
@@ -48,7 +49,5 @@ export function showElementItem(to: string, a: NavAudience): boolean {
 }
 
 /** Extra top-bar links for brand reviewers (admins reach these via Admin). */
-export const BRAND_REVIEW_LINKS = [
-  { to: "/approvals", label: "Approvals" },
-  { to: "/admin/approved-figures", label: "Approved figures" },
-] as const;
+// One "Review" door; approved figures are a tab reachable from /approvals.
+export const BRAND_REVIEW_LINKS = [{ to: "/approvals", label: "Review" }] as const;
