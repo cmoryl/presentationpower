@@ -270,10 +270,16 @@ function MapsPage() {
           shape.setAttribute("fill", `url(#${id}-pdf-${n++})`);
         });
         // Names are set in Geist; weights of 600 and over print in Geist Bold.
-        el.querySelectorAll("text, tspan").forEach((t) => {
-          if (t.getAttribute("font-family")) t.setAttribute("font-family", "Geist");
-          const wgt = Number(t.getAttribute("font-weight") ?? 400);
-          if (t.getAttribute("font-weight")) t.setAttribute("font-weight", wgt >= 600 ? "bold" : "normal");
+        el.setAttribute("font-family", "Geist");
+        el.querySelectorAll("[font-family]").forEach((t) => t.setAttribute("font-family", "Geist"));
+        el.querySelectorAll("[font-weight]").forEach((t) => {
+          const v = t.getAttribute("font-weight") ?? "";
+          t.setAttribute("font-weight", v === "bold" || Number(v) >= 600 ? "bold" : "normal");
+        });
+        el.querySelectorAll<SVGElement>("[style*='font']").forEach((t) => {
+          t.style.fontFamily = "Geist";
+          const w = t.style.fontWeight;
+          if (w) t.style.fontWeight = w === "bold" || Number(w) >= 600 ? "bold" : "normal";
         });
         await svg2pdf(el, doc, { x: 0, y: 0, width: w, height: h });
       } finally {
