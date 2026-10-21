@@ -11,6 +11,79 @@ export const SJB_LETTERING = [
 
 const pct = (v: number) => `${v.toFixed(1)}%`;
 
+/** Supplied exact-construction master (SJB-Lettering-Exact.svg). Units: cap height 120. */
+const EXACT = {
+  id: "sjb-lettering-exact",
+  w: 1453.0390625,
+  h: 132.5625,
+  cap: 120,
+  pngWidths: [1200, 2400, 4800],
+};
+const ratio = EXACT.w / EXACT.h;
+const capPct = (u: number) => pct((u / EXACT.cap) * 100);
+
+function SjbLetteringExact() {
+  const specs: [string, string][] = [
+    ["Artwork size", `${EXACT.w} × ${EXACT.h} units (cap height 120)`],
+    ["Aspect ratio", `${ratio.toFixed(4)} : 1 — fixed`],
+    ["Stroke / stem", `33 units · ${capPct(33)} of letter height`],
+    ["Letter gap", `12 units · ${capPct(12)}`],
+    ["Word space", `29 units · ${capPct(29)}`],
+    ["Shadow", `6.5625 right · 6.5625 down (${capPct(6.5625)}, exactly 45°)`],
+    ["Chamfers / serifs", "17 at 45° · serifs 10.7266"],
+    ["Diagonals", "A and W lean 7:24 (16.26°) · N slope 2:1"],
+  ];
+  const rules = [
+    "Use the file as supplied: scale from the corners only, never stretch, squash, slant or re-space.",
+    "Keep the blue shadow (#00AAE7) with its white letters; never move, recolour or remove it.",
+    "White letters are for dark backgrounds only (Navy or darker); never place on busy photography.",
+    "Leave clear space of at least one letter height (cap height) on every side.",
+    "Don't retype the name in a font; always use this artwork.",
+  ];
+  return (
+    <div className="space-y-3 rounded-xl border border-[#003FC7]/30 p-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="text-[14px] font-bold">Exact master — single line</p>
+        <span className="text-[11px] font-semibold text-[#003FC7]">Use this version</span>
+      </div>
+      <div className="flex aspect-[16/4] items-center justify-center rounded-xl bg-[#03002C] p-8">
+        <img src={`${BASE}/${EXACT.id}.svg`} alt="SAN JUAN BOWL lettering, exact master" className="max-h-full max-w-full object-contain" />
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <a href={`${BASE}/${EXACT.id}.svg`} download={`${EXACT.id}.svg`} className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/15 px-3 py-1 text-[12px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]">
+          <Download className="h-3.5 w-3.5" /> SVG (editable)
+        </a>
+        {EXACT.pngWidths.map((w) => (
+          <a key={w} href={`${BASE}/${EXACT.id}-${w}.png`} download={`${EXACT.id}-${w}.png`} className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/15 px-3 py-1 text-[12px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]">
+            <Download className="h-3.5 w-3.5" /> PNG transparent {w} × {Math.round(w / ratio)} px
+          </a>
+        ))}
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <h4 className="mb-1 text-[13px] font-bold">Construction and sizing</h4>
+          <dl className="grid gap-1 text-[12px]">
+            {specs.map(([k, v]) => (
+              <div key={k} className="flex justify-between gap-3 border-b border-[#03002C]/10 py-1">
+                <dt className="text-[#666666]">{k}</dt><dd className="text-right font-semibold">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-2 text-[12px] text-[#666666]">
+            Height at a given width = width ÷ {ratio.toFixed(4)}. E.g. 600 mm wide → {(600 / ratio).toFixed(1)} mm tall; 1920 px → {Math.round(1920 / ratio)} px.
+          </p>
+        </div>
+        <div>
+          <h4 className="mb-1 text-[13px] font-bold">Rules</h4>
+          <ul className="list-disc space-y-1 pl-4 text-[12px] text-[#03002C]/80">
+            {rules.map((r) => <li key={r}>{r}</li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function SjbLettering() {
   const cap = audit.cap_height;
   return (
@@ -21,6 +94,8 @@ export function SjbLettering() {
         every gap is the same, and every letter carries the same shadow. Files are editable vectors (one group per letter);
         scale by the corners only. White letters: dark backgrounds only.
       </p>
+      <SjbLetteringExact />
+      <h4 className="text-[13px] font-bold">Earlier rebuilds</h4>
       <div className="grid gap-4 sm:grid-cols-2">
         {SJB_LETTERING.map((l) => (
           <div key={l.id} className="space-y-2">
