@@ -614,10 +614,10 @@ function Dashboard() {
           />
         </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-4">
-          <MiniStat label="Module variants" value={MODULE_VARIANTS.length} accent={BRAND.blue} />
+          <MiniStat label="Approved layouts" value={MODULE_VARIANTS.length} accent={BRAND.blue} />
           <MiniStat label="Sections" value={SECTION_FRAMEWORKS.length} accent={BRAND.aqua} />
           <MiniStat label="Layouts" value={LAYOUT_FRAMEWORKS.length} accent={BRAND.lavender} />
-          <MiniStat label="Brand modes" value={BRAND_MODES.length} accent={BRAND.yellow} />
+          <MiniStat label="Brands" value={BRAND_MODES.length} accent={BRAND.yellow} />
         </div>
       </section>
     </AppShell>

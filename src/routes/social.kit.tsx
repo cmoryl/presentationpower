@@ -381,7 +381,7 @@ function KitBuilderInner() {
       </AdminSection>
 
       {/* Step 3 · Brand + Event */}
-      <AdminSection eyebrow="Step 3" title="Brand mode + event context (optional)">
+      <AdminSection eyebrow="Step 3" title="Brand + event details (optional)">
         <div className="grid gap-3 sm:grid-cols-3">
           <label className="rounded-2xl border border-black/10 bg-white/70 p-3 text-sm">
             <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">

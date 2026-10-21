@@ -45,3 +45,5 @@
 - [x] Link check: 140 signed-in pages crawled, no broken pages; downloads start correctly.
 - [x] Main menu trimmed: "Create", "Review" (one reviewer door), Demos admin-only.
 - [ ] Stadium 3D view — BLOCKED: BoothHUB's /showcase/san-juan-bowl returns BRAND_NOT_FOUND; must be fixed and published in BoothHUB.
+- [x] Plain-language labels on everyday screens (Brand, Approved layouts, Layout).
+- [ ] One-sentence whole-event-kit demo — needs your go-ahead (larger build).
