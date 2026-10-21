@@ -79,6 +79,11 @@ function KitPage() {
               <Link to="/events/kits/nexus/guide">Open brand guide page</Link>
             </Button>
           )}
+          {kit.id === "hackathon" && (
+            <Button asChild variant="outline">
+              <Link to="/events/kits/hackathon/guide">Open brand guide page</Link>
+            </Button>
+          )}
         </div>
       ) : null}
 
