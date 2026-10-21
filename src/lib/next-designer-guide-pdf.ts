@@ -64,7 +64,7 @@ async function loadImg(url: string, max = 900, png = false): Promise<Img | null>
     g.drawImage(img, 0, 0, c.width, c.height);
     return png
       ? { data: c.toDataURL("image/png"), w: c.width, h: c.height, fmt: "PNG" }
-      : { data: c.toDataURL("image/jpeg", 0.82), w: c.width, h: c.height, fmt: "JPEG" };
+      : { data: c.toDataURL("image/jpeg", 0.72), w: c.width, h: c.height, fmt: "JPEG" };
   } catch {
     return null;
   }
@@ -161,7 +161,7 @@ export async function buildDesignerGuidePdf(opts: DesignerGuideOptions): Promise
   // ---------------- How to use ----------------
   section("How to use this pack", "Start from these files. Don't redraw a lockup, pick new colours or rebuild a supplied master.");
   sub("Folders");
-  for (const f of PACK_FOLDERS) para(`${f.dir || "00-START-HERE.pdf"} — ${f.title}: ${f.body}`);
+  for (const f of PACK_FOLDERS) para(f.dir ? `${f.dir} — ${f.body}` : f.body);
   y += 6;
   sub("File names");
   para(`Every file follows next26_<division>_<asset>_<variant>.<format>, for example ${designerFileName("Finance", "stacked", "white", "eps")}.`);
@@ -238,8 +238,9 @@ export async function buildDesignerGuidePdf(opts: DesignerGuideOptions): Promise
     need(40 + hexes.length * 12);
     font("bold", 11);
     doc.text(`${g.label}`, M, y + 11);
+    const lw = doc.getTextWidth(g.label);
     font("normal", 8, GREY);
-    doc.text(g.family, M + doc.getTextWidth(g.label) * 1.2 + 10, y + 11);
+    doc.text(g.family, M + lw + 8, y + 11);
     y += 16;
     const bw = 220 / hexes.length;
     hexes.forEach((h, i) => {
@@ -283,6 +284,7 @@ export async function buildDesignerGuidePdf(opts: DesignerGuideOptions): Promise
   section("Look and feel — templates in use", "Every supplied template with a saved example, grouped by piece. Captions show division and size; links open the live master.");
   for (const fam of families) {
     const rows = fam.templates.filter((t) => t.exampleUrl);
+    need(230);
     sub(`${fam.label} (${rows.length})`);
     if (!rows.length) {
       para("Not yet produced.", 9, GREY);
@@ -347,7 +349,7 @@ export async function buildDesignerGuidePdf(opts: DesignerGuideOptions): Promise
       if (i % 4 === 0) onProgress?.(`${label} examples ${i + 1} of ${items.length}`);
       const x = M + c * (cw + 14);
       doc.setFillColor(242, 242, 242).rect(x, y, cw, ih, "F");
-      const im = await loadImg(it.img, 700);
+      const im = await loadImg(it.img, 560);
       if (im) {
         const k = Math.min(cw / im.w, ih / im.h);
         doc.addImage(im.data, "JPEG", x + (cw - im.w * k) / 2, y + (ih - im.h * k) / 2, im.w * k, im.h * k);
