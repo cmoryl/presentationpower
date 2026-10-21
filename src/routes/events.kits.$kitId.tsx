@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SUPPLIED_KITS, kitFileSize, type KitFile, type SuppliedKit } from "@/lib/supplied-event-kits";
+import { SUPPLIED_KITS, KIT_EVENT, kitFileSize, type KitFile, type SuppliedKit } from "@/lib/supplied-event-kits";
 
 export const Route = createFileRoute("/events/kits/$kitId")({
   loader: ({ params }) => {
@@ -58,11 +58,11 @@ function KitPage() {
   const { kitId } = Route.useLoaderData();
   const kit = SUPPLIED_KITS[kitId];
   const groups = [...new Set(kit.pieces.map((p) => p.group))];
-  const other = kit.id === "nexus" ? SUPPLIED_KITS.hackathon : SUPPLIED_KITS.nexus;
+  const event = KIT_EVENT[kit.id];
   return (
     <main className="mx-auto max-w-6xl px-6 py-8">
-      <Link to="/events/$eventId" params={{ eventId: "nexus-london" }} className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
-        <ArrowLeft className="h-4 w-4" /> NeXus London ’26
+      <Link to="/events/$eventId" params={{ eventId: event.id }} className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+        <ArrowLeft className="h-4 w-4" /> {event.name}
       </Link>
       <h1 className="mt-3 text-3xl font-bold leading-tight text-foreground">{kit.name} brand kit</h1>
       <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-muted-foreground">{kit.intro}</p>
@@ -71,9 +71,6 @@ function KitPage() {
           <a href={kit.guide.file} download>
             <Download className="h-4 w-4" /> Brand guidelines (PDF)
           </a>
-        </Button>
-        <Button asChild variant="outline">
-          <Link to="/events/kits/$kitId" params={{ kitId: other.id }}>{other.name} kit</Link>
         </Button>
       </div>
 

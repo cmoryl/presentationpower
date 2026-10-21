@@ -7,7 +7,7 @@ import type { LinkOptions } from "@tanstack/react-router";
 import { NEXT_EVENT } from "./next-event";
 import { SF_READINESS, SF_VENUE } from "./next-sf-event";
 import { SJB_EVENT } from "./san-juan-bowl";
-import { NEXUS_EVENT } from "./supplied-event-kits";
+import { HACKATHON_EVENT, NEXUS_EVENT } from "./supplied-event-kits";
 
 export type EventTabId =
   | "checklist"
@@ -408,7 +408,6 @@ function nexusEntry(): EventEntry {
         id: "checklist",
         tools: [
           { label: "NeXus brand kit", detail: "Supplied logos, colours, event map, signage, badges, lanyards and screens.", link: { to: "/events/kits/$kitId", params: { kitId: "nexus" } } },
-          { label: "Hackathon brand kit", detail: "The GlobalLink Hackathon London ’26 logos, guide and pieces.", link: { to: "/events/kits/$kitId", params: { kitId: "hackathon" } } },
         ],
       },
       {
@@ -420,14 +419,38 @@ function nexusEntry(): EventEntry {
     ],
     readiness: [
       { label: "NeXus logo and brand kit", state: "ready", link: { to: "/events/kits/$kitId", params: { kitId: "nexus" } } },
-      { label: "Hackathon logo and brand kit", state: "ready", link: { to: "/events/kits/$kitId", params: { kitId: "hackathon" } } },
       { label: "Signage, badges and lanyards", state: "ready", detail: "Supplied finished files.", link: { to: "/events/kits/$kitId", params: { kitId: "nexus" } } },
       { label: "Dates", state: "waiting", blockedOn: "the organisers" },
     ],
   };
 }
 
-export const BUILT_IN_EVENTS: readonly EventEntry[] = [londonEntry(), sfEntry(), sanJuanBowlEntry(), nexusEntry()];
+function hackathonEntry(): EventEntry {
+  return {
+    id: HACKATHON_EVENT.id,
+    kind: "edition",
+    name: HACKATHON_EVENT.name,
+    venue: HACKATHON_EVENT.venue,
+    city: HACKATHON_EVENT.city,
+    dates: HACKATHON_EVENT.datesLabel,
+    tabs: [
+      {
+        id: "checklist",
+        tools: [
+          { label: "Hackathon brand kit", detail: "Supplied logos, brand guide and finished pieces.", link: { to: "/events/kits/$kitId", params: { kitId: "hackathon" } } },
+        ],
+      },
+      knowledge,
+    ],
+    readiness: [
+      { label: "Hackathon logo and brand kit", state: "ready", link: { to: "/events/kits/$kitId", params: { kitId: "hackathon" } } },
+      { label: "Venue", state: "waiting", blockedOn: "the organisers" },
+      { label: "Dates", state: "waiting", blockedOn: "the organisers" },
+    ],
+  };
+}
+
+export const BUILT_IN_EVENTS: readonly EventEntry[] = [londonEntry(), sfEntry(), sanJuanBowlEntry(), nexusEntry(), hackathonEntry()];
 
 export function builtInEvent(id: string): EventEntry | undefined {
   return BUILT_IN_EVENTS.find((e) => e.id === id);
