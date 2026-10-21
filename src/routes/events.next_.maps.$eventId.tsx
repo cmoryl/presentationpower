@@ -250,6 +250,31 @@ function MapsPage() {
       host.appendChild(el);
       document.body.appendChild(host);
       try {
+        // Box-relative fades are re-set in drawing units per room, which the PDF
+        // writer reproduces exactly.
+        let n = 0;
+        el.querySelectorAll<SVGGraphicsElement>("[fill^='url(#']").forEach((shape) => {
+          const id = /url\(#([^)]+)\)/.exec(shape.getAttribute("fill") ?? "")?.[1];
+          const grad = id ? el.querySelector(`#${CSS.escape(id)}`) : null;
+          if (!grad || grad.getAttribute("gradientUnits") !== "objectBoundingBox") return;
+          const b = shape.getBBox();
+          const copy = grad.cloneNode(true) as Element;
+          const at = (k: string) => Number(copy.getAttribute(k) ?? (k === "x2" ? 1 : 0));
+          copy.setAttribute("id", `${id}-pdf-${n}`);
+          copy.setAttribute("gradientUnits", "userSpaceOnUse");
+          copy.setAttribute("x1", String(b.x + at("x1") * b.width));
+          copy.setAttribute("x2", String(b.x + at("x2") * b.width));
+          copy.setAttribute("y1", String(b.y + at("y1") * b.height));
+          copy.setAttribute("y2", String(b.y + at("y2") * b.height));
+          grad.parentNode?.appendChild(copy);
+          shape.setAttribute("fill", `url(#${id}-pdf-${n++})`);
+        });
+        // Names are set in Geist; weights of 600 and over print in Geist Bold.
+        el.querySelectorAll("text, tspan").forEach((t) => {
+          if (t.getAttribute("font-family")) t.setAttribute("font-family", "Geist");
+          const wgt = Number(t.getAttribute("font-weight") ?? 400);
+          if (t.getAttribute("font-weight")) t.setAttribute("font-weight", wgt >= 600 ? "bold" : "normal");
+        });
         await svg2pdf(el, doc, { x: 0, y: 0, width: w, height: h });
       } finally {
         host.remove();
