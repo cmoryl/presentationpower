@@ -209,18 +209,84 @@ function MapsPage() {
     }
     setPdfBusy(true);
     try {
-      const [{ jsPDF }, { qeiiRasteriseSvg }] = await Promise.all([
-        import("jspdf"),
-        import("@/lib/next-london-qeii-pdf"),
-      ]);
-      const art = await qeiiRasteriseSvg(preparedSvg.file);
+      // The SVG goes into the PDF as vector artwork (walls, rooms and names stay
+      // editable in Illustrator/Acrobat), not as a picture.
+      const [{ jsPDF }, { svg2pdf }] = await Promise.all([import("jspdf"), import("svg2pdf.js")]);
+      // PDF fills have no per-stop transparency, so a fade toward clear is written
+      // as the same fade toward white — identical on the map's white ground.
+      const flat = preparedSvg.file.replace(
+        /stop-color="#([0-9a-fA-F]{6})"([^>]*?)\sstop-opacity="([\d.]+)"/g,
+        (_m, hex: string, rest: string, op: string) => {
+          const a = Number(op);
+          const n = parseInt(hex, 16);
+          const mix = (v: number) => Math.round(v * a + 255 * (1 - a)).toString(16).padStart(2, "0");
+          return `stop-color="#${mix((n >> 16) & 255)}${mix((n >> 8) & 255)}${mix(n & 255)}"${rest}`;
+        },
+      );
+      const el = new DOMParser().parseFromString(flat, "image/svg+xml").documentElement as unknown as SVGSVGElement;
+      if (el.nodeName !== "svg") throw new Error("the map drawing could not be read.");
+      const vb = (el.getAttribute("viewBox") ?? "").split(/[\s,]+/).map(Number);
+      const vw = vb[2] || parseFloat(el.getAttribute("width") ?? "") || 842;
+      const vh = vb[3] || parseFloat(el.getAttribute("height") ?? "") || 595;
       // One page the shape of the map, sized in points from the drawing's own aspect.
       const w = 842;
-      const h = (art.h / art.w) * w;
+      const h = (vh / vw) * w;
       const doc = new jsPDF({ unit: "pt", format: [w, h], orientation: w > h ? "landscape" : "portrait" });
-      doc.addImage(art.dataUrl, "PNG", 0, 0, w, h, undefined, "FAST");
-      doc.setProperties({ title: `${current.title} map (proof)`, subject: "Proof rasterised from the Element map. Use the SVG for print." });
-      saveFile(doc.output("blob"), `rdraft-${eventId}-${current.floor_key}-${face}-PROOF.pdf`);
+      // Map names keep the Geist face, embedded in the file.
+      const toB64 = async (url: string) => {
+        const buf = new Uint8Array(await (await fetch(url)).arrayBuffer());
+        let bin = "";
+        for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+        return btoa(bin);
+      };
+      const [reg, bold] = await Promise.all([toB64("/fonts/Geist-Regular.ttf"), toB64("/fonts/Geist-Bold.ttf")]);
+      doc.addFileToVFS("Geist-Regular.ttf", reg);
+      doc.addFont("Geist-Regular.ttf", "Geist", "normal");
+      doc.addFileToVFS("Geist-Bold.ttf", bold);
+      doc.addFont("Geist-Bold.ttf", "Geist", "bold");
+      // svg2pdf measures in the live document, so the drawing is mounted off-screen briefly.
+      const host = document.createElement("div");
+      host.style.cssText = "position:fixed;left:-99999px;top:0;width:0;height:0;overflow:hidden";
+      host.appendChild(el);
+      document.body.appendChild(host);
+      try {
+        // Box-relative fades are re-set in drawing units per room, which the PDF
+        // writer reproduces exactly.
+        let n = 0;
+        el.querySelectorAll<SVGGraphicsElement>("[fill^='url(#']").forEach((shape) => {
+          const id = /url\(#([^)]+)\)/.exec(shape.getAttribute("fill") ?? "")?.[1];
+          const grad = id ? el.querySelector(`#${CSS.escape(id)}`) : null;
+          if (!grad || grad.getAttribute("gradientUnits") !== "objectBoundingBox") return;
+          const b = shape.getBBox();
+          const copy = grad.cloneNode(true) as Element;
+          const at = (k: string) => Number(copy.getAttribute(k) ?? (k === "x2" ? 1 : 0));
+          copy.setAttribute("id", `${id}-pdf-${n}`);
+          copy.setAttribute("gradientUnits", "userSpaceOnUse");
+          copy.setAttribute("x1", String(b.x + at("x1") * b.width));
+          copy.setAttribute("x2", String(b.x + at("x2") * b.width));
+          copy.setAttribute("y1", String(b.y + at("y1") * b.height));
+          copy.setAttribute("y2", String(b.y + at("y2") * b.height));
+          grad.parentNode?.appendChild(copy);
+          shape.setAttribute("fill", `url(#${id}-pdf-${n++})`);
+        });
+        // Names are set in Geist; weights of 600 and over print in Geist Bold.
+        el.setAttribute("font-family", "Geist");
+        el.querySelectorAll("[font-family]").forEach((t) => t.setAttribute("font-family", "Geist"));
+        el.querySelectorAll("[font-weight]").forEach((t) => {
+          const v = t.getAttribute("font-weight") ?? "";
+          t.setAttribute("font-weight", v === "bold" || Number(v) >= 600 ? "bold" : "normal");
+        });
+        el.querySelectorAll<SVGElement>("[style*='font']").forEach((t) => {
+          t.style.fontFamily = "Geist";
+          const w = t.style.fontWeight;
+          if (w) t.style.fontWeight = w === "bold" || Number(w) >= 600 ? "bold" : "normal";
+        });
+        await svg2pdf(el, doc, { x: 0, y: 0, width: w, height: h });
+      } finally {
+        host.remove();
+      }
+      doc.setProperties({ title: `${current.title} map`, subject: "Vector map from Element; walls, rooms and names are editable." });
+      saveFile(doc.output("blob"), `rdraft-${eventId}-${current.floor_key}-${face}.pdf`);
     } catch (error) {
       toast.error(`PDF not downloaded: ${error instanceof Error ? error.message : "the map could not be drawn."}`);
     } finally {

@@ -72,6 +72,7 @@
         "react-resizable-panels": "^4.6.5",
         "recharts": "^2.15.4",
         "sonner": "^2.0.7",
+        "svg2pdf.js": "^2.8.1",
         "tailwind-merge": "3.5.0",
         "tailwindcss": "4.2.1",
         "three": "^0.186.1",
@@ -890,6 +891,8 @@
 
     "css-tree": ["css-tree@3.2.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/css-tree/-/css-tree-3.2.1.tgz", { "dependencies": { "mdn-data": "2.27.1", "source-map-js": "^1.2.1" } }, "sha512-X7sjQzceUhu1u7Y/ylrRZFU2FS6LRiFVp6rKLPg23y3x3c3DOKAwuXGDp+PAGjh6CSnCjYeAul8pcT8bAl+lSA=="],
 
+    "cssesc": ["cssesc@3.0.0", "", { "bin": { "cssesc": "bin/cssesc" } }, "sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg=="],
+
     "csstype": ["csstype@3.2.3", "", {}, "sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ=="],
 
     "d3-array": ["d3-array@3.2.4", "", { "dependencies": { "internmap": "1 - 2" } }, "sha512-tdQAmyA18i4J7wprpYq8ClcxZy3SC31QMeByyCFyRt7BVHdREQZ5lpzoe5mFEYZUWe+oq8HBvk9JjpibyEV4Jg=="],
@@ -1067,6 +1070,8 @@
     "flat-cache": ["flat-cache@4.0.1", "", { "dependencies": { "flatted": "^3.2.9", "keyv": "^4.5.4" } }, "sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw=="],
 
     "flatted": ["flatted@3.4.2", "", {}, "sha512-PjDse7RzhcPkIJwy5t7KPWQSZ9cAbzQXcafsetQoD7sOJRQlGikNbx7yZp2OotDnJyrDcbyRq3Ttb18iYOqkxA=="],
+
+    "font-family-papandreou": ["font-family-papandreou@0.2.0-patch2", "", {}, "sha512-l/YiRdBSH/eWv6OF3sLGkwErL+n0MqCICi9mppTZBOCL5vixWGDqCYvRcuxB2h7RGCTzaTKOHT2caHvCXQPRlw=="],
 
     "forwarded": ["forwarded@0.2.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/forwarded/-/forwarded-0.2.0.tgz", {}, "sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow=="],
 
@@ -1500,6 +1505,8 @@
 
     "source-map-support": ["source-map-support@0.5.21", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/source-map-support/-/source-map-support-0.5.21.tgz", { "dependencies": { "buffer-from": "^1.0.0", "source-map": "^0.6.0" } }, "sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w=="],
 
+    "specificity": ["specificity@0.4.1", "", { "bin": { "specificity": "./bin/specificity" } }, "sha512-1klA3Gi5PD1Wv9Q0wUoOQN1IWAuPu0D1U03ThXTr0cJ20+/iq2tHSDnK7Kk/0LXJ1ztUB2/1Os0wKmfyNgUQfg=="],
+
     "splaytree": ["splaytree@3.2.3", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/splaytree/-/splaytree-3.2.3.tgz", {}, "sha512-7OXrNWzy6CK+r7Ch9OLPBDTKfB6XlWHjX4P0RU5B3IgFuWPeYN0XtRtlexGRjgbQxpfaUve6jTAwBGWuGntz/w=="],
 
     "split2": ["split2@4.2.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/split2/-/split2-4.2.0.tgz", {}, "sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg=="],
@@ -1527,6 +1534,10 @@
     "supports-color": ["supports-color@7.2.0", "", { "dependencies": { "has-flag": "^4.0.0" } }, "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw=="],
 
     "svg-pathdata": ["svg-pathdata@6.0.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/svg-pathdata/-/svg-pathdata-6.0.3.tgz", {}, "sha512-qsjeeq5YjBZ5eMdFuUa4ZosMLxgr5RZ+F+Y1OrDhuOCEInRMA3x74XdBtggJcj9kOeInz0WE+LgCPDkZFlBYJw=="],
+
+    "svg2pdf.js": ["svg2pdf.js@2.8.1", "", { "dependencies": { "cssesc": "^3.0.0", "font-family-papandreou": "^0.2.0-patch1", "specificity": "^0.4.1", "svgpath": "^2.3.0" }, "peerDependencies": { "jspdf": "^4.0.0 || ^3.0.0 || ^2.0.0" } }, "sha512-AzXfPHjHnFt9dpdRPhWWBOKipnMSWQZRKiV3FTTPdY6wwRgT3labbA4s0HIQaskNhwAhrcI2u2rDhD8j8udfNQ=="],
+
+    "svgpath": ["svgpath@2.6.0", "", {}, "sha512-OIWR6bKzXvdXYyO4DK/UWa1VA1JeKq8E+0ug2DG98Y/vOmMpfZNj+TIG988HjfYSqtcy/hFOtZq/n/j5GSESNg=="],
 
     "swr": ["swr@2.5.1", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/swr/-/swr-2.5.1.tgz", { "dependencies": { "dequal": "^2.0.3", "use-sync-external-store": "^1.6.0" }, "peerDependencies": { "react": "^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-BRw55e8r0B7SpDN20CAzoQAHl7y1yP7/Zt7oqUjMv0vSt2u2Xnkm88Ws+VypbV9BXHQVuSuyVq7zMjO16wSExw=="],
 
