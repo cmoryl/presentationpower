@@ -26,6 +26,23 @@ exec(compile(_src, P, "exec"), ns)
 analyse, filtered, svg_symbol, mark_forms, split, read_texts = (ns[k] for k in ("analyse", "filtered", "svg_symbol", "mark_forms", "split", "read_texts"))
 BLEED = 9.0
 
+def ink_from_render(tpath, texts, W, H):
+    """Black read from an ICC fill: take the ink the text actually renders in."""
+    import subprocess
+    from PIL import Image
+    sc = min(1.0, 2000 / max(W, H))
+    subprocess.run(["pdftocairo", "-png", "-singlefile", "-transp", "-scale-to-x", str(int(W * sc)), "-scale-to-y", str(int(H * sc)), tpath, tpath[:-4]], check=True)
+    im = Image.open(tpath[:-4] + ".png").convert("RGBA")
+    for t in texts:
+        if t["color"] != "#000000": continue
+        r = t.get("rot")
+        box = (t["x"], t["top"], t["x"] + t["w"], t["bottom"]) if not r else (t["x"] + t["w"] / 2 - t["size"], t["y"] - t["w"] / 2, t["x"] + t["w"] / 2 + t["size"], t["y"] + t["w"] / 2)
+        crop = im.crop(tuple(int(max(0, v * sc)) for v in box))
+        px = [p for p in crop.getdata() if p[3] > 250]
+        if px:
+            px.sort(key=lambda p: p[0] + p[1] + p[2]); m = px[len(px) // 2]
+            t["color"] = "#%02X%02X%02X" % m[:3]
+
 def one(it, OUT, version):
     lid = it["id"]; src = pikepdf.open(it["pdf"]); page = src.pages[it["page"]]
     ops, paints, W, H = analyse(src, page, set())
@@ -59,6 +76,7 @@ def one(it, OUT, version):
     # Some files fill text through an ICC space pdfplumber reads as 0; set the ink seen in the render.
     for t in texts:
         if it.get("textColor") and t["color"] == "#000000": t["color"] = it["textColor"]
+    if any(t["color"] == "#000000" for t in texts): ink_from_render(tpath, texts, W, H)
     npath = f"{OUT}/{lid}-native.pdf"; nat.save(npath)
     syms = [svg_symbol(npath, bg_page, "bg", f"{lid}-bg")] + [svg_symbol(npath, parts[b["id"]]["page"], b["id"], f"{lid}-{b['id']}") for b in boxes]
     open(f"{OUT}/{lid}-native.svg", "w").write(f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {W:g} {H:g}">' + "".join(syms) + "</svg>")
@@ -68,7 +86,7 @@ def one(it, OUT, version):
             "ground": it.get("ground", [{"offset": 0, "color": "#003B71"}, {"offset": 1, "color": "#139DD8"}]),
             "native": {"version": version, "profile": "sRGB IEC61966-2.1", "bgPage": bg_page, "parts": parts,
                        "strips": {"left": {"bg": 0, "content": 0, "w": 0}, "right": {"bg": 0, "content": 0, "w": 0}}, "bgBox": [-BLEED, -BLEED, W + BLEED, H + BLEED]},
-            "sign": {"margin": it.get("margin", 36.0)}}
+            "sign": {"margin": round(min(it.get("margin", 36.0), 0.15 * min(W, H)), 2)}}
 
 spec = json.load(open(sys.argv[1])); OUT = spec["out"]; os.makedirs(OUT, exist_ok=True)
 lay = {}
