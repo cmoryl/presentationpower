@@ -18,7 +18,7 @@ export type KitFile = {
   size?: string;
 };
 export type KitLogo = { name: string; format: "SVG" | "PNG" | string; url: string };
-export type KitColour = { name: string; hex: string; rgb: string; cmyk: string; pantone: string };
+export type KitColour = { name: string; hex: string; rgb: string; cmyk: string; pantone: string; source?: string };
 
 export type SuppliedKit = {
   id: "nexus" | "hackathon" | "legalweek";
@@ -27,6 +27,8 @@ export type SuppliedKit = {
   /** Empty when the package has no brand guide; never filled in by us. */
   colours: KitColour[];
   gradientNote?: string;
+  /** Replaces the default "as printed in the brand guide" line. */
+  colourNote?: string;
   typography: string;
   logoNote: string;
   donts: string[];
@@ -41,6 +43,21 @@ export type SuppliedKit = {
 const BLUES: KitColour[] = [
   { name: "Dark Blue", hex: "#003B71", rgb: "0 · 59 · 113", cmyk: "100 · 84 · 30 · 16", pantone: "541 C" },
   { name: "Light Blue", hex: "#139DD8", rgb: "19 · 157 · 216", cmyk: "75 · 23 · 0 · 0", pantone: "299 C" },
+];
+
+// Legalweek has no brand guide. Every value below was read from its live files
+// (scripts/legalweek-colours.py records how); nothing was transcribed by eye.
+const LEGALWEEK_COLOURS: KitColour[] = [
+  { name: "Deep navy", hex: "#002F49", rgb: "0 · 47 · 73", cmyk: "", pantone: "", source: "Screen · email header (AI) + solid ground layer in every header PSD" },
+  { name: "Light blue", hex: "#139DD8", rgb: "19 · 157 · 216", cmyk: "", pantone: "", source: "Screen · email header (AI) + header PSD artwork — same as the TransPerfect Light Blue" },
+  { name: "Aqua", hex: "#36DBD5", rgb: "54 · 219 · 213", cmyk: "", pantone: "", source: "Screen · email header (AI) + solid light layers in the header PSDs" },
+  { name: "Sky blue", hex: "#479BD3", rgb: "71 · 155 · 211", cmyk: "", pantone: "", source: "Screen · email header (AI)" },
+  { name: "Bright blue (glow)", hex: "#0D66B7", rgb: "13 · 102 · 183", cmyk: "", pantone: "", source: "Screen · peak of the multiply glow layer in the header PSDs" },
+  { name: "Pillar blue", hex: "#3F98C6", rgb: "", cmyk: "75.4 · 28.5 · 8.6 · 0", pantone: "", source: "Print · pillar signs (AI), main colour — hex is a SWOP screen preview" },
+  { name: "Pillar mid blue", hex: "#337FAB", rgb: "", cmyk: "85.2 · 45.3 · 16.8 · 0.8", pantone: "", source: "Print · pillar signs (AI) — hex is a SWOP screen preview" },
+  { name: "Pillar sea green", hex: "#8EBBB9", rgb: "", cmyk: "46.9 · 12.9 · 28.1 · 0", pantone: "", source: "Print · pillar signs (AI) — hex is a SWOP screen preview" },
+  { name: "Pillar dark blue", hex: "#324B76", rgb: "", cmyk: "100 · 83.6 · 29.7 · 15.6", pantone: "", source: "Print · pillar signs (AI) — matches the TransPerfect Dark Blue build (100 · 84 · 30 · 16); hex is a SWOP screen preview" },
+  { name: "White", hex: "#FFFFFF", rgb: "255 · 255 · 255", cmyk: "0 · 0 · 0 · 0", pantone: "", source: "Type and logo in every file" },
 ];
 
 const DONTS = [
@@ -86,7 +103,11 @@ export const SUPPLIED_KITS: Record<SuppliedKit["id"], SuppliedKit> = {
     name: "TransPerfect Legal at Legalweek 2026",
     intro:
       "Supplied artwork for TransPerfect Legal at Legalweek 2026, NYC, March 9–12, Javits Center (North). Theme: “Experience the next wave of legal technology.” Every piece is the designers’ own file, unchanged.",
-    colours: [],
+    colours: LEGALWEEK_COLOURS,
+    gradientNote:
+      "Header and monitor backgrounds: a Deep navy ground with a Bright blue glow (multiply, 82 %) and Aqua light layers at 57 % and 70 %.",
+    colourNote:
+      "Read straight from the live files (April 2026 package). Screen colours are exact values from the email-header Illustrator file and the Photoshop fill layers. Print builds are exact from the pillar-sign Illustrator file; their hex is only a screen preview made with that file's own colour profile (U.S. Web Coated SWOP v2). No Pantone was specified anywhere, so none is listed. The Illustrator swatch panels hold only the default Spanish swatch set, not brand colours.",
     typography: "Poppins (SemiBold supplied with the pillar signs and fabric walls).",
     logoNote: "No separate logo files were supplied; the TransPerfect Legal mark appears inside each piece.",
     donts: [],
