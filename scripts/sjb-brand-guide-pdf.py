@@ -46,6 +46,7 @@ def img(name, x, y, w, h, bg=None):
     im = Image.open(os.path.join(SRC, name)) if isinstance(name, str) else name
     iw, ih = im.size; s = min(w / iw, h / ih) * 0.86
     c.drawImage(ImageReader(im), x + (w - iw * s) / 2, y + (h - ih * s) / 2, iw * s, ih * s, mask="auto")
+    c.setStrokeColor("#D9DCE5"); c.rect(x, y, w, h, stroke=1, fill=0)
 
 
 def link(label, url, x, y, size=9):
