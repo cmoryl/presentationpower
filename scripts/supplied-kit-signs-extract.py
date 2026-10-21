@@ -65,6 +65,10 @@ def retype(paints, r, W, H):
         if bx0 >= x0 and bx1 <= x1 and by0 >= y0 and by1 <= y1 and ((by1 - by0) if rot else (bx1 - bx0)) < 0.4 * long_ext:
             gl.append((p, bx0, by0, bx1, by1))
     if not gl: raise ValueError(f"no glyphs for {r['text']}")
+    # A short panel behind a short word also passes the length test; glyphs share one cap height.
+    perp = lambda g: (g[3] - g[1]) if rot else (g[4] - g[2])
+    med = sorted(perp(g) for g in gl)[len(gl) // 2]
+    gl = [g for g in gl if perp(g) <= 1.3 * med]
     for g in gl: g[0]["hidden"] = True
     ux0, uy0, ux1, uy1 = min(g[1] for g in gl), min(g[2] for g in gl), max(g[3] for g in gl), max(g[4] for g in gl)
     cap_ratio, ink = _font_metrics(r["font"])
