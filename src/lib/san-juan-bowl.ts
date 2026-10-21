@@ -17,7 +17,7 @@ export const SJB_EVENT = {
   shortName: "San Juan Bowl",
   city: "San Juan, Puerto Rico",
   /** Not issued yet — pages must say so rather than guess. */
-  venue: "",
+  venue: "Hiram Bithorn Stadium",
   datesLabel: "",
 } as const;
 
