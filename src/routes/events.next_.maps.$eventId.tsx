@@ -10,7 +10,6 @@ import { listVenueMapEdits, saveVenueMapEdits } from "@/lib/qeii-map-edits.funct
 import { EMPTY_QEII_MAP_EDITS, qeiiFloorMapEdits, qeiiApplyRoomEdit, qeiiClearRoomEdit, qeiiRoomEdit, type QeiiMapEdits, type QeiiRoomEdit } from "@/lib/qeii-map-edits";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { eventDisplayName } from "@/lib/event-names";
-import { trimFloorToContent } from "@/lib/venue-floor-normalise";
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -27,7 +26,6 @@ import {
 } from "@/lib/event-maps.functions";
 import { saveVenueFloor } from "@/lib/venues.functions";
 import { eventFloorId, importSvgFloor } from "@/lib/venue-map-import";
-import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
 import { eventMapFloor, eventMapSheet, eventMapSvg, type EventMapRow } from "@/lib/event-floor-plan";
 import { QEII_ROOM_PALETTE, qeiiRoomShapes } from "@/lib/next-london-qeii-rooms";
 import { QEII_MAP_LOOKS, QEII_MAP_LOOK_ORDER, type QeiiPlanFace } from "@/lib/next-london-qeii-style";
