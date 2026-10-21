@@ -256,6 +256,11 @@ function ApprovalQueuePage() {
           checks, talk it through in the thread, then approve or send it back.
           {persona === "sales" && " Your own submissions appear here with their current state."}
         </p>
+        {persona !== "sales" && (
+          <Link to="/admin/approved-figures" className="mt-3 inline-block text-sm font-medium text-primary underline-offset-4 hover:underline">
+            Approved figures →
+          </Link>
+        )}
       </header>
 
       <div className="grid gap-3 sm:grid-cols-3">
