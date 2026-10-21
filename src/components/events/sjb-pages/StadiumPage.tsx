@@ -7,9 +7,10 @@ import { Button } from "@/design-system/element";
 import { BOOTHHUB_ORIGIN } from "@/lib/boothhub-3d";
 
 const STADIUM_URL = `${BOOTHHUB_ORIGIN}/showcase/san-juan-bowl`;
-/** Flip to true once BoothHUB publishes the San Juan Bowl stadium; until then
- *  its showcase returns an error, so we show "Coming soon" instead. */
-const STADIUM_READY = true;
+/** Flip to true once BoothHUB publishes the Hiram Bithorn model; the current
+ *  showcase still shows the superseded Loubriel stadium, so we show
+ *  "Coming soon" until the rebuilt model is live. */
+const STADIUM_READY = false;
 
 
 export function StadiumPage() {
@@ -23,7 +24,7 @@ export function StadiumPage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="text-2xl font-semibold">Stadium 3D view</h1>
-            <p className="text-sm text-muted-foreground">Juan Ramón Loubriel Stadium, Bayamón. Drag to orbit; the model is built and edited in BoothHUB.</p>
+            <p className="text-sm text-muted-foreground">Hiram Bithorn Stadium, San Juan. Drag to orbit; the model is built and edited in BoothHUB.</p>
           </div>
           {STADIUM_READY && !share && (
           <Button asChild variant="outline">

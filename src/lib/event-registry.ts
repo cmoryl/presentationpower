@@ -339,7 +339,7 @@ function sanJuanBowlEntry(): EventEntry {
           },
           {
             label: "Stadium 3D view",
-            detail: "Juan Ramón Loubriel Stadium, Bayamón — the interactive BoothHUB stadium and field.",
+            detail: "Hiram Bithorn Stadium, San Juan — the interactive BoothHUB stadium and field.",
             link: { to: "/events/san-juan-bowl/stadium" },
           },
           {

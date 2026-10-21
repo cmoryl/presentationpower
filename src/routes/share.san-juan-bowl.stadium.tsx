@@ -7,9 +7,8 @@ export const Route = createFileRoute("/share/san-juan-bowl/stadium")({
   head: () => ({
     meta: [
       { title: "San Juan Bowl stadium in 3D" },
-      { name: "description", content: "Explore Juan Ramón Loubriel Stadium, Bayamón, in 3D for the TransPerfect San Juan Bowl." },
-      { property: "og:title", content: "San Juan Bowl stadium in 3D" },
-      { property: "og:description", content: "Explore Juan Ramón Loubriel Stadium, Bayamón, in 3D for the TransPerfect San Juan Bowl." },
+      { name: "description", content: "Explore Hiram Bithorn Stadium, San Juan, in 3D for the TransPerfect San Juan Bowl." },
+      { property: "og:description", content: "Explore Hiram Bithorn Stadium, San Juan, in 3D for the TransPerfect San Juan Bowl." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
