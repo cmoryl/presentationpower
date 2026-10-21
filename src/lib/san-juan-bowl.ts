@@ -16,8 +16,8 @@ export const SJB_EVENT = {
   name: "TransPerfect San Juan Bowl",
   shortName: "San Juan Bowl",
   city: "San Juan, Puerto Rico",
-  /** Not issued yet — pages must say so rather than guess. */
-  venue: "",
+  /** Confirmed by the event team (Oct 2026). */
+  venue: "Hiram Bithorn Stadium",
   datesLabel: "",
 } as const;
 
