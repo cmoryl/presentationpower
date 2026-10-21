@@ -10,7 +10,6 @@ import { listVenueMapEdits, saveVenueMapEdits } from "@/lib/qeii-map-edits.funct
 import { EMPTY_QEII_MAP_EDITS, qeiiFloorMapEdits, qeiiApplyRoomEdit, qeiiClearRoomEdit, qeiiRoomEdit, type QeiiMapEdits, type QeiiRoomEdit } from "@/lib/qeii-map-edits";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
 import { eventDisplayName } from "@/lib/event-names";
-import { trimFloorToContent } from "@/lib/venue-floor-normalise";
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -27,8 +26,7 @@ import {
 } from "@/lib/event-maps.functions";
 import { saveVenueFloor } from "@/lib/venues.functions";
 import { eventFloorId, importSvgFloor } from "@/lib/venue-map-import";
-import type { QeiiFloorVector } from "@/lib/next-london-qeii-vectors";
-import { qeiiPlanSvg } from "@/lib/next-london-qeii-plan";
+import { eventMapFloor, eventMapSheet, eventMapSvg, type EventMapRow } from "@/lib/event-floor-plan";
 import { QEII_ROOM_PALETTE, qeiiRoomShapes } from "@/lib/next-london-qeii-rooms";
 import { QEII_MAP_LOOKS, QEII_MAP_LOOK_ORDER, type QeiiPlanFace } from "@/lib/next-london-qeii-style";
 
@@ -54,32 +52,8 @@ const btn =
   "inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white px-4 py-2 text-[13px] font-semibold text-[#03002C] transition-colors hover:bg-[#F2F2F2] disabled:opacity-50";
 const field = "w-full rounded-lg border border-[#03002C]/20 bg-white px-3 py-2 text-[14px] text-[#03002C]";
 
-type Row = {
-  floor_key: string;
-  marker: string;
-  title: string;
-  position: number;
-  source_kind: string;
-  source_name: string | null;
-  w: number;
-  h: number;
-  shapes: unknown;
-  labels: unknown;
-  room_colours: unknown;
-  room_uses: unknown;
-};
-
-const toFloor = (eventId: string, r: Row): QeiiFloorVector => trimFloorToContent({
-  id: eventFloorId(eventId, r.floor_key),
-  marker: r.marker,
-  title: r.title,
-  page: r.position + 1,
-  kind: "vector",
-  w: r.w,
-  h: r.h,
-  shapes: (r.shapes as QeiiFloorVector["shapes"]) ?? [],
-  labels: (r.labels as QeiiFloorVector["labels"]) ?? [],
-} as QeiiFloorVector);
+type Row = EventMapRow;
+const toFloor = eventMapFloor;
 
 const keyFrom = (t: string) =>
   t.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "floor";
@@ -132,16 +106,11 @@ function MapsPage() {
   };
   const plan = q.data?.plan;
   const sheet = useMemo(
-    () => ({
-      venueName: plan?.venue || q.data?.venue?.name || plan?.name || "Venue",
-      tabs: rows.map((r) => ({ id: eventFloorId(eventId, r.floor_key), label: r.marker })),
-      // San Francisco is a GlobalLink NEXT edition: its maps carry the GlobalLink NEXT lockup.
-      lockup: /san-francisco|next-sf/i.test(eventId) ? "globallink-side-by-side-color.svg" : undefined,
-    }),
+    () => eventMapSheet(eventId, rows, { plan: plan?.venue, venue: q.data?.venue?.name, fallback: plan?.name }),
     [plan, rows, eventId, q.data?.venue],
   );
   const svg = useMemo(
-    () => (floor ? qeiiPlanSvg(floor, { face, roomColours, sheet, edits: labelEdits }) : ""),
+    () => (floor ? eventMapSvg(floor, { face, roomColours, sheet, edits: labelEdits }) : ""),
     [floor, face, roomColours, sheet, labelEdits],
   );
   const [preparedSvg, setPreparedSvg] = useState<{ source: string; file: string } | null>(null);
