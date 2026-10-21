@@ -130,14 +130,26 @@ function LockupTile({ item, accent }: { item: NextLockup; accent: string }) {
         <span className="font-medium">
           {item.lockupLabel} · {item.variantLabel}
         </span>
-        <a
-          href={item.src}
-          download
-          className="rounded-full border px-3 py-1 text-[11px] transition hover:opacity-80"
-          style={{ borderColor: accent, color: accent }}
-        >
-          SVG
-        </a>
+        <span className="flex gap-1.5">
+          {(
+            [
+              ["SVG", item.src],
+              ["EPS", item.src.replace(/\/([^/]+)\.svg$/, "/eps/$1.eps")],
+              ["PNG", item.src.replace(/\/([^/]+)\.svg$/, "/png/$1.png")],
+            ] as const
+          ).map(([label, href]) => (
+            <a
+              key={label}
+              href={href}
+              download
+              title={label === "PNG" ? "Transparent PNG, 2400 px wide" : label === "EPS" ? "Vector EPS for print and signage" : "Vector SVG for web and slides"}
+              className="rounded-full border px-3 py-1 text-[11px] transition hover:opacity-80"
+              style={{ borderColor: accent, color: accent }}
+            >
+              {label}
+            </a>
+          ))}
+        </span>
       </figcaption>
     </figure>
   );
