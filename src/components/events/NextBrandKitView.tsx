@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { Download, ExternalLink, Loader2, PencilRuler } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/design-system/element";
-import { BrandKitGuideSections, GUIDE_SECTIONS } from "@/components/events/brand-kit/BrandKitGuideSections";
+import { BrandKitGuideSections, GUIDE_SECTIONS, PLANNING_GUIDE_SECTIONS } from "@/components/events/brand-kit/BrandKitGuideSections";
 import { BrandKitPillarAreaSections, PILLAR_AREA_SECTIONS } from "@/components/events/brand-kit/BrandKitPillarAreaSections";
 import {
   BRAND_KIT_COLOUR_NOTE,
@@ -24,12 +24,17 @@ import {
   type KitFamily,
 } from "@/lib/next-brand-kit";
 
-const SECTIONS = [
+const BRAND_SECTIONS = [
   ["logos", "Logos & lockups"],
   ["colour", "Colour & type"],
   ["templates", "Sign templates"],
   ["digital", "Digital & slides"],
   ...GUIDE_SECTIONS,
+] as const;
+// Partners only get the share link, so the shared view keeps the planning parts.
+const SHARED_SECTIONS = [
+  ...BRAND_SECTIONS,
+  ...PLANNING_GUIDE_SECTIONS,
   ...PILLAR_AREA_SECTIONS,
   ["new-city", "Starting a new city"],
 ] as const;
@@ -82,7 +87,7 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
 
       <div className="lg:grid lg:grid-cols-[200px_1fr] lg:gap-10">
       <nav aria-label="Brand kit sections" className="sticky top-0 z-10 -mx-6 flex gap-4 overflow-x-auto bg-background/95 px-6 py-3 text-sm lg:top-6 lg:mx-0 lg:h-fit lg:flex-col lg:gap-2 lg:px-0 lg:py-8">
-        {SECTIONS.map(([id, label]) => (
+        {(shared ? SHARED_SECTIONS : BRAND_SECTIONS).map(([id, label]) => (
           <a key={id} href={`#${id}`} className="whitespace-nowrap font-medium text-muted-foreground hover:text-foreground">
             {label}
           </a>
@@ -257,10 +262,18 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
         ) : null}
       </section>
 
-      <BrandKitGuideSections shared={shared} />
-      <BrandKitPillarAreaSections />
+      <BrandKitGuideSections shared={shared} part={shared ? "all" : "brand"} />
+      {shared ? <BrandKitPillarAreaSections /> : (
+        <Link to="/events/next/planning-guide" className="mt-12 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border p-4 hover:border-[#003FC7]">
+          <span>
+            <span className="block text-sm font-semibold">Planning the event?</span>
+            <span className="block text-sm text-muted-foreground">Event sections, NEXT Mart, NEXTbrew, pillar and area options, and starting a new city are in the planning guide.</span>
+          </span>
+          <span className="text-sm font-semibold text-[#003FC7]">Open the planning guide →</span>
+        </Link>
+      )}
 
-      <section id="new-city" className="mt-12 scroll-mt-16">
+      {shared && <section id="new-city" className="mt-12 scroll-mt-16">
         <h2 className="text-xl font-semibold">Starting a new city</h2>
         <ol className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {NEW_CITY_CHECKLIST.map((c, i) => (
@@ -271,7 +284,7 @@ export function NextBrandKitView({ shared = false }: { shared?: boolean }) {
             </li>
           ))}
         </ol>
-      </section>
+      </section>}
       </div>
       </div>
     </div>
