@@ -12,6 +12,8 @@ import { SF_VENUE_FACT_SHEET, SF_VENUE_FLOORS, SF_VENUE_ROOMS, sfVenueRoomList }
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
 import { EventMapView } from "@/components/events/EventMapView";
 
+const n = (v: number | null) => (v == null ? "–" : v.toLocaleString("en-US"));
+
 export function SfVenueMeetingSpace() {
   const [floor, setFloor] = useState<number>(3);
   const [busy, setBusy] = useState(false);
