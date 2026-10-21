@@ -10,7 +10,7 @@ import { BOOTHHUB_ORIGIN } from "@/lib/boothhub-3d";
 const STADIUM_URL = `${BOOTHHUB_ORIGIN}/showcase/san-juan-bowl`;
 /** Flip to true once BoothHUB publishes the San Juan Bowl stadium; until then
  *  its showcase returns an error, so we show "Coming soon" instead. */
-const STADIUM_READY = false;
+const STADIUM_READY = true;
 
 export const Route = createFileRoute("/events/san-juan-bowl_/stadium")({
   head: () => ({
