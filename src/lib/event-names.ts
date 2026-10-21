@@ -7,6 +7,7 @@ const NAMES: Record<string, string> = {
   "legalnext-new-york": "LegalNEXT New York",
   "nexus-london": "NeXus London ’26",
   "hackathon-london": "GlobalLink Hackathon London ’26",
+  "legalweek-2026": "TransPerfect Legal at Legalweek 2026",
 };
 
 /** Readable event name; unknown ids are title-cased rather than shown raw. */

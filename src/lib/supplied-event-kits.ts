@@ -6,6 +6,7 @@
 
 import nexusFiles from "@/lib/supplied-kits/nexus.json";
 import hackathonFiles from "@/lib/supplied-kits/hackathon.json";
+import legalweekFiles from "@/lib/supplied-kits/legalweek.json";
 
 export type KitFile = {
   group: string;
@@ -20,16 +21,17 @@ export type KitLogo = { name: string; format: "SVG" | "PNG" | string; url: strin
 export type KitColour = { name: string; hex: string; rgb: string; cmyk: string; pantone: string };
 
 export type SuppliedKit = {
-  id: "nexus" | "hackathon";
+  id: "nexus" | "hackathon" | "legalweek";
   name: string;
   intro: string;
+  /** Empty when the package has no brand guide; never filled in by us. */
   colours: KitColour[];
   gradientNote?: string;
   typography: string;
   logoNote: string;
   donts: string[];
   logos: KitLogo[];
-  guide: KitFile;
+  guide?: KitFile;
   live: KitFile[];
   map?: KitFile;
   pieces: KitFile[];

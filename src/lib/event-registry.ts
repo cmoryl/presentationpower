@@ -7,7 +7,7 @@ import type { LinkOptions } from "@tanstack/react-router";
 import { NEXT_EVENT } from "./next-event";
 import { SF_READINESS, SF_VENUE } from "./next-sf-event";
 import { SJB_EVENT } from "./san-juan-bowl";
-import { HACKATHON_EVENT, NEXUS_EVENT } from "./supplied-event-kits";
+import { HACKATHON_EVENT, LEGALWEEK_EVENT, NEXUS_EVENT } from "./supplied-event-kits";
 
 export type EventTabId =
   | "checklist"
@@ -450,7 +450,32 @@ function hackathonEntry(): EventEntry {
   };
 }
 
-export const BUILT_IN_EVENTS: readonly EventEntry[] = [londonEntry(), sfEntry(), sanJuanBowlEntry(), nexusEntry(), hackathonEntry()];
+/** Legalweek 2026: venue and dates as printed on the supplied pillar signs and social posts. */
+function legalweekEntry(): EventEntry {
+  return {
+    id: LEGALWEEK_EVENT.id,
+    kind: "edition",
+    name: LEGALWEEK_EVENT.name,
+    venue: LEGALWEEK_EVENT.venue,
+    city: LEGALWEEK_EVENT.city,
+    dates: LEGALWEEK_EVENT.datesLabel,
+    tabs: [
+      {
+        id: "checklist",
+        tools: [
+          { label: "Legalweek 2026 kit", detail: "Supplied pillar signs, charging lockers, social, email and screen pieces.", link: { to: "/events/kits/$kitId", params: { kitId: "legalweek" } } },
+        ],
+      },
+      knowledge,
+    ],
+    readiness: [
+      { label: "Supplied event pieces", state: "ready", link: { to: "/events/kits/$kitId", params: { kitId: "legalweek" } } },
+      { label: "Fabric walls", state: "waiting", blockedOn: "a smaller Dropbox link (the folder is too large to download)" },
+    ],
+  };
+}
+
+export const BUILT_IN_EVENTS: readonly EventEntry[] = [londonEntry(), sfEntry(), sanJuanBowlEntry(), nexusEntry(), hackathonEntry(), legalweekEntry()];
 
 export function builtInEvent(id: string): EventEntry | undefined {
   return BUILT_IN_EVENTS.find((e) => e.id === id);
