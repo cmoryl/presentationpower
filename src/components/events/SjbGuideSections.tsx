@@ -92,6 +92,29 @@ export function SjbGuideSections() {
             </div>
           </div>
         </div>
+        <h3 className="mt-6 text-sm font-bold text-foreground">Palm trees from the logo</h3>
+        <p className="text-xs text-muted-foreground">The badge's own palms, supplied as standalone artwork for patterns, corners and merchandise. Use as supplied; never redraw, recolour (except the one-colour file) or stretch.</p>
+        <div className="mt-3 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            ["sjb-palms-pair", "Palm pair — full colour", "#FFFFFF"],
+            ["sjb-palms-pair-1color", "Palm pair — one colour", "#FFFFFF"],
+            ["sjb-palm-left", "Left palm", "#FFFFFF"],
+            ["sjb-palm-right", "Right palm", "#FFFFFF"],
+          ].map(([id, label, bg]) => (
+            <div key={id} className="overflow-hidden rounded-lg border border-border">
+              <div className="flex h-40 items-center justify-center p-4" style={{ background: bg }}>
+                <img src={`/downloads/sjb-palms/${id}.svg`} alt={label} className="max-h-full max-w-full" />
+              </div>
+              <div className="p-3">
+                <p className="text-sm font-semibold text-foreground">{label}</p>
+                <div className="mt-2 flex gap-3 text-xs font-semibold">
+                  <a href={`/downloads/sjb-palms/${id}.svg`} download={`${id}.svg`} className="text-primary hover:underline">SVG</a>
+                  <a href={`/downloads/sjb-palms/${id}-2400.png`} download={`${id}-2400.png`} className="text-primary hover:underline">Transparent PNG</a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
         <SjbLink page="single" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">Single-colour versions</SjbLink>
       </Section>
 
