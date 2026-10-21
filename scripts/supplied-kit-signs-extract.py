@@ -29,9 +29,14 @@ BLEED = 9.0
 def one(it, OUT, version):
     lid = it["id"]; src = pikepdf.open(it["pdf"]); page = src.pages[it["page"]]
     ops, paints, W, H = analyse(src, page, set())
-    oy = float(page.MediaBox[1]); ox = float(page.MediaBox[0]); H = round(H - oy, 2)
+    # Work in trim space: press PDFs carry crop marks, colour bars and a slug outside the TrimBox.
+    tb = [float(v) for v in page.obj.get("/TrimBox", page.MediaBox)]
+    ox, oy = tb[0], tb[1]; W = round(tb[2] - tb[0], 2); H = round(tb[3] - tb[1], 2)
     for p in paints:
-        if p["box"]: p["box"] = [p["box"][0] - ox, p["box"][1] - oy, p["box"][2] - ox, p["box"][3] - oy]
+        if p["box"]:
+            p["box"] = [p["box"][0] - ox, p["box"][1] - oy, p["box"][2] - ox, p["box"][3] - oy]
+            b = p["box"]
+            if b[2] <= 0.5 or b[3] <= 0.5 or b[0] >= W - 0.5 or b[1] >= H - 0.5: p["hidden"] = True
     shift = f"1 0 0 1 {-ox:.6f} {-oy:.6f} cm\n".encode()
     mark_forms(ops, page, paints)
     bg, objs = split(paints, W, H)
@@ -49,7 +54,8 @@ def one(it, OUT, version):
     tpdf = pikepdf.new(); tpdf.add_blank_page(page_size=(W, H)); tp = tpdf.pages[-1]; tp.Resources = tpdf.copy_foreign(res_ind)
     tp.Contents = tpdf.make_stream(b"q\n" + shift + pikepdf.unparse_content_stream(filtered(ops, {p["i"] for p in paints if p["kind"] == "text"})) + b"\nQ\n")
     tpath = f"{OUT}/{lid}-text.pdf"; tpdf.save(tpath)
-    texts = read_texts(tpath, H)
+    # Printer's marks (registration text, slug) sit outside the trim.
+    texts = [t for t in read_texts(tpath, H) if t["font"] != "Courier" and -1 < t["x"] < W and 0 < t["y"] < H + 1]
     # Some files fill text through an ICC space pdfplumber reads as 0; set the ink seen in the render.
     for t in texts:
         if it.get("textColor") and t["color"] == "#000000": t["color"] = it["textColor"]
