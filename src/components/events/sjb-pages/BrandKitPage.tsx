@@ -3,6 +3,7 @@
 // approved backgrounds, misuse gallery and badge anatomy, plus the palette,
 // type and usage rules, with downloads. Event facts stay "to be confirmed"
 // until issued.
+import { SjbLettering } from "@/components/events/SjbLettering";
 
 import { useState } from "react";
 import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
@@ -330,6 +331,8 @@ export function SjbBrandKit() {
           </div>
 
           <SjbSingleColour className="pt-2" />
+
+          <SjbLettering />
 
           <SjbLink page="designers"
             className={`${card} flex flex-wrap items-center justify-between gap-3 hover:border-[#003FC7]`}
