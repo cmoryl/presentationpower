@@ -16,6 +16,9 @@ import {
   SJB_TYPE_NOTE,
   type SjbMisuseDemo,
 } from "@/lib/san-juan-bowl";
+import curvedAi from "@/assets/sjb/curved-lettering.ai.asset.json";
+import curvedSvg from "@/assets/sjb/curved-lettering.svg.asset.json";
+import curvedPng from "@/assets/sjb/curved-lettering.png.asset.json";
 
 const TITLE = "San Juan Bowl brand guide — TransPerfect Element";
 const DESC = "San Juan Bowl badge, variants, clear space, colours with CMYK/RGB/HEX, Geist typography and logo don’ts.";
@@ -105,6 +108,20 @@ function SjbGuide() {
               </div>
             </div>
           ))}
+        </div>
+        <div className="mt-4 overflow-hidden rounded-lg border border-border">
+          <div className="flex h-56 items-center justify-center p-6" style={{ background: NAVY }}>
+            <img src={curvedSvg.url} alt="SAN JUAN BOWL curved lettering" className="max-h-full max-w-full" />
+          </div>
+          <div className="p-3">
+            <p className="text-sm font-semibold text-foreground">Curved lettering — SAN JUAN BOWL only <span className="font-normal text-muted-foreground">· for dark backgrounds</span></p>
+            <p className="text-xs text-muted-foreground">The badge's own arched lettering on its own, white with the Caribbean Sky shadow. Use as supplied; never retype, re-curve or stretch it.</p>
+            <div className="mt-2 flex gap-3 text-xs font-semibold">
+              <a href={curvedSvg.url} download="sjb-san-juan-bowl-curved-lettering.svg" className="text-primary hover:underline">SVG</a>
+              <a href={curvedAi.url} download="sjb-san-juan-bowl-curved-lettering.ai" className="text-primary hover:underline">AI</a>
+              <a href={curvedPng.url} download="sjb-san-juan-bowl-curved-lettering.png" className="text-primary hover:underline">Transparent PNG</a>
+            </div>
+          </div>
         </div>
         <Link to="/events/san-juan-bowl/brand-kit/single-colour" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">Single-colour versions</Link>
       </Section>
