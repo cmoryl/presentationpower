@@ -209,7 +209,7 @@ SNAP_TOL = 9.0                     # degrees: edges this close to a true angle a
 LEVEL_TOL = 1.6                    # cap %: horizontal edges this close share one height
 
 
-def ring_lines(coords):
+def ring_lines(coords, inner=False):
     """Corners of a ring -> straight lines (angle, offset, length), true angles snapped."""
     pts = np.array(coords[:-1])
     lines = []
@@ -219,7 +219,7 @@ def ring_lines(coords):
         ang = math.degrees(math.atan2(v[1], v[0])) % 180
         for t in SNAP:
             tol = SNAP_TOL if t in (0.0, 90.0) else 4.0
-            if t == 90.0: tol = 7.5
+            if t == 90.0: tol = 3.0 if inner else 7.5
             if min(abs(ang - t), 180 - abs(ang - t)) <= tol: ang = t; break
         lines.append([ang, (a + b) / 2, L, v])
     # merge neighbours that now run the same way (one edge drawn in pieces)
@@ -256,9 +256,9 @@ def clean_letter(g, levels):
     out = []
     for p in polys:
         rings = []
-        for r in [p.exterior, *p.interiors]:
+        for ri, r in enumerate([p.exterior, *p.interiors]):
             simp = shapely.simplify(shapely.LineString(r.coords), 0.55).coords
-            lines = ring_lines(list(simp))
+            lines = ring_lines(list(simp), inner=ri > 0)
             for ln in lines:  # shared heights: tops, bottoms, bars, serifs
                 if ln[0] == 0.0:
                     y = ln[1][1]; k = min(levels, key=lambda v: abs(v - y))
