@@ -300,7 +300,7 @@ export function SjbBrandKit() {
           <p className="font-mono text-[11px] uppercase tracking-wider text-[#666666]">Brand kit</p>
           <h1 className="mt-1 text-[32px] font-bold leading-tight">{SJB_EVENT.name}</h1>
           <p className="mt-1 text-[14px] text-[#666666]">
-            {SJB_EVENT.city} · Venue and dates to be confirmed — nothing is printed until the organisers issue them.
+            {SJB_EVENT.venue}, {SJB_EVENT.city} · Dates to be confirmed — nothing is printed until the organisers issue them.
           </p>
           <a
             href="/downloads/san-juan-bowl-brand-guide.pdf"
@@ -320,6 +320,25 @@ export function SjbBrandKit() {
           <SjbShareLinkButton />
         </header>
 
+        <SjbBrandKitBody />
+        {!share && <KitSignList kit="san-juan-bowl" />}
+
+        <section className={`${card} space-y-2`}>
+          <h2 className="text-[17px] font-bold">What's next</h2>
+          <p className="text-[14px] text-[#03002C]/80">
+            Maps, signage and badges open from the event home as soon as the venue's floor plans and sign list arrive.
+            Room colours and uses are set per event, so nothing here is overwritten by other events.
+          </p>
+        </section>
+      </div>
+    </SjbShell>
+  );
+}
+
+/** Every brand-kit section (logo through naming); reused on the designers page. */
+export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
+  return (
+    <>
         <section className="space-y-4">
           <div>
             <h2 className="text-[20px] font-bold">Logo</h2>
@@ -343,7 +362,7 @@ export function SjbBrandKit() {
 
           <SjbLettering />
 
-          <SjbLink page="designers"
+          {!embedded && (<SjbLink page="designers"
             className={`${card} flex flex-wrap items-center justify-between gap-3 hover:border-[#003FC7]`}
           >
             <div>
@@ -353,7 +372,7 @@ export function SjbBrandKit() {
               </p>
             </div>
             <span className="text-[13px] font-semibold text-[#003FC7]">Open designer pages →</span>
-          </SjbLink>
+          </SjbLink>)}
 
           <div className={`${card} space-y-3`}>
             <h3 className="text-[15px] font-bold">Approved backgrounds</h3>
@@ -579,16 +598,6 @@ export function SjbBrandKit() {
           </dl>
         </section>
 
-        {!share && <KitSignList kit="san-juan-bowl" />}
-
-        <section className={`${card} space-y-2`}>
-          <h2 className="text-[17px] font-bold">What's next</h2>
-          <p className="text-[14px] text-[#03002C]/80">
-            Maps, signage and badges open from the event home as soon as the venue's floor plans and sign list arrive.
-            Room colours and uses are set per event, so nothing here is overwritten by other events.
-          </p>
-        </section>
-      </div>
-    </SjbShell>
+    </>
   );
 }
