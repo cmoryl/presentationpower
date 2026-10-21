@@ -1,0 +1,147 @@
+{
+ "logos": [
+  {
+   "name": "01_Hackathon2026_Logo",
+   "format": "SVG",
+   "url": "/__l5e/assets-v1/8504ec6f-e772-42fc-b7ef-84117bb56f3d/01_Hackathon2026_Logo.svg"
+  },
+  {
+   "name": "02_Hackathon2026_Logo_1Ink_DarkBlue",
+   "format": "SVG",
+   "url": "/__l5e/assets-v1/e89bd0c2-4ee8-444c-bbfd-c2cf48a3fec9/02_Hackathon2026_Logo_1Ink_DarkBlue.svg"
+  },
+  {
+   "name": "03_Hackathon2026_Logo_1Ink_LightBlue",
+   "format": "SVG",
+   "url": "/__l5e/assets-v1/c1f6c7dd-35aa-4566-90b4-be6d48391299/03_Hackathon2026_Logo_1Ink_LightBlue.svg"
+  },
+  {
+   "name": "04_Hackathon2026_Logo_White",
+   "format": "SVG",
+   "url": "/__l5e/assets-v1/82dedfbb-3ce6-48f6-8044-ef92d629b156/04_Hackathon2026_Logo_White.svg"
+  },
+  {
+   "name": "00_Dark_Blue_BG",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/34db0abc-fdfe-4751-9fbd-1b1a6424c214/00_Dark_Blue_BG.png"
+  },
+  {
+   "name": "01_Hackathon_Logo",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/6cd826b7-c1d2-4e92-9623-e071e49625a0/01_Hackathon_Logo.png"
+  },
+  {
+   "name": "02_Hackathon_Logo_1Ink",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/282748e5-6091-4904-98cf-bb26c598e683/02_Hackathon_Logo_1Ink.png"
+  },
+  {
+   "name": "03_Hackathon_Logo_2Ink_DarkBlueBG",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/012bbd1f-ca9e-4c49-8d7c-4db481cf3f7f/03_Hackathon_Logo_2Ink_DarkBlueBG.png"
+  },
+  {
+   "name": "04_Hackathon_Logo_1Ink_DarkBlueBG",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/0ef64772-816e-4b30-b2fa-4f2329db1fee/04_Hackathon_Logo_1Ink_DarkBlueBG.png"
+  }
+ ],
+ "guide": {
+  "group": "Brand guide",
+  "title": "Hackathon brand guidelines",
+  "preview": "/__l5e/assets-v1/4676360d-8f92-4839-9b2b-124cae1d1dbe/hackathon-brand-guidelines.jpg",
+  "file": "/__l5e/assets-v1/5ab92ba2-0dd4-40b8-823e-de974a1520f5/hackathon-brand-guidelines.pdf",
+  "format": "PDF",
+  "bytes": 1204880
+ },
+ "live": [
+  {
+   "group": "Live files",
+   "title": "Hackathon logo (Illustrator)",
+   "preview": "/__l5e/assets-v1/b5988ff7-7649-4e64-a0f8-e8e01d9a6cce/hackathon-logo-illustrator.jpg",
+   "file": "/__l5e/assets-v1/5ee3dd65-65dc-49a4-b60b-0635169fb6a2/hackathon-logo-illustrator.ai",
+   "format": "AI",
+   "bytes": 772826
+  },
+  {
+   "group": "Live files",
+   "title": "Hackathon brand kit (Illustrator)",
+   "preview": "/__l5e/assets-v1/a20a6a04-c73b-4637-9526-2b1aafd1958f/hackathon-brand-kit-illustrator.jpg",
+   "file": "/__l5e/assets-v1/d5611535-10f0-44eb-aada-1b25fa96587a/hackathon-brand-kit-illustrator.ai",
+   "format": "AI",
+   "bytes": 996137
+  }
+ ],
+ "pieces": [
+  {
+   "group": "Pillar signs",
+   "title": "Stage Hackathon pillar signs",
+   "preview": "/__l5e/assets-v1/ee73a04b-00c9-4fa4-8ceb-abc222ddf2cb/stage-hackathon-pillar-signs.jpg",
+   "file": "/__l5e/assets-v1/c27e673d-504b-47ab-9555-6547567e99a2/stage-hackathon-pillar-signs.pdf",
+   "format": "PDF",
+   "bytes": 429019
+  },
+  {
+   "group": "Badges",
+   "title": "Former Hackathon winner badge",
+   "preview": "/__l5e/assets-v1/d517d267-535a-4e55-a25a-f71fae531e6c/former-hackathon-winner-badge.jpg",
+   "file": "/__l5e/assets-v1/c6d24cac-d085-4fa6-b174-fc84ee2159c7/former-hackathon-winner-badge.pdf",
+   "format": "PDF",
+   "bytes": 1756138
+  },
+  {
+   "group": "Screen slides",
+   "title": "Hackathon screen 1",
+   "preview": "/__l5e/assets-v1/109dcb1d-4b68-415b-b529-b2bcbb573318/hackathon-screen-1-preview.jpg",
+   "file": "/__l5e/assets-v1/ca750af8-6e9f-4f7b-9ab8-39654d3ba6dc/hackathon-screen-1.jpg",
+   "format": "JPG",
+   "bytes": 207406,
+   "size": "1920 \u00d7 1080 px"
+  },
+  {
+   "group": "Screen slides",
+   "title": "Hackathon screen 2",
+   "preview": "/__l5e/assets-v1/e15afbc8-af3b-45d3-8858-a7351372d36d/hackathon-screen-2-preview.jpg",
+   "file": "/__l5e/assets-v1/5d902481-0893-498d-972a-c889d4147120/hackathon-screen-2.jpg",
+   "format": "JPG",
+   "bytes": 1074334,
+   "size": "1920 \u00d7 1080 px"
+  },
+  {
+   "group": "Screen slides",
+   "title": "Hackathon screen 3",
+   "preview": "/__l5e/assets-v1/f878ff22-3a7f-4999-bc8a-354e3769ccd2/hackathon-screen-3-preview.jpg",
+   "file": "/__l5e/assets-v1/4deb2374-4752-48d5-b38f-9a551a29ba58/hackathon-screen-3.jpg",
+   "format": "JPG",
+   "bytes": 874611,
+   "size": "1920 \u00d7 1080 px"
+  },
+  {
+   "group": "Screen slides",
+   "title": "Hackathon screen 4",
+   "preview": "/__l5e/assets-v1/5737a6a4-27d8-4da1-956e-79f738d178f5/hackathon-screen-4-preview.jpg",
+   "file": "/__l5e/assets-v1/041a7c0f-5b4e-41be-b3bf-5f33a73120e0/hackathon-screen-4.jpg",
+   "format": "JPG",
+   "bytes": 830711,
+   "size": "1920 \u00d7 1080 px"
+  },
+  {
+   "group": "Screen slides",
+   "title": "Hackathon screen 5",
+   "preview": "/__l5e/assets-v1/478b5006-75cf-4e00-8aa2-397e55702e73/hackathon-screen-5-preview.jpg",
+   "file": "/__l5e/assets-v1/f43898c7-9a06-4517-b82a-3cfdfe5e4b55/hackathon-screen-5.jpg",
+   "format": "JPG",
+   "bytes": 912351,
+   "size": "1920 \u00d7 1080 px"
+  },
+  {
+   "group": "Screen slides",
+   "title": "Hackathon screen 6",
+   "preview": "/__l5e/assets-v1/e152bf40-a22a-4ac5-bd96-af70854e0804/hackathon-screen-6-preview.jpg",
+   "file": "/__l5e/assets-v1/887dc8b6-dbdc-4d3b-a90b-2c51c272eb18/hackathon-screen-6.jpg",
+   "format": "JPG",
+   "bytes": 1096904,
+   "size": "1920 \u00d7 1080 px"
+  }
+ ]
+}

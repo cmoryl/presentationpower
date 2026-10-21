@@ -1,0 +1,330 @@
+{
+ "logos": [
+  {
+   "name": "Nexus_Logo_2026_1inks",
+   "format": "SVG",
+   "url": "/__l5e/assets-v1/599b2803-cb55-4ade-9810-b34b67355d44/Nexus_Logo_2026_1inks.svg"
+  },
+  {
+   "name": "Nexus_Logo_2026_2inks",
+   "format": "SVG",
+   "url": "/__l5e/assets-v1/0b7347a1-d3f0-4f76-aa20-6262443c5de6/Nexus_Logo_2026_2inks.svg"
+  },
+  {
+   "name": "Nexus_Logo_2026_4inks",
+   "format": "SVG",
+   "url": "/__l5e/assets-v1/f5ab527a-cfa3-4c2d-8fa4-cd5e5c385855/Nexus_Logo_2026_4inks.svg"
+  },
+  {
+   "name": "Nexus_Logo_2026_White",
+   "format": "SVG",
+   "url": "/__l5e/assets-v1/fcd4fc77-adfa-4a98-8dff-33af6d33dc60/Nexus_Logo_2026_White.svg"
+  },
+  {
+   "name": "00_Dark_Blue_BG",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/1cc04779-462e-4565-9b85-a7dd1aeca4d5/00_Dark_Blue_BG.png"
+  },
+  {
+   "name": "01_Nexus_Logo",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/97e939c7-56ac-4131-8c01-ea88b1a8646e/01_Nexus_Logo.png"
+  },
+  {
+   "name": "02_Nexus_Logo_2inks",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/cb981e7e-4a8e-4c46-8d7a-a03731c12dfc/02_Nexus_Logo_2inks.png"
+  },
+  {
+   "name": "03_Nexus_Logo_1ink_Dark_Blue",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/8b75cbff-d676-4482-b6bc-998ec2ca2086/03_Nexus_Logo_1ink_Dark_Blue.png"
+  },
+  {
+   "name": "04_Nexus_Logo_DarkBlueBG",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/d328bb55-1ac3-4f4f-ab3e-8e3a59abbd77/04_Nexus_Logo_DarkBlueBG.png"
+  },
+  {
+   "name": "05_Nexus_Logo_2inks_DarkBlueBG",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/0cabed89-f026-41b9-9429-321ccacc2ee1/05_Nexus_Logo_2inks_DarkBlueBG.png"
+  },
+  {
+   "name": "06_Nexus_Logo_2inks_LightBlueBG",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/46146113-9dac-4b2a-8ec8-5abf4a46632a/06_Nexus_Logo_2inks_LightBlueBG.png"
+  },
+  {
+   "name": "07_Nexus_Logo_1ink_White",
+   "format": "PNG",
+   "url": "/__l5e/assets-v1/54787ce9-22e1-4b11-992e-c0c3692e0e6e/07_Nexus_Logo_1ink_White.png"
+  }
+ ],
+ "guide": {
+  "group": "Brand guide",
+  "title": "NeXus brand guidelines",
+  "preview": "/__l5e/assets-v1/d280818d-2680-48af-a0de-29e5359cd40c/nexus-brand-guidelines.jpg",
+  "file": "/__l5e/assets-v1/f7c7baf3-fd0d-4001-9db9-0b4ef78b684d/nexus-brand-guidelines.pdf",
+  "format": "PDF",
+  "bytes": 1120616
+ },
+ "live": [
+  {
+   "group": "Live files",
+   "title": "NeXus logo (Illustrator)",
+   "preview": "/__l5e/assets-v1/7291a4d3-ac75-4805-9a0e-05d23f730854/nexus-logo-illustrator.jpg",
+   "file": "/__l5e/assets-v1/02e2c884-875d-4095-b24d-bd66a049b7c4/nexus-logo-illustrator.ai",
+   "format": "AI",
+   "bytes": 800004
+  },
+  {
+   "group": "Live files",
+   "title": "NeXus brand kit (Illustrator, RGB)",
+   "preview": "/__l5e/assets-v1/6e6a7391-4e62-41e6-a047-0e9b12447bca/nexus-brand-kit-illustrator-rgb.jpg",
+   "file": "/__l5e/assets-v1/8e91a89d-754d-4b80-a108-eca64e36a2c1/nexus-brand-kit-illustrator-rgb.ai",
+   "format": "AI",
+   "bytes": 1129850
+  },
+  {
+   "group": "Live files",
+   "title": "NeXus x Hackathon slide template (draft)",
+   "preview": null,
+   "file": "/__l5e/assets-v1/7023d6d9-6e27-42e9-8826-5fb8b5936304/nexus26-hackathon-template-draft.pptx",
+   "format": "PPTX",
+   "bytes": 38338797
+  }
+ ],
+ "map": {
+  "group": "Venue map",
+  "title": "Event map & locations",
+  "preview": "/__l5e/assets-v1/6e454029-94c8-4cbe-a1d4-5f19774f24af/event-map-locations.jpg",
+  "file": "/__l5e/assets-v1/49d1136a-e4c1-4e77-b137-3dd2846f6276/event-map-locations.ai",
+  "format": "AI",
+  "bytes": 2641398
+ },
+ "pieces": [
+  {
+   "group": "Venue signage",
+   "title": "Elevator door (ground)",
+   "preview": "/__l5e/assets-v1/c0f39fe2-4576-4f66-b5ff-e94e9767601d/elevator-door-ground.jpg",
+   "file": "/__l5e/assets-v1/be6e3c58-8afc-48b3-8d22-d635577ed1f5/elevator-door-ground.pdf",
+   "format": "PDF",
+   "bytes": 1326710,
+   "size": "1115 \u00d7 2100 mm"
+  },
+  {
+   "group": "Venue signage",
+   "title": "Elevator door (extra)",
+   "preview": "/__l5e/assets-v1/cbf5e419-cf72-402b-ad6a-b74bcc2ad4db/elevator-door-extra.jpg",
+   "file": "/__l5e/assets-v1/b177d2c8-d08b-4df5-8df0-93e21adf44a3/elevator-door-extra.pdf",
+   "format": "PDF",
+   "bytes": 747631,
+   "size": "1115 \u00d7 2100 mm"
+  },
+  {
+   "group": "Venue signage",
+   "title": "Lift internal mirror",
+   "preview": "/__l5e/assets-v1/63a4f226-e15d-48e7-aa94-9395c2e21a23/lift-internal-mirror.jpg",
+   "file": "/__l5e/assets-v1/6ba9531d-5ebb-4f76-b434-f91330a35187/lift-internal-mirror.pdf",
+   "format": "PDF",
+   "bytes": 543454,
+   "size": "1850 \u00d7 1200 mm"
+  },
+  {
+   "group": "Venue signage",
+   "title": "Pillar B",
+   "preview": "/__l5e/assets-v1/95bc0360-aa45-4b06-b2ad-0245a1381052/pillar-b.jpg",
+   "file": "/__l5e/assets-v1/94fbc8e6-4309-4df8-8b2d-3fea94b02806/pillar-b.pdf",
+   "format": "PDF",
+   "bytes": 1197582,
+   "size": "2685 \u00d7 1380 mm (+50 mm)"
+  },
+  {
+   "group": "Venue signage",
+   "title": "Shelf display front",
+   "preview": "/__l5e/assets-v1/e18407d6-9630-482b-aaec-264d63f68867/shelf-display-front.jpg",
+   "file": "/__l5e/assets-v1/0f42883f-b26f-4a04-9f02-f72f414e4112/shelf-display-front.pdf",
+   "format": "PDF",
+   "bytes": 26020656,
+   "size": "1830 \u00d7 2440 mm"
+  },
+  {
+   "group": "Venue signage",
+   "title": "Stair riser",
+   "preview": "/__l5e/assets-v1/40434089-a526-4293-b0ec-012de6f9cc8e/stair-riser.jpg",
+   "file": "/__l5e/assets-v1/1d768a2d-3471-475c-b9ef-2adc74572640/stair-riser.pdf",
+   "format": "PDF",
+   "bytes": 637059,
+   "size": "1685 \u00d7 115 mm"
+  },
+  {
+   "group": "Venue signage",
+   "title": "Floor graphic A",
+   "preview": "/__l5e/assets-v1/ecc2cb5c-d10b-4de5-8ee0-3de07c08ae5e/floor-graphic-a.jpg",
+   "file": "/__l5e/assets-v1/e682a7b1-30d9-4d2d-9add-31a6fed9e537/floor-graphic-a.pdf",
+   "format": "PDF",
+   "bytes": 424225,
+   "size": "600 \u00d7 600 mm"
+  },
+  {
+   "group": "Venue signage",
+   "title": "Floor graphic B",
+   "preview": "/__l5e/assets-v1/26a39488-fed9-44d6-97f4-a499672537ae/floor-graphic-b.jpg",
+   "file": "/__l5e/assets-v1/e7c8e2ac-c96e-4c0e-af77-da0f8fa3afed/floor-graphic-b.pdf",
+   "format": "PDF",
+   "bytes": 440558,
+   "size": "1200 \u00d7 1200 mm"
+  },
+  {
+   "group": "Pillar signs",
+   "title": "Regular NeXus pillar signs",
+   "preview": "/__l5e/assets-v1/d7d897f2-2808-4115-9763-de6a05b387b7/regular-nexus-pillar-signs.jpg",
+   "file": "/__l5e/assets-v1/2099a788-fc9d-4800-b94d-5316319d835d/regular-nexus-pillar-signs.pdf",
+   "format": "PDF",
+   "bytes": 1309847
+  },
+  {
+   "group": "Pillar signs",
+   "title": "Stage NeXus pillar signs",
+   "preview": "/__l5e/assets-v1/c3c25f76-d9bb-4fa6-9508-65f47c787df3/stage-nexus-pillar-signs.jpg",
+   "file": "/__l5e/assets-v1/c668239f-53a0-4148-84e3-330544f58607/stage-nexus-pillar-signs.pdf",
+   "format": "PDF",
+   "bytes": 860086
+  },
+  {
+   "group": "Pillar signs",
+   "title": "Stage NeXus pillar sign (light)",
+   "preview": "/__l5e/assets-v1/4819e15c-eab7-4f84-896b-c0a94fd0161a/stage-nexus-pillar-sign-light.jpg",
+   "file": "/__l5e/assets-v1/5244196c-2e31-41b0-bd3c-63b7b8cb36ca/stage-nexus-pillar-sign-light.pdf",
+   "format": "PDF",
+   "bytes": 860799
+  },
+  {
+   "group": "Badges",
+   "title": "NeXus name tags",
+   "preview": "/__l5e/assets-v1/39816859-cdd8-400a-93da-df78710ba495/nexus-name-tags.jpg",
+   "file": "/__l5e/assets-v1/f026aa79-c0ed-4e5d-8e8a-13310ed584f1/nexus-name-tags.pdf",
+   "format": "PDF",
+   "bytes": 1842537
+  },
+  {
+   "group": "Lanyards",
+   "title": "Lanyard colour guide",
+   "preview": "/__l5e/assets-v1/2ad71161-80c1-460f-8e5f-2bdb1f543b70/lanyard-colour-guide.jpg",
+   "file": "/__l5e/assets-v1/bb5d556e-8915-4fed-b0d5-50170dde0b59/lanyard-colour-guide.pdf",
+   "format": "PDF",
+   "bytes": 390062
+  },
+  {
+   "group": "Lanyards",
+   "title": "Staff lanyard",
+   "preview": "/__l5e/assets-v1/26d9b473-3feb-47e1-9eca-9e41e0fe5a82/staff-lanyard.jpg",
+   "file": "/__l5e/assets-v1/8c5e19f4-4174-489a-9607-06840999931e/staff-lanyard.pdf",
+   "format": "PDF",
+   "bytes": 368147
+  },
+  {
+   "group": "Lanyards",
+   "title": "Judge lanyard",
+   "preview": "/__l5e/assets-v1/2caff2d8-96a3-4321-aaf2-5080a3c0cf4b/judge-lanyard.jpg",
+   "file": "/__l5e/assets-v1/647efe5a-da17-47de-8a01-185bd4588444/judge-lanyard.pdf",
+   "format": "PDF",
+   "bytes": 398997
+  },
+  {
+   "group": "Lanyards",
+   "title": "Hacker lanyard",
+   "preview": "/__l5e/assets-v1/b668a61c-ac6b-44f8-9952-b7c82cd66356/hacker-lanyard.jpg",
+   "file": "/__l5e/assets-v1/be8cccf7-ac9f-4b35-b2f4-37b488be0161/hacker-lanyard.pdf",
+   "format": "PDF",
+   "bytes": 401241
+  },
+  {
+   "group": "Lanyards",
+   "title": "Expert lanyard",
+   "preview": "/__l5e/assets-v1/d48ad882-7e16-42b4-ab35-dbb9cdd49757/expert-lanyard.jpg",
+   "file": "/__l5e/assets-v1/faae7a27-5884-4313-bccb-1cfb672c9c48/expert-lanyard.pdf",
+   "format": "PDF",
+   "bytes": 367429
+  },
+  {
+   "group": "Lanyards",
+   "title": "Executive lanyard",
+   "preview": "/__l5e/assets-v1/57d56dd6-14e2-4b34-a436-20a7c8b5d742/executive-lanyard.jpg",
+   "file": "/__l5e/assets-v1/8c475989-8c11-41d6-a039-fa77099b53fc/executive-lanyard.pdf",
+   "format": "PDF",
+   "bytes": 374285
+  },
+  {
+   "group": "Lanyards",
+   "title": "Change Maker lanyard",
+   "preview": "/__l5e/assets-v1/63037f22-5335-4259-a793-7c2be72b942c/change-maker-lanyard.jpg",
+   "file": "/__l5e/assets-v1/dda761a0-ebc0-4f6a-96c1-080ba05a21fc/change-maker-lanyard.pdf",
+   "format": "PDF",
+   "bytes": 411056
+  },
+  {
+   "group": "Lanyards",
+   "title": "Candlestick Maker lanyard",
+   "preview": "/__l5e/assets-v1/7dbe0747-8635-4fa2-91b6-9a396a7cc9c6/candlestick-maker-lanyard.jpg",
+   "file": "/__l5e/assets-v1/c5f0fa67-54f6-4548-9827-3dbb678e65c9/candlestick-maker-lanyard.pdf",
+   "format": "PDF",
+   "bytes": 416504
+  },
+  {
+   "group": "Screen slides",
+   "title": "NeXus screen 1",
+   "preview": "/__l5e/assets-v1/4d245319-c2d8-49a7-b461-50243db06093/nexus-screen-1-preview.jpg",
+   "file": "/__l5e/assets-v1/de0d8de4-71da-4ec1-a28d-e1ec137328cd/nexus-screen-1.jpg",
+   "format": "JPG",
+   "bytes": 388871,
+   "size": "1920 \u00d7 1080 px"
+  },
+  {
+   "group": "Screen slides",
+   "title": "NeXus screen 2",
+   "preview": "/__l5e/assets-v1/4703e3b0-a3f7-4eff-bd23-b9f8b8071770/nexus-screen-2-preview.jpg",
+   "file": "/__l5e/assets-v1/e34b0b66-6e60-4fad-a415-7a96f0fbf715/nexus-screen-2.jpg",
+   "format": "JPG",
+   "bytes": 857625,
+   "size": "1920 \u00d7 1080 px"
+  },
+  {
+   "group": "Screen slides",
+   "title": "NeXus screen 3",
+   "preview": "/__l5e/assets-v1/575815e9-9a25-43ac-93cf-e6672f7acc9c/nexus-screen-3-preview.jpg",
+   "file": "/__l5e/assets-v1/94f81cea-824d-45f3-833e-f9edb80193d2/nexus-screen-3.jpg",
+   "format": "JPG",
+   "bytes": 1091732,
+   "size": "1920 \u00d7 1080 px"
+  },
+  {
+   "group": "Screen slides",
+   "title": "NeXus screen 4",
+   "preview": "/__l5e/assets-v1/8b708787-559f-47df-9e60-267bc7f1da4e/nexus-screen-4-preview.jpg",
+   "file": "/__l5e/assets-v1/a6fc42ca-b28f-40df-8ed2-2de098735836/nexus-screen-4.jpg",
+   "format": "JPG",
+   "bytes": 793266,
+   "size": "1920 \u00d7 1080 px"
+  },
+  {
+   "group": "Screen slides",
+   "title": "NeXus screen 5",
+   "preview": "/__l5e/assets-v1/44d23ee4-e702-4b90-aeff-68d5d8b781a9/nexus-screen-5-preview.jpg",
+   "file": "/__l5e/assets-v1/fc86708d-81af-438c-a46c-802ca3490b34/nexus-screen-5.jpg",
+   "format": "JPG",
+   "bytes": 1088013,
+   "size": "1920 \u00d7 1080 px"
+  },
+  {
+   "group": "Screen slides",
+   "title": "NeXus screen 6",
+   "preview": "/__l5e/assets-v1/fde27a1e-07ab-4115-ae05-778a4f87dfa0/nexus-screen-6-preview.jpg",
+   "file": "/__l5e/assets-v1/21eab9d1-fd3a-4ee3-aa0b-9b72163f624c/nexus-screen-6.jpg",
+   "format": "JPG",
+   "bytes": 712693,
+   "size": "1920 \u00d7 1080 px"
+  }
+ ]
+}
