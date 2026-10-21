@@ -10,6 +10,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, CircleDashed } from "lucide-react"
 
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/design-system/element";
+import { EventTimeline } from "@/components/events/EventTimeline";
 import { getEventIntake } from "@/lib/event-intake.functions";
 import { EVENT_INTAKE_ITEMS, INTAKE_STATUS_LABEL, summarizeIntake, type IntakeStatus } from "@/lib/event-intake";
 import {
@@ -173,6 +174,7 @@ function EventHome() {
               {progress.ready} of {progress.total} ready
             </span>
           </div>
+          <EventTimeline eventId={eventId} ready={progress.ready} total={progress.total} />
         </header>
 
         <nav aria-label="Event sections" className="mt-6 flex flex-wrap gap-1 border-b border-[#03002C]/12">

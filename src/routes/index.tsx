@@ -28,7 +28,7 @@ import {
   CornerDownLeft,
   Trophy,
 } from "lucide-react";
-import { AGENT_ROUTE, AGENT_LABEL, seedAgentPrompt } from "@/lib/agent-seed";
+import { AGENT_ROUTE, AGENT_LABEL, guessAgentSurface, seedAgentPrompt } from "@/lib/agent-seed";
 import { AppShell } from "@/components/AppShell";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useSignedIn } from "@/components/CloudDeckControls";
@@ -272,8 +272,10 @@ function Dashboard() {
   const sendToOracle = (prompt: string) => {
     const q = prompt.trim();
     if (!q) return;
-    seedAgentPrompt(mode.id, q);
-    navigate({ to: AGENT_ROUTE[mode.id] });
+    // The words decide the agent ("signage" → Events); the picker is the fallback.
+    const surface = guessAgentSurface(q) ?? mode.id;
+    seedAgentPrompt(surface, q);
+    navigate({ to: AGENT_ROUTE[surface] });
   };
 
   return (
@@ -613,12 +615,6 @@ function Dashboard() {
             caption="Hybrid retrieval chat"
           />
         </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-4">
-          <MiniStat label="Approved layouts" value={MODULE_VARIANTS.length} accent={BRAND.blue} />
-          <MiniStat label="Sections" value={SECTION_FRAMEWORKS.length} accent={BRAND.aqua} />
-          <MiniStat label="Layouts" value={LAYOUT_FRAMEWORKS.length} accent={BRAND.lavender} />
-          <MiniStat label="Brands" value={BRAND_MODES.length} accent={BRAND.yellow} />
-        </div>
       </section>
     </AppShell>
   );
@@ -892,7 +888,7 @@ function AgentBar({
               htmlFor="agent-prompt"
               className="block text-[10px] font-semibold uppercase tracking-[0.28em] text-white/50"
             >
-              Ask the {agentLabel.toLowerCase()} · or describe what you need
+              What do you need? · Deck, print, event or social — we'll pick the right agent
             </label>
             <textarea
               id="agent-prompt"

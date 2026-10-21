@@ -40,3 +40,17 @@ export function consumeAgentPrompt(surface: AgentSurface): string | null {
     return null;
   }
 }
+
+/** Pick the agent from the words of a request; null when nothing clearly says.
+ *  Lets one "What do you need?" box send people to the right place. */
+export function guessAgentSurface(prompt: string): AgentSurface | null {
+  const t = prompt.toLowerCase();
+  const rules: [AgentSurface, RegExp][] = [
+    ["event", /\b(event|signage|sign|booth|badge|kiosk|banner|step[- ]and[- ]repeat|pillar|venue|wayfinding|invite|invitation|flyer)s?\b/],
+    ["social", /\b(social|linkedin|instagram|facebook|tiktok|post|story|reel|tweet|email header)s?\b/],
+    ["print", /\b(print|brochure|case study|one[- ]pager|leaflet|datasheet|pdf|press)s?\b/],
+    ["presentation", /\b(deck|slides?|presentation|pitch|powerpoint|qbr|business review)s?\b/],
+  ];
+  const hits = rules.filter(([, re]) => re.test(t)).map(([s]) => s);
+  return hits.length ? hits[0]! : null;
+}
