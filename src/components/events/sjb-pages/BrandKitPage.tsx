@@ -331,6 +331,8 @@ export function SjbBrandKit() {
 
           <SjbSingleColour className="pt-2" />
 
+          <SjbLettering />
+
           <SjbLink page="designers"
             className={`${card} flex flex-wrap items-center justify-between gap-3 hover:border-[#003FC7]`}
           >
