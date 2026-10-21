@@ -511,7 +511,8 @@ export function SocialRenderer({
   const { boxRef: stackBoxRef, stackRef, fit: stackFit } = useStackFit(copySignature);
   const baseBrand = findBrand(brandId);
   // San Juan Bowl assets wear the Bowl's own navy, sky and gold palette.
-  const brand = sjbEventLogoFor(copyProp?.title) ? { ...baseBrand, tokens: sjbKitTokens() } : baseBrand;
+  const isSjb = Boolean(sjbEventLogoFor(copyProp?.title));
+  const brand = isSjb ? { ...baseBrand, tokens: sjbKitTokens() } : baseBrand;
   const preset = presetFor(format);
   const tune = format.tune ?? {};
   // The caller wins; otherwise the platform preset decides bleed vs panel.
@@ -534,11 +535,14 @@ export function SocialRenderer({
     transformOrigin: "top left",
   };
 
-  const inkColor = mode === "dark" ? "#FFFFFF" : BRAND.ink;
-  const dimColor = mode === "dark" ? "rgba(255,255,255,0.72)" : "rgba(3,0,44,0.62)";
-  const chipBg = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.06)";
+  // Deep plate/ink: TransPerfect ink, or Bowl Navy on San Juan Bowl assets.
+  const deepHex = isSjb ? brand.tokens.primary : BRAND.ink;
+  const deep = (alpha: number) => tintRgba(deepHex, alpha);
+  const inkColor = mode === "dark" ? "#FFFFFF" : deepHex;
+  const dimColor = mode === "dark" ? "rgba(255,255,255,0.72)" : deep(0.62);
+  const chipBg = mode === "dark" ? "rgba(255,255,255,0.14)" : deep(0.06);
   const chipBorder =
-    mode === "dark" ? "1px solid rgba(255,255,255,0.22)" : "1px solid rgba(3,0,44,0.14)";
+    mode === "dark" ? "1px solid rgba(255,255,255,0.22)" : "1px solid ${deep(0.14)}";
 
   const padPx = (short * preset.padPct) / 100;
   const safe = format.safeArea ?? {};
@@ -723,15 +727,15 @@ export function SocialRenderer({
           // rather than a dark tint, so the photo still reads through.
           background:
             mode === "dark"
-              ? "linear-gradient(140deg, rgba(255,255,255,0.06) 0%, rgba(3,0,44,0.10) 100%)"
+              ? "linear-gradient(140deg, rgba(255,255,255,0.06) 0%, ${deep(0.10)} 100%)"
               : "linear-gradient(140deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.10) 100%)",
           backdropFilter: "blur(32px) saturate(155%)",
           borderTop: hairline,
           borderBottom: hairline,
           boxShadow:
             mode === "dark"
-              ? "inset 0 1px 0 rgba(255,255,255,0.10), 0 8px 28px rgba(3,0,44,0.14)"
-              : "inset 0 1px 0 rgba(255,255,255,0.55), 0 8px 24px rgba(3,0,44,0.08)",
+              ? "inset 0 1px 0 rgba(255,255,255,0.10), 0 8px 28px ${deep(0.14)}"
+              : "inset 0 1px 0 rgba(255,255,255,0.55), 0 8px 24px ${deep(0.08)}",
         }
       : style.plate === "aura"
         ? {
@@ -742,7 +746,7 @@ export function SocialRenderer({
             // the tint never fights light or dark ink.
             background:
               mode === "dark"
-                ? `radial-gradient(130% 150% at 26% ${copyAlign === "end" ? "104%" : "-4%"}, ${tintRgba(brand.tokens.accent, 0.3)} 0%, ${tintRgba(brand.tokens.accent, 0.12)} 42%, rgba(3,0,44,0) 76%), linear-gradient(${copyAlign === "end" ? "180deg" : "0deg"}, rgba(3,0,44,0) 0%, rgba(3,0,44,0.26) 48%, rgba(3,0,44,0.5) 100%)`
+                ? `radial-gradient(130% 150% at 26% ${copyAlign === "end" ? "104%" : "-4%"}, ${tintRgba(brand.tokens.accent, 0.3)} 0%, ${tintRgba(brand.tokens.accent, 0.12)} 42%, ${deep(0)} 76%), linear-gradient(${copyAlign === "end" ? "180deg" : "0deg"}, ${deep(0)} 0%, ${deep(0.26)} 48%, ${deep(0.5)} 100%)`
                 : `radial-gradient(130% 150% at 26% ${copyAlign === "end" ? "104%" : "-4%"}, ${tintRgba(brand.tokens.accent, 0.26)} 0%, ${tintRgba(brand.tokens.accent, 0.1)} 42%, rgba(255,255,255,0) 76%), linear-gradient(${copyAlign === "end" ? "180deg" : "0deg"}, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 48%, rgba(255,255,255,0.66) 100%)`,
             backdropFilter: "blur(26px) saturate(150%)",
             // Full strength at the anchored edge, feathering to nothing on the
@@ -755,12 +759,12 @@ export function SocialRenderer({
           }
         : style.plate === "solid"
           ? {
-              background: mode === "dark" ? "rgba(3,0,44,0.88)" : "rgba(255,255,255,0.92)",
-              boxShadow: "0 10px 30px rgba(3,0,44,0.18)",
+              background: mode === "dark" ? deep(0.88) : "rgba(255,255,255,0.92)",
+              boxShadow: "0 10px 30px ${deep(0.18)}",
             }
           : style.plate === "band"
             ? {
-                background: mode === "dark" ? "rgba(3,0,44,0.42)" : "rgba(255,255,255,0.48)",
+                background: mode === "dark" ? deep(0.42) : "rgba(255,255,255,0.48)",
                 backdropFilter: "blur(18px) saturate(140%)",
               }
             : style.plateFullBleed
@@ -770,8 +774,8 @@ export function SocialRenderer({
                   background:
                     mode === "dark"
                       ? copyAlign === "end"
-                        ? "linear-gradient(180deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.34) 45%, rgba(3,0,44,0.62) 100%)"
-                        : "linear-gradient(0deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.34) 45%, rgba(3,0,44,0.62) 100%)"
+                        ? "linear-gradient(180deg, ${deep(0)} 0%, ${deep(0.34)} 45%, ${deep(0.62)} 100%)"
+                        : "linear-gradient(0deg, ${deep(0)} 0%, ${deep(0.34)} 45%, ${deep(0.62)} 100%)"
                       : copyAlign === "end"
                         ? "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.48) 45%, rgba(255,255,255,0.78) 100%)"
                         : "linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.48) 45%, rgba(255,255,255,0.78) 100%)",
@@ -841,7 +845,7 @@ export function SocialRenderer({
 
   return (
     <div
-      className="relative overflow-hidden rounded-xl shadow-[0_6px_24px_rgba(3,0,44,0.14)]"
+      className="relative overflow-hidden rounded-xl shadow-[0_6px_24px_${deep(0.14)}]"
       style={wrapperStyle}
     >
       <div ref={frameRef} className="relative" style={inner} data-kit-asset-frame="true">
@@ -908,7 +912,7 @@ export function SocialRenderer({
               ...panelRect,
               borderRadius: (short * 3.4) / 100,
               boxShadow:
-                mode === "dark" ? "0 18px 46px rgba(0,0,0,0.42)" : "0 18px 40px rgba(3,0,44,0.16)",
+                mode === "dark" ? "0 18px 46px rgba(0,0,0,0.42)" : "0 18px 40px ${deep(0.16)}",
             }}
           >
             <img
@@ -1098,7 +1102,7 @@ export function SocialRenderer({
                           padding: `${(short * 1.2) / 100}px ${(short * 2.2) / 100}px`,
                           borderRadius: style.cta === "block" ? (short * 0.6) / 100 : 9999,
                           background: brand.tokens.accent,
-                          color: BRAND.ink,
+                          color: deepHex,
                           fontWeight: style.cta === "block" ? 700 : 600,
                           letterSpacing: "0.02em",
                         }
@@ -1141,7 +1145,7 @@ export function SocialRenderer({
                 filter:
                   mode === "dark"
                     ? "drop-shadow(0 2px 10px rgba(0,0,0,0.45))"
-                    : "drop-shadow(0 2px 8px rgba(3,0,44,0.18))",
+                    : "drop-shadow(0 2px 8px ${deep(0.18)})",
               }}
             />
           ) : (
@@ -1190,9 +1194,9 @@ function DesignGround({
   const bloomY = copyAlign === "end" ? "12%" : "88%";
   const base =
     mode === "dark"
-      ? `linear-gradient(150deg, ${tintRgba(accent, 0.22)} 0%, rgba(3,0,44,0.92) 58%, rgba(3,0,44,0.98) 100%)`
+      ? `linear-gradient(150deg, ${tintRgba(accent, 0.22)} 0%, ${deep(0.92)} 58%, ${deep(0.98)} 100%)`
       : `linear-gradient(150deg, ${tintRgba(accent, 0.13)} 0%, rgba(255,255,255,0.86) 46%, ${tintRgba(accent, 0.07)} 100%)`;
-  const rule = mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(3,0,44,0.07)";
+  const rule = mode === "dark" ? "rgba(255,255,255,0.10)" : deep(0.07);
 
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
