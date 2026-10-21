@@ -1,8 +1,7 @@
 import { KitSignList } from "@/components/events/KitSignList";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Download, FileText, PencilRuler } from "lucide-react";
+import { ArrowLeft, Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { kitSigns } from "@/lib/legal-next-signage";
 import { SUPPLIED_KITS, KIT_EVENT, kitFileSize, type KitFile, type SuppliedKit } from "@/lib/supplied-event-kits";
 
 export const Route = createFileRoute("/events/kits/$kitId")({
