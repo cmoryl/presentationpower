@@ -48,7 +48,9 @@ async function loadImg(url: string, max = 900, png = false): Promise<Img | null>
   try {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = url;
+    img.src = url.startsWith("https://brandhubcreator.lovable.app/")
+      ? `/api/public/brandhub-image?path=${encodeURIComponent(new URL(url).pathname)}`
+      : url;
     await img.decode();
     const k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
     const c = document.createElement("canvas");
