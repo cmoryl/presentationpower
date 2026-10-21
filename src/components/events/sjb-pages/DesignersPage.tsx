@@ -16,7 +16,7 @@ export function DesignersPage() {
         </SjbLink>
         <header>
           <p className="font-mono text-[11px] uppercase tracking-wider text-[#666666]">For designers and print vendors</p>
-          <h1 className="mt-1 text-[32px] font-bold leading-tight">Logo construction &amp; production</h1>
+          <h1 className="mt-1 text-[32px] font-bold leading-tight">Brand guide, construction &amp; production</h1>
           <p className="mt-1 text-[14px] text-[#666666]">The full brand guide, then the exact build of the badge and production specs.</p>
         </header>
         <SjbGuideSections />
