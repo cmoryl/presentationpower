@@ -872,6 +872,7 @@ export function SocialRenderer({
             short={short}
             copyAlign={copyAlign}
             panelSide={panelMode ? panelSide : null}
+            deepHex={deepHex}
           />
         ) : null}
 
