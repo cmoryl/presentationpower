@@ -9,6 +9,7 @@ import { z } from "zod";
 import { ArrowLeft, ArrowRight, CheckCircle2, CircleDashed } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { Button } from "@/design-system/element";
 import { getEventIntake } from "@/lib/event-intake.functions";
 import { EVENT_INTAKE_ITEMS, INTAKE_STATUS_LABEL, summarizeIntake, type IntakeStatus } from "@/lib/event-intake";
 import {
@@ -152,6 +153,15 @@ function EventHome() {
           <p className="mt-1 text-[15px] text-[#03002C]/75">
             {[entry.venue, entry.city, entry.dates].filter(Boolean).join(" · ")}
           </p>
+          {eventId === "san-juan-bowl" && (
+            <div className="mt-4">
+              <Button asChild>
+                <Link to="/events/san-juan-bowl/stadium">
+                  Stadium 3D view <ArrowRight aria-hidden />
+                </Link>
+              </Button>
+            </div>
+          )}
           <div className="mt-3 flex items-center gap-3">
             <div className="h-2 w-48 overflow-hidden rounded-full bg-[#03002C]/10 dark:bg-card">
               <div
