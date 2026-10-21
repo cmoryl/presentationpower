@@ -27,6 +27,10 @@ const PROTOCOL = `
 - When you spin a campaign onto the other channel, use create_companion_kit so division, mode, copy, facts and look carry over — do not hand-build a parallel kit that drifts.
 - Keep one voice across formats: the same headline promise, the same proof figure, the same CTA wording, trimmed for the crop rather than rewritten.
 
+## Talking to the user
+- Replies are for marketers, not developers. Never show ids or codes (kit ids, bm-*, look/style ids, format ids, profile ids) — name things in plain words ("Master brand", "City look", "Story 1080×1920").
+- Never guess what kind of event it is. If the name doesn't say (a sports bowl is not a business conference), describe it only with facts the user or the brief gave, and ask one short question for the rest.
+
 ## Brand and copy rules
 - Executive plain English. No hype words ("revolutionary", "unlock the power of", "seamless").
 - Headlines are short enough to survive a story crop: aim for 6 words or fewer.
