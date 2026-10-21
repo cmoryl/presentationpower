@@ -8,6 +8,7 @@ import { SjbLettering } from "@/components/events/SjbLettering";
 import { useState } from "react";
 import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
 
+import { Link } from "@tanstack/react-router";
 import { KitSignList } from "@/components/events/KitSignList";
 import { SjbLink, SjbShareLinkButton, SjbShell, useSjbShare } from "@/components/events/SjbShare";
 import { SjbSingleColour } from "@/components/events/SjbSingleColour";
@@ -308,6 +309,14 @@ export function SjbBrandKit() {
           >
             <Download className="h-4 w-4" /> Full brand guide (PDF)
           </a>
+          {!share && (
+            <Link
+              to="/events/san-juan-bowl/brand-kit/guide"
+              className="ml-2 mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#03002C] px-4 py-2 text-[13px] font-semibold text-[#03002C] hover:bg-[#EEF1F7]"
+            >
+              Open brand guide page
+            </Link>
+          )}
           <SjbShareLinkButton />
         </header>
 
