@@ -138,7 +138,15 @@ export function kitReuse() {
   const audit = venueTemplateAudit(LONDON_PANELS);
   return {
     families: NEXT_VENUE_TEMPLATES,
-    coverage: audit.coverage.map((c) => ({ id: c.family.id, count: c.panels.length })),
+    coverage: audit.coverage.map((c) => ({
+      id: c.family.id,
+      count: c.panels.length,
+      // Real London artwork in force for this family (first few with a picture).
+      examples: c.panels
+        .map((p) => ({ id: p.id, room: p.room, src: londonPanelArtworkSrc(p.id) }))
+        .filter((e): e is { id: string; room: string; src: string } => !!e.src)
+        .slice(0, 4),
+    })),
     unmatched: audit.unmatched.map((p) => p.id),
     reuse: audit.reuse,
   };

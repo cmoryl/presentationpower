@@ -101,14 +101,37 @@ export function BrandKitGuideSections({
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="text-xs text-muted-foreground">
-              <tr><th className="py-2 pr-4">Sign</th><th className="py-2 pr-4">Supplied size</th><th className="py-2">Ready-made sizes</th></tr>
+              <tr><th className="py-2 pr-4">Preview</th><th className="py-2 pr-4">Sign</th><th className="py-2 pr-4">Supplied size</th><th className="py-2 pr-4">Ready-made sizes</th><th className="py-2">Files</th></tr>
             </thead>
             <tbody className="divide-y divide-border">
               {sizes.map((s) => (
-                <tr key={s.title}>
+                <tr key={s.id} className="align-middle">
+                  <td className="py-2 pr-4">
+                    {s.preview ? (
+                      <a href={s.preview} target="_blank" rel="noreferrer" className="block w-16 rounded border border-border bg-muted focus-visible:outline-2 focus-visible:outline-ring" title="Open the full picture">
+                        <img src={s.preview} alt={`${s.title} preview`} loading="lazy" className="h-16 w-16 rounded object-contain" />
+                      </a>
+                    ) : !shared ? (
+                      <Link to="/events/next/sign-editor/$signId" params={{ signId: s.id }} className="text-xs text-primary hover:underline">View in editor</Link>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">No picture yet</span>
+                    )}
+                  </td>
                   <td className="py-2 pr-4 font-medium">{s.title}</td>
                   <td className="py-2 pr-4">{s.supplied}</td>
-                  <td className="py-2 text-muted-foreground">{s.presets.length ? s.presets.join(" · ") : "Any size can be typed in"}</td>
+                  <td className="py-2 pr-4 text-muted-foreground">{s.presets.length ? s.presets.join(" · ") : "Any size can be typed in"}</td>
+                  <td className="py-2">
+                    <div className="flex flex-wrap gap-2">
+                      {s.masterUrl ? (
+                        <Button asChild size="sm" variant="outline"><a href={s.masterUrl} download>Master</a></Button>
+                      ) : null}
+                      {!shared ? (
+                        <Button asChild size="sm" variant="outline">
+                          <Link to="/events/next/sign-editor/$signId" params={{ signId: s.id }}>Open</Link>
+                        </Button>
+                      ) : null}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -145,9 +168,22 @@ export function BrandKitGuideSections({
           <div><dt className="font-semibold text-destructive">Never change</dt><dd className="text-muted-foreground">{REUSE_RULES.never}</dd></div>
         </dl>
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {reuse.families.map((f) => (
+          {reuse.families.map((f) => {
+            const cov = reuse.coverage.find((c) => c.id === f.id);
+            return (
             <li key={f.id} className="rounded-lg border border-border p-4">
-              <p className="text-sm font-semibold">{f.name} <span className="font-normal text-muted-foreground">· {reuse.coverage.find((c) => c.id === f.id)?.count ?? 0} signs</span></p>
+              {cov?.examples.length ? (
+                <div className="mb-3 grid grid-cols-4 gap-1">
+                  {cov.examples.map((e) => (
+                    <a key={e.id} href={e.src} target="_blank" rel="noreferrer" title={`${e.room} — open the London artwork`} className="block rounded bg-muted focus-visible:outline-2 focus-visible:outline-ring">
+                      <img src={e.src} alt={`${f.name} example, ${e.room}`} loading="lazy" className="h-16 w-full rounded object-contain" />
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <p className="mb-3 text-xs text-muted-foreground">No artwork produced yet</p>
+              )}
+              <p className="text-sm font-semibold">{f.name} <span className="font-normal text-muted-foreground">· {cov?.count ?? 0} signs</span></p>
               <p className="mt-1 text-xs text-muted-foreground">{f.substrate}</p>
               <p className="mt-2 text-xs"><span className="font-medium">Face:</span> {f.orientation} · <span className="font-medium">Ground:</span> {f.ground.replace(/-/g, " ")}</p>
               <p className="mt-2 text-xs leading-relaxed">{f.printNote}</p>
