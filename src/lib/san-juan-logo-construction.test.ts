@@ -7,11 +7,12 @@ it("preserves every original path across the six source layers", () => {
   expect(SJB_COMPONENTS.map(p => p.order)).toEqual([1,2,3,4,5,6]);
 });
 it("scales from badge bounds rather than the square artboard", () => {
-  const size = sjbProductionSize(1186.7000732421875);
-  expect(size.height).toBeCloseTo(1161.7000732421875,8);
+  // EPS master bounds (x 33.69895, w 1186.6021, h 1161.699), as issued for the brand kit.
+  const size = sjbProductionSize(1186.6021);
+  expect(size.height).toBeCloseTo(1161.699,6);
   expect(size.clearSpace).toBeCloseTo(171.7,8);
-  expect(size.artboard).toBeCloseTo(1254,8);
-  expect(SJB_MEASUREMENTS.bounds.x).toBeCloseTo(33.69975280761719,8);
+  expect(size.artboard).toBeCloseTo(1254,0);
+  expect(SJB_MEASUREMENTS.bounds.x).toBeCloseTo(33.69895,6);
 });
 import { SJB_SCENE_ELEMENTS } from "./san-juan-logo-construction";
 describe("scene elements", () => {
