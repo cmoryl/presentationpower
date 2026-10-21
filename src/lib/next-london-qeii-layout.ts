@@ -32,7 +32,19 @@ import {
   qeiiRectInside,
   qeiiRectsOverlap,
   type QeiiRect,
+  qeiiRings,
+  type QeiiRing,
 } from "@/lib/next-london-qeii-geometry";
+import { qeiiRoomShapes } from "@/lib/next-london-qeii-rooms";
+
+function ringsBox(rings: QeiiRing[]): QeiiRect | undefined {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const ring of rings)
+    for (const [x, y] of ring) {
+      x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y);
+    }
+  return Number.isFinite(x0) ? { x0, y0, x1, y1 } : undefined;
+}
 
 /**
  * Issued cap-height → rendered em size.
@@ -275,7 +287,14 @@ export function qeiiPlanLayout(floor: QeiiFloorVector, options: QeiiLayoutOption
 
 
     // The space the artwork actually draws for this room, and the objects inside it.
-    const holder: QeiiRect | undefined = qeiiHolderBox(floor.shapes, group.x, group.y);
+    // On event floors a room cut out of a shared hall (air walls) is held by its
+    // own cut outline, so a name too wide for that room breaks onto more lines
+    // before its type is made smaller.
+    const cellD = floor.id.includes(":")
+      ? qeiiRoomShapes(floor).find((r) => r.room === room)?.cell
+      : undefined;
+    const cellRect = cellD ? ringsBox(qeiiRings(cellD)) : undefined;
+    const holder: QeiiRect | undefined = cellRect ?? qeiiHolderBox(floor.shapes, group.x, group.y);
     const nearby = objects.filter(
       (o) => !(group.x >= o.x0 && group.x <= o.x1 && group.y >= o.y0 && group.y <= o.y1),
     );
