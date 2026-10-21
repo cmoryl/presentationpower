@@ -1,0 +1,82 @@
+// Shared-view plumbing for the San Juan Bowl brand guides.
+// The same page bodies render inside the app (AppShell) and on the public
+// share link (/share/san-juan-bowl/*), where the only navigation is between
+// the guide pages themselves — no menu, no links into the rest of Element.
+import { createContext, useContext, type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
+import { AppShell } from "@/components/AppShell";
+import logoColor from "@/assets/san-juan-bowl/sjb-logo-color.svg.asset.json";
+
+const SjbShareCtx = createContext(false);
+export const useSjbShare = () => useContext(SjbShareCtx);
+
+export type SjbPage = "event" | "kit" | "designers" | "single" | "stadium";
+
+const APP_PATHS = {
+  kit: "/events/san-juan-bowl/brand-kit",
+  designers: "/events/san-juan-bowl/brand-kit/designers",
+  single: "/events/san-juan-bowl/brand-kit/single-colour",
+  stadium: "/events/san-juan-bowl/stadium",
+} as const;
+const SHARE_PATHS = {
+  kit: "/share/san-juan-bowl",
+  designers: "/share/san-juan-bowl/designers",
+  single: "/share/san-juan-bowl/single-colour",
+  stadium: "/share/san-juan-bowl/stadium",
+} as const;
+
+/** Link between Bowl guide pages; in the share view it stays inside the share link
+ *  and links to the app's event home are dropped. */
+export function SjbLink({ page, className, children }: { page: SjbPage; className?: string; children: ReactNode }) {
+  const share = useSjbShare();
+  if (page === "event") {
+    if (share) return null;
+    return <Link to="/events/$eventId" params={{ eventId: "san-juan-bowl" }} className={className}>{children}</Link>;
+  }
+  return <Link to={(share ? SHARE_PATHS : APP_PATHS)[page]} className={className}>{children}</Link>;
+}
+
+const TABS: { page: Exclude<SjbPage, "event">; label: string }[] = [
+  { page: "kit", label: "Brand kit" },
+  { page: "designers", label: "For designers" },
+  { page: "single", label: "Single colour" },
+  { page: "stadium", label: "Stadium 3D" },
+];
+
+function ShareShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="min-h-dvh bg-white text-[#03002C]">
+      <header className="sticky top-0 z-20 border-b border-[#03002C]/10 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
+          <div className="flex items-center gap-2">
+            <img src={logoColor.url} alt="" className="h-9 w-9" />
+            <span className="text-[15px] font-bold">TransPerfect San Juan Bowl</span>
+          </div>
+          <nav aria-label="Brand guide" className="flex flex-wrap gap-1">
+            {TABS.map((t) => (
+              <Link
+                key={t.page}
+                to={SHARE_PATHS[t.page]}
+                activeOptions={{ exact: true }}
+                className="rounded-md px-3 py-1.5 text-[13px] font-semibold text-[#03002C]/70 hover:bg-[#F2F2F2] hover:text-[#03002C]"
+                activeProps={{ className: "bg-[#F2F2F2] !text-[#03002C]" }}
+              >
+                {t.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </header>
+      <main>{children}</main>
+    </div>
+  );
+}
+
+/** AppShell inside Element; the menu-free share frame on the share link. */
+export function SjbShell({ children }: { children: ReactNode }) {
+  return useSjbShare() ? <ShareShell>{children}</ShareShell> : <AppShell>{children}</AppShell>;
+}
+
+export function SjbShareProvider({ children }: { children: ReactNode }) {
+  return <SjbShareCtx.Provider value>{children}</SjbShareCtx.Provider>;
+}
