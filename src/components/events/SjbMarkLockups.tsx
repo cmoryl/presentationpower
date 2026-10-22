@@ -1,4 +1,4 @@
-// San Juan Bowl small-size mark (lettering shield) and lockups (team matchup, official partner,
+// San Juan Bowl small-size mark (the badge) and lockups (team matchup, official partner,
 // badge + venue/date). Files in public/downloads/sjb-mark/ and sjb-lockups/ are generated: the mark
 // from the exact lettering construction, the lockups with the supplied badge copied in untouched.
 import { useState } from "react";
@@ -27,7 +27,7 @@ export function SjbSmallMark({ compact = false }: { compact?: boolean }) {
 
       <div className="grid gap-4 md:grid-cols-[minmax(0,220px)_1fr]">
         <div className="flex items-center justify-center rounded-xl border border-[#03002C]/10 bg-[#F2F2F2] p-6">
-          <img src={m.svg} alt="San Juan Bowl small-size mark: lettering shield" className="h-[200px] w-auto" />
+          <img src={m.svg} alt="San Juan Bowl small-size mark: the badge" className="h-[200px] w-auto" />
         </div>
         <div className="space-y-3">
           <p className="text-[12px] font-semibold uppercase tracking-wide text-[#03002C]/60">At real pixel height</p>
@@ -62,7 +62,7 @@ export function SjbSmallMark({ compact = false }: { compact?: boolean }) {
       {compact && <p className="text-[12px] text-[#666666]">{m.rules[0]} {m.rules[1]}</p>}
 
       <div className="flex flex-wrap gap-1.5">
-        {(compact ? m.files.filter((f) => ["SVG", "PDF (CMYK)", "PNG 1024", "Avatar 1080 (navy)", "Favicon (ICO)"].includes(f.label)) : m.files).map((f) => (
+        {(compact ? m.files.filter((f) => ["SVG", "PNG 1024", "Avatar 1080 (navy)", "Favicon (ICO)"].includes(f.label)) : m.files).map((f) => (
           <a key={f.file} href={`${m.dir}/${f.file}`} download={f.file} className={chip}>
             <Download className="h-3 w-3" /> {f.label}
           </a>

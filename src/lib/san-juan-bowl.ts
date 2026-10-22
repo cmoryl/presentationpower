@@ -181,31 +181,28 @@ export const SJB_MIN_SIZES = [
 ] as const;
 
 /**
- * Small-size mark (approved Oct 2026): the badge frame at 3/4 scale around the exact 3-line stacked
- * lettering at scale 1. Generated with the lettering construction — never redraw or retype it.
+ * Small-size mark: the supplied full badge (sjb-logo-color.svg) cropped to its EPS bounds —
+ * artwork untouched, only the viewBox changes. Icons/avatars use the dark-background badge on navy.
  */
 export const SJB_SMALL_MARK = {
   dir: "/downloads/sjb-mark",
   svg: "/downloads/sjb-mark/sjb-mark-shield.svg",
   pack: "/downloads/sjb-mark/sjb-mark-pack.zip",
-  use: "Below 160 px, where the badge's ribbon, lettering and waves fill in: social avatars, app icons, browser tabs, merch tags, video watermarks. Use it from 160 px down to 48 px high; at 16–32 px (favicon) it reads as the shield shape.",
+  use: "The full San Juan Bowl badge, trimmed to its edges and sized for small uses: social avatars, app icons, browser tabs, merch tags, video watermarks. Fine details soften below 160 px — check legibility at the size you use.",
   rules: [
-    "Never use it next to the full badge — it stands in for the badge, it doesn't sit beside it.",
-    "Above 160 px (or 40 mm in print), use the full badge.",
-    "Works on white, light gray and Bowl Navy as supplied — the gold keyline carries the edge on navy.",
-    "Don't add the sun, waves or the TransPerfect ribbon, and don't recolour the frame or lettering.",
+    "This is the real badge, not a redraw — never swap in lettering on its own as the logo.",
+    "Use the supplied file at the size needed; never redraw, simplify or recolour it.",
+    "On Bowl Navy, use the navy icon/avatar files (dark-background badge).",
+    "Above 160 px (or 40 mm in print), use the full badge files with clear space.",
   ],
   geometry: [
-    { label: "Frame", value: "Badge frame × 3/4: roof 35 : 18 (27.2°), side 70.1°, walls, V arcs R 906" },
-    { label: "Bands", value: "Navy 16.5 · gold keyline 12 (true offsets — arcs stay concentric)" },
-    { label: "Lettering", value: "3-line stacked master at scale 1, translated only (−271.671875, 180.375)" },
-    { label: "Clearance", value: "69 units (0.575 cap height) above SAN, beside JUAN and below BOWL" },
-    { label: "Proportion", value: "741 × 902 (1 : 1.217)" },
+    { label: "Source", value: "sjb-logo-color.svg, artwork unchanged" },
+    { label: "Crop", value: "viewBox 33.69895 46.1505 1186.6021 1161.699 (EPS bounds)" },
+    { label: "Proportion", value: "1.021437 : 1" },
+    { label: "Icons", value: "Dark badge on #0D0E21, 12% margin each side" },
   ],
   files: [
     { label: "SVG", file: "sjb-mark-shield.svg" },
-    { label: "PDF (CMYK)", file: "sjb-mark-shield-cmyk.pdf" },
-    { label: "EPS (CMYK)", file: "sjb-mark-shield-cmyk.eps" },
     { label: "PNG 1024", file: "sjb-mark-shield-1024.png" },
     { label: "PNG 512", file: "sjb-mark-shield-512.png" },
     { label: "PNG 160", file: "sjb-mark-shield-160.png" },
