@@ -17,7 +17,7 @@ from reportlab.lib.utils import ImageReader
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = "/tmp/sjb"
 ORIGIN = "https://transperfectelement.lovable.app"
-OUT = os.path.join(ROOT, "public/downloads/san-juan-bowl-brand-guide.pdf")
+OUT = "/tmp/san-juan-bowl-brand-guide.pdf"  # over 10 MB: upload with lovable-assets to src/assets/sjb/brand-guide.pdf.asset.json and update the two links
 pdfmetrics.registerFont(TTFont("G", os.path.join(ROOT, "public/fonts/Geist-Regular.ttf")))
 pdfmetrics.registerFont(TTFont("GB", os.path.join(ROOT, "public/fonts/Geist-Bold.ttf")))
 
