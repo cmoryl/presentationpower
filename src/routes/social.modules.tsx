@@ -38,6 +38,7 @@ import {
   type SocialFitResult,
 } from "@/lib/social-module-fit";
 import { refitSocialModuleLayout } from "@/lib/social-module-refit.functions";
+import { useSocialModuleMasters } from "@/lib/social-module-masters";
 
 export const Route = createFileRoute("/social/modules")({
   head: () => ({
@@ -85,15 +86,16 @@ function SocialModuleStudio() {
   const [rationale, setRationale] = useState<string>("");
 
   const format = getFormat(formatId) ?? SOCIAL_FORMATS[0];
-  const layout = findSocialModuleLayout(layoutId);
+  const masters = useSocialModuleMasters();
+  const layout = masters.allLayouts.find((m) => m.id === layoutId);
   const refit = useServerFn(refitSocialModuleLayout);
 
   // Seed / reseed the editable section whenever the chosen module changes.
   useEffect(() => {
-    if (!layout) return;
+    if (!layout || masters.isLoading) return;
     setSection(buildSocialModuleSection({ layout, copy: DEFAULT_COPY, relief: reliefAt(0) }));
     setRationale("");
-  }, [layoutId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [layoutId, masters.isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const paths = useMemo(() => (section ? sectionTextPaths(section) : []), [section]);
 
@@ -124,7 +126,7 @@ function SocialModuleStudio() {
               maxChars: Math.max(24, Math.round(value.length * 0.72) || 80),
             };
           }),
-          candidates: socialModulesForFormat(format)
+          candidates: socialModulesForFormat(format, masters.layouts)
             .filter((l) => l.id !== layout.id)
             .slice(0, 10)
             .map((l) => ({ id: l.id, label: l.label, description: l.description.slice(0, 300) })),

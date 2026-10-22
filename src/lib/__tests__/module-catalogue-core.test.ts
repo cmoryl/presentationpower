@@ -4,6 +4,8 @@ import { buildModuleManifests } from "../module-catalogue";
 import { PRINT_SECTION_MODULES } from "../print-library/section-modules";
 import { SOCIAL_MODULE_LAYOUTS } from "../social-module-layouts";
 import { customModuleSlide } from "../custom-modules";
+import { deriveSocialModuleLayouts } from "../social-module-layouts";
+import { applyPrintOverride } from "../module-overrides";
 
 describe("module governance contract", () => {
   it("requires both published and approved for team module availability", () => {
@@ -40,6 +42,16 @@ describe("module governance contract", () => {
 });
 
 describe("derived module catalogue", () => {
+  it("inherits print master factories, names and density for social output", () => {
+    const master = PRINT_SECTION_MODULES[0]; if (!master) throw new Error("Missing master");
+    const authored = { ...master.make(), title: "Authored master" };
+    const edited = applyPrintOverride(master, { id: "override", scope: "print", module_id: master.id, label: "Authored name", description: null, tags: null, density: "tall", best_for: null, hidden: false, content: authored, notes: null, updated_at: "2026-10-22" });
+    const adaptation = deriveSocialModuleLayouts([edited])[0];
+    expect(adaptation?.label).toBe("Authored name");
+    expect(adaptation?.density).toBe("tall");
+    expect(adaptation?.make()).toEqual(authored);
+    expect(adaptation?.suitedFor).not.toContain("landscape-wide");
+  });
   it("has one adaptation per real print master, inherits edits and never invents a social registry", () => {
     const first = PRINT_SECTION_MODULES[0]; if (!first) throw new Error("Print registry empty");
     const data = { variants: [], families: [], custom: [], overrides: [{ scope: "print", module_id: first.id, label: "Edited master", hidden: true, updated_at: "2026-10-22T17:00:00Z" }], templates: [], references: {}, history: [], people: {}, errors: [], complete: true, checkedAt: "2026-10-22T17:00:00Z" };
