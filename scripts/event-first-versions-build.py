@@ -64,7 +64,13 @@ def build(ev, kind):
         c.setFont(font, size)
         (c.drawCentredString if align == "center" else c.drawString)(tx, H - y, text)
     line(e["bold"], hd[0], hd[1], head)
-    if sb[0]: line(e["reg"], sb[0], sb[1], e["sub"])
+    if kind == "flyer" and ev == "sjb":
+        # Issued facts only: the venue is confirmed, the date is not.
+        line(e["reg"], sb[0], sb[1], "Hiram Bithorn Stadium · San Juan, Puerto Rico")
+        c.setFillColor(HexColor(e["accent"]))
+        line(e["reg"], 15, 656, "Date to be confirmed")
+        c.setFillColor(HexColor("#FFFFFF"))
+    elif sb[0]: line(e["reg"], sb[0], sb[1], e["sub"])
     if bar:
         c.setFillColor(HexColor(e["accent"])); bw = W * 0.12; c.rect(W / 2 - bw / 2, H - bar - W * 0.008, bw, W * 0.008, stroke=0, fill=1)
     c.save()
