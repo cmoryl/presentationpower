@@ -3,6 +3,8 @@
 // approved backgrounds, misuse gallery and badge anatomy, plus the palette,
 // type and usage rules, with downloads. Event facts stay "to be confirmed"
 // until issued.
+import { SjbCurvedLettering, SjbPalms } from "@/components/events/SjbGuideSections";
+import { ConstructionSection, LargeFormatSection } from "@/components/events/SjbDesignerSections";
 import masterKit from "@/assets/sjb/master-logo-kit.zip.asset.json";
 import { SjbLettering } from "@/components/events/SjbLettering";
 import { SJB_LETTERING_SPEC_VISIBLE } from "@/components/events/SjbShare";
@@ -360,6 +362,9 @@ export function SjbBrandKit() {
         </header>
 
         <SjbBrandKitBody />
+        {/* Designer content (construction + production) lives on this one page. */}
+        <ConstructionSection />
+        <LargeFormatSection />
         {!share && <KitSignList kit="san-juan-bowl" />}
 
         <section className={`${card} space-y-2`}>
@@ -404,10 +409,11 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
           {!embedded && <SjbLockups />}
 
           <SjbSingleColour className="pt-2" />
+          {!embedded && <div><SjbCurvedLettering /><SjbPalms /></div>}
 
           {SJB_LETTERING_SPEC_VISIBLE && <SjbLettering />}
 
-          {!embedded && (<SjbLink page="designers"
+          {false && (<SjbLink page="designers"
             className={`${card} flex flex-wrap items-center justify-between gap-3 hover:border-[#003FC7]`}
           >
             <div>

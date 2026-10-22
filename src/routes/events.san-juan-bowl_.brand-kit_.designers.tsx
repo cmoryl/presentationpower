@@ -1,6 +1,6 @@
 // /events/san-juan-bowl/brand-kit/designers — the technical half of the brand
 // kit, kept off the front page so most people find the logo and colours fast.
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { DesignersPage } from "@/components/events/sjb-pages/DesignersPage";
 
 export const Route = createFileRoute("/events/san-juan-bowl_/brand-kit_/designers")({
@@ -14,5 +14,7 @@ export const Route = createFileRoute("/events/san-juan-bowl_/brand-kit_/designer
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  // Merged into the main brand kit by request; old links land there.
+  beforeLoad: () => { throw redirect({ to: "/events/san-juan-bowl/brand-kit" }); },
   component: DesignersPage,
 });

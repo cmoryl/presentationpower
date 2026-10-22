@@ -93,46 +93,11 @@ export function SjbGuideSections({ withSingleColour = true }: SjbGuideSectionsPr
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">{SJB_LOGO_RULES.map((r) => <li key={r}>{r}</li>)}</ul>
         </div>
         {withSingleColour && <SjbSingleColour className="mt-6" />}
-        <div className="mt-4 overflow-hidden rounded-lg border border-border">
-          <div className="flex h-56 items-center justify-center p-6" style={{ background: NAVY }}>
-            <img src={curvedSvg.url} alt="SAN JUAN BOWL curved lettering" className="max-h-full max-w-full" />
-          </div>
-          <div className="p-3">
-            <p className="text-sm font-semibold text-foreground">Curved lettering — SAN JUAN BOWL only <span className="font-normal text-muted-foreground">· for dark backgrounds</span></p>
-            <p className="text-xs text-muted-foreground">The badge's own arched lettering on its own, white with the Caribbean Sky shadow. Use as supplied; never retype, re-curve or stretch it.</p>
-            <div className="mt-2 flex gap-3 text-xs font-semibold">
-              <a href={curvedSvg.url} download="sjb-san-juan-bowl-curved-lettering.svg" className="text-primary hover:underline">SVG</a>
-              <a href={curvedAi.url} download="sjb-san-juan-bowl-curved-lettering.ai" className="text-primary hover:underline">AI</a>
-              <a href={curvedPng.url} download="sjb-san-juan-bowl-curved-lettering.png" className="text-primary hover:underline">Transparent PNG</a>
-            </div>
-          </div>
-        </div>
+        <SjbCurvedLettering />
         {SJB_LETTERING_SPEC_VISIBLE && <div className="mt-4"><SjbLetteringStacked compact /></div>}
         <div className="mt-4"><SjbSmallMark compact /></div>
         <div className="mt-4"><SjbLockups /></div>
-        <h3 className="mt-6 text-sm font-bold text-foreground">Palm trees from the logo</h3>
-        <p className="text-xs text-muted-foreground">The badge's own palms, supplied as standalone artwork for patterns, corners and merchandise. Use as supplied; never redraw, recolour (except the one-colour file) or stretch.</p>
-        <div className="mt-3 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[
-            ["sjb-palms-pair", "Palm pair — full colour", "#FFFFFF"],
-            ["sjb-palms-pair-1color", "Palm pair — one colour", "#FFFFFF"],
-            ["sjb-palm-left", "Left palm", "#FFFFFF"],
-            ["sjb-palm-right", "Right palm", "#FFFFFF"],
-          ].map(([id, label, bg]) => (
-            <div key={id} className="overflow-hidden rounded-lg border border-border">
-              <div className="flex h-40 items-center justify-center p-4" style={{ background: bg }}>
-                <img src={`/downloads/sjb-palms/${id}.svg`} alt={label} className="max-h-full max-w-full" />
-              </div>
-              <div className="p-3">
-                <p className="text-sm font-semibold text-foreground">{label}</p>
-                <div className="mt-2 flex gap-3 text-xs font-semibold">
-                  <a href={`/downloads/sjb-palms/${id}.svg`} download={`${id}.svg`} className="text-primary hover:underline">SVG</a>
-                  <a href={`/downloads/sjb-palms/${id}-2400.png`} download={`${id}-2400.png`} className="text-primary hover:underline">Transparent PNG</a>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <SjbPalms />
         {!withSingleColour && <SjbLink page="single" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">Single-colour versions</SjbLink>}
       </Section>
 
@@ -211,5 +176,58 @@ function Section({ n, title, children }: { n: string; title: string; children: R
       <h2 className="text-2xl font-bold text-foreground"><span className="mr-2 text-primary">{n}.</span>{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
+  );
+}
+
+/** The badge's curved lettering on its own; shared by the guide and the brand kit. */
+export function SjbCurvedLettering() {
+  return (
+    <>
+        <div className="mt-4 overflow-hidden rounded-lg border border-border">
+          <div className="flex h-56 items-center justify-center p-6" style={{ background: NAVY }}>
+            <img src={curvedSvg.url} alt="SAN JUAN BOWL curved lettering" className="max-h-full max-w-full" />
+          </div>
+          <div className="p-3">
+            <p className="text-sm font-semibold text-foreground">Curved lettering — SAN JUAN BOWL only <span className="font-normal text-muted-foreground">· for dark backgrounds</span></p>
+            <p className="text-xs text-muted-foreground">The badge's own arched lettering on its own, white with the Caribbean Sky shadow. Use as supplied; never retype, re-curve or stretch it.</p>
+            <div className="mt-2 flex gap-3 text-xs font-semibold">
+              <a href={curvedSvg.url} download="sjb-san-juan-bowl-curved-lettering.svg" className="text-primary hover:underline">SVG</a>
+              <a href={curvedAi.url} download="sjb-san-juan-bowl-curved-lettering.ai" className="text-primary hover:underline">AI</a>
+              <a href={curvedPng.url} download="sjb-san-juan-bowl-curved-lettering.png" className="text-primary hover:underline">Transparent PNG</a>
+            </div>
+          </div>
+        </div>
+            </>
+  );
+}
+
+/** Palm trees taken from the logo; shared by the guide and the brand kit. */
+export function SjbPalms() {
+  return (
+    <>
+        <h3 className="mt-6 text-sm font-bold text-foreground">Palm trees from the logo</h3>
+        <p className="text-xs text-muted-foreground">The badge's own palms, supplied as standalone artwork for patterns, corners and merchandise. Use as supplied; never redraw, recolour (except the one-colour file) or stretch.</p>
+        <div className="mt-3 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            ["sjb-palms-pair", "Palm pair — full colour", "#FFFFFF"],
+            ["sjb-palms-pair-1color", "Palm pair — one colour", "#FFFFFF"],
+            ["sjb-palm-left", "Left palm", "#FFFFFF"],
+            ["sjb-palm-right", "Right palm", "#FFFFFF"],
+          ].map(([id, label, bg]) => (
+            <div key={id} className="overflow-hidden rounded-lg border border-border">
+              <div className="flex h-40 items-center justify-center p-4" style={{ background: bg }}>
+                <img src={`/downloads/sjb-palms/${id}.svg`} alt={label} className="max-h-full max-w-full" />
+              </div>
+              <div className="p-3">
+                <p className="text-sm font-semibold text-foreground">{label}</p>
+                <div className="mt-2 flex gap-3 text-xs font-semibold">
+                  <a href={`/downloads/sjb-palms/${id}.svg`} download={`${id}.svg`} className="text-primary hover:underline">SVG</a>
+                  <a href={`/downloads/sjb-palms/${id}-2400.png`} download={`${id}-2400.png`} className="text-primary hover:underline">Transparent PNG</a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+    </>
   );
 }
