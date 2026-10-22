@@ -41,7 +41,7 @@ function SjbGuide() {
           <h1 className="text-3xl font-bold leading-tight text-white">Brand guidelines</h1>
         </div>
         <Button asChild variant="secondary">
-          <a href="/__l5e/assets-v1/fb59c60d-d9f6-47a4-9ece-a585f3c5b78d/san-juan-bowl-brand-guide-v2.1.pdf" download><Download className="h-4 w-4" /> Full brand guide v2.1 (PDF)</a>
+          <a href="/__l5e/assets-v1/c3ddbf52-fd43-4423-a0cf-282230c0002d/san-juan-bowl-brand-guide-v2.1.pdf" download><Download className="h-4 w-4" /> Full brand guide v2.1 (PDF)</a>
         </Button>
         <Button asChild variant="secondary">
           <a href={masterKit.url} download="SJB-Master-Logo-Kit-v2.1.zip"><Download className="h-4 w-4" /> Master logo kit v2.1 (ZIP)</a>

@@ -73,7 +73,7 @@ def head(title, kicker):
     c.setFillColor(INK); c.setFont("GB", 22); c.drawString(M, H - 62, title)
     c.bookmarkPage(f"p{page_no[0]}"); TOC.append((title, page_no[0]))
     c.setFont("G", 7.5); c.setFillColor("#666666")
-    c.drawString(M, 24, f"TransPerfect San Juan Bowl · Brand guide v{VERSION} · {RELEASED} · Live kit (open to all): " + ORIGIN + "/events/san-juan-bowl/brand-kit")
+    c.drawString(M, 24, f"TransPerfect San Juan Bowl · Brand guide v{VERSION} · {RELEASED} · Blue links open the live files (no sign-in)")
     c.drawRightString(W - M, 24, str(page_no[0]))
 
 
@@ -296,7 +296,7 @@ for lab, files in rows:
         x = link(t[2:] if t.startswith("u-") else t, URL[fn], x, y, 8.5)
     y -= 24
 link("Construction sheet (PDF)", ORIGIN + "/downloads/san-juan-bowl-logo-construction-sheet.pdf", M + 190, y); c.setFont("GB", 10); c.setFillColor(INK); c.drawString(M, y, "Construction sheet")
-y -= 30; para("Links open the live files on " + ORIGIN + ". Originals are never changed; if a file is updated, the next guide version links to it. Every link opens without sign-in.", M, y, W - 2 * M, 9, color="#444444")
+y -= 30; para("Blue links open the live files. Originals are never changed; if a file is updated, the next guide version links to it. Every link opens without sign-in.", M, y, W - 2 * M, 9, color="#444444")
 c.showPage()
 
 c.save()
