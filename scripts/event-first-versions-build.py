@@ -36,7 +36,7 @@ FORMATS = {
     "story": (1080, 1920, [240, 380, 600, 600], (86, 1180), (44, 1260), "center", 1050),
     "email": (600, 200, [24, 28, 210, 144], (22, 92), (15, 122), "left", 0),
     "pillar": (1728, 6912, [214, 500, 1300, 1300], (300, 3700), (0, 0), "center", 3240),
-    "flyer": (612, 792, [106, 64, 400, 400], (58, 566), (19, 622), "center", 520),
+    "flyer": (612, 792, [146, 80, 320, 320], (58, 520), (19, 575), "center", 460),
 }
 PLAN = [("nexus", "post"), ("nexus", "story"), ("nexus", "email"),
         ("hackathon", "post"), ("hackathon", "story"), ("hackathon", "email"),
@@ -55,7 +55,7 @@ def logo_pdf(svg, w, h):
 def build(ev, kind):
     e = EVENTS[ev]; W, H, lb, hd, sb, align, bar = FORMATS[kind]
     head = "WELCOME" if kind == "pillar" else e["head"]
-    if ev == "sjb" and kind in ("post", "story"): head = "San Juan Bowl"
+    if ev == "sjb" and kind in ("post", "story", "flyer"): head = "San Juan Bowl"
     path = os.path.join(SRC, f"{ev}-{kind}.pdf")
     c = canvas.Canvas(path, pagesize=(W, H))
     c.linearGradient(0, H, 0, 0, (HexColor(e["g0"]), HexColor(e["g1"])), extend=True)
@@ -69,7 +69,7 @@ def build(ev, kind):
         # Issued facts only: the venue is confirmed, the date is not.
         line(e["reg"], sb[0], sb[1], "Hiram Bithorn Stadium · San Juan, Puerto Rico")
         c.setFillColor(HexColor(e["accent"]))
-        line(e["reg"], 15, 656, "Date to be confirmed")
+        line(e["reg"], 15, 610, "Date to be confirmed")
         c.setFillColor(HexColor("#FFFFFF"))
     elif sb[0]: line(e["reg"], sb[0], sb[1], e["sub"])
     if bar:
