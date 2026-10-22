@@ -168,6 +168,35 @@ function BrandGuidesIndex() {
         </div>
       </Link>
 
+      <section className="mt-6" aria-labelledby="event-guides-heading">
+        <h2
+          id="event-guides-heading"
+          className="text-[11px] font-semibold uppercase tracking-[0.3em] text-muted-foreground"
+        >
+          Event brand guides
+        </h2>
+        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            { to: "/events/kits/nexus/guide", name: "NeXus London", note: "Typography, colours and don'ts from the designers' kit." },
+            { to: "/events/kits/hackathon/guide", name: "GlobalLink Hackathon", note: "Typography, colours and don'ts from the designers' kit." },
+            { to: "/events/kits/legalweek/guide", name: "Legalweek 2026", note: "Screen and print colours from the supplied kit." },
+            { to: "/events/san-juan-bowl/brand-kit/guide", name: "TransPerfect San Juan Bowl", note: "Logo, lettering, palette, construction and don'ts." },
+          ].map((e) => (
+            <Link
+              key={e.to}
+              to={e.to as never}
+              className="group flex flex-col rounded-xl border border-border bg-card p-5 transition hover:border-primary"
+            >
+              <span className="text-[11px] uppercase tracking-[0.2em] text-primary">Event</span>
+              <span className="mt-2 text-lg font-semibold">{e.name}</span>
+              <span className="mt-1 flex-1 text-sm text-muted-foreground">{e.note}</span>
+              <span className="mt-4 text-xs text-muted-foreground group-hover:text-foreground">Open guide →</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+
       <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         {filtered.map((g) => {
           const division = BRAND_MODES.find((b) => b.id === g.divisionId);
