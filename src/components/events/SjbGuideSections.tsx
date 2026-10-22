@@ -1,4 +1,5 @@
 // Shared San Juan Bowl brand guide sections (intro, logo, variations, colours,
+import { SJB_LETTERING_SPEC_VISIBLE } from "@/components/events/SjbShare";
 // type, don'ts). Rendered by the guide page and the designers kit so both carry
 // the full regular guide. Values come only from src/lib/san-juan-bowl.ts.
 import { X } from "lucide-react";
@@ -97,7 +98,7 @@ export function SjbGuideSections() {
             </div>
           </div>
         </div>
-        <div className="mt-4"><SjbLetteringStacked compact /></div>
+        {SJB_LETTERING_SPEC_VISIBLE && <div className="mt-4"><SjbLetteringStacked compact /></div>}
         <div className="mt-4"><SjbSmallMark compact /></div>
         <div className="mt-4"><SjbLockups /></div>
         <h3 className="mt-6 text-sm font-bold text-foreground">Palm trees from the logo</h3>

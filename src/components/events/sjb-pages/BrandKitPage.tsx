@@ -4,6 +4,7 @@
 // type and usage rules, with downloads. Event facts stay "to be confirmed"
 // until issued.
 import { SjbLettering } from "@/components/events/SjbLettering";
+import { SJB_LETTERING_SPEC_VISIBLE } from "@/components/events/SjbShare";
 
 import { useState } from "react";
 import { ArrowLeft, Ban, Check, Copy, Download } from "lucide-react";
@@ -396,7 +397,7 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
 
           <SjbSingleColour className="pt-2" />
 
-          <SjbLettering />
+          {SJB_LETTERING_SPEC_VISIBLE && <SjbLettering />}
 
           {!embedded && (<SjbLink page="designers"
             className={`${card} flex flex-wrap items-center justify-between gap-3 hover:border-[#003FC7]`}
