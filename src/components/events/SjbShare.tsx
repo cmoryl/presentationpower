@@ -50,7 +50,6 @@ export const SJB_LETTERING_SPEC_VISIBLE = false;
 
 const TABS: { page: Exclude<SjbPage, "event">; label: string }[] = [
   { page: "kit", label: "Brand kit" },
-  { page: "designers", label: "For designers" },
   { page: "single", label: "Single colour" },
   ...(SJB_LETTERING_SPEC_VISIBLE ? [{ page: "lettering" as const, label: "Lettering spec" }] : []),
   { page: "stadium", label: "Stadium 3D" },
