@@ -3,7 +3,7 @@ import { useRequireSignIn } from "@/hooks/use-require-sign-in";
 import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 import { ApprovalGate } from "@/components/approvals/ApprovalGate";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PrintRulers } from "@/components/print/PrintRulers";
 import {
   exportPrintAssetAsPdf,
@@ -333,6 +333,17 @@ function AssetEditor() {
   // "features") instead of appending — this is what the canvas Replace action
   // arms so picking a module swaps rather than piles on.
   const [replaceTarget, setReplaceTarget] = useState<string | null>(null);
+  // The pinned preview sits just under the editor toolbar, whose height
+  // changes as its buttons wrap.
+  const [toolbarH, setToolbarH] = useState(64);
+  const toolbarRoRef = useRef<ResizeObserver | null>(null);
+  const pinToolbarRef = useCallback((el: HTMLDivElement | null) => {
+    toolbarRoRef.current?.disconnect();
+    if (!el) return;
+    const ro = new ResizeObserver(() => setToolbarH(el.offsetHeight));
+    ro.observe(el);
+    toolbarRoRef.current = ro;
+  }, []);
   // Canvas "Edit" deep-link: id of the stacked module to reveal in the Shared
   // modules panel, plus a nonce that force-opens the panel on each click.
   const [moduleFocus, setModuleFocus] = useState<{ id: string; nonce: number } | null>(null);
@@ -1158,7 +1169,7 @@ function AssetEditor() {
       <div className="print-studio relative left-1/2 w-screen -translate-x-1/2 bg-[#03002C] text-white [color-scheme:dark]">
       <div className="mx-auto max-w-[1600px] px-4 pb-10 pt-3">
         {/* HEADER BAR */}
-        <div className="dark sticky top-0 z-50 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#03002C] px-4 py-2.5">
+        <div ref={pinToolbarRef} className="dark sticky top-[var(--app-header-h,0px)] z-20 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#03002C] px-4 py-2.5">
           <div className="flex items-center gap-3">
             <Link
               to="/"
@@ -1649,7 +1660,7 @@ function AssetEditor() {
           )}
 
           {/* CANVAS + document inputs */}
-          <div className="min-w-0 space-y-6 rounded-sm bg-[#0B0A2A] pb-8 pl-12 pr-8 pt-12 ring-1 ring-white/5">
+          <div style={{ ["--editor-pin-offset" as string]: `${toolbarH + 12}px` }} className="editor-pin min-w-0 space-y-6 rounded-sm bg-[#0B0A2A] pb-8 pl-12 pr-8 pt-12 ring-1 ring-white/5">
             <div className="relative">
             <div
               ref={canvasRef}

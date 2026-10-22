@@ -399,7 +399,7 @@ function MapsPage() {
 
         {current && floor && (
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-            <div className="space-y-3">
+            <div className="editor-pin space-y-3">
               <div className="flex flex-wrap items-center gap-2">
                 {rows.map((r) => (
                   <button

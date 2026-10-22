@@ -36,6 +36,17 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
   const locSearch = useRouterState({ select: (s) => s.location.searchStr });
 
   const [adminOpen, setAdminOpen] = useState(false);
+  // Publish the sticky header's height so pinned editor previews sit just below it.
+  const headerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const set = () => document.documentElement.style.setProperty("--app-header-h", `${el.offsetHeight}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const [presOpen, setPresOpen] = useState(false);
   // Hover intent: a short close delay so crossing the gap to a menu, or brushing
   // past a neighbouring item, doesn't flicker menus open and shut on every pixel.
@@ -220,6 +231,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
   return (
     <div className="min-h-dvh bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
       <header
+        ref={headerRef}
         className={
           "sticky top-0 z-30 border-b border-white/30 " +
           "bg-[#F5F1EA]/60 [backdrop-filter:blur(28px)_saturate(180%)] " +

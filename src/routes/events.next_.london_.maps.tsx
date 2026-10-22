@@ -729,7 +729,7 @@ function LondonMapsPage() {
                 </button>
               </div>
             ) : (
-              <div>
+              <div className="editor-pin">
                 {floorMap}
                 <button type="button" className={`${btn} mt-2.5`} onClick={() => setExpanded(true)}>
                   <Maximize2 className="h-4 w-4" /> Open large editor

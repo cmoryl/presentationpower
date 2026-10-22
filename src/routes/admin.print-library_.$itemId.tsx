@@ -449,7 +449,7 @@ function MasterItemEditorPage() {
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
         {/* ------------------------- Live page ------------------------- */}
-        <section className="min-w-0">
+        <section className="editor-pin min-w-0">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {!multiPage && (
               <ControlGroup label="Preview mode">

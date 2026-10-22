@@ -1547,3 +1547,15 @@ body.export-mode [data-print-surface] {
 [data-page-orient="portrait"] [data-portrait="city-list"] > * {
   font-size: var(--p-px) !important;
 }
+
+/* Live editors: the artwork preview stays on screen while the settings
+   column scrolls. Desktop only — on narrow screens the page stacks. */
+@utility editor-pin {
+  @media (min-width: 1024px) {
+    position: sticky;
+    top: calc(var(--app-header-h, 72px) + var(--editor-pin-offset, 12px));
+    align-self: start;
+    max-height: calc(100dvh - var(--app-header-h, 72px) - var(--editor-pin-offset, 12px) - 12px);
+    overflow: auto;
+  }
+}

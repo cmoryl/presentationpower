@@ -424,7 +424,7 @@ export function BackgroundTuner({
         </div>
       )}
       {/* ── LIVE STAGE ─────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-3">
+      <div className="editor-pin flex flex-col gap-3">
         <div className="order-2 rounded-2xl border border-black/10 bg-white/60 p-3 dark:border-white/15 dark:bg-white/[0.03]">
           <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">

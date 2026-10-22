@@ -253,7 +253,7 @@ function PrintModuleStudioPage() {
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         {/* ---------------- Page sheet ---------------- */}
-        <section className="min-w-0">
+        <section className="editor-pin min-w-0">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <ControlGroup label="Page">
               {PAGE_SIZES.map((s) => (

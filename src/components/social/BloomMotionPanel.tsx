@@ -309,7 +309,7 @@ export function BloomMotionPanel({ aperture, side, layouts = {} }: Props) {
       </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
-        <div className="overflow-hidden rounded-2xl border border-black/10 bg-white">
+        <div className="editor-pin overflow-hidden rounded-2xl border border-black/10 bg-white">
           <BloomMotionAd
             accentMotionId={accentId}
             backdropId={backdropId}

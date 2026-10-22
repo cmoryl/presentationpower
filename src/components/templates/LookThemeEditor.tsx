@@ -303,7 +303,7 @@ export function LookThemeEditor({
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="editor-pin space-y-3">
           {livePack ? (
             (["cover", "stats"] as const).map((scene, i) => (
               <figure key={scene}>
