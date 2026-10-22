@@ -101,6 +101,8 @@ c.setFont("G", 10.5); c.setFillColor("#FFFFFF"); c.drawString(M, H - 212, "Hiram
 c.setFont("GB", 9); c.setFillColor(GOLD); c.drawString(M, 60, f"Version {VERSION} · Released {RELEASED}")
 c.setFont("G", 10); c.setFillColor("#FFFFFF")
 para("Every image in this guide is the supplied artwork. Blue links open or download the live files — always use the latest from the live kit.", M, H - 240, 300, 10, color="#FFFFFF")
+c.setFont("GB", 10); c.setFillColor(GOLD); _t = "Open the brand guide online (no sign-in)  \u2197"
+c.drawString(M, 230, _t); c.linkURL(ORIGIN + "/share/san-juan-bowl", (M, 228, M + c.stringWidth(_t, "GB", 10), 240))
 c.showPage()
 
 # 2 logo variants
