@@ -1158,7 +1158,7 @@ function AssetEditor() {
       <div className="print-studio relative left-1/2 w-screen -translate-x-1/2 bg-[#03002C] text-white [color-scheme:dark]">
       <div className="mx-auto max-w-[1600px] px-4 pb-10 pt-3">
         {/* HEADER BAR */}
-        <div className="dark sticky top-[var(--app-header-h,0px)] z-20 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#03002C] px-4 py-2.5">
+        <div ref={pinToolbarRef} className="dark sticky top-[var(--app-header-h,0px)] z-20 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#03002C] px-4 py-2.5">
           <div className="flex items-center gap-3">
             <Link
               to="/"
@@ -1649,7 +1649,7 @@ function AssetEditor() {
           )}
 
           {/* CANVAS + document inputs */}
-          <div style={{ ["--editor-pin-offset" as string]: "64px" }} className="editor-pin min-w-0 space-y-6 rounded-sm bg-[#0B0A2A] pb-8 pl-12 pr-8 pt-12 ring-1 ring-white/5">
+          <div style={{ ["--editor-pin-offset" as string]: `${toolbarH + 12}px` }} className="editor-pin min-w-0 space-y-6 rounded-sm bg-[#0B0A2A] pb-8 pl-12 pr-8 pt-12 ring-1 ring-white/5">
             <div className="relative">
             <div
               ref={canvasRef}
