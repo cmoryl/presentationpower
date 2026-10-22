@@ -94,6 +94,10 @@ export const updateCustomModule = createServerFn({ method: "POST" })
     if (p.notes !== undefined) db.notes = p.notes;
     if (p.thumbnailUrl !== undefined) db.thumbnail_url = p.thumbnailUrl;
     if (p.status !== undefined) db.status = p.status;
+    if (p.status === "archived") {
+      const { checkRetirement } = await import("./module-catalogue.server");
+      await checkRetirement(context.supabase, data.id);
+    }
     // Any saved edit takes the module back to draft: the approved version was
     // the one a reviewer saw, so a changed module has to be reviewed again.
     if (p.status === "draft") {
@@ -115,7 +119,10 @@ export const deleteCustomModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("custom_modules").delete().eq("id", data.id);
+    const { checkRetirement } = await import("./module-catalogue.server");
+    await checkRetirement(context.supabase, data.id);
+    // Stable identities and saved history survive retirement.
+    const { error } = await context.supabase.from("custom_modules").update({ status: "archived" }).eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });

@@ -102,6 +102,11 @@ export const updatePrintPageTemplate = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const p = data.patch;
+    if (p.hidden) {
+      const { checkRetirement, requireCatalogueAdmin } = await import("./module-catalogue.server");
+      await requireCatalogueAdmin(supabase, userId);
+      await checkRetirement(supabase, data.id);
+    }
     if (p.scope === "shared") {
       const { data: isAdmin } = await supabase.rpc("has_role", {
         _user_id: userId,

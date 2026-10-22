@@ -45,6 +45,11 @@ export const saveModuleOverride = createServerFn({ method: "POST" })
     z.object({ scope, moduleId: z.string().min(2), patch: patchSchema }).parse(data),
   )
   .handler(async ({ data, context }) => {
+    if (data.patch.hidden && data.scope !== "library") {
+      const { checkRetirement, requireCatalogueAdmin } = await import("./module-catalogue.server");
+      await requireCatalogueAdmin(context.supabase, context.userId);
+      await checkRetirement(context.supabase, data.moduleId);
+    }
     const p = data.patch;
     const row: Record<string, unknown> = {
       scope: data.scope,
@@ -70,6 +75,8 @@ export const saveModuleOverride = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw error;
+    const { logLearningSignal } = await import("./learning.server");
+    await logLearningSignal(context.supabase, context.userId, { source: "edit", subjectType: "module", subjectId: data.moduleId, summary: `Updated ${data.scope} module master`, detail: { fields: Object.keys(p) } });
     return saved;
   });
 

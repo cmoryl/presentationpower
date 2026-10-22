@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { VariantRenderer } from "../VariantRenderer";
-import { findSlideModule, registeredModuleIds } from "../module-registry";
+import { findSlideModule, slideModuleAuthority } from "../module-registry";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
@@ -66,15 +66,22 @@ describe("module conformance matrix", () => {
     expect(MODULE_VARIANTS.length).toBeGreaterThan(200);
   });
 
-  it("claims every variant in the registry (except blank canvas)", () => {
+  it("claims every variant including blank canvas through one registry", () => {
     const unregistered = MODULE_VARIANTS.filter(
-      (v) => v.id !== "MV-CANVAS-BLANK" && !findSlideModule(v.id),
+      (v) => !findSlideModule(v.id),
     ).map((v) => v.id);
 
     expect(
       unregistered,
       "All functional variants must be registered to avoid legacy fallbacks",
     ).toEqual([]);
+  });
+
+  it("reports exact blank canvas ownership and predicate viz ownership", () => {
+    expect(slideModuleAuthority("MV-CANVAS-BLANK")).toEqual({ owner: "family:canvas", authority: "exact" });
+    const viz = MODULE_VARIANTS.find((v) => slideModuleAuthority(v.id).authority === "predicate");
+    expect(viz).toBeDefined();
+    expect(slideModuleAuthority("not-a-module")).toEqual({ owner: null, authority: "unowned" });
   });
 
   for (const mode of ["light", "dark"] as const) {
