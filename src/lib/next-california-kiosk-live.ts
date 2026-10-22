@@ -403,6 +403,8 @@ export type KioskEdits = {
   parked?: KioskEdits;
   /** `stops` (top → bottom) set when an approved NEXT ground was picked; `top`/`bottom` stay its ends. */
   ground?: { top: string; bottom: string; stops?: string[]; styleId?: string } | null;
+  /** Scene photograph picked as the background (sign-scene-backgrounds registry); beats the supplied ground and any ramp. */
+  scene?: string | null;
   blocks?: Record<string, BlockEdit>;
   texts?: Record<string, TextEdit>;
   /** Per-object edits inside a piece (dx/dy in kiosk points, scale about the object's centre). */
