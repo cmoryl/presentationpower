@@ -48,11 +48,14 @@ export const SJB_SHARE_PATH = SHARE_PATHS.kit;
 /** Hidden for now by request: single-line/stacked lettering masters and the lettering specification. */
 export const SJB_LETTERING_SPEC_VISIBLE = false;
 
+/** Hidden for now by request: the Stadium 3D tab on the public share pages. */
+export const SJB_SHARE_STADIUM_VISIBLE = false;
+
 const TABS: { page: Exclude<SjbPage, "event">; label: string }[] = [
   { page: "kit", label: "Brand kit" },
   { page: "single", label: "Single colour" },
   ...(SJB_LETTERING_SPEC_VISIBLE ? [{ page: "lettering" as const, label: "Lettering spec" }] : []),
-  { page: "stadium", label: "Stadium 3D" },
+  ...(SJB_SHARE_STADIUM_VISIBLE ? [{ page: "stadium" as const, label: "Stadium 3D" }] : []),
 ];
 
 function ShareShell({ children }: { children: ReactNode }) {
