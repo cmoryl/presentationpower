@@ -369,6 +369,7 @@ export function CaseStudyLayout({
             )}
 
             {/* Modules that replaced the stat pills land in their place. */}
+            {Object.values((content as { moduleSlots?: Record<string, string> }).moduleSlots ?? {}).includes("stats") && (content.modules ?? []).some((m) => (content as { moduleSlots?: Record<string, string> }).moduleSlots?.[m.id] === "stats") && (
             <div style={{ padding: `${cq(14)} ${padCq(padX(density))} 0` }}>
               <PrintSectionsStack
                 sections={content.modules}
@@ -379,6 +380,7 @@ export function CaseStudyLayout({
                 slot="stats"
               />
             </div>
+            )}
 
             {/* CSR ROWS — Challenge / Solution / Result */}
             <div
