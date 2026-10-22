@@ -135,8 +135,8 @@ for i, (n, bg, lab) in enumerate(ones):
         for ext in u[1] + ["png"]: nx = link(ext.upper(), URL[f"{u[0]}.{ext}"], nx, y - 14, 8.5)
     else:
         nx = link("SVG", URL[n + ".svg"], x + 100, y - 14, 8.5); link("PNG", URL[n + ".png"], nx, y - 14, 8.5)
-para("Navy is preferred when we get to choose the one colour. If only black and white are available, use black on light backgrounds and white on dark. Unframed files are the updated October 2026 masters; framed files are unchanged.", M, 90, W - 2 * M, 9)
-link("Framed and earlier single-colour files (ZIP)", URL["1c-pack.zip"], M, 62, 9)
+para("Navy is preferred when we get to choose the one colour. If only black and white are available, use black on light backgrounds and white on dark. Unframed files are the updated October 2026 masters; framed files are unchanged.", M, 70, W - 2 * M, 9)
+link("Framed and earlier single-colour files (ZIP)", URL["1c-pack.zip"], M, 44, 9)
 c.showPage()
 
 # 3b arched lettering only
