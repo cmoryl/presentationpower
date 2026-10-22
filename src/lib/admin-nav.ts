@@ -61,6 +61,7 @@ export const ADMIN_NAV_GROUPS: ReadonlyArray<AdminNavGroup> = [
     label: "Studios",
     items: [
       { to: "/admin/canvas", label: "Canvas Studio" },
+      { to: "/admin/modules-hub", label: "Master modules" },
       { to: "/admin/module-studio", label: "Module Studio" },
       { to: "/admin/modules", label: "Module editor" },
     ],
