@@ -155,10 +155,15 @@ function EventHome() {
             {[entry.venue, entry.city, entry.dates].filter(Boolean).join(" · ")}
           </p>
           {eventId === "san-juan-bowl" && (
-            <div className="mt-4">
+            <div className="mt-4 flex flex-wrap gap-2">
               <Button asChild>
                 <Link to="/events/san-juan-bowl/stadium">
                   Stadium 3D view <ArrowRight aria-hidden />
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/events/next/sign-editor/$signId" params={{ signId: "sjb-first-flyer" }}>
+                  Game flyer <ArrowRight aria-hidden />
                 </Link>
               </Button>
             </div>
