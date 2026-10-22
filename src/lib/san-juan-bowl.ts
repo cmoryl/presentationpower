@@ -176,7 +176,7 @@ export const SJB_LARGE_FORMAT = {
 /** Smallest sizes the badge may reproduce at before detail is lost. */
 export const SJB_MIN_SIZES = [
   { context: "Print", minimum: "40 mm wide", note: "Keeps the 7.8-unit keyline at 0.26 mm; at 25 mm it drops to 0.16 mm and the lace and letter details to 0.07 mm, below what presses hold." },
-  { context: "Screen", minimum: "160 px wide", note: "Every line stays at or above 1 px. Below 160 px the detail fills in on every version, including single colour — use the small-size mark (lettering shield) instead, from 160 px down to 48 px high." },
+  { context: "Screen", minimum: "160 px wide", note: "Every line stays at or above 1 px. Below 160 px the detail fills in on every version, including single colour — use the small-size mark files (the same badge, trimmed and pre-sized) and check legibility." },
   { context: "Embroidery / patch (full colour)", minimum: "90 mm wide", note: "Stitching needs about 1 mm per detail; at 60 mm the keyline is 0.39 mm. One-colour embroidery can go to 60 mm with a digitiser stitch-out (see Single colour)." },
 ] as const;
 
