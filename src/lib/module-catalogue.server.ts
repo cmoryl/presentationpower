@@ -24,7 +24,7 @@ export async function readCatalogue(client: Client): Promise<ModuleCatalogueData
     ["print_page_templates", "*"], ["decks", "id,title,status,is_template,context"],
     ["deck_slides", "id,deck_id,variant_id,content"],
     ["print_assets", "id,title,status,content,context,source_module_ids"],
-    ["campaign_kits", "id,name,surface,event_facts,copy"], ["surfaces", "id,title,kind,content"],
+    ["campaign_kits", "id,name,surface,event_facts,copy"], ["surfaces", "id,title,kind,modules,context"],
     ["event_signs", "id,event_id,status,template_id,fields"], ["sign_templates", "id,name,layout_id,edits,status"],
     ["module_catalogue_versions", "id,source_table,source_key,revision,created_at,created_by,operation"],
   ] as const;

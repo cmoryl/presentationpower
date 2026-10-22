@@ -48,7 +48,8 @@ function suitability(m: PrintSectionModule): AspectClass[] {
   return ["square", "portrait", "portrait-tall", "landscape"];
 }
 
-export const SOCIAL_MODULE_LAYOUTS: SocialModuleLayout[] = PRINT_SECTION_MODULES.map((m) => ({
+export function deriveSocialModuleLayouts(modules: PrintSectionModule[]): SocialModuleLayout[] {
+  return modules.map((m) => ({
   id: m.id,
   label: m.label,
   description: m.description,
@@ -58,7 +59,9 @@ export const SOCIAL_MODULE_LAYOUTS: SocialModuleLayout[] = PRINT_SECTION_MODULES
   tags: m.tags,
   suitedFor: suitability(m),
   make: m.make,
-}));
+  }));
+}
+export const SOCIAL_MODULE_LAYOUTS = deriveSocialModuleLayouts(PRINT_SECTION_MODULES);
 
 export const SOCIAL_MODULE_FAMILIES = PRINT_MODULE_FAMILY_ORDER;
 export { printModuleFamilyMeta };
@@ -85,9 +88,9 @@ export function socialModuleMatches(layout: SocialModuleLayout, query: string): 
 }
 
 /** Modules ranked for a given format — suited ones first, then the rest. */
-export function socialModulesForFormat(format: SocialFormat): SocialModuleLayout[] {
+export function socialModulesForFormat(format: SocialFormat, layouts = SOCIAL_MODULE_LAYOUTS): SocialModuleLayout[] {
   const cls = aspectClass(format);
-  return [...SOCIAL_MODULE_LAYOUTS].sort((a, b) => {
+  return [...layouts].sort((a, b) => {
     const av = a.suitedFor.includes(cls) ? 0 : 1;
     const bv = b.suitedFor.includes(cls) ? 0 : 1;
     if (av !== bv) return av - bv;

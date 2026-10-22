@@ -46,7 +46,7 @@ export function ModuleCatalogueDetail({ module: m, onClose, overrides }: ModuleC
   const oldSnapshot = compare?.snapshot as Record<string, unknown> | undefined;
   const changes = oldSnapshot ? [...new Set([...Object.keys(oldSnapshot), ...Object.keys(liveSnapshot ?? {})])].filter((k) => JSON.stringify(oldSnapshot[k]) !== JSON.stringify(liveSnapshot?.[k])) : [];
   return <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
-    <DialogContent className="max-h-[90dvh] max-w-4xl overflow-y-auto">
+    <DialogContent className="max-h-[90dvh] max-w-4xl overflow-y-auto [animation:none]">
       <div className="pr-7"><Badge variant="secondary">{MODULE_CLASSES[m.classification]}</Badge><DialogTitle className="mt-3 break-words">{m.label}</DialogTitle><DialogDescription className="mt-2">{m.description || m.id}</DialogDescription></div>
       <div className="flex flex-wrap gap-2">
         {m.classification === "print" || m.classification === "adaptation" ? <Button asChild size="sm"><Link to="/admin/modules/print/$moduleId" params={{ moduleId: m.id }}><ArrowUpRight />Edit master</Link></Button> : m.classification === "team" ? <Button asChild size="sm"><Link to="/admin/module-studio" search={{ module: m.id }}><ArrowUpRight />Open in Module Studio</Link></Button> : <Button asChild size="sm"><Link to="/admin/modules" search={{ tab: m.classification === "template" ? "page-templates" : "deck", q: m.id }}><ArrowUpRight />Edit catalogue entry</Link></Button>}
