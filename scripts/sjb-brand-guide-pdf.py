@@ -250,6 +250,38 @@ for n in ["HEX, RGB and HSL values are exact, taken from the supplied artwork �
 c.showPage()
 
 
+# 9b colour balance + readable pairings (mirrors SJB_COLOR_PROPORTION / SJB_PAIRINGS)
+head("Colour balance and readable pairings", "Colour")
+HX = {"navy": COLORS[0][1], "sky": COLORS[1][1], "gold": COLORS[2][1], "white": COLORS[3][1]}
+NM = {"navy": COLORS[0][0], "sky": COLORS[1][0], "gold": COLORS[2][0], "white": COLORS[3][0]}
+def _lum(h):
+    v = [int(h[i:i+2], 16) / 255 for i in (1, 3, 5)]
+    v = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in v]
+    return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]
+def _cr(a, b):
+    x, y = sorted([_lum(a), _lum(b)], reverse=True); return (x + 0.05) / (y + 0.05)
+para("A suggested share of each colour in a layout, then every text/background pair checked against web accessibility contrast (AA needs 4.5:1 for body text, 3:1 for large headlines).", M, 470, W - 2 * M, 9.5, color="#444444")
+x = M; bw = W - 2 * M
+for k, pct in [("navy", 60), ("white", 25), ("sky", 10), ("gold", 5)]:
+    w = bw * pct / 100; c.setFillColor(HX[k]); c.rect(x, 400, w, 34, stroke=0, fill=1)
+    x += w
+lx = M
+for k, pct in [("navy", 60), ("white", 25), ("sky", 10), ("gold", 5)]:
+    c.setFillColor(HX[k]); c.setStrokeColor("#D9DCE5"); c.rect(lx, 384, 9, 9, stroke=1, fill=1)
+    t = f"{NM[k]} {pct}%"; c.setFillColor(INK); c.setFont("GB", 9); c.drawString(lx + 14, 385, t); lx += 34 + c.stringWidth(t, "GB", 9)
+c.setStrokeColor("#D9DCE5"); c.rect(M, 400, bw, 34, stroke=1, fill=0)
+c.setFont("G", 8.5); c.setFillColor("#444444"); c.drawString(M, 370, "Guidance only — gold stays the smallest share so it keeps its punch.")
+pairs = [("white","navy"),("gold","navy"),("sky","navy"),("navy","white"),("navy","gold"),("navy","sky"),("sky","white"),("gold","white")]
+pw = (bw - 36) / 4
+for i, (fg, bg) in enumerate(pairs):
+    px = M + (i % 4) * (pw + 12); py = 270 - (i // 4) * 120
+    c.setFillColor(HX[bg]); c.setStrokeColor("#D9DCE5"); c.rect(px, py, pw, 60, stroke=1, fill=1)
+    c.setFillColor(HX[fg]); c.setFont("GB", 18); c.drawString(px + 12, py + 22, "Aa Bowl")
+    r = _cr(HX[fg], HX[bg]); v = "Any text" if r >= 4.5 else "Large headlines only" if r >= 3 else "Never for text"
+    c.setFillColor(INK); c.setFont("GB", 9); c.drawString(px, py - 14, f"{NM[fg]} on {NM[bg]}")
+    c.setFont("G", 8.5); c.setFillColor("#E53D2E" if r < 3 else INK); c.drawString(px, py - 27, f"{r:.1f}:1 · {v}")
+c.showPage()
+
 # 15 shield mark + lockups
 head("Small-size mark and lockups", "Logo pieces")
 img(local("sjb-mark/sjb-mark-shield-512.png"), M, 260, 180, 180, "#FFFFFF")
