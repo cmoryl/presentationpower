@@ -1,0 +1,119 @@
+{
+ "unit": "u = SAN JUAN cap height / 120 (same unit as the single-line master)",
+ "rules": [
+  [
+   "Letters",
+   "Exact copies of the single-line master: same outlines, serifs and 45° shadow. Lines are only moved, never redrawn."
+  ],
+  [
+   "Line gap",
+   "29 face to face (= the word space). Baseline to baseline 149."
+  ],
+  [
+   "Letter gap / word space",
+   "12 / 29, unchanged from the single line."
+  ],
+  [
+   "Centred",
+   "Each line centred on the widest line, measured on the letter faces."
+  ],
+  [
+   "Left / right aligned",
+   "Lines flush on the letter faces’ left or right edge; every shadow overhangs by the same 6.5625, so the edge stays even."
+  ],
+  [
+   "BOWL full width",
+   "Master BOWL scaled uniformly by 13/8 = 1.625 with its shadow: cap 195, stroke 53.625, serif 17.4306640625, shadow (10.6640625, 10.6640625) at 45°. Its three letter gaps are 20.30859375 so BOWL ends exactly on SAN JUAN’s edges (874.6953125). Letterforms are not stretched."
+  ],
+  [
+   "Clearance",
+   "No shadow touches another letter; closest is 5.4375."
+  ],
+  [
+   "Exactness",
+   "Every coordinate an exact finite decimal; each letter checked identical to the master (BOWL at exactly 1.625× in the full-width version)."
+  ]
+ ],
+ "layouts": [
+  {
+   "id": "2-line",
+   "lines": "SAN JUAN / BOWL",
+   "align": "Centred",
+   "artWidth": "881.2578125",
+   "artHeight": "275.5625",
+   "viewBox": "-3 -3 887.2578125 281.5625",
+   "aspect": 3.1512
+  },
+  {
+   "id": "2-line-left",
+   "lines": "SAN JUAN / BOWL",
+   "align": "Left aligned",
+   "artWidth": "881.2578125",
+   "artHeight": "275.5625",
+   "viewBox": "-3 -3 887.2578125 281.5625",
+   "aspect": 3.1512
+  },
+  {
+   "id": "2-line-right",
+   "lines": "SAN JUAN / BOWL",
+   "align": "Right aligned",
+   "artWidth": "881.2578125",
+   "artHeight": "275.5625",
+   "viewBox": "-3 -3 887.2578125 281.5625",
+   "aspect": 3.1512
+  },
+  {
+   "id": "full-width-bowl",
+   "lines": "SAN JUAN / BOWL (BOWL full width)",
+   "align": "Spans full width",
+   "artWidth": "885.359375",
+   "artHeight": "354.6640625",
+   "viewBox": "-3 -3 891.359375 360.6640625",
+   "aspect": 2.4714
+  },
+  {
+   "id": "3-line",
+   "lines": "SAN / JUAN / BOWL",
+   "align": "Centred",
+   "artWidth": "543.34375",
+   "artHeight": "424.5625",
+   "viewBox": "-3 -3 549.34375 430.5625",
+   "aspect": 1.2759
+  },
+  {
+   "id": "3-line-left",
+   "lines": "SAN / JUAN / BOWL",
+   "align": "Left aligned",
+   "artWidth": "543.34375",
+   "artHeight": "424.5625",
+   "viewBox": "-3 -3 549.34375 430.5625",
+   "aspect": 1.2759
+  },
+  {
+   "id": "3-line-right",
+   "lines": "SAN / JUAN / BOWL",
+   "align": "Right aligned",
+   "artWidth": "543.34375",
+   "artHeight": "424.5625",
+   "viewBox": "-3 -3 549.34375 430.5625",
+   "aspect": 1.2759
+  }
+ ],
+ "colourways": [
+  {
+   "suffix": "",
+   "name": "White on Navy",
+   "bg": "#0D0E21"
+  },
+  {
+   "suffix": "-navy",
+   "name": "Navy on White",
+   "bg": "#FFFFFF"
+  },
+  {
+   "suffix": "-navy-white",
+   "name": "Navy on Blue",
+   "bg": "#00AAE7"
+  }
+ ]
+}

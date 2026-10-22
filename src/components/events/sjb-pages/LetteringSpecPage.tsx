@@ -10,6 +10,7 @@ import { SjbLink, SjbShell } from "@/components/events/SjbShare";
 import { Button } from "@/design-system/element";
 import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import spec from "@/lib/sjb-lettering-spec.json";
+import stacked from "@/lib/sjb-lettering-stacked.json";
 
 const BASE = "/downloads/sjb-lettering";
 const DRAW = `${BASE}/spec`;
@@ -249,7 +250,26 @@ export function LetteringSpecPage() {
           <Table head={["Word", "Letter", "x left", "x right", "Advance"]} rows={spec.positions.map((p) => [p.word, p.letter, p.xLeft, p.xRight, p.advance])} mono={[2, 3, 4]} />
         </Section>
 
-        <Section id="sizes" title="7 · Clearances, sizes and minimum size" intro="The tightest spots in the lettering, and a calculator for any cap height.">
+        <Section id="stacked" title="7 · Stacked lockups" intro="Two-line and three-line versions built from the same letters. Lines are only moved; the full-width BOWL is the master BOWL scaled by exactly 13/8.">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {stacked.layouts.filter((l) => ["2-line", "2-line-left", "full-width-bowl", "3-line"].includes(l.id)).map((l) => (
+              <figure key={l.id} className="space-y-2">
+                <div className="flex aspect-[4/3] items-center justify-center rounded-md border border-border bg-[#0D0E21] p-4">
+                  <img src={`${BASE}/stacked/sjb-lettering-stacked-${l.id}.svg`} alt={`Stacked lettering, ${l.lines}, ${l.align.toLowerCase()}`} className="max-h-full max-w-full object-contain" />
+                </div>
+                <figcaption className="text-[12.5px] text-muted-foreground"><b className="text-foreground">{l.lines}</b> · {l.align}</figcaption>
+              </figure>
+            ))}
+          </div>
+          <Table head={["Rule", "Value"]} rows={stacked.rules} />
+          <Table head={["File", "Lines", "Alignment", "Artwork incl. shadow (u)", "Aspect"]} rows={stacked.layouts.map((l) => [`sjb-lettering-stacked-${l.id}.svg`, l.lines, l.align, `${l.artWidth} × ${l.artHeight}`, `${l.aspect} : 1`])} mono={[0, 3, 4]} />
+          <p className="text-[12.5px] text-muted-foreground">
+            Each layout comes in White on Navy (no suffix), Navy on White (<span className="font-mono">-navy</span>) and Navy on Blue (<span className="font-mono">-navy-white</span>), as SVG and transparent PNG at 1200, 2400 and 4800 px.{" "}
+            <a href={`${BASE}/stacked/sjb-lettering-stacked-pack.zip`} download className="font-semibold text-foreground underline">Download all stacked files (ZIP)</a>
+          </p>
+        </Section>
+
+        <Section id="sizes" title="8 · Clearances, sizes and minimum size" intro="The tightest spots in the lettering, and a calculator for any cap height.">
           <div className="grid gap-6 lg:grid-cols-2">
             <Drawing file={spec.files.clearA} alt="Close-up of the A inner foot on a 1 u grid" caption={<><b className="text-foreground">Tightest spot, A inner foot</b> (1 square = 1 u). Separate shadow pieces 2.16 apart, shortest shadow edge 2.25, background channel 2.609.</>} />
             <Drawing file={spec.files.clearU} alt="Close-up of the U opening between its inner serifs" caption={<><b className="text-foreground">U opening</b> between the inner serifs: exactly 12, the same as the letter gap.</>} />
@@ -257,7 +277,7 @@ export function LetteringSpecPage() {
           <SizeCalculator />
         </Section>
 
-        <Section id="colour" title="8 · Colour" intro="White letters with a cyan shadow, always placed on navy. The lettering has no background of its own, so on a light ground only the shadow would show.">
+        <Section id="colour" title="9 · Colour" intro="White letters with a cyan shadow, always placed on navy. The lettering has no background of its own, so on a light ground only the shadow would show.">
           <div className="grid gap-3 sm:grid-cols-3">
             {spec.colour.map((c) => (
               <div key={c.role} className="overflow-hidden rounded-md border border-border">
@@ -271,13 +291,13 @@ export function LetteringSpecPage() {
           </div>
         </Section>
 
-        <Section id="rules" title="9 · File and editing rules">
+        <Section id="rules" title="10 · File and editing rules">
           <ul className="max-w-4xl list-disc space-y-1.5 pl-5 text-[13.5px]">
             {spec.editingRules.map((r) => <li key={r}>{r}</li>)}
           </ul>
         </Section>
 
-        <Section id="verification" title="10 · Verification" intro="Checked on the saved file with exact rational arithmetic and zero tolerance, then by four independent blind reviews. The last review found no defects.">
+        <Section id="verification" title="11 · Verification" intro="Checked on the saved file with exact rational arithmetic and zero tolerance, then by four independent blind reviews. The last review found no defects.">
           <Table head={["Check", "Result"]} rows={spec.verification.map((v) => [v.check, v.result])} />
         </Section>
       </div>

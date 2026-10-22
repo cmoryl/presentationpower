@@ -1,5 +1,6 @@
 import { Download } from "lucide-react";
 import { SjbLink } from "@/components/events/SjbShare";
+import { SjbLetteringStacked } from "@/components/events/SjbLetteringStacked";
 
 /** Straight-on "SAN JUAN BOWL" lettering rebuilt letter by letter from the badge by
  *  scripts/sjb-straight-lettering.py (one cap height, one gap, one shadow). Upright only. */
@@ -105,6 +106,7 @@ export function SjbLettering() {
         White letters: dark backgrounds only.
       </p>
       <SjbLetteringExact />
+      <SjbLetteringStacked />
       <div className="space-y-3 rounded-xl border border-[#03002C]/10 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
