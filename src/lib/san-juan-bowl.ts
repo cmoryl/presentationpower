@@ -107,13 +107,16 @@ export const SJB_LOGO_ANATOMY = [
 ] as const;
 
 /**
- * Clear space = the height of the yellow banner on every side.
- * `unitPct` is the banner height as a share of the diagram container
- * (badge + ring), used to draw the diagram; measured from the supplied SVG.
+ * Clear space = x on every side, x = the full height of the ribbon element (outline included).
+ * The diagram is drawn from these measured numbers (supplied SVG, viewBox 0 0 1254 1254),
+ * so the dashed ring sits exactly x from the visible badge edge on all four sides.
  */
 export const SJB_CLEAR_SPACE = {
   rule: "Keep clear space around the badge of at least x on every side, where x is the full height of the ribbon element, navy outline included (171.7 units, 14.47% of the logo width).",
-  unitPct: 12,
+  /** x in artwork units. */
+  xUnits: 171.7,
+  /** Visible badge bounds inside the 1254-unit square artboard (full-colour file). */
+  art: { left: 33.7, top: 46.1, width: 1186.7, height: 1161.7, artboard: 1254 },
   /** Banner height as a share of badge height, measured from the artwork. */
   bannerPctOfBadge: 14.8,
 } as const;
@@ -173,8 +176,8 @@ export const SJB_LARGE_FORMAT = {
 /** Smallest sizes the badge may reproduce at before detail is lost. */
 export const SJB_MIN_SIZES = [
   { context: "Print", minimum: "40 mm wide", note: "Keeps the 7.8-unit keyline at 0.26 mm; at 25 mm it drops to 0.16 mm and the lace and letter details to 0.07 mm, below what presses hold." },
-  { context: "Screen", minimum: "160 px wide", note: "Every line stays at or above 1 px. Below 160 px use the single-colour version; there is no badge-only lockup." },
-  { context: "Embroidery / patch", minimum: "90 mm wide", note: "Stitching needs about 1 mm per detail; at 60 mm the keyline is 0.39 mm. Ask for the simplified stitch version for anything smaller." },
+  { context: "Screen", minimum: "160 px wide", note: "Every line stays at or above 1 px. Below 160 px the detail fills in on every version, including single colour — keep the badge at 160 px or larger until a small-size mark is approved." },
+  { context: "Embroidery / patch (full colour)", minimum: "90 mm wide", note: "Stitching needs about 1 mm per detail; at 60 mm the keyline is 0.39 mm. One-colour embroidery can go to 60 mm with a digitiser stitch-out (see Single colour)." },
 ] as const;
 
 /** Approved backgrounds and which variant sits on each. */
@@ -204,7 +207,7 @@ export type SjbMisuseDemo =
 /** The don'ts, each with a live demo of the mistake. */
 export const SJB_MISUSE: ReadonlyArray<{ id: SjbMisuseDemo; title: string; detail: string }> = [
   { id: "stretch", title: "Don't stretch or squash", detail: "The badge always keeps its supplied proportions." },
-  { id: "recolour", title: "Don't recolour", detail: "No tints, no gradients, no one-colour versions beyond the supplied variants." },
+  { id: "recolour", title: "Don't recolour", detail: "No tints, gradients or new colours. One-colour use only as shown on the Single colour page: the supplied Navy, Black and White files, or an event-colour ink signed off by the designer." },
   { id: "crop", title: "Don't crop", detail: "The whole diamond stays visible, banner to waves." },
   { id: "rotate", title: "Don't rotate", detail: "The badge sits upright on its point, never tilted." },
   { id: "busy", title: "Don't use busy backgrounds", detail: "No photography or patterns that fight the artwork." },

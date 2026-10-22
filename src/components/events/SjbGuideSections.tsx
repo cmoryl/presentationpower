@@ -74,6 +74,9 @@ export function SjbGuideSections() {
                 <div className="mt-2 flex gap-3 text-xs font-semibold">
                   <a href={v.svg} download className="text-primary hover:underline">SVG</a>
                   <a href={v.png} download className="text-primary hover:underline">PNG</a>
+                  <a href={`/downloads/sjb-logo/print/sjb-logo-${v.id}-cmyk.pdf`} download className="text-primary hover:underline">PDF (CMYK)</a>
+                  <a href={`/downloads/sjb-logo/print/sjb-logo-${v.id}-cmyk.eps`} download className="text-primary hover:underline">EPS (CMYK)</a>
+                  <a href={`/downloads/sjb-logo/print/sjb-logo-${v.id}-cmyk-illustrator.ai`} download className="text-primary hover:underline">AI (CMYK)</a>
                 </div>
               </div>
             </div>

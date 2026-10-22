@@ -46,6 +46,9 @@ const PREVIEW_BGS = [
   { name: "Ink", hex: BRAND.ink },
 ] as const;
 
+/** CMYK print masters (PDF, EPS, PDF-compatible AI) made 1:1 from the supplied SVGs with the master EPS inks. */
+const SJB_PRINT_DIR = "/downloads/sjb-logo/print";
+
 function LogoVariantCard({ logo }: { logo: (typeof SJB_LOGOS)[number] }) {
   const [bg, setBg] = useState<string>(logo.previewBg);
   return (
@@ -90,41 +93,67 @@ function LogoVariantCard({ logo }: { logo: (typeof SJB_LOGOS)[number] }) {
         >
           <Download className="h-3.5 w-3.5" /> PNG
         </a>
+        {(["pdf", "eps"] as const).map((ext) => (
+          <a
+            key={ext}
+            href={`${SJB_PRINT_DIR}/sjb-logo-${logo.id}-cmyk.${ext}`}
+            download
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/25 px-3 py-1.5 text-[12px] font-semibold hover:bg-[#F2F2F2]"
+          >
+            <Download className="h-3.5 w-3.5" /> {ext.toUpperCase()} (CMYK)
+          </a>
+        ))}
+        <a
+          href={`${SJB_PRINT_DIR}/sjb-logo-${logo.id}-cmyk-illustrator.ai`}
+          download
+          className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/25 px-3 py-1.5 text-[12px] font-semibold hover:bg-[#F2F2F2]"
+        >
+          <Download className="h-3.5 w-3.5" /> AI (CMYK)
+        </a>
       </div>
     </div>
   );
 }
 
 function ClearSpaceDiagram() {
-  const unit = SJB_CLEAR_SPACE.unitPct;
-  const badgeSize = 100 - unit * 2;
+  // Exact geometry: the ring box is the visible badge plus x on every side; the artwork
+  // file (with its own padding) is placed so its badge edge lands exactly x inside the ring.
+  const { xUnits: x, art } = SJB_CLEAR_SPACE;
+  const boxW = art.width + 2 * x;
+  const boxH = art.height + 2 * x;
+  const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(4)}%`;
   return (
     <div className={`${card} space-y-3`}>
       <h3 className="text-[15px] font-bold">Clear space</h3>
       <p className="text-[13px] text-[#03002C]/80">{SJB_CLEAR_SPACE.rule}</p>
       <div className="flex justify-center rounded-xl border border-[#03002C]/10 bg-[#F2F2F2] p-6">
-        <div className="relative aspect-square w-full max-w-[320px]">
-          <div className="absolute inset-0 rounded-lg border-2 border-dashed border-[#003FC7]/60" aria-hidden="true" />
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-            style={{ width: `${badgeSize}%`, height: `${badgeSize}%` }}
-          >
-            <img src={SJB_LOGOS[0].svg} alt="San Juan Bowl badge with clear-space ring" className="h-full w-full object-contain" />
-          </div>
+        <div className="relative w-full max-w-[320px]" style={{ aspectRatio: `${boxW} / ${boxH}` }}>
+          <div className="absolute inset-0 rounded-sm border-2 border-dashed border-[#003FC7]/60" aria-hidden="true" />
+          <img
+            src={SJB_LOGOS[0].svg}
+            alt="San Juan Bowl badge with clear-space ring"
+            className="absolute max-w-none"
+            style={{
+              left: pct(x - art.left, boxW),
+              top: pct(x - art.top, boxH),
+              width: pct(art.artboard, boxW),
+              height: pct(art.artboard, boxH),
+            }}
+          />
           <div
             className="absolute left-1/2 top-0 flex -translate-x-1/2 flex-col items-center gap-0.5"
-            style={{ height: `${unit}%` }}
+            style={{ height: pct(x, boxH) }}
             aria-hidden="true"
           >
             <div className="h-full w-px bg-[#FFD600]" />
             <span className="whitespace-nowrap rounded bg-white/90 px-1.5 py-0.5 font-mono text-[10px] text-[#03002C]">
-              1 banner height
+              x = ribbon height
             </span>
           </div>
         </div>
       </div>
       <p className="text-[12px] text-[#666666]">
-        Nothing — type, rules, other logos, page edges — enters the dashed area.
+        Nothing — type, rules, other logos, page edges — enters the dashed area. Drawn to scale: the ring is exactly x from the badge on every side.
       </p>
     </div>
   );
@@ -345,6 +374,8 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
             <p className="mt-1 text-[13px] text-[#666666]">
               Two supplied variants from the designer's final package. Try each on different backgrounds before
               downloading — the right variant is the one that stays crisp.
+             Print vendors: each card has CMYK PDF, EPS and AI files with the master inks, or{" "}
+              <a href="/downloads/sjb-logo/sjb-logo-print-masters.zip" download className="font-semibold text-[#003FC7] hover:underline">download all print masters (ZIP)</a>.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
