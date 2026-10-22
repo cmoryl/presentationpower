@@ -266,7 +266,7 @@ c.showPage()
 import urllib.request, io
 head("Curved lettering and palm trees", "Logo pieces")
 curved = {k: ORIGIN + json.load(open(os.path.join(ROOT, f"src/assets/sjb/curved-lettering.{k}.asset.json")))["url"] for k in ("svg", "ai", "png")}
-cv = Image.open(io.BytesIO(urllib.request.urlopen(curved["png"]).read())).convert("RGBA")
+cv = Image.open(io.BytesIO(urllib.request.urlopen(urllib.request.Request(curved["png"], headers={"User-Agent": "Mozilla/5.0"})).read())).convert("RGBA")
 img(cv, M, 250, 300, 190, NAVY)
 c.setFont("GB", 10); c.setFillColor(INK); c.drawString(M, 232, "Curved SAN JUAN BOWL — on navy")
 nx = link("SVG", curved["svg"], M, 216, 8.5); nx = link("AI", curved["ai"], nx, 216, 8.5); link("PNG", curved["png"], nx, 216, 8.5)
