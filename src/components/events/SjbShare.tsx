@@ -45,11 +45,14 @@ export const SjbLink = forwardRef<HTMLAnchorElement, { page: SjbPage } & AnchorH
 /** Public address of the share link (works signed out). */
 export const SJB_SHARE_PATH = SHARE_PATHS.kit;
 
+/** Hidden for now by request: single-line/stacked lettering masters and the lettering specification. */
+export const SJB_LETTERING_SPEC_VISIBLE = false;
+
 const TABS: { page: Exclude<SjbPage, "event">; label: string }[] = [
   { page: "kit", label: "Brand kit" },
   { page: "designers", label: "For designers" },
   { page: "single", label: "Single colour" },
-  { page: "lettering", label: "Lettering spec" },
+  ...(SJB_LETTERING_SPEC_VISIBLE ? [{ page: "lettering" as const, label: "Lettering spec" }] : []),
   { page: "stadium", label: "Stadium 3D" },
 ];
 
