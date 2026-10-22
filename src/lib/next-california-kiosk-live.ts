@@ -824,7 +824,7 @@ export function buildKioskFrontSvg(
   L: LiveLayout,
   artSvg: string,
   edits: KioskEdits = {},
-  opts: { outline?: TextPathFn; fontCss?: string; family?: (font: string) => string } = {},
+  opts: { outline?: TextPathFn; fontCss?: string; family?: (font: string) => string; sceneHref?: string } = {},
 ): string {
   const placed = layoutKiosk(L, edits);
   const art = splitArtSvg(artSvg);
@@ -854,10 +854,13 @@ export function buildKioskFrontSvg(
   });
   parts.push(`</defs>`);
   const nat = L.native;
+  const scene = signScene(L.id, edits.scene);
   parts.push(
-    nat && !edits.ground
-      ? `<g id="Background"><rect x="${-B}" y="${-B}" width="${KW + 2 * B}" height="${KIOSK_H + 2 * B}" fill="#FFFFFF"/><use xlink:href="#art-${nat.bgSym ?? "bg"}" href="#art-${nat.bgSym ?? "bg"}" x="${nativeBgBox(L)[0]}" y="${nativeBgBox(L)[1]}" width="${nativeBgBox(L)[2]}" height="${nativeBgBox(L)[3]}"/></g>`
-      : `<g id="Background"><rect x="${-B}" y="${-B}" width="${KW + 2 * B}" height="${KIOSK_H + 2 * B}" fill="url(#kg)"/></g>`,
+    scene
+      ? `<g id="Background"><image href="${opts.sceneHref ?? scene.src}" xlink:href="${opts.sceneHref ?? scene.src}" x="${-B}" y="${-B}" width="${KW + 2 * B}" height="${KIOSK_H + 2 * B}" preserveAspectRatio="xMidYMid slice"/></g>`
+      : nat && !edits.ground
+        ? `<g id="Background"><rect x="${-B}" y="${-B}" width="${KW + 2 * B}" height="${KIOSK_H + 2 * B}" fill="#FFFFFF"/><use xlink:href="#art-${nat.bgSym ?? "bg"}" href="#art-${nat.bgSym ?? "bg"}" x="${nativeBgBox(L)[0]}" y="${nativeBgBox(L)[1]}" width="${nativeBgBox(L)[2]}" height="${nativeBgBox(L)[3]}"/></g>`
+        : `<g id="Background"><rect x="${-B}" y="${-B}" width="${KW + 2 * B}" height="${KIOSK_H + 2 * B}" fill="url(#kg)"/></g>`,
   );
   parts.push(`<g id="Graphics">`);
   for (const p of placed) {
