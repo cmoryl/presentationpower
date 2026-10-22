@@ -17,7 +17,8 @@ from reportlab.lib.colors import HexColor
 D = sys.argv[1]; SRC = os.path.join(D, "src"); os.makedirs(SRC, exist_ok=True)
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 for n in ("Poppins-Bold", "Poppins-Regular"):
-    pdfmetrics.registerFont(TTFont(n, f"/tmp/lwf/{n}.ttf"))
+    if os.path.exists(f"/tmp/lwf/{n}.ttf"):  # only needed for the NeXus/Hackathon pieces
+        pdfmetrics.registerFont(TTFont(n, f"/tmp/lwf/{n}.ttf"))
 pdfmetrics.registerFont(TTFont("Geist-Bold", os.path.join(ROOT, "public/fonts/Geist-Bold.ttf")))
 pdfmetrics.registerFont(TTFont("Geist-Regular", os.path.join(ROOT, "public/fonts/Geist-Regular.ttf")))
 
@@ -35,10 +36,13 @@ FORMATS = {
     "story": (1080, 1920, [240, 380, 600, 600], (86, 1180), (44, 1260), "center", 1050),
     "email": (600, 200, [24, 28, 210, 144], (22, 92), (15, 122), "left", 0),
     "pillar": (1728, 6912, [214, 500, 1300, 1300], (300, 3700), (0, 0), "center", 3240),
+    "flyer": (612, 792, [146, 80, 320, 320], (58, 520), (19, 575), "center", 460),
 }
 PLAN = [("nexus", "post"), ("nexus", "story"), ("nexus", "email"),
         ("hackathon", "post"), ("hackathon", "story"), ("hackathon", "email"),
-        ("sjb", "post"), ("sjb", "story"), ("sjb", "email"), ("sjb", "pillar")]
+        ("sjb", "post"), ("sjb", "story"), ("sjb", "email"), ("sjb", "pillar"), ("sjb", "flyer")]
+ONLY = sys.argv[2] if len(sys.argv) > 2 else None
+if ONLY: PLAN = [p for p in PLAN if f"{p[0]}-{p[1]}" == ONLY]
 
 
 def logo_pdf(svg, w, h):
@@ -51,7 +55,7 @@ def logo_pdf(svg, w, h):
 def build(ev, kind):
     e = EVENTS[ev]; W, H, lb, hd, sb, align, bar = FORMATS[kind]
     head = "WELCOME" if kind == "pillar" else e["head"]
-    if ev == "sjb" and kind in ("post", "story"): head = "San Juan Bowl"
+    if ev == "sjb" and kind in ("post", "story", "flyer"): head = "San Juan Bowl"
     path = os.path.join(SRC, f"{ev}-{kind}.pdf")
     c = canvas.Canvas(path, pagesize=(W, H))
     c.linearGradient(0, H, 0, 0, (HexColor(e["g0"]), HexColor(e["g1"])), extend=True)
@@ -61,7 +65,13 @@ def build(ev, kind):
         c.setFont(font, size)
         (c.drawCentredString if align == "center" else c.drawString)(tx, H - y, text)
     line(e["bold"], hd[0], hd[1], head)
-    if sb[0]: line(e["reg"], sb[0], sb[1], e["sub"])
+    if kind == "flyer" and ev == "sjb":
+        # Issued facts only: the venue is confirmed, the date is not.
+        line(e["reg"], sb[0], sb[1], "Hiram Bithorn Stadium · San Juan, Puerto Rico")
+        c.setFillColor(HexColor(e["accent"]))
+        line(e["reg"], 15, 610, "Date to be confirmed")
+        c.setFillColor(HexColor("#FFFFFF"))
+    elif sb[0]: line(e["reg"], sb[0], sb[1], e["sub"])
     if bar:
         c.setFillColor(HexColor(e["accent"])); bw = W * 0.12; c.rect(W / 2 - bw / 2, H - bar - W * 0.008, bw, W * 0.008, stroke=0, fill=1)
     c.save()

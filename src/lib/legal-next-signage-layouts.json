@@ -19720,5 +19720,125 @@
   "sign": {
    "margin": 36
   }
+ },
+ "divsign-sjb-first-flyer": {
+  "id": "divsign-sjb-first-flyer",
+  "source": "first version \u00b7 TransPerfect San Juan Bowl",
+  "trimW": 612.0,
+  "trimH": 792.0,
+  "originX": 0.0,
+  "originY": 0.0,
+  "mediaW": 612.0,
+  "mediaH": 792.0,
+  "texts": [
+   {
+    "id": "t0",
+    "text": "San Juan Bowl",
+    "font": "Geist-Bold",
+    "size": 58.0,
+    "color": "#FFFFFF",
+    "x": 95.34,
+    "y": 520.0,
+    "w": 421.31,
+    "top": 479.11,
+    "bottom": 537.11
+   },
+   {
+    "id": "t1",
+    "text": "Hiram Bithorn Stadium \u00b7 San Juan, Puerto Rico",
+    "font": "Geist-Regular",
+    "size": 19.0,
+    "color": "#FFFFFF",
+    "x": 102.12,
+    "y": 575.0,
+    "w": 407.76,
+    "top": 561.61,
+    "bottom": 580.61
+   },
+   {
+    "id": "t2",
+    "text": "Date to be confirmed",
+    "font": "Geist-Regular",
+    "size": 15.0,
+    "color": "#FFD600",
+    "x": 232.35,
+    "y": 610.0,
+    "w": 147.3,
+    "top": 599.42,
+    "bottom": 614.42
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b0",
+    "y0": 0,
+    "y1": 792.0,
+    "c0": 0,
+    "c1": 792.0,
+    "screen": false,
+    "parts": [
+     {
+      "id": "n0",
+      "x0": 269.28,
+      "y0": 460.0,
+      "x1": 342.72,
+      "y1": 464.9
+     },
+     {
+      "id": "n1",
+      "x0": 146.0,
+      "y0": 80.0,
+      "x1": 466.0,
+      "y1": 400.0
+     }
+    ]
+   }
+  ],
+  "ground": [
+   {
+    "offset": 0,
+    "color": "#0D0E21"
+   },
+   {
+    "offset": 1,
+    "color": "#0D0E21"
+   }
+  ],
+  "native": {
+   "version": "first-versions-2026-10-21",
+   "profile": "sRGB IEC61966-2.1",
+   "bgPage": 0,
+   "parts": {
+    "n0": {
+     "page": 1,
+     "kind": "vector"
+    },
+    "n1": {
+     "page": 2,
+     "kind": "vector"
+    }
+   },
+   "strips": {
+    "left": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    },
+    "right": {
+     "bg": 0,
+     "content": 0,
+     "w": 0
+    }
+   },
+   "bgBox": [
+    -9.0,
+    -9.0,
+    621.0,
+    801.0
+   ]
+  },
+  "sign": {
+   "margin": 36
+  }
  }
 }
