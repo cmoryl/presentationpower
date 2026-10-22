@@ -32,7 +32,7 @@ const PUBLIC_NO_LOGIN_PATHS = [
   "/vendor", // vendor hand-off packs: token-gated and expiring
   "/events/next/london", // print vendors: revision in force
   "/events/next/kiosk-editor", // opened inside BoothHub
-  "/events/san-juan-bowl/stadium", // live field 3D view: public by request
+  "/events/san-juan-bowl", // Bowl event info, brand kit, guide, lettering, single-colour and stadium: public by request
   "/convert", // cross-format adapter: shared with clients; account-bound features stay gated
   "/api",
   "/mcp",
