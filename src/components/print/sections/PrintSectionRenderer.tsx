@@ -482,14 +482,29 @@ export function PrintSectionsStack({
   mode,
   accent,
   density = "standard",
+  slots,
+  slot,
+  claimedSlots,
 }: {
   sections: PrintSection[] | undefined;
   mode: "light" | "dark";
   accent: string;
   /** Page density — scales the rhythm between modules with the document. */
   density?: "compact" | "standard" | "airy";
+  /** module id → built-in section key it replaced (renders in that section's place). */
+  slots?: Record<string, string>;
+  /** Render only modules anchored to this built-in section. */
+  slot?: string;
+  /** Slots the layout renders in place; the main stack skips those modules. */
+  claimedSlots?: readonly string[];
 }) {
-  const live = safeList(sections).filter((s) => s && !printSectionIsEmpty(s));
+  const live = safeList(sections)
+    .filter((s) => s && !printSectionIsEmpty(s))
+    .filter((s) => {
+      const at = slots?.[s.id];
+      if (slot) return at === slot;
+      return !at || !claimedSlots?.includes(at);
+    });
   if (live.length === 0) return null;
   // The STACK owns the vertical rhythm — modules themselves carry no margin, so
   // any mix of template blocks and newer modules spaces identically, and a

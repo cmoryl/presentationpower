@@ -836,6 +836,12 @@ function AssetEditor() {
         // hide it so the layout can't synthesise it back, and keep its copy.
         if (SECTION_CLEARABLE_FIELDS[replaceTarget]) {
           patch.hiddenSections = withSectionHidden(content, replaceTarget);
+          // Anchor the new module to the replaced section's place (layouts
+          // that support it render it there; others fall back to the stack).
+          patch.moduleSlots = {
+            ...((content as { moduleSlots?: Record<string, string> }).moduleSlots ?? {}),
+            [fit.section.id]: replaceTarget,
+          };
           replacedLabel =
             SECTION_DELETE_LABELS[replaceTarget] ?? replaceTarget.replace(/([A-Z])/g, " $1");
         }
