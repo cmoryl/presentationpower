@@ -17,7 +17,7 @@ from reportlab.lib.utils import ImageReader
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = "/tmp/sjb"
 ORIGIN = "https://transperfectelement.lovable.app"
-VERSION, RELEASED = "2.1", "22 October 2026"
+VERSION, RELEASED = "1.0", "22 October 2026"
 HISTORY = [
     ("2.0", "22 October 2026", ["Updated single-colour Black, Navy and White masters (AI/EPS/SVG/PNG as supplied).",
                                 "Added arched lettering only (Black, Navy, White) — limited use, by approval only; not an official Bowl logo.",
@@ -98,7 +98,7 @@ c.setFillColor("#FFFFFF"); c.setFont("GB", 34); c.drawString(M, H - 120, "TransP
 c.drawString(M, H - 160, "San Juan Bowl")
 c.setFont("G", 13); c.setFillColor(SKY); c.drawString(M, H - 192, "Brand guide · Logo, colour, type")
 c.setFont("G", 10.5); c.setFillColor("#FFFFFF"); c.drawString(M, H - 212, "Hiram Bithorn Stadium, San Juan, Puerto Rico")
-c.setFont("GB", 9); c.setFillColor(GOLD); c.drawString(M, 60, f"Version {VERSION} · Released {RELEASED} · Supersedes all earlier editions")
+c.setFont("GB", 9); c.setFillColor(GOLD); c.drawString(M, 60, f"Version {VERSION} · Released {RELEASED}")
 c.setFont("G", 10); c.setFillColor("#FFFFFF")
 para("Every image in this guide is the supplied artwork. Blue links open or download the live files — always use the latest from the live kit.", M, H - 240, 300, 10, color="#FFFFFF")
 c.showPage()
