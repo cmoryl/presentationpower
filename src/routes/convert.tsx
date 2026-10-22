@@ -65,6 +65,15 @@ import {
   uploadKindOf,
 } from "@/lib/convert-upload";
 import { structureConvertUpload } from "@/lib/convert-upload.functions";
+import {
+  CONVERT_ZIP_MAX_BYTES,
+  contentFromIdml,
+  isZipName,
+  readZipInventory,
+  zipEntryAsFile,
+  type ZipInventory,
+  type ZipPiece,
+} from "@/lib/convert-zip";
 import { seedContent, useDeckStore, type Brief } from "@/lib/deck-store";
 import { BRAND_MODES, byId, MODULE_FAMILIES, MODULE_VARIANTS } from "@/lib/taxonomy";
 
@@ -207,6 +216,47 @@ function ConvertPage() {
   // Uploaded artwork file (.ai / Canva PDF or PPTX export / SVG …).
   const [upload, setUpload] = useState<UploadState>({ status: "idle" });
   const structureUpload = useServerFn(structureConvertUpload);
+  // Live-file package (.zip): list every piece, user picks one to resize.
+  const [pkg, setPkg] = useState<{ name: string; zip: import("jszip"); inventory: ZipInventory } | null>(null);
+  const onZipFile = async (file: File) => {
+    if (file.size > CONVERT_ZIP_MAX_BYTES) {
+      setUpload({ status: "error", name: file.name, message: `That zip is ${Math.round(file.size / 1024 / 1024)} MB — the limit is 500 MB.` });
+      return;
+    }
+    setUpload({ status: "reading", name: file.name });
+    try {
+      const { zip, inventory } = await readZipInventory(file);
+      setPkg({ name: file.name, zip, inventory });
+      setUpload({ status: "idle" });
+      if (!inventory.pieces.some((p) => p.status === "ready")) toast.error("No readable live files in that zip — add Illustrator, IDML, PDF, SVG or Office files.");
+    } catch {
+      setUpload({ status: "error", name: file.name, message: "Couldn't open that zip — it may be damaged or password-protected." });
+    }
+  };
+  const onPickPiece = async (piece: ZipPiece) => {
+    if (!pkg) return;
+    setSourceKind("upload");
+    try {
+      const f = await zipEntryAsFile(pkg.zip, piece);
+      if (piece.kind === "idml") {
+        setUpload({ status: "reading", name: piece.name });
+        const content = await contentFromIdml(f);
+        if (!content) throw new Error("No live text found in that IDML — it may be outlined. Use its PDF instead.");
+        setUpload({ status: "done", name: piece.name, kindLabel: piece.label, content });
+        return;
+      }
+      await onUploadFile(f);
+    } catch (e) {
+      setUpload({ status: "error", name: piece.name, message: (e as Error).message || "Could not read that file." });
+    }
+  };
+  const onDropAny = (file: File) => {
+    if (isZipName(file.name)) { void onZipFile(file); return; }
+    setPkg(null);
+    setSourceKind("upload");
+    void onUploadFile(file);
+  };
+
   const onUploadFile = async (file: File) => {
     const kind = uploadKindOf(file.name);
     if (!kind) {
