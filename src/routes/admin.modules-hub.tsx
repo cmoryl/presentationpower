@@ -1,185 +1,59 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { AdminPageHeader } from "@/components/admin/AdminPage";
-import { PRINT_MODULE_COUNT } from "@/lib/print-library/section-modules";
+import { useServerFn } from "@tanstack/react-start";
+import { useMemo, useState } from "react";
+import { Search, RefreshCw, Download, ArrowUpRight, Layers, ShieldCheck, AlertTriangle } from "lucide-react";
+import { Button, Input, Badge } from "@/design-system/element";
+import { getModuleCatalogue } from "@/lib/module-catalogue.functions";
+import { buildModuleManifests } from "@/lib/module-catalogue";
+import { MODULE_CLASSES, manifestMatches, usageTotal, type ModuleManifest } from "@/lib/module-catalogue-core";
+import type { ModuleOverrideRow } from "@/lib/module-overrides";
+import { slideModuleAuthority } from "@/components/slide/module-registry";
+import "@/components/slide/modules/register-all";
+import { ModuleCatalogueDetail, downloadCatalogueJson } from "@/components/admin/ModuleCatalogueDetail";
 
 const TITLE = "Master modules · Admin · TransPerfect Element";
-const DESC =
-  "One place to see every module family in Element and how each is maintained, created, built, imported and exported.";
-
+const DESC = "Governed catalogue of presentation variants, team modules, print sections and derived adaptations, with usage, release controls and history.";
 export const Route = createFileRoute("/admin/modules-hub")({
-  head: () => ({
-    meta: [
-      { title: TITLE },
-      { name: "description", content: DESC },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESC },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  head: () => ({ meta: [{ title: TITLE }, { name: "description", content: DESC }, { property: "og:title", content: TITLE }, { property: "og:description", content: DESC }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: ModulesHub,
 });
-
-type Step = { label: string; to: string };
-type Family = {
-  name: string;
-  what: string;
-  countKey: "variants" | "custom" | "print" | null;
-  maintain: Step[];
-  create: Step[];
-  build: Step[];
-  importFrom: Step[];
-  exportTo: Step[];
-};
-
-const FAMILIES: Family[] = [
-  {
-    name: "Slide modules",
-    what: "The MV-* variants decks are built from, each permitted per section framework.",
-    countKey: "variants",
-    maintain: [{ label: "Module editor", to: "/admin/modules" }],
-    create: [{ label: "Module Studio", to: "/admin/module-studio" }],
-    build: [{ label: "Template Studio", to: "/looks" }],
-    importFrom: [{ label: "Imported decks", to: "/library/imported" }],
-    exportTo: [{ label: "Library (PPTX via deck export)", to: "/library" }],
-  },
-  {
-    name: "Custom modules",
-    what: "Team-made modules that go through review before anyone can use them.",
-    countKey: "custom",
-    maintain: [{ label: "My modules", to: "/library/my" }],
-    create: [{ label: "Module Studio", to: "/admin/module-studio" }],
-    build: [{ label: "Canvas Studio", to: "/admin/canvas" }],
-    importFrom: [{ label: "Overrides", to: "/library/overrides" }],
-    exportTo: [{ label: "Approvals (Modules tab)", to: "/approvals" }],
-  },
-  {
-    name: "Print section modules",
-    what: "The pm-* sections used by case studies, brochures, posters and print templates.",
-    countKey: "print",
-    maintain: [{ label: "Print modules", to: "/library/print/modules" }],
-    create: [{ label: "Print library", to: "/admin/print-library" }],
-    build: [{ label: "Print Studio", to: "/library/print" }],
-    importFrom: [{ label: "PDF ingestion", to: "/admin/pdf-ingest" }],
-    exportTo: [{ label: "Print audit", to: "/library/print/audit" }],
-  },
-  {
-    name: "Social modules",
-    what: "Layouts used in social and digital kits.",
-    countKey: null,
-    maintain: [{ label: "Social modules", to: "/social/modules" }],
-    create: [{ label: "Module Studio", to: "/admin/module-studio" }],
-    build: [{ label: "Convert to every size", to: "/convert" }],
-    importFrom: [{ label: "Convert (upload live files)", to: "/convert" }],
-    exportTo: [{ label: "Convert (Download all)", to: "/convert" }],
-  },
-];
-
-function useCount(table: "module_variants" | "custom_modules") {
-  return useQuery({
-    queryKey: ["modules-hub-count", table],
-    queryFn: async () => {
-      const { count, error } = await supabase
-        .from(table)
-        .select("*", { count: "exact", head: true });
-      if (error) return null;
-      return count ?? 0;
-    },
-  });
-}
-
-function StepLinks({ steps }: { steps: Step[] }) {
-  return (
-    <ul className="space-y-1">
-      {steps.map((s) => (
-        <li key={s.label}>
-          <Link to={s.to as never} className="text-sm text-primary underline-offset-2 hover:underline">
-            {s.label}
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-const COLS: { key: keyof Pick<Family, "maintain" | "create" | "build" | "importFrom" | "exportTo">; label: string }[] = [
-  { key: "maintain", label: "Maintain" },
-  { key: "create", label: "Create" },
-  { key: "build", label: "Build with" },
-  { key: "importFrom", label: "Import" },
-  { key: "exportTo", label: "Export / release" },
-];
-
+const selectClass = "h-9 min-w-0 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 function ModulesHub() {
-  const variants = useCount("module_variants");
-  const custom = useCount("custom_modules");
-  const counts = {
-    variants: variants.data,
-    custom: custom.data,
-    print: PRINT_MODULE_COUNT,
-  } as const;
-
-  return (
-    <div>
-      <AdminPageHeader eyebrow="Studios" title="Master modules" description={DESC} />
-
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
-        {[
-          { label: "Slide variants", v: counts.variants },
-          { label: "Custom modules", v: counts.custom },
-          { label: "Print sections", v: counts.print },
-        ].map((s) => (
-          <div key={s.label} className="rounded-md border border-black/10 p-4 dark:border-white/10">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">{s.label}</div>
-            <div className="mt-1 text-3xl font-semibold">{s.v ?? "—"}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[900px] border-collapse text-left">
-          <thead>
-            <tr className="border-b border-black/10 dark:border-white/10">
-              <th className="py-3 pr-4 text-sm font-semibold">Module family</th>
-              {COLS.map((c) => (
-                <th key={c.key} className="py-3 pr-4 text-sm font-semibold">{c.label}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {FAMILIES.map((f) => (
-              <tr key={f.name} className="border-b border-black/5 align-top dark:border-white/5">
-                <td className="py-4 pr-4">
-                  <div className="font-medium">
-                    {f.name}
-                    {f.countKey && counts[f.countKey] != null && (
-                      <span className="ml-2 text-sm text-muted-foreground">{counts[f.countKey]}</span>
-                    )}
-                  </div>
-                  <p className="mt-1 max-w-xs text-sm text-muted-foreground">{f.what}</p>
-                </td>
-                {COLS.map((c) => (
-                  <td key={c.key} className="py-4 pr-4">
-                    <StepLinks steps={f[c.key]} />
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <section className="mt-10 max-w-3xl space-y-2 text-sm leading-relaxed">
-        <h2 className="text-lg font-semibold">How a module moves through Element</h2>
-        <ol className="list-decimal space-y-1 pl-5">
-          <li>Create or import it in a studio.</li>
-          <li>Send it for review; decisions happen only on Approvals.</li>
-          <li>Once approved it appears in the library for decks, print and kits.</li>
-          <li>Exports run the normal QA checks before any file is written.</li>
-        </ol>
-      </section>
-    </div>
-  );
+  const fetchCatalogue = useServerFn(getModuleCatalogue);
+  const catalogue = useQuery({ queryKey: ["module-catalogue"], queryFn: () => fetchCatalogue(), staleTime: 30_000, retry: false });
+  const [query, setQuery] = useState(""); const [type, setType] = useState("all"); const [status, setStatus] = useState("all");
+  const [owner, setOwner] = useState("all"); const [surface, setSurface] = useState("all"); const [family, setFamily] = useState("all");
+  const [usage, setUsage] = useState("all"); const [brand, setBrand] = useState("all"); const [page, setPage] = useState(0);
+  const [selected, setSelected] = useState<string | null>(null); const [view, setView] = useState("catalogue");
+  const modules = useMemo(() => catalogue.data ? buildModuleManifests(catalogue.data, slideModuleAuthority) : [], [catalogue.data]);
+  const duplicateKeys = useMemo(() => {
+    const groups = new Map<string, ModuleManifest[]>();
+    for (const m of modules.filter((r) => r.classification !== "adaptation")) { const key = `${m.classification}:${m.label.trim().toLowerCase()}`; groups.set(key, [...(groups.get(key) ?? []), m]); }
+    return new Set([...groups.values()].filter((g) => g.length > 1).flatMap((g) => g.map((m) => m.key)));
+  }, [modules]);
+  const filtered = modules.filter((m) => manifestMatches(m, query) && (type === "all" || m.classification === type) && (status === "all" || m.lifecycle === status) && (owner === "all" || m.owner === owner) && (surface === "all" || m.surfaces.includes(surface)) && (family === "all" || m.family === family) && (brand === "all" || m.brandSupport.includes(brand)) && (usage === "all" || usage === "used" && usageTotal(m.usage) > 0 || usage === "unused" && usageTotal(m.usage) === 0 || usage === "warnings" && m.warnings.length > 0 || usage === "duplicates" && duplicateKeys.has(m.key)));
+  const shown = filtered.slice(page * 30, (page + 1) * 30);
+  const chosen = modules.find((m) => m.key === selected);
+  const systems = modules.filter((m) => m.classification === "system");
+  const registered = systems.filter((m) => !m.renderer.startsWith("Unregistered"));
+  const familyCoverage = [...new Set(systems.map((m) => m.family))].map((f) => ({ name: f, modules: systems.filter((m) => m.family === f) }));
+  function selectFilter(label: string, value: string, setter: (v: string) => void, options: string[], labels?: Record<string, string>) {
+    return <label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground"><span>{label}</span><select aria-label={label} className={selectClass} value={value} onChange={(e) => { setter(e.target.value); setPage(0); }}><option value="all">All {label.toLowerCase()}</option>{options.map((o) => <option key={o} value={o}>{labels?.[o] ?? o}</option>)}</select></label>;
+  }
+  return <div className="pb-16 text-foreground">
+    <header className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6"><div><p className="text-xs text-muted-foreground">Studios / Governance</p><h1 className="mt-2 text-3xl font-semibold">Master modules</h1><p className="mt-2 text-sm text-muted-foreground">Presentation · Print · Social · Events</p></div><div className="flex flex-wrap gap-2"><Button variant="outline" size="sm" disabled={catalogue.isFetching} onClick={() => void catalogue.refetch()}><RefreshCw />Refresh</Button><Button variant="outline" size="sm" disabled={!modules.length} onClick={() => downloadCatalogueJson({ checkedAt: catalogue.data?.checkedAt, complete: catalogue.data?.complete, modules: filtered }, "element-module-catalogue.json")}><Download />Export catalogue</Button><Button asChild size="sm"><Link to="/admin/module-studio"><Layers />Create module</Link></Button></div></header>
+    <div className="mb-6 grid grid-cols-2 gap-4 border-b border-border pb-6 lg:grid-cols-5">{Object.entries(MODULE_CLASSES).map(([key, label]) => <div key={key}><div className="text-3xl font-semibold">{catalogue.isPending ? "—" : modules.filter((m) => m.classification === key).length}</div><div className="mt-1 text-xs text-muted-foreground">{label}</div></div>)}</div>
+    <div className="mb-5 flex flex-wrap items-center gap-2 border-b border-border pb-3"><Button size="sm" variant={view === "catalogue" ? "secondary" : "ghost"} onClick={() => setView("catalogue")}><Layers />Catalogue</Button><Button size="sm" variant={view === "coverage" ? "secondary" : "ghost"} onClick={() => setView("coverage")}><ShieldCheck />Renderer coverage</Button><Button asChild size="sm" variant="ghost"><Link to="/approvals" search={{ tab: "modules" }}>Module reviews<ArrowUpRight /></Link></Button><Button asChild size="sm" variant="ghost"><Link to="/admin/modules">Master editor<ArrowUpRight /></Link></Button><span className="ml-auto text-xs text-muted-foreground">{catalogue.data ? `Checked ${new Date(catalogue.data.checkedAt).toLocaleTimeString()}` : "Loading catalogue"}</span></div>
+    {catalogue.error && <div role="alert" className="mb-5 border border-destructive p-4 text-sm text-destructive">{catalogue.error.message}<Button className="ml-3" size="sm" variant="outline" onClick={() => void catalogue.refetch()}>Retry</Button></div>}
+    {!!catalogue.data?.errors.length && <div role="alert" className="mb-5 flex items-start gap-2 border border-border bg-muted p-3 text-sm"><AlertTriangle className="size-4 shrink-0" /><span>Incomplete usage check: {catalogue.data.errors.join("; ")}. Retirement is disabled until the check succeeds.</span></div>}
+    {view === "coverage" ? <section><h2 className="text-xl font-semibold">{registered.length} / {systems.length} presentation variants registered</h2><div className="mt-4 overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr className="border-b border-border"><th className="py-3">Family</th><th>Registered</th><th>Fallback</th><th>Renderer owners</th></tr></thead><tbody>{familyCoverage.map((f) => <tr key={f.name} className="border-b border-border"><td className="py-3 pr-3 font-medium">{f.name}</td><td>{f.modules.filter((m) => !m.renderer.startsWith("Unregistered")).length} / {f.modules.length}</td><td>{f.modules.filter((m) => m.renderer.startsWith("Unregistered")).length}</td><td className="max-w-md text-xs text-muted-foreground">{[...new Set(f.modules.map((m) => m.renderer))].join(" · ")}</td></tr>)}</tbody></table></div></section> : <>
+      <div className="mb-4 flex items-center gap-2"><Search className="size-4 text-muted-foreground" /><Input aria-label="Search all modules" placeholder="Search name, id, family, owner or tags" value={query} onChange={(e) => { setQuery(e.target.value); setPage(0); }} className="max-w-xl" /></div>
+      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">{selectFilter("Type", type, setType, Object.keys(MODULE_CLASSES), MODULE_CLASSES)}{selectFilter("Status", status, setStatus, ["shipped", "draft", "in-review", "approved", "changes-requested", "retired"])}{selectFilter("Owner", owner, setOwner, [...new Set(modules.map((m) => m.owner))].sort())}{selectFilter("Surface", surface, setSurface, ["Presentation", "Print", "Social", "Event"])}{selectFilter("Family", family, setFamily, [...new Set(modules.map((m) => m.family))].sort())}{selectFilter("Brand", brand, setBrand, [...new Set(modules.flatMap((m) => m.brandSupport))].sort())}{selectFilter("Usage", usage, setUsage, ["used", "unused", "warnings", "duplicates"], { used: "Has recorded usage", unused: "No recorded references", warnings: "Needs attention", duplicates: "Duplicate names" })}<div className="flex items-end"><Button variant="ghost" size="sm" onClick={() => { setQuery(""); setType("all"); setStatus("all"); setOwner("all"); setSurface("all"); setFamily("all"); setBrand("all"); setUsage("all"); setPage(0); }}>Clear filters</Button></div></div>
+      <div className="overflow-x-auto"><table className="w-full min-w-[900px] text-left text-sm"><thead><tr className="border-b border-border text-xs text-muted-foreground"><th className="py-3 pr-4">Module</th><th className="pr-4">Type / surface</th><th className="pr-4">State</th><th className="pr-4">Owner / revision</th><th className="pr-4">Recorded usage</th><th className="pr-4">Modified</th><th><span className="sr-only">Open module</span></th></tr></thead><tbody>{shown.map((m) => <tr key={m.key} className="border-b border-border align-top hover:bg-muted/40"><td className="max-w-80 py-4 pr-4"><Button variant="link" className="h-auto justify-start whitespace-normal p-0 text-left text-sm font-semibold" onClick={() => setSelected(m.key)}>{m.label}</Button><div className="mt-1 break-all font-mono text-xs text-muted-foreground">{m.id}</div><div className="mt-1 text-xs text-muted-foreground">{m.family}{duplicateKeys.has(m.key) ? " · duplicate name" : ""}</div></td><td className="max-w-52 py-4 pr-4"><div className="text-xs">{MODULE_CLASSES[m.classification]}</div><div className="mt-1 text-xs text-muted-foreground">{m.surfaces.join(" / ")}</div></td><td className="py-4 pr-4"><Badge variant={m.lifecycle === "retired" ? "outline" : "secondary"}>{m.lifecycle}</Badge>{m.warnings.length > 0 && <div className="mt-1 text-xs text-muted-foreground">{m.warnings.length} checks</div>}</td><td className="py-4 pr-4"><div>{m.owner}</div><div className="mt-1 text-xs text-muted-foreground">{m.version ? `Revision ${m.version}` : "Code / no snapshot"}</div></td><td className="py-4 pr-4"><div className="font-medium">{usageTotal(m.usage)}{!m.usageComplete ? "+" : ""}</div><div className="mt-1 text-xs text-muted-foreground">{m.usage.decks} decks · {m.usage.print} print<br />{m.usage.templates} templates · {m.usage.social + m.usage.events} kits/signs</div></td><td className="py-4 pr-4 text-xs text-muted-foreground">{m.modifiedAt ? new Date(m.modifiedAt).toLocaleDateString() : "Code release"}</td><td className="py-3"><Button variant="ghost" size="icon" title={`Inspect ${m.label}`} aria-label={`Inspect ${m.label}`} onClick={() => setSelected(m.key)}><ArrowUpRight /></Button></td></tr>)}</tbody></table></div>
+      {!shown.length && <p className="py-10 text-sm text-muted-foreground">{catalogue.isPending ? "Loading module records…" : "No matching modules."}</p>}
+      <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground"><span>{filtered.length} matching records · {duplicateKeys.size} duplicate-name entries</span><div className="flex items-center gap-2"><Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>Previous</Button><span>Page {page + 1} / {Math.max(1, Math.ceil(filtered.length / 30))}</span><Button variant="outline" size="sm" disabled={(page + 1) * 30 >= filtered.length} onClick={() => setPage((p) => p + 1)}>Next</Button></div></div>
+    </>}
+    {chosen && <ModuleCatalogueDetail module={chosen} overrides={(catalogue.data?.overrides ?? []) as unknown as ModuleOverrideRow[]} onClose={() => setSelected(null)} />}
+  </div>;
 }
