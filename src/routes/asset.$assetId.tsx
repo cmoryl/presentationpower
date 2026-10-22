@@ -1904,6 +1904,19 @@ function AssetEditor() {
                       <SectionSelectOverlay
                         canvasRef={canvasRef}
                         scanKey={rawContent}
+                        onMove={(key, targetKey, place) => {
+                          const id = key.slice("module:".length);
+                          const tid = targetKey.slice("module:".length);
+                          const mods = [...((rawContent as { modules?: PrintSection[] }).modules ?? [])];
+                          const from = mods.findIndex((m) => m.id === id);
+                          if (from < 0 || id === tid) return;
+                          const [item] = mods.splice(from, 1);
+                          let to = mods.findIndex((m) => m.id === tid);
+                          if (to < 0) return;
+                          if (place === "after") to += 1;
+                          mods.splice(to, 0, item);
+                          patchContent({ modules: mods } as never);
+                        }}
                         onDelete={(key) => {
                           if (key.startsWith("module:")) {
                             const id = key.slice("module:".length);
