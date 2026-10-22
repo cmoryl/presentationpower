@@ -49,13 +49,13 @@ page_no = [0]
 TOC = []
 
 
-def img(name, x, y, w, h, bg=None):
+def img(name, x, y, w, h, bg=None, frame=True):
     if bg:
         c.setFillColor(bg); c.rect(x, y, w, h, stroke=0, fill=1)
     im = Image.open(os.path.join(SRC, name)) if isinstance(name, str) else name
     iw, ih = im.size; s = min(w / iw, h / ih) * 0.86
     c.drawImage(ImageReader(im), x + (w - iw * s) / 2, y + (h - ih * s) / 2, iw * s, ih * s, mask="auto")
-    c.setStrokeColor("#D9DCE5"); c.rect(x, y, w, h, stroke=1, fill=0)
+    if frame: c.setStrokeColor("#D9DCE5"); c.rect(x, y, w, h, stroke=1, fill=0)
 
 
 def link(label, url, x, y, size=9):
@@ -93,7 +93,7 @@ def para(text, x, y, w, size=9.5, font="G", lead=1.4, color=INK):
 # 1 cover
 page_no[0] += 1
 c.setFillColor(NAVY); c.rect(0, 0, W, H, stroke=0, fill=1)
-img("sjb-logo-dark.png", W / 2 - 40, 70, 400, 470)
+img("sjb-logo-dark.png", W / 2 - 40, 70, 400, 470, frame=False)
 c.setFillColor("#FFFFFF"); c.setFont("GB", 34); c.drawString(M, H - 120, "TransPerfect")
 c.drawString(M, H - 160, "San Juan Bowl")
 c.setFont("G", 13); c.setFillColor(SKY); c.drawString(M, H - 192, "Brand guide · Logo, colour, type")
@@ -101,10 +101,6 @@ c.setFont("G", 10.5); c.setFillColor("#FFFFFF"); c.drawString(M, H - 212, "Hiram
 c.setFont("GB", 9); c.setFillColor(GOLD); c.drawString(M, 60, f"Version {VERSION} · Released {RELEASED} · Supersedes all earlier editions")
 c.setFont("G", 10); c.setFillColor("#FFFFFF")
 para("Every image in this guide is the supplied artwork. Blue links open or download the live files — always use the latest from the live kit.", M, H - 240, 300, 10, color="#FFFFFF")
-y = 230
-c.setFont("GB", 10); c.setFillColor(GOLD)
-for label, u in [("Open the live brand kit", "/events/san-juan-bowl/brand-kit"), ("Single-colour logos", "/events/san-juan-bowl/brand-kit/single-colour"), ("Share link (no sign-in)", "/share/san-juan-bowl")]:
-    t = label + "  ↗"; c.drawString(M, y, t); c.linkURL(ORIGIN + u, (M, y - 2, M + c.stringWidth(t, "GB", 10), y + 10)); y -= 20
 c.showPage()
 
 # 2 logo variants
