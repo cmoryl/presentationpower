@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SjbLink } from "@/components/events/SjbShare";
 import { SjbLetteringStacked } from "@/components/events/SjbLetteringStacked";
+import { SjbLockups, SjbSmallMark } from "@/components/events/SjbMarkLockups";
 import {
   SJB_CLEAR_SPACE,
   SJB_COLORS,
@@ -97,6 +98,8 @@ export function SjbGuideSections() {
           </div>
         </div>
         <div className="mt-4"><SjbLetteringStacked compact /></div>
+        <div className="mt-4"><SjbSmallMark compact /></div>
+        <div className="mt-4"><SjbLockups /></div>
         <h3 className="mt-6 text-sm font-bold text-foreground">Palm trees from the logo</h3>
         <p className="text-xs text-muted-foreground">The badge's own palms, supplied as standalone artwork for patterns, corners and merchandise. Use as supplied; never redraw, recolour (except the one-colour file) or stretch.</p>
         <div className="mt-3 grid gap-4 md:grid-cols-2 lg:grid-cols-4">

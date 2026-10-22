@@ -176,9 +176,77 @@ export const SJB_LARGE_FORMAT = {
 /** Smallest sizes the badge may reproduce at before detail is lost. */
 export const SJB_MIN_SIZES = [
   { context: "Print", minimum: "40 mm wide", note: "Keeps the 7.8-unit keyline at 0.26 mm; at 25 mm it drops to 0.16 mm and the lace and letter details to 0.07 mm, below what presses hold." },
-  { context: "Screen", minimum: "160 px wide", note: "Every line stays at or above 1 px. Below 160 px the detail fills in on every version, including single colour — keep the badge at 160 px or larger until a small-size mark is approved." },
+  { context: "Screen", minimum: "160 px wide", note: "Every line stays at or above 1 px. Below 160 px the detail fills in on every version, including single colour — use the small-size mark (lettering shield) instead, from 160 px down to 48 px high." },
   { context: "Embroidery / patch (full colour)", minimum: "90 mm wide", note: "Stitching needs about 1 mm per detail; at 60 mm the keyline is 0.39 mm. One-colour embroidery can go to 60 mm with a digitiser stitch-out (see Single colour)." },
 ] as const;
+
+/**
+ * Small-size mark (approved Oct 2026): the badge frame at 3/4 scale around the exact 3-line stacked
+ * lettering at scale 1. Generated with the lettering construction — never redraw or retype it.
+ */
+export const SJB_SMALL_MARK = {
+  dir: "/downloads/sjb-mark",
+  svg: "/downloads/sjb-mark/sjb-mark-shield.svg",
+  pack: "/downloads/sjb-mark/sjb-mark-pack.zip",
+  use: "Below 160 px, where the badge's ribbon, lettering and waves fill in: social avatars, app icons, browser tabs, merch tags, video watermarks. Use it from 160 px down to 48 px high; at 16–32 px (favicon) it reads as the shield shape.",
+  rules: [
+    "Never use it next to the full badge — it stands in for the badge, it doesn't sit beside it.",
+    "Above 160 px (or 40 mm in print), use the full badge.",
+    "Works on white, light gray and Bowl Navy as supplied — the gold keyline carries the edge on navy.",
+    "Don't add the sun, waves or the TransPerfect ribbon, and don't recolour the frame or lettering.",
+  ],
+  geometry: [
+    { label: "Frame", value: "Badge frame × 3/4: roof 35 : 18 (27.2°), side 70.1°, walls, V arcs R 906" },
+    { label: "Bands", value: "Navy 16.5 · gold keyline 12 (true offsets — arcs stay concentric)" },
+    { label: "Lettering", value: "3-line stacked master at scale 1, translated only (−271.671875, 180.375)" },
+    { label: "Clearance", value: "69 units (0.575 cap height) above SAN, beside JUAN and below BOWL" },
+    { label: "Proportion", value: "741 × 902 (1 : 1.217)" },
+  ],
+  files: [
+    { label: "SVG", file: "sjb-mark-shield.svg" },
+    { label: "PDF (CMYK)", file: "sjb-mark-shield-cmyk.pdf" },
+    { label: "EPS (CMYK)", file: "sjb-mark-shield-cmyk.eps" },
+    { label: "PNG 1024", file: "sjb-mark-shield-1024.png" },
+    { label: "PNG 512", file: "sjb-mark-shield-512.png" },
+    { label: "PNG 160", file: "sjb-mark-shield-160.png" },
+    { label: "PNG 64", file: "sjb-mark-shield-64.png" },
+    { label: "PNG 48", file: "sjb-mark-shield-48.png" },
+    { label: "Avatar 1080 (navy)", file: "sjb-mark-avatar-1080.png" },
+    { label: "App icon 512", file: "sjb-mark-icon-512.png" },
+    { label: "App icon 192", file: "sjb-mark-icon-192.png" },
+    { label: "Apple touch 180", file: "sjb-mark-apple-touch-icon-180.png" },
+    { label: "Favicon (ICO)", file: "sjb-mark-favicon.ico" },
+  ],
+} as const;
+
+/**
+ * Lockups (approved Oct 2026): editable SVG templates with the badge copied in untouched, x clear space
+ * on every side, live Geist text and dashed placeholder groups for team and partner logos.
+ */
+export const SJB_LOCKUPS = {
+  dir: "/downloads/sjb-lockups",
+  pack: "/downloads/sjb-lockups/sjb-lockups-pack.zip",
+  items: [
+    {
+      id: "team-matchup",
+      name: "Team matchup",
+      use: "Game-day graphics, tickets, scoreboard and social. Team A · badge · Team B with the venue line.",
+      rules: "Team logos sit inside the 780-unit square slots (2/3 of badge height), 1.6x from the badge, never larger than the badge. Names Geist Bold, venue line Geist Regular.",
+    },
+    {
+      id: "official-partner",
+      name: "Official partner",
+      use: "Sponsor kits and partner co-marketing.",
+      rules: "Rule at x from the badge; OFFICIAL PARTNER label and partner logo start at 2x. The partner logo fits inside its 1100 × 480 slot and never exceeds the badge height.",
+    },
+    {
+      id: "venue-date",
+      name: "Badge + venue / date",
+      use: "Save-the-dates, posters, invitations and email headers.",
+      rules: "Gold rule 240 × 9 at 0.5x under the badge, then HIRAM BITHORN STADIUM (Geist Bold) and the city/date line (Geist Regular). DATE TBC stays until the organisers confirm the date.",
+    },
+  ],
+} as const;
 
 /** Approved backgrounds and which variant sits on each. */
 export const SJB_BACKGROUNDS: ReadonlyArray<{

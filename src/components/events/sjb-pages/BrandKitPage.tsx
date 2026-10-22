@@ -12,6 +12,7 @@ import { Link } from "@tanstack/react-router";
 import { KitSignList } from "@/components/events/KitSignList";
 import { SjbLink, SjbShareLinkButton, SjbShell, useSjbShare } from "@/components/events/SjbShare";
 import { SjbSingleColour } from "@/components/events/SjbSingleColour";
+import { SjbLockups, SjbSmallMark } from "@/components/events/SjbMarkLockups";
 import { BRAND } from "@/lib/brand-colors";
 import {
   SJB_BACKGROUNDS,
@@ -388,6 +389,10 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
             <ClearSpaceDiagram />
             <MinSizeCard />
           </div>
+
+          <SjbSmallMark />
+          {/* The designers page already shows the lockups in its guide sections. */}
+          {!embedded && <SjbLockups />}
 
           <SjbSingleColour className="pt-2" />
 
