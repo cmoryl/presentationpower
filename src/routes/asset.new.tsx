@@ -134,7 +134,7 @@ function NewAssetPage() {
             client: prospect.trim(),
             industry: "",
             audience: "",
-            summary: "",
+            summary: name,
             challenge: { heading: "", body: "" },
             solution: { heading: "", body: "" },
             result: { heading: "", body: "" },

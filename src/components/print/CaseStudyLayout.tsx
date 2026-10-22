@@ -198,13 +198,13 @@ export function CaseStudyLayout({
               }}
             >
               <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
-                <PrintEyebrow
+                {content.eyebrow === "" ? <span /> : <PrintEyebrow
                   label={content.eyebrow ?? "CLIENT CASE STUDY"}
                   mode={mode}
                   accent={accent}
                   cq={cq}
                   onDark
-                />
+                />}
                 <div className="flex items-center" style={{ gap: cq(10) }}>
                   {content.clientLogoUrl ? (
                     <>
