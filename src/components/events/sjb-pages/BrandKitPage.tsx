@@ -348,7 +348,7 @@ export function SjbBrandKit() {
             download="SJB-Master-Logo-Kit-v2.1.zip"
             className="ml-2 mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/20 px-4 py-2 text-[13px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]"
           >
-            <Download className="h-4 w-4" /> Master logo kit v2.1 (ZIP, 18 MB)
+            <Download className="h-4 w-4" /> Master logo kit v2.1 (ZIP, 16 MB)
           </a>
           {!share && (
             <Link
