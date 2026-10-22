@@ -59,6 +59,7 @@ import {
   type TextAlign,
   cmykScreen, rotatedBox } from "@/lib/next-california-kiosk-live";
 import { downloadKiosk, loadArtSvg, type KioskDownload } from "@/lib/next-california-kiosk-live-export";
+import { signScene, signScenes } from "@/lib/sign-scene-backgrounds";
 import { kioskCmykMaster } from "@/lib/next-california-kiosk-cmyk-masters";
 import { markArt, markFamilyFor, markH, markTransform, type KioskMark } from "@/lib/kiosk-marks";
 import { NEXT_LOGO_COLOURWAY_LABELS, nextLogoColourways, type NextLogoColourway } from "@/lib/next-logo-vectors";
@@ -271,6 +272,8 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
   const placed = useMemo(() => layoutKiosk(L, edits), [L, edits]);
   const bands = useMemo(() => stepBands(L.stepGuides, L.trimH), [L]);
   const ground = kioskGround(L, edits);
+  const scenes = signScenes(L.id);
+  const scene = signScene(L.id, edits.scene);
   const symId = `kart-${L.id}`;
 
   const commit = (next: KioskEdits) => { setHistory((h) => [...h.slice(-49), edits]); setFuture([]); setEdits(next); };
@@ -1046,7 +1049,9 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
                     ) : null}
                   </g>
                 ) : null}
-                {L.native && !edits.ground && !L.groundOnly ? (
+                {scene ? (
+                  <svg x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} viewBox={`${-B} ${-B} ${KIOSK_W + 2 * B} ${KIOSK_H + 2 * B}`} overflow="hidden" pointerEvents="none"><image href={scene.src} x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} preserveAspectRatio="xMidYMid slice" /></svg>
+                ) : L.native && !edits.ground && !L.groundOnly ? (
                   <>{/* Paper is white: unprinted areas of the designer file show as white, not transparent. */}<rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill="#FFFFFF" pointerEvents="none" /><svg x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} viewBox={`${-B} ${-B} ${KIOSK_W + 2 * B} ${KIOSK_H + 2 * B}`} overflow="hidden" pointerEvents="none">{/* Clip to the bleed: some supplied grounds carry page white beyond it. */}<use href={`#${symId}-${L.native.bgSym ?? "bg"}`} x={nativeBgBox(L)[0]} y={nativeBgBox(L)[1]} width={nativeBgBox(L)[2]} height={nativeBgBox(L)[3]} pointerEvents="none" /></svg></>
                 ) : (
                   <rect x={-B} y={-B} width={KIOSK_W + 2 * B} height={KIOSK_H + 2 * B} fill={`url(#kg-${L.id})`} />
@@ -1494,25 +1499,39 @@ function KioskFaceEditor({ layout: L, front, face, onFace, vendor, fill = false,
               </Sec>
 
               <Sec title="Background">
+                {scenes.length ? (
+                  <div className="mb-3">
+                    <p className="mb-1.5 text-[10.5px] text-white/55">Scene backgrounds</p>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {scenes.map((s) => (
+                        <button key={s.id} type="button" title={s.label} aria-label={s.label} aria-pressed={edits.scene === s.id}
+                          onClick={() => commit({ ...edits, ground: null, scene: s.id })}
+                          className="h-14 rounded-sm border border-white/15 bg-cover bg-center aria-pressed:ring-2 aria-pressed:ring-[#A1FBF9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+                          style={{ backgroundImage: `url(${s.src})` }} />
+                      ))}
+                    </div>
+                    <p className="mt-1 text-[10.5px] text-white/50">{scene ? scene.label : "Pick a scene, or keep the supplied artwork below"}</p>
+                  </div>
+                ) : null}
                 {L.sign ? (
                   <div className="mb-3">
                     <p className="mb-1.5 text-[10.5px] text-white/55">Approved NEXT backgrounds</p>
                     <div className="grid grid-cols-4 gap-1.5">
-                      <button type="button" title="As supplied" aria-pressed={!edits.ground} onClick={() => commit({ ...edits, ground: null })}
+                      <button type="button" title="As supplied" aria-pressed={!edits.ground && !scene} onClick={() => commit({ ...edits, ground: null, scene: null })}
                         className="flex h-10 items-center justify-center rounded-sm border border-white/15 text-[9.5px] text-white/70 aria-pressed:ring-2 aria-pressed:ring-[#A1FBF9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]">Supplied</button>
                       {SIGN_GROUNDS.map(([id, g]) => (
-                        <button key={id} type="button" title={g.label} aria-label={g.label} aria-pressed={edits.ground?.styleId === id}
-                          onClick={() => commit({ ...edits, ground: { top: g.stops[0]!, bottom: g.stops[g.stops.length - 1]!, stops: g.stops, styleId: id } })}
+                        <button key={id} type="button" title={g.label} aria-label={g.label} aria-pressed={!scene && edits.ground?.styleId === id}
+                          onClick={() => commit({ ...edits, ground: { top: g.stops[0]!, bottom: g.stops[g.stops.length - 1]!, stops: g.stops, styleId: id }, scene: null })}
                           className="h-10 rounded-sm border border-white/15 aria-pressed:ring-2 aria-pressed:ring-[#A1FBF9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
                           style={{ background: `linear-gradient(180deg, ${g.stops.join(", ")})` }} />
                       ))}
                     </div>
-                    <p className="mt-1 text-[10.5px] text-white/50">{edits.ground?.styleId ? LONDON_STYLES[edits.ground.styleId]?.label : edits.ground ? "Custom colours" : "As supplied"}</p>
+                    <p className="mt-1 text-[10.5px] text-white/50">{scene ? scene.label : edits.ground?.styleId ? LONDON_STYLES[edits.ground.styleId]?.label : edits.ground ? "Custom colours" : "As supplied"}</p>
                   </div>
                 ) : null}
                 <div className="flex gap-3 text-[10.5px] text-white/55">
-                  <label className="flex items-center gap-1.5">Top <input type="color" className="h-7 w-9 rounded-sm border border-white/10 bg-transparent" value={ground[0]!.color} onChange={(e) => commit({ ...edits, ground: { top: e.target.value.toUpperCase(), bottom: ground[ground.length - 1]!.color } })} /></label>
-                  <label className="flex items-center gap-1.5">Bottom <input type="color" className="h-7 w-9 rounded-sm border border-white/10 bg-transparent" value={ground[ground.length - 1]!.color} onChange={(e) => commit({ ...edits, ground: { top: ground[0]!.color, bottom: e.target.value.toUpperCase() } })} /></label>
+                  <label className="flex items-center gap-1.5">Top <input type="color" className="h-7 w-9 rounded-sm border border-white/10 bg-transparent" value={ground[0]!.color} onChange={(e) => commit({ ...edits, ground: { top: e.target.value.toUpperCase(), bottom: ground[ground.length - 1]!.color }, scene: null })} /></label>
+                  <label className="flex items-center gap-1.5">Bottom <input type="color" className="h-7 w-9 rounded-sm border border-white/10 bg-transparent" value={ground[ground.length - 1]!.color} onChange={(e) => commit({ ...edits, ground: { top: ground[0]!.color, bottom: e.target.value.toUpperCase() }, scene: null })} /></label>
                 </div>
                 <p className="text-[10.5px] text-white/50">The side strips carry the same background ramp.</p>
               </Sec>
