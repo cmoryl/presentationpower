@@ -95,6 +95,7 @@ export function SjbSingleColour({ className }: SjbSingleColourProps) {
     <div className="space-y-3 pt-4">
       <div><h3 id="sjb-1c-lettering" className="text-[17px] font-bold">Lettering only (arched)</h3>
         <p className="mt-1 text-[13px] text-muted-foreground">The arched TRANSPERFECT / SAN JUAN / BOWL wording from the logo, without the badge. Supplied files in one colour, transparent background.</p></div>
+      <p role="note" className="rounded-md border border-border bg-muted p-3 text-sm font-semibold">Limited use, by approval only. This is not an official Bowl logo.</p>
       <div className="grid gap-4 md:grid-cols-3">
         {LETTERING.map(l => <article key={l.id} className="overflow-hidden rounded-md border border-border">
           <div className="aspect-[5/2] p-6" style={{ background: l.ground }}><img src={l.preview} alt={`San Juan Bowl arched lettering only, ${l.name}`} className="h-full w-full object-contain" /></div>
