@@ -333,6 +333,17 @@ function AssetEditor() {
   // "features") instead of appending — this is what the canvas Replace action
   // arms so picking a module swaps rather than piles on.
   const [replaceTarget, setReplaceTarget] = useState<string | null>(null);
+  // The pinned preview sits just under the editor toolbar, whose height
+  // changes as its buttons wrap.
+  const [toolbarH, setToolbarH] = useState(64);
+  const toolbarRoRef = useRef<ResizeObserver | null>(null);
+  const pinToolbarRef = useCallback((el: HTMLDivElement | null) => {
+    toolbarRoRef.current?.disconnect();
+    if (!el) return;
+    const ro = new ResizeObserver(() => setToolbarH(el.offsetHeight));
+    ro.observe(el);
+    toolbarRoRef.current = ro;
+  }, []);
   // Canvas "Edit" deep-link: id of the stacked module to reveal in the Shared
   // modules panel, plus a nonce that force-opens the panel on each click.
   const [moduleFocus, setModuleFocus] = useState<{ id: string; nonce: number } | null>(null);
