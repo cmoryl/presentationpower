@@ -282,10 +282,10 @@ para("Palms are taken from the logo. Use as supplied; only the one-colour file m
 c.showPage()
 
 # 15 shield mark + lockups
-head("Shield mark and lockups", "Logo pieces")
+head("Small-size mark and lockups", "Logo pieces")
 img(local("sjb-mark/sjb-mark-shield-512.png"), M, 260, 180, 180, "#FFFFFF")
-c.setFont("GB", 10); c.setFillColor(INK); c.drawString(M, 242, "Shield mark (icons, avatars)")
-nx = link("SVG", dl("sjb-mark/sjb-mark-shield.svg"), M, 226, 8.5); nx = link("CMYK PDF", dl("sjb-mark/sjb-mark-shield-cmyk.pdf"), nx, 226, 8.5); link("EPS", dl("sjb-mark/sjb-mark-shield-cmyk.eps"), nx, 226, 8.5)
+c.setFont("GB", 10); c.setFillColor(INK); c.drawString(M, 242, "Small-size mark — the badge")
+nx = link("SVG", dl("sjb-mark/sjb-mark-shield.svg"), M, 226, 8.5); link("PNG 512", dl("sjb-mark/sjb-mark-shield-512.png"), nx, 226, 8.5)
 link("Mark pack (ZIP)", dl("sjb-mark/sjb-mark-pack.zip"), M, 208, 8.5)
 lk = [("official-partner", "Official partner"), ("team-matchup", "Team matchup"), ("venue-date", "Venue and date")]
 lw2 = (W - M - (M + 210) - 24) / 3
@@ -315,7 +315,7 @@ URL["curved-lettering.svg"], URL["curved-lettering.ai"] = curved["svg"], curved[
 rows += [("Event name lettering", ["sjb-lettering-exact.svg", "sjb-lettering-exact-navy.svg", "sjb-lettering-exact-navy-white.svg", "sjb-lettering-spec.pdf", "sjb-lettering-stacked-pack.zip"]),
          ("Curved lettering", ["curved-lettering.svg", "curved-lettering.ai"]),
          ("Palm trees", ["sjb-palms-pair.svg", "sjb-palms-pair-1color.svg", "sjb-palm-left.svg", "sjb-palm-right.svg"]),
-         ("Shield mark and lockups", ["sjb-mark-pack.zip", "sjb-lockups-pack.zip"])]
+         ("Small-size mark and lockups", ["sjb-mark-pack.zip", "sjb-lockups-pack.zip"])]
 y = H - 104
 for lab, files in rows:
     c.setFont("GB", 10); c.setFillColor(INK); c.drawString(M, y, lab); x = M + 190
