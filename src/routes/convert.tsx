@@ -1,4 +1,5 @@
 // /convert — Cross-format layout adapter.
+import { CONVERT_PDF_MAX_BYTES } from "@/lib/convert-pdf-read";
 //
 // Take one approved piece of content (a deck slide, or copy typed in) and
 // convert it into another medium: a social card, a 1-page print brief, or a
@@ -59,6 +60,7 @@ import { CSS_DPI } from "@/lib/print-proof-export";
 import {
   CONVERT_UPLOAD_ACCEPT,
   CONVERT_UPLOAD_MAX_BYTES,
+
   contentFromSvgMarkup,
   fileToBase64,
   uploadKindLabel,
@@ -133,7 +135,7 @@ type SourceKind = "module" | "deck" | "manual" | "print" | "upload";
 type UploadState =
   | { status: "idle" }
   | { status: "reading"; name: string }
-  | { status: "done"; name: string; kindLabel: string; content: AdaptContent }
+  | { status: "done"; name: string; kindLabel: string; content: AdaptContent; layers?: { name: string; visible: boolean }[]; pictures?: string[]; preview?: string }
   | { status: "error"; name: string; message: string };
 
 function ConvertPage() {
@@ -261,6 +263,38 @@ function ConvertPage() {
     const kind = uploadKindOf(file.name);
     if (!kind) {
       setUpload({ status: "error", name: file.name, message: "That file type isn't supported — use an Illustrator (.ai), PDF, PowerPoint, Word, Excel or SVG file." });
+      return;
+    }
+    if (kind === "pdf") {
+      if (!userId) {
+        setUpload({ status: "error", name: file.name, message: "Reading Illustrator, PDF and Office files needs a TransPerfect sign-in — SVG artwork and typed copy work for everyone." });
+        return;
+      }
+      if (file.size > CONVERT_PDF_MAX_BYTES) {
+        setUpload({ status: "error", name: file.name, message: `That file is ${Math.round(file.size / 1024 / 1024)} MB — the limit is 500 MB.` });
+        return;
+      }
+      setUpload({ status: "reading", name: file.name });
+      try {
+        const { readPdfLike } = await import("@/lib/convert-pdf-read");
+        const read = await readPdfLike(file);
+        if (!read.text.trim()) {
+          throw new Error(/\.ait?$/i.test(file.name)
+            ? "No live text found. Re-save the Illustrator file with “Create PDF Compatible File” ticked (or the text may be outlined) and try again."
+            : "No live text found in that file — the text may be outlined.");
+        }
+        const { content } = await structureUpload({ data: { filename: file.name, text: read.text.slice(0, 400_000) } });
+        const c = content as AdaptContent;
+        const pics = read.pictures.map((p) => p.url);
+        const merged: AdaptContent = {
+          ...c,
+          ...(pics[0] && !c.media ? { media: { kind: "photo", url: pics[0], alt: `Hero image from ${file.name}` } } : {}),
+          ...(pics.length ? { images: pics.map((url, i) => ({ seed: `${file.name}-${i}`, url, title: i === 0 ? "Hero image" : `Image ${i + 1}` })) } : {}),
+        };
+        setUpload({ status: "done", name: file.name, kindLabel: uploadKindLabel(file.name), content: merged, layers: read.layers, pictures: pics, preview: read.preview });
+      } catch (e) {
+        setUpload({ status: "error", name: file.name, message: (e as Error).message || "Could not read that file." });
+      }
       return;
     }
     if (file.size > CONVERT_UPLOAD_MAX_BYTES) {
@@ -473,7 +507,7 @@ function ConvertPage() {
           <span className="text-[16px] font-bold text-[var(--tp-ink)]">
             {upload.status === "reading" ? `Reading ${upload.name}…` : upload.status === "done" ? `${upload.name} — every size is below` : "Drop your file or a zip of live files here, or click to choose"}
           </span>
-          <span className="text-[12.5px] text-[var(--tp-dark-gray)]">Illustrator, InDesign (IDML), Canva PDF or PowerPoint, Word, Excel or SVG · up to 20 MB each · zipped packages up to 500 MB</span>
+          <span className="text-[12.5px] text-[var(--tp-dark-gray)]">Illustrator, InDesign (IDML), Canva PDF or PowerPoint, Word, Excel or SVG · Illustrator and PDF up to 500 MB, other files 20 MB · zipped packages up to 500 MB</span>
           <input
             id="convert-drop"
             type="file"
@@ -667,7 +701,7 @@ function ConvertPage() {
                     {upload.status === "reading" ? "Reading your file…" : "Choose an artwork file"}
                   </span>
                   <span className="mt-1 block text-[11.5px] leading-snug text-[var(--tp-dark-gray)]">
-                    SVG artwork works for everyone. Illustrator, PDF and Office files need a TransPerfect sign-in — up to 20 MB.
+                    SVG artwork works for everyone. Illustrator, PDF and Office files need a TransPerfect sign-in.
                   </span>
                   <input
                     id="convert-upload"
@@ -690,7 +724,7 @@ function ConvertPage() {
                     {upload.status === "reading" ? "Reading your file…" : "Choose an artwork file"}
                   </span>
                   <span className="mt-1 block text-[11.5px] leading-snug text-[var(--tp-dark-gray)]">
-                    Illustrator (.ai), Canva export (PDF or PowerPoint), Word, Excel or SVG — up to 20 MB.
+                    Illustrator (.ai), Canva export (PDF or PowerPoint), Word, Excel or SVG — Illustrator and PDF up to 500 MB, others 20 MB.
                   </span>
                   <input
                     id="convert-upload"
@@ -721,6 +755,36 @@ function ConvertPage() {
                     <p className="mt-0.5 text-[11.5px] text-[var(--tp-dark-gray)]">
                       {upload.kindLabel} — headline, copy{upload.content.points?.length ? `, ${upload.content.points.length} supporting line(s)` : ""}{upload.content.stat ? ` and the figure “${upload.content.stat.value}”` : ""} read from the file. Edit anything below before converting.
                     </p>
+                  {upload.pictures?.length || upload.layers?.length || upload.preview ? (
+                      <div className="mt-2 space-y-2">
+                        {upload.pictures?.length ? (
+                          <div>
+                            <p className="text-[11px] font-semibold">Imagery ({upload.pictures.length}) — the first is used as the hero</p>
+                            <div className="mt-1 flex flex-wrap gap-1.5">
+                              {upload.pictures.map((u, i) => (
+                                <img key={i} src={u} alt={i === 0 ? "Hero image from file" : `Image ${i + 1} from file`} className={`h-14 w-auto rounded border object-cover ${i === 0 ? "border-[var(--tp-blue)] border-2" : "border-black/10"}`} />
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
+                        {upload.layers?.length ? (
+                          <div>
+                            <p className="text-[11px] font-semibold">Layers ({upload.layers.length})</p>
+                            <ul className="mt-1 flex flex-wrap gap-1">
+                              {upload.layers.map((l, i) => (
+                                <li key={i} className={`rounded border border-black/10 bg-white px-1.5 py-0.5 text-[11px] ${l.visible ? "" : "text-[var(--tp-dark-gray)] line-through"}`}>{l.name}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : null}
+                        {upload.preview ? (
+                          <details>
+                            <summary className="cursor-pointer text-[11px] font-semibold">Original layout (reference)</summary>
+                            <img src={upload.preview} alt="Flat preview of the original artwork" className="mt-1 max-h-64 w-auto rounded border border-black/10" />
+                          </details>
+                        ) : null}
+                      </div>
+                    ) : null}
                   </div>
                 ) : null}
                 <p className="text-[11px] leading-snug text-[color:var(--color-muted-foreground)]">

@@ -19,7 +19,7 @@
 import type { AdaptContent } from "@/lib/cross-format-adapt";
 
 export const CONVERT_UPLOAD_ACCEPT =
-  ".ai,.pdf,.pptx,.docx,.xlsx,.svg,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/svg+xml";
+  ".ai,.ait,.pdf,application/postscript,application/illustrator,.pptx,.docx,.xlsx,.svg,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/svg+xml";
 
 /** 20 MB — matches the agent document intake ceiling. */
 export const CONVERT_UPLOAD_MAX_BYTES = 20 * 1024 * 1024;
@@ -30,14 +30,14 @@ export function uploadKindOf(name: string): ConvertUploadKind | null {
   const ext = name.slice(name.lastIndexOf(".") + 1).toLowerCase();
   if (ext === "svg") return "svg";
   if (ext === "pptx" || ext === "docx" || ext === "xlsx") return "office";
-  if (ext === "pdf" || ext === "ai") return "pdf";
+  if (ext === "pdf" || ext === "ai" || ext === "ait") return "pdf";
   return null;
 }
 
 /** Plain-language label for the accepted file, shown in the source panel. */
 export function uploadKindLabel(name: string): string {
   const ext = name.slice(name.lastIndexOf(".") + 1).toLowerCase();
-  if (ext === "ai") return "Illustrator file";
+  if (ext === "ai" || ext === "ait") return "Illustrator file";
   if (ext === "svg") return "SVG artwork";
   if (ext === "pptx") return "PowerPoint / Canva export";
   if (ext === "pdf") return "PDF / Canva export";
