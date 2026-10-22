@@ -1,3 +1,4 @@
+import { SJB_LETTERING_SPEC_VISIBLE } from "@/components/events/SjbShare";
 // /events/san-juan-bowl/brand-kit/lettering — the construction spec behind the exact
 // SAN JUAN BOWL lettering master (public/downloads/sjb-lettering/sjb-lettering-exact.svg).
 // Every number comes from src/lib/sjb-lettering-spec.json, generated from the same exact
@@ -167,6 +168,11 @@ function SizeCalculator() {
 }
 
 export function LetteringSpecPage() {
+  if (!SJB_LETTERING_SPEC_VISIBLE) return <div className="mx-auto max-w-3xl px-6 py-16"><h1 className="text-[24px] font-bold">Lettering specification</h1><p className="mt-2 text-sm text-muted-foreground">This page is not available right now. See the San Juan Bowl brand kit for current logo files.</p></div>;
+  return <LetteringSpecBody />;
+}
+
+function LetteringSpecBody() {
   return (
     <SjbShell>
       <div className="mx-auto max-w-6xl space-y-12 px-6 py-8 text-foreground">
