@@ -866,10 +866,14 @@ division={brandId}
             ) : null}
 
             {view === "all" ? (
-              <div className="grid items-end gap-4 border border-[color:var(--color-border)] bg-[color:var(--color-muted)] p-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid items-start gap-4 border border-[color:var(--color-border)] bg-[color:var(--color-muted)] p-4 [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))]">
                 {ADAPT_TARGETS.map((t) => {
                   const r = adaptContent(source, t.id);
                   const f = adaptTargetFormat(t);
+                  // Fit every size inside the same 230 × 180 thumbnail box so wide banners never spill over.
+                  const fit = f ? Math.min(230 / f.width, 180 / f.height) : 0;
+                  const thumbShort = f ? Math.round(fit * Math.min(f.width, f.height)) : 0;
+                  const thumbW = f ? Math.round(fit * f.width) : 140;
                   return (
                     <Fragment key={t.id}>
                     {(() => {
@@ -880,10 +884,10 @@ division={brandId}
                         setTargetId(t.id);
                         setView("one");
                       }}
-                      className="flex flex-col items-center gap-2 p-2 text-left hover:bg-[color:var(--color-background)]/60 focus-visible:outline-2 focus-visible:outline-[color:var(--color-primary)]"
+                      className="flex w-full flex-col items-center gap-2 rounded-sm border border-transparent bg-[color:var(--color-background)]/40 p-3 text-center hover:border-[color:var(--color-border)] hover:bg-[color:var(--color-background)] focus-visible:outline-2 focus-visible:outline-[color:var(--color-primary)]"
                       aria-label={`Open ${t.label}`}
                     >
-                      <div className="pointer-events-none">
+                      <div className="pointer-events-none flex h-[200px] w-full items-center justify-center overflow-hidden">
                         {drawn && drawnSource ? (
                           <ModuleAsDrawn
                             variantId={drawnSource.variantId}
@@ -892,12 +896,12 @@ division={brandId}
                             mode={mode}
                             frameW={frameOf(r, f).w}
                             frameH={frameOf(r, f).h}
-                            displayWidth={f ? Math.round(170 * Math.max(1, f.width / f.height)) : 200}
+                            displayWidth={thumbW}
                           />
                         ) : f && look === "editorial" ? (
-                          <SocialEditorialCard format={f} brandId={brandId} result={r} displayShortEdge={170} />
+                          <SocialEditorialCard format={f} brandId={brandId} result={r} displayShortEdge={thumbShort} />
                         ) : f && socialGrid ? (
-                          <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={170} variantId={groundVariant} ground={ground} chart={source.chart} images={source.images} pointIcons={source.pointIcons} />
+                          <SocialModuleGrid format={f} brandId={brandId} headline={source.headline} eyebrow={source.eyebrow} points={gridPoints} displayShortEdge={thumbShort} variantId={groundVariant} ground={ground} chart={source.chart} images={source.images} pointIcons={source.pointIcons} />
                         ) : f ? (
                           <SocialRenderer
                             format={f}
@@ -905,10 +909,10 @@ division={brandId}
                             mode={mode}
                             copy={toSocialCopy(r)}
                             imageUrl={r.content.media?.kind === "photo" ? r.content.media.url : undefined}
-                            displayShortEdge={170}
+                            displayShortEdge={thumbShort}
                           />
                         ) : (
-                          <PrintBriefPreview result={r} brandId={brandId} displayWidth={200} ground={printGround} />
+                          <PrintBriefPreview result={r} brandId={brandId} displayWidth={thumbW} ground={printGround} />
                         )}
                       </div>
                       <span className="text-[12px] font-semibold">{t.label}</span>
