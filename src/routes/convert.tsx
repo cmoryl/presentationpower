@@ -65,6 +65,15 @@ import {
   uploadKindOf,
 } from "@/lib/convert-upload";
 import { structureConvertUpload } from "@/lib/convert-upload.functions";
+import {
+  CONVERT_ZIP_MAX_BYTES,
+  contentFromIdml,
+  isZipName,
+  readZipInventory,
+  zipEntryAsFile,
+  type ZipInventory,
+  type ZipPiece,
+} from "@/lib/convert-zip";
 import { seedContent, useDeckStore, type Brief } from "@/lib/deck-store";
 import { BRAND_MODES, byId, MODULE_FAMILIES, MODULE_VARIANTS } from "@/lib/taxonomy";
 
@@ -207,6 +216,47 @@ function ConvertPage() {
   // Uploaded artwork file (.ai / Canva PDF or PPTX export / SVG …).
   const [upload, setUpload] = useState<UploadState>({ status: "idle" });
   const structureUpload = useServerFn(structureConvertUpload);
+  // Live-file package (.zip): list every piece, user picks one to resize.
+  const [pkg, setPkg] = useState<{ name: string; zip: import("jszip"); inventory: ZipInventory } | null>(null);
+  const onZipFile = async (file: File) => {
+    if (file.size > CONVERT_ZIP_MAX_BYTES) {
+      setUpload({ status: "error", name: file.name, message: `That zip is ${Math.round(file.size / 1024 / 1024)} MB — the limit is 500 MB.` });
+      return;
+    }
+    setUpload({ status: "reading", name: file.name });
+    try {
+      const { zip, inventory } = await readZipInventory(file);
+      setPkg({ name: file.name, zip, inventory });
+      setUpload({ status: "idle" });
+      if (!inventory.pieces.some((p) => p.status === "ready")) toast.error("No readable live files in that zip — add Illustrator, IDML, PDF, SVG or Office files.");
+    } catch {
+      setUpload({ status: "error", name: file.name, message: "Couldn't open that zip — it may be damaged or password-protected." });
+    }
+  };
+  const onPickPiece = async (piece: ZipPiece) => {
+    if (!pkg) return;
+    setSourceKind("upload");
+    try {
+      const f = await zipEntryAsFile(pkg.zip, piece);
+      if (piece.kind === "idml") {
+        setUpload({ status: "reading", name: piece.name });
+        const content = await contentFromIdml(f);
+        if (!content) throw new Error("No live text found in that IDML — it may be outlined. Use its PDF instead.");
+        setUpload({ status: "done", name: piece.name, kindLabel: piece.label, content });
+        return;
+      }
+      await onUploadFile(f);
+    } catch (e) {
+      setUpload({ status: "error", name: piece.name, message: (e as Error).message || "Could not read that file." });
+    }
+  };
+  const onDropAny = (file: File) => {
+    if (isZipName(file.name)) { void onZipFile(file); return; }
+    setPkg(null);
+    setSourceKind("upload");
+    void onUploadFile(file);
+  };
+
   const onUploadFile = async (file: File) => {
     const kind = uploadKindOf(file.name);
     if (!kind) {
@@ -416,26 +466,64 @@ function ConvertPage() {
             e.preventDefault();
             setDragOver(false);
             const f = e.dataTransfer.files?.[0];
-            if (f) { setSourceKind("upload"); void onUploadFile(f); }
+            if (f) onDropAny(f);
           }}
           className={`mt-6 flex cursor-pointer flex-col items-center justify-center gap-1 rounded-md border-2 border-dashed px-6 py-8 text-center transition-colors ${dragOver ? "border-[var(--tp-blue)] bg-[var(--tp-blue-white)]" : "border-[var(--tp-blue)]/40 bg-[var(--tp-surface)] hover:border-[var(--tp-blue)]"}`}
         >
           <span className="text-[16px] font-bold text-[var(--tp-ink)]">
-            {upload.status === "reading" ? `Reading ${upload.name}…` : upload.status === "done" ? `${upload.name} — every size is below` : "Drop your file here, or click to choose"}
+            {upload.status === "reading" ? `Reading ${upload.name}…` : upload.status === "done" ? `${upload.name} — every size is below` : "Drop your file or a zip of live files here, or click to choose"}
           </span>
-          <span className="text-[12.5px] text-[var(--tp-dark-gray)]">Illustrator, Canva PDF or PowerPoint, Word, Excel or SVG · up to 20 MB</span>
+          <span className="text-[12.5px] text-[var(--tp-dark-gray)]">Illustrator, InDesign (IDML), Canva PDF or PowerPoint, Word, Excel or SVG · up to 20 MB each · zipped packages up to 500 MB</span>
           <input
             id="convert-drop"
             type="file"
-            accept={CONVERT_UPLOAD_ACCEPT}
+            accept={`${CONVERT_UPLOAD_ACCEPT},.zip,.idml,application/zip`}
             className="sr-only"
             onChange={(e) => {
               const f = e.target.files?.[0];
-              if (f) { setSourceKind("upload"); void onUploadFile(f); }
+              if (f) onDropAny(f);
               e.target.value = "";
             }}
           />
         </label>
+
+        {pkg && (
+          <section aria-label="Files in the zip" className="mt-4 rounded-md border border-[color:var(--color-border)] bg-[var(--tp-surface)] p-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="text-[14px] font-bold text-[var(--tp-ink)]">
+                {pkg.name} · {pkg.inventory.pieces.filter((p) => p.status === "ready").length} pieces ready — pick one to resize
+              </h2>
+              <button type="button" onClick={() => setPkg(null)} className="text-[12px] font-semibold text-[var(--tp-blue)] hover:underline">
+                Close package
+              </button>
+            </div>
+            <p className="mt-1 text-[12px] text-[var(--tp-dark-gray)]">
+              Also in the package: {pkg.inventory.fonts} font files, {pkg.inventory.links} linked images
+              {pkg.inventory.ignored ? `, ${pkg.inventory.ignored} other files` : ""}. These stay with your originals and aren't changed.
+            </p>
+            <ul className="mt-3 max-h-[320px] divide-y divide-[color:var(--color-border)] overflow-auto rounded-sm border border-[color:var(--color-border)] bg-white">
+              {pkg.inventory.pieces.map((p) => (
+                <li key={p.path}>
+                  <button
+                    type="button"
+                    disabled={p.status !== "ready" || upload.status === "reading"}
+                    onClick={() => void onPickPiece(p)}
+                    className={`flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-[13px] ${p.status === "ready" ? "hover:bg-[var(--tp-blue-white)] focus-visible:bg-[var(--tp-blue-white)]" : "cursor-not-allowed opacity-70"} ${upload.status === "done" && upload.name === p.name ? "bg-[var(--tp-blue-white)] font-semibold" : ""}`}
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate text-[var(--tp-ink)]">{p.name}</span>
+                      {p.folder && <span className="block truncate text-[11px] text-[var(--tp-dark-gray)]">{p.folder}</span>}
+                      {p.note && <span className="block text-[11px] text-[var(--tp-dark-gray)]">{p.note}</span>}
+                    </span>
+                    <span className="shrink-0 text-[11px] text-[var(--tp-dark-gray)]">
+                      {p.label} · {p.size ? `${(p.size / 1024 / 1024).toFixed(1)} MB` : ""}{p.status === "skipped" ? " · skipped" : ""}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <div className="mt-8 space-y-8">
           {/* ── Source ─────────────────────────────────────────── */}
