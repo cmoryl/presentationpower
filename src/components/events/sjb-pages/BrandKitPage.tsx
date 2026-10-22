@@ -3,6 +3,7 @@
 // approved backgrounds, misuse gallery and badge anatomy, plus the palette,
 // type and usage rules, with downloads. Event facts stay "to be confirmed"
 // until issued.
+import masterKit from "@/assets/sjb/master-logo-kit.zip.asset.json";
 import { SjbLettering } from "@/components/events/SjbLettering";
 import { SJB_LETTERING_SPEC_VISIBLE } from "@/components/events/SjbShare";
 
@@ -339,6 +340,13 @@ export function SjbBrandKit() {
             className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#003FC7]"
           >
             <Download className="h-4 w-4" /> Full brand guide v2.0 (PDF)
+          </a>
+          <a
+            href={masterKit.url}
+            download="SJB-Master-Logo-Kit-v2.0.zip"
+            className="ml-2 mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/20 px-4 py-2 text-[13px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]"
+          >
+            <Download className="h-4 w-4" /> Master logo kit v2.0 (ZIP, 18 MB)
           </a>
           {!share && (
             <Link

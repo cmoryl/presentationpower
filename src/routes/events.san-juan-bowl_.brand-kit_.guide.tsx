@@ -5,6 +5,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SJB_COLORS, SJB_EVENT, SJB_LOGOS } from "@/lib/san-juan-bowl";
+import masterKit from "@/assets/sjb/master-logo-kit.zip.asset.json";
 import { SjbGuideSections } from "@/components/events/SjbGuideSections";
 
 const TITLE = "San Juan Bowl brand guide — TransPerfect Element";
@@ -41,6 +42,9 @@ function SjbGuide() {
         </div>
         <Button asChild variant="secondary">
           <a href="/__l5e/assets-v1/ed212e41-2afe-40af-a77b-1357722f6620/san-juan-bowl-brand-guide-v2.0.pdf" download><Download className="h-4 w-4" /> Full brand guide v2.0 (PDF)</a>
+        </Button>
+        <Button asChild variant="secondary">
+          <a href={masterKit.url} download="SJB-Master-Logo-Kit-v2.0.zip"><Download className="h-4 w-4" /> Master logo kit v2.0 (ZIP)</a>
         </Button>
       </header>
 
