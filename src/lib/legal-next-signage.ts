@@ -290,6 +290,14 @@ export const SUPPLIED_KIT_SIGNS: LegalSign[] = [
     kitSign(kit, `${k}-first-email`, `${name} email header — first version`, "600 × 200 px", "First version", "Header", FIRST_NOTE),
   ]),
   kitSign("san-juan-bowl", "sjb-first-pillar", "San Juan Bowl pillar — first version", "24 × 96 in (confirm with venue)", "First version", "Pillar", FIRST_NOTE),
+  {
+    ...kitSign("san-juan-bowl", "sjb-first-flyer", "San Juan Bowl game flyer — first version", "8.5 × 11 in", "First version", "Flyer", FIRST_NOTE),
+    sizes: [
+      { w: 8.5, h: 11, label: "US Letter · 8.5 × 11 in" },
+      { w: 8.27, h: 11.69, label: "A4 · 210 × 297 mm" },
+      { w: 5.83, h: 8.27, label: "A5 · 148 × 210 mm" },
+    ],
+  },
 ];
 /** Editable signs of one supplied kit. */
 export const kitSigns = (kit: string) => SUPPLIED_KIT_SIGNS.filter((s) => s.kit === kit);
