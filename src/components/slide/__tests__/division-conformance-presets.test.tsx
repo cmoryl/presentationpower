@@ -59,10 +59,9 @@ const presets = divisionConformancePresets();
 describe("per-division conformance presets", () => {
   it("derives one preset per brand scope from the module registry", () => {
     expect(presets.length).toBeGreaterThanOrEqual(10);
-    // Every variant except the deliberately spec-free blank canvas has an owner.
-    expect(registryOwnedVariantIds().length).toBe(
-      MODULE_VARIANTS.length - UNSPECIFIED_VARIANT_IDS.length,
-    );
+    // Blank canvas now has a renderer owner, but still has no division design spec.
+    expect(registryOwnedVariantIds().length).toBe(MODULE_VARIANTS.length);
+    expect(UNSPECIFIED_VARIANT_IDS).toEqual(["MV-CANVAS-BLANK"]);
     for (const p of presets) expect(p.moduleIds.length).toBeGreaterThan(200);
   });
 

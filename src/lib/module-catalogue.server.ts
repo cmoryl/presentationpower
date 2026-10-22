@@ -6,6 +6,11 @@ type Row = Record<string, unknown>;
 type Table = keyof Database["public"]["Tables"];
 /** Page every source instead of treating the API's first 1,000 rows as the entire estate. */
 async function readAll(client: Client, table: Table, columns: string): Promise<Row[]> {
+  if (table === "module_catalogue_versions") {
+    const result = await client.from(table).select(columns).order("id", { ascending: false }).limit(1000);
+    if (result.error) throw new Error(`${table}: ${result.error.message}`);
+    return (result.data ?? []) as unknown as Row[];
+  }
   const rows: Row[] = [];
   for (let from = 0; ; from += 500) {
     const result = await client.from(table).select(columns).order(table === "kiosk_layer_edits" ? "booth_id" : "id").range(from, from + 499);
