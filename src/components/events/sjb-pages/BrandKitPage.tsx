@@ -337,18 +337,18 @@ export function SjbBrandKit() {
             {SJB_EVENT.venue}, {SJB_EVENT.city} · Dates to be confirmed — nothing is printed until the organisers issue them.
           </p>
           <a
-            href="/__l5e/assets-v1/ed212e41-2afe-40af-a77b-1357722f6620/san-juan-bowl-brand-guide-v2.0.pdf"
-            download="san-juan-bowl-brand-guide-v2.0.pdf"
+            href="/__l5e/assets-v1/fb59c60d-d9f6-47a4-9ece-a585f3c5b78d/san-juan-bowl-brand-guide-v2.1.pdf"
+            download="san-juan-bowl-brand-guide-v2.1.pdf"
             className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#003FC7]"
           >
-            <Download className="h-4 w-4" /> Full brand guide v2.0 (PDF)
+            <Download className="h-4 w-4" /> Full brand guide v2.1 (PDF)
           </a>
           <a
             href={masterKit.url}
-            download="SJB-Master-Logo-Kit-v2.0.zip"
+            download="SJB-Master-Logo-Kit-v2.1.zip"
             className="ml-2 mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/20 px-4 py-2 text-[13px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]"
           >
-            <Download className="h-4 w-4" /> Master logo kit v2.0 (ZIP, 18 MB)
+            <Download className="h-4 w-4" /> Master logo kit v2.1 (ZIP, 18 MB)
           </a>
           {!share && (
             <Link

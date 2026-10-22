@@ -103,7 +103,7 @@ c.setFont("G", 10); c.setFillColor("#FFFFFF")
 para("Every image in this guide is the supplied artwork. Blue links open or download the live files — always use the latest from the live kit.", M, H - 240, 300, 10, color="#FFFFFF")
 y = 230
 c.setFont("GB", 10); c.setFillColor(GOLD)
-for label, u in [("Open the live brand kit", "/events/san-juan-bowl/brand-kit"), ("Designer construction pages", "/events/san-juan-bowl/brand-kit/designers"), ("Single-colour logos", "/events/san-juan-bowl/brand-kit/single-colour"), ("Share link (no sign-in)", "/share/san-juan-bowl")]:
+for label, u in [("Open the live brand kit", "/events/san-juan-bowl/brand-kit"), ("Single-colour logos", "/events/san-juan-bowl/brand-kit/single-colour"), ("Share link (no sign-in)", "/share/san-juan-bowl")]:
     t = label + "  ↗"; c.drawString(M, y, t); c.linkURL(ORIGIN + u, (M, y - 2, M + c.stringWidth(t, "GB", 10), y + 10)); y -= 20
 c.showPage()
 
