@@ -130,7 +130,15 @@ export function registerSlideModule(reg: ModuleRegistration): void {
 }
 
 export function findSlideModule(variantId: string): ModuleRegistration | null {
-  return byVariantId.get(variantId) ?? matchers.find((m) => m.match!(variantId)) ?? null;
+  return byVariantId.get(variantId) ?? matchers.find((m) => m.match?.(variantId)) ?? null;
+}
+
+/** Reports actual lookup precedence, including predicate-owned variants. */
+export function slideModuleAuthority(variantId: string): { owner: string | null; authority: "exact" | "predicate" | "unowned" } {
+  const exact = byVariantId.get(variantId);
+  if (exact) return { owner: exact.id, authority: "exact" };
+  const predicate = matchers.find((m) => m.match?.(variantId));
+  return predicate ? { owner: predicate.id, authority: "predicate" } : { owner: null, authority: "unowned" };
 }
 
 /** Per-cell controls the owning family reads; all false when unowned. */
