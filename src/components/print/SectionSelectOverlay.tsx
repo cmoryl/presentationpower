@@ -30,6 +30,8 @@ type Props = {
   /** Swap only the section's photography, leaving the layout alone. Offered on
    *  sections that carry an image (hero, photo modules). */
   onReplaceMedia?: (sectionKey: string) => void;
+  /** Drag a stacked module (module:<id>) above/below another module. */
+  onMove?: (sectionKey: string, targetKey: string, place: "before" | "after") => void;
   /** Optional dependency list — re-scan when any of these change. */
   scanKey?: unknown;
 };
@@ -40,8 +42,12 @@ export function SectionSelectOverlay({
   onReplace,
   onEditModule,
   onReplaceMedia,
+  onMove,
   scanKey,
 }: Props) {
+  const [drag, setDrag] = useState<{ key: string; y: number; target: string | null; place: "before" | "after" } | null>(null);
+  const dragStart = useRef<{ key: string; y: number; moved: boolean } | null>(null);
+  const suppressClick = useRef(false);
   const [sections, setSections] = useState<Section[]>([]);
   const [hoverKey, setHoverKey] = useState<string | null>(null);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
@@ -144,7 +150,11 @@ export function SectionSelectOverlay({
           <button
             key={s.key}
             type="button"
-            className="pointer-events-auto absolute cursor-pointer transition-colors"
+            className={
+              "pointer-events-auto absolute transition-colors " +
+              (onMove && s.key.startsWith("module:") ? "cursor-grab active:cursor-grabbing touch-none" : "cursor-pointer")
+            }
+            title={onMove && s.key.startsWith("module:") ? "Click to select · drag up or down to move" : undefined}
             style={{
               top: s.rect.top,
               left: s.rect.left,
@@ -158,10 +168,52 @@ export function SectionSelectOverlay({
                   : "2px dashed transparent",
               borderRadius: 10,
             }}
+            onPointerDown={(e) => {
+              if (!onMove || !s.key.startsWith("module:") || e.button !== 0) return;
+              dragStart.current = { key: s.key, y: e.clientY, moved: false };
+              (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+            }}
+            onPointerMove={(e) => {
+              const st = dragStart.current;
+              if (!st) return;
+              if (!st.moved && Math.abs(e.clientY - st.y) < 6) return;
+              st.moved = true;
+              const canvas = canvasRef.current;
+              if (!canvas) return;
+              const y = e.clientY - canvas.getBoundingClientRect().top;
+              const mods = sections.filter((m) => m.key.startsWith("module:"));
+              let target: string | null = null;
+              let place: "before" | "after" = "before";
+              for (const m of mods) {
+                if (y >= m.rect.top - 8 && y <= m.rect.top + m.rect.height + 8) {
+                  target = m.key;
+                  place = y < m.rect.top + m.rect.height / 2 ? "before" : "after";
+                  break;
+                }
+              }
+              setDrag({ key: st.key, y, target, place });
+            }}
+            onPointerUp={() => {
+              const st = dragStart.current;
+              dragStart.current = null;
+              if (st?.moved) {
+                suppressClick.current = true;
+                if (drag?.target && drag.target !== st.key && onMove) onMove(st.key, drag.target, drag.place);
+              }
+              setDrag(null);
+            }}
+            onPointerCancel={() => {
+              dragStart.current = null;
+              setDrag(null);
+            }}
             onMouseEnter={() => setHoverKey(s.key)}
             onMouseLeave={() => setHoverKey((h) => (h === s.key ? null : h))}
             onClick={(e) => {
               e.stopPropagation();
+              if (suppressClick.current) {
+                suppressClick.current = false;
+                return;
+              }
               setSelectedKey((k) => (k === s.key ? null : s.key));
             }}
             aria-label={`Select ${s.label} section`}
@@ -178,6 +230,18 @@ export function SectionSelectOverlay({
         );
       })}
 
+      {drag?.target && (() => {
+        const t = sections.find((m) => m.key === drag.target);
+        if (!t) return null;
+        const top = drag.place === "before" ? t.rect.top - 3 : t.rect.top + t.rect.height - 1;
+        return (
+          <div
+            aria-hidden
+            className="absolute h-[4px] rounded-full bg-primary shadow-[0_0_0_3px_rgba(0,63,199,0.2)]"
+            style={{ top, left: t.rect.left, width: t.rect.width }}
+          />
+        );
+      })()}
       {active && (
         <div
           className="pointer-events-auto absolute flex items-center gap-1 rounded-xl border border-black/10 bg-white px-1.5 py-1 shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
