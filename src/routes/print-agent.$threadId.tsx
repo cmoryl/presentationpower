@@ -148,7 +148,7 @@ function PrintAgentThreadPage() {
 
   return (
     <AppShell>
-      <div className={`mx-auto w-full ${live ? "max-w-none" : "max-w-[1400px]"} px-4 pb-8 pt-6 sm:px-6">
+      <div className={`mx-auto w-full ${live ? "max-w-none" : "max-w-[1400px]"} px-4 pb-8 pt-6 sm:px-6`}>
         <header className="mb-4">
           <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
             <Printer className="size-3.5" aria-hidden /> Print agent
