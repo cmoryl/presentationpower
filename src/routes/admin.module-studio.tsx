@@ -38,7 +38,6 @@ import {
 } from "@/lib/custom-modules";
 import {
   createCustomModule,
-  decideModuleReview,
   deleteCustomModule,
   listCustomModules,
   submitModuleForReview,
@@ -129,7 +128,6 @@ function ModuleStudioPage() {
   const update = useServerFn(updateCustomModule);
   const remove = useServerFn(deleteCustomModule);
   const submitReview = useServerFn(submitModuleForReview);
-  const decideReview = useServerFn(decideModuleReview);
 
   const modules = useQuery({
     queryKey: ["custom-modules"],
@@ -283,10 +281,8 @@ function ModuleStudioPage() {
   const publishable = canPublish(issues);
 
   const save = useMutation({
-    // "submit" and "publish" first save the current composition as a draft,
-    // then move it through review — nothing reaches the library unreviewed
-    // except through the logged admin "publish now" override.
-    mutationFn: async (action: "draft" | "submit" | "publish") => {
+    // Review decisions belong only to Approvals; the studio authors and submits.
+    mutationFn: async (action: "draft" | "submit") => {
       const status: Meta["status"] = "draft";
       if (!comp || !parts) throw new Error("Nothing to save");
       const payload = {
@@ -310,20 +306,16 @@ function ModuleStudioPage() {
         ? ((await update({ data: { id: meta.id, patch: payload } })) as CustomModuleRow)
         : ((await create({ data: payload })) as CustomModuleRow);
       if (action === "submit") await submitReview({ data: { id: row.id } });
-      if (action === "publish") {
-        await decideReview({ data: { id: row.id, decision: "approved", override: true } });
-      }
       return row;
     },
     onSuccess: (row, action) => {
-      patchMeta({ id: row.id, status: action === "publish" ? "published" : "draft" });
+      patchMeta({ id: row.id, status: "draft" });
       void qc.invalidateQueries({ queryKey: ["custom-modules"] });
       void qc.invalidateQueries({ queryKey: ["custom-modules", "published"] });
       void qc.invalidateQueries({ queryKey: ["module-review-queue"] });
       const msg = {
         draft: ["Module draft saved", "Keep composing — nothing is published yet."],
         submit: ["Sent for review", "It goes live in Add slide once another reviewer approves it."],
-        publish: ["Published without review", "Logged in the audit trail. Every builder can now insert it."],
       }[action];
       toast.success(msg[0], { description: msg[1] });
     },
@@ -634,18 +626,8 @@ function ModuleStudioPage() {
                   ⇧
                 </StudioMenuBtn>
               </EditorMenuRow>
-              <EditorMenuRow label="Publish now (admin)" hint="Skips review — logged in the audit trail">
-                <StudioMenuBtn
-                  label="Publish now without review"
-                  disabled={save.isPending || !publishable}
-                  onClick={() => {
-                    if (window.confirm("Publish without a second reviewer? This is logged.")) {
-                      save.mutate("publish");
-                    }
-                  }}
-                >
-                  ⚑
-                </StudioMenuBtn>
+              <EditorMenuRow label="Module approvals" hint="Review and publishing decisions">
+                <Link to="/approvals" search={{ tab: "modules" }} className="text-primary underline">Open approvals</Link>
               </EditorMenuRow>
               <EditorMenuRow label="Export module slide" hint="Editable layers, native shapes">
                 <StudioMenuBtn
