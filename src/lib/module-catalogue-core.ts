@@ -4,6 +4,13 @@ export type ModuleLifecycle = "shipped" | "draft" | "in-review" | "approved" | "
 export type UsageKind = "decks" | "print" | "templates" | "social" | "events";
 export interface ModuleUsage { decks: number; print: number; templates: number; social: number; events: number }
 export interface ModuleReference { id: string; title: string; kind: UsageKind; href: string | null }
+export type CatalogueValue = string | number | boolean | null | CatalogueValue[] | { [key: string]: CatalogueValue };
+export type CatalogueRow = Record<string, CatalogueValue>;
+export interface ModuleCatalogueData {
+  variants: CatalogueRow[]; families: CatalogueRow[]; custom: CatalogueRow[]; overrides: CatalogueRow[];
+  templates: CatalogueRow[]; history: CatalogueRow[]; references: Record<string, ModuleReference[]>;
+  people: Record<string, string>; errors: string[]; complete: boolean; checkedAt: string;
+}
 export interface ModuleManifest {
   key: string; id: string; label: string; description: string; classification: ModuleClass;
   family: string; surfaces: string[]; lifecycle: ModuleLifecycle; owner: string;

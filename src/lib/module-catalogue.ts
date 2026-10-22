@@ -1,9 +1,8 @@
 import { PRINT_SECTION_MODULES } from "./print-library/section-modules";
 import { STARTER_TEMPLATES } from "./print-library/starter-templates";
 import { SOCIAL_MODULE_LAYOUTS } from "./social-module-layouts";
-import { moduleLifecycle, usageFromReferences, type ModuleManifest, type ModuleReference } from "./module-catalogue-core";
-import type { getModuleCatalogue } from "./module-catalogue.functions";
-type CatalogueData = Awaited<ReturnType<typeof getModuleCatalogue>>;
+import { moduleLifecycle, usageFromReferences, type ModuleManifest, type ModuleReference, type ModuleCatalogueData } from "./module-catalogue-core";
+type CatalogueData = ModuleCatalogueData;
 type Row = Record<string, unknown>;
 const strings = (v: unknown): string[] => Array.isArray(v) ? v.filter((s): s is string => typeof s === "string") : [];
 const text = (v: unknown): string | null => typeof v === "string" && v.length ? v : null;

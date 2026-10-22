@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { moduleReferenceIds, usageFromReferences, retirementIssue, type ModuleReference } from "./module-catalogue-core";
+import { moduleReferenceIds, usageFromReferences, retirementIssue, type ModuleReference, type ModuleCatalogueData } from "./module-catalogue-core";
 type Client = SupabaseClient<Database>;
 type Row = Record<string, unknown>;
 type Table = keyof Database["public"]["Tables"];
@@ -18,7 +18,7 @@ export async function requireCatalogueAdmin(client: Client, userId: string) {
   const { data, error } = await client.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (error || !data) throw new Error("Only admins can manage the module catalogue.");
 }
-export async function readCatalogue(client: Client) {
+export async function readCatalogue(client: Client): Promise<ModuleCatalogueData> {
   const sources = [
     ["module_variants", "*"], ["module_families", "*"], ["custom_modules", "*"], ["module_overrides", "*"],
     ["print_page_templates", "*"], ["decks", "id,title,status,is_template,context"],
@@ -65,7 +65,7 @@ export async function readCatalogue(client: Client) {
   for (const table of ["module_overrides", "custom_modules", "print_page_templates"]) for (const r of data[table] ?? []) for (const field of ["created_by", "updated_by", "owner_id"]) if (typeof r[field] === "string") peopleIds.add(r[field]);
   const { data: people, error: peopleError } = peopleIds.size ? await client.rpc("display_names", { _ids: [...peopleIds] }) : { data: [], error: null };
   if (peopleError) errors.push("Member names could not be checked");
-  return {
+  const result = {
     variants: data.module_variants ?? [], families: data.module_families ?? [],
     custom: (data.custom_modules ?? []).map(({ content, canvas_blocks, ...row }) => ({ ...row, editable_fields: Object.keys((content ?? {}) as Row) })),
     overrides: data.module_overrides ?? [],
@@ -73,6 +73,8 @@ export async function readCatalogue(client: Client) {
     references, history, people: Object.fromEntries((people ?? []).map((p) => [p.id, p.display_name || "Team member"])),
     errors, complete: errors.length === 0, checkedAt: new Date().toISOString(),
   };
+  // PostgreSQL JSON and scalar columns are serialized into an explicit DTO contract.
+  return JSON.parse(JSON.stringify(result)) as ModuleCatalogueData;
 }
 export async function checkRetirement(client: Client, id: string, acknowledged = false) {
   const estate = await readCatalogue(client);

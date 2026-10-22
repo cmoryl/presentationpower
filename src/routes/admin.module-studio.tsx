@@ -48,6 +48,7 @@ import { compositionToModuleParts, moduleToItems } from "@/lib/module-studio-bri
 import { STAGE_H, STAGE_W, makeItem, useCanvasStudio, type CanvasItem } from "@/lib/canvas-studio";
 
 export const Route = createFileRoute("/admin/module-studio")({
+  validateSearch: (search: Record<string, unknown>) => ({ module: typeof search.module === "string" ? search.module : undefined }),
   head: () => ({
     meta: [
       { title: "Module Studio · Admin · TransPerfect Element" },
@@ -89,6 +90,8 @@ function emptyMeta(): Meta {
 }
 
 function ModuleStudioPage() {
+  const requestedModule = Route.useSearch().module;
+  const loadedModule = useRef<string | null>(null);
   const {
     compositions,
     activeId,
@@ -394,6 +397,14 @@ function ModuleStudioPage() {
       status: asCopy ? "draft" : ((row.status as Meta["status"]) ?? "draft"),
     });
   };
+
+  useEffect(() => {
+    if (!requestedModule || loadedModule.current === requestedModule) return;
+    const row = modules.data?.find((r) => r.id === requestedModule);
+    if (!row) return;
+    loadedModule.current = requestedModule;
+    loadRow(row);
+  }, [requestedModule, modules.data]);
 
   if (!comp) return null;
 

@@ -38,7 +38,8 @@ import {
 } from "@/lib/module-overrides.functions";
 
 export const Route = createFileRoute("/admin/modules")({
-  head: () => ({ meta: [{ title: "Module editor · Admin · TransPerfect Element" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({ tab: typeof s.tab === "string" ? s.tab : "print", q: typeof s.q === "string" ? s.q : "" }),
+  head: () => ({ meta: [{ title: "Module editor · Admin · TransPerfect Element" }, { name: "description", content: "Maintain reusable print sections, presentation variants and page templates with reversible master overrides." }, { property: "og:title", content: "Module editor · TransPerfect Element" }, { property: "og:description", content: "Govern reusable module masters and saved page templates." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: ModuleEditorPage,
 });
 
@@ -56,14 +57,15 @@ type Draft = {
 };
 
 function ModuleEditorPage() {
+  const search = Route.useSearch();
   const listFn = useServerFn(listModuleOverrides);
   const saveFn = useServerFn(saveModuleOverride);
   const delFn = useServerFn(deleteModuleOverride);
   const qc = useQueryClient();
 
-  const [tab, setTab] = useState<ModuleOverrideScope | "page-templates">("print");
+  const [tab, setTab] = useState<ModuleOverrideScope | "page-templates">(search.tab === "deck" ? "deck" : search.tab === "page-templates" ? "page-templates" : "print");
   const scope: ModuleOverrideScope = tab === "deck" ? "deck" : "print";
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(search.q);
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
 
   const { templates } = usePrintPageTemplates();
