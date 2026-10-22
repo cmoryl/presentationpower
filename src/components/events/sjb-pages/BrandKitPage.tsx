@@ -333,7 +333,7 @@ export function SjbBrandKit() {
             {SJB_EVENT.venue}, {SJB_EVENT.city} · Dates to be confirmed — nothing is printed until the organisers issue them.
           </p>
           <a
-            href="/downloads/san-juan-bowl-brand-guide.pdf"
+            href="/__l5e/assets-v1/dfe14e4f-ff8b-41c7-beb5-60a8c4c5ac67/san-juan-bowl-brand-guide.pdf"
             download="san-juan-bowl-brand-guide.pdf"
             className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#003FC7]"
           >
