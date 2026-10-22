@@ -38,6 +38,8 @@ import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { PrintBriefPreview } from "@/components/convert/PrintBriefPreview";
 import { ModuleAsDrawn } from "@/components/convert/ModuleAsDrawn";
 import { SocialCardDownload } from "@/components/convert/SocialCardDownload";
+import { assetFileSlug, downloadAssetBlob, exportAssetImage } from "@/lib/asset-export";
+import { toast } from "sonner";
 import { SocialEditorialCard } from "@/components/convert/SocialEditorialCard";
 import { SocialModuleGrid, socialGridCapacity, CONVERT_GROUNDS, groundCss } from "@/components/convert/SocialModuleGrid";
 import {
@@ -183,7 +185,7 @@ function ConvertPage() {
   const [familyId, setFamilyId] = useState<string>("all");
   const [moduleBrand, setModuleBrand] = useState<string>(BRAND_MODES[0].id);
   const [selection, setSelection] = useState<AdaptSelection>(EMPTY_SELECTION);
-  const [view, setView] = useState<"one" | "all">("one");
+  const [view, setView] = useState<"one" | "all">("all");
   const [look, setLook] = useState<"rebuilt" | "editorial" | "drawn">("rebuilt");
   // Coming from the module catalog: bring the chosen module into view in the list.
   useEffect(() => {
@@ -355,6 +357,41 @@ function ConvertPage() {
   const printGround = ground.scene ? groundCss({ ...ground, dark: false }, groundVariant) : undefined;
 
   const socialWrapRef = useRef<HTMLDivElement>(null);
+  const wallRef = useRef<HTMLDivElement>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [zipping, setZipping] = useState<number | null>(null);
+  const downloadAll = async () => {
+    const cards = Array.from(wallRef.current?.querySelectorAll<HTMLElement>("[data-wall-card]") ?? []);
+    if (!cards.length) return;
+    setZipping(0);
+    await new Promise((r) => setTimeout(r, 400));
+    try {
+      const { default: JSZip } = await import("jszip");
+      const zip = new JSZip();
+      const used = new Set<string>();
+      for (const [i, card] of cards.entries()) {
+        setZipping(i + 1);
+        const box = card.firstElementChild as HTMLElement | null;
+        // Print pages are captured from a full-size copy rendered off screen; thumbnails are too small.
+        const full = document.querySelector<HTMLElement>(`[data-full-print="${card.dataset.wallCard}"] [data-print-brief-page]`);
+        const node = full ?? card.querySelector<HTMLElement>("[data-kit-asset-frame]") ?? (box?.firstElementChild as HTMLElement | null);
+        const width = Number(card.dataset.w);
+        const height = Number(card.dataset.h);
+        if (!node || !width || !height) continue;
+        const blob = await exportAssetImage({ node, width, height, label: card.dataset.name ?? "" }, { format: "png" });
+        let name = `${String(i + 1).padStart(2, "0")}-${assetFileSlug(card.dataset.name ?? "size", "size")}.png`;
+        while (used.has(name)) name = name.replace(/\.png$/, "-2.png");
+        used.add(name);
+        zip.file(name, blob);
+      }
+      const out = await zip.generateAsync({ type: "blob", compression: "STORE" });
+      downloadAssetBlob(out, `${assetFileSlug(source.headline || "converted", "converted")}-every-size.zip`);
+    } catch (e) {
+      toast.error(`Download failed: ${e instanceof Error ? e.message : "unknown error"}`);
+    } finally {
+      setZipping(null);
+    }
+  };
   const printPageRef = useRef<HTMLDivElement>(null);
   const label = `${result.content.headline.slice(0, 40)} · ${result.target.label}`;
 
@@ -362,33 +399,59 @@ function ConvertPage() {
     <AppShell>
       <main className="mx-auto w-full max-w-[1200px] px-5 py-10">
         <p className="text-[11px] font-semibold tracking-[0.18em] text-[var(--tp-dark-gray)] uppercase">
-          Cross-format adapter
+          Convert
         </p>
         <h1 className="mt-2 text-[34px] leading-[1.1] font-bold tracking-[-0.02em] text-[var(--tp-ink)]">
-          One piece of content, every medium
+          Make it once. Get every size.
         </h1>
-        <p className="mt-2 max-w-[70ch] text-[14px] leading-[1.5] text-[var(--tp-ink)]/75">
-          Start from a master module, a deck slide, a print piece, or an uploaded artwork file
-          (Illustrator .ai, a Canva PDF/PowerPoint download, or SVG) — then convert it into any
-          social, print or event size. The headline, body copy, supporting points, figures and
-          photography carry across; the layout structure and type hierarchy are the target medium's
-          own. Anything shortened or left out is listed before you export.
+        <p className="mt-2 max-w-[60ch] text-[14px] leading-[1.5] text-[var(--tp-ink)]/75">
+          Drop in a file or pick something you already have — every social, print and event size appears below, ready to download.
         </p>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[360px_1fr]">
+        <label
+          htmlFor="convert-drop"
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOver(false);
+            const f = e.dataTransfer.files?.[0];
+            if (f) { setSourceKind("upload"); void onUploadFile(f); }
+          }}
+          className={`mt-6 flex cursor-pointer flex-col items-center justify-center gap-1 rounded-md border-2 border-dashed px-6 py-8 text-center transition-colors ${dragOver ? "border-[var(--tp-blue)] bg-[var(--tp-blue-white)]" : "border-[var(--tp-blue)]/40 bg-[var(--tp-surface)] hover:border-[var(--tp-blue)]"}`}
+        >
+          <span className="text-[16px] font-bold text-[var(--tp-ink)]">
+            {upload.status === "reading" ? `Reading ${upload.name}…` : upload.status === "done" ? `${upload.name} — every size is below` : "Drop your file here, or click to choose"}
+          </span>
+          <span className="text-[12.5px] text-[var(--tp-dark-gray)]">Illustrator, Canva PDF or PowerPoint, Word, Excel or SVG · up to 20 MB</span>
+          <input
+            id="convert-drop"
+            type="file"
+            accept={CONVERT_UPLOAD_ACCEPT}
+            className="sr-only"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) { setSourceKind("upload"); void onUploadFile(f); }
+              e.target.value = "";
+            }}
+          />
+        </label>
+
+        <div className="mt-8 space-y-8">
           {/* ── Source ─────────────────────────────────────────── */}
-          <section className="space-y-4">
+          <section className="grid gap-6 lg:grid-cols-2">
+            <div className="space-y-4">
             <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
-              Step 1 · Choose your content
+              Or start from
             </h2>
 
             <div role="group" aria-label="Source" className="grid grid-cols-3 gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5 sm:grid-cols-5">
               {(
                 [
-                  ["module", "Master module"],
-                  ["deck", "Deck slide"],
+                  ["module", "Ready-made"],
+                  ["deck", "Your slide"],
                   ["print", "Print piece"],
-                  ["upload", "Upload file"],
+                  ["upload", "Your file"],
                   ["manual", "Type copy"],
                 ] as const
               ).map(([k, l]) => (
@@ -636,43 +699,14 @@ function ConvertPage() {
               </div>
             )}
 
-            {manual ? null : <InfoBuilder source={rawSource} selection={selection} onChange={setSelection} />}
-
-            <h2 className="pt-2 text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
-              Step 3 · Choose a format
-            </h2>
-            <div className="grid gap-1">
-              {ADAPT_TARGETS.map((t, i) => (
-                <Fragment key={t.id}>
-                {i === 0 || (ADAPT_TARGETS[i - 1].surface ?? ADAPT_TARGETS[i - 1].medium) !== (t.surface ?? t.medium) ? (
-                  <h3 className="pt-2 text-[11px] font-semibold tracking-[0.1em] text-[var(--tp-dark-gray)] uppercase">
-                    {t.surface === "event" ? "Event signage" : t.medium === "print" ? "Print" : "Social"}
-                  </h3>
-                ) : null}
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setTargetId(t.id)}
-                  className={`rounded-lg border px-3 py-2 text-left text-[12.5px] ${targetId === t.id ? "border-[var(--tp-blue)] bg-[var(--tp-blue-white)] text-[var(--tp-ink)]" : "border-black/15 text-[var(--tp-ink)] hover:border-[var(--tp-blue)]"}`}
-                >
-                  <span className="flex items-center justify-between gap-2">
-                    <span className="font-semibold">{t.label}</span>
-                    {(fitNotes.get(t.id) ?? 0) === 0 ? (
-                      <span className="shrink-0 rounded-sm bg-[var(--tp-green)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--tp-ink)]">Fits as-is</span>
-                    ) : (
-                      <span className="shrink-0 rounded-sm bg-[var(--tp-surface)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--tp-dark-gray)]">
-                        {fitNotes.get(t.id)} change{(fitNotes.get(t.id) ?? 0) === 1 ? "" : "s"} to fit
-                      </span>
-                    )}
-                  </span>
-                  <span className="mt-0.5 block text-[11px] text-[var(--tp-dark-gray)]">
-                    {t.medium === "print"
-                      ? `${Math.round((t.trimIn?.width ?? 0) * 25.4)} × ${Math.round((t.trimIn?.height ?? 0) * 25.4)} mm`
-                      : `${adaptTargetFormat(t)?.width} × ${adaptTargetFormat(t)?.height} px`}
-                  </span>
-                </button>
-                </Fragment>
-              ))}
+            </div>
+            <div>
+              {manual ? null : (
+                <details className="rounded-md border border-[color:var(--color-border)] p-3">
+                  <summary className="cursor-pointer text-[13px] font-semibold text-[var(--tp-ink)]">Edit text and choose what carries across</summary>
+                  <div className="mt-3"><InfoBuilder source={rawSource} selection={selection} onChange={setSelection} /></div>
+                </details>
+              )}
             </div>
           </section>
 
@@ -680,9 +714,19 @@ function ConvertPage() {
           <section className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase">
-                Step 4 · Preview &amp; export — {result.target.label}
+                {view === "all" ? "Every size" : result.target.label}
               </h2>
-              <div className="flex flex-wrap items-center gap-2">
+              {view === "all" ? (
+                <button
+                  type="button"
+                  onClick={() => void downloadAll()}
+                  disabled={zipping !== null}
+                  className="inline-flex h-11 items-center gap-2 rounded-sm bg-[color:var(--color-primary)] px-5 text-[13px] font-semibold text-[color:var(--color-primary-foreground)] hover:opacity-90 disabled:opacity-60"
+                >
+                  {zipping !== null ? `Preparing ${zipping} of ${ADAPT_TARGETS.length}…` : "Download all (ZIP)"}
+                </button>
+              ) : null}
+              <div className={`flex flex-wrap items-center gap-2 ${view === "all" ? "hidden" : ""}`}>
                 <AssetExportMenu
 division={brandId}
                   label="Digital export"
@@ -805,7 +849,7 @@ division={brandId}
             <div role="group" aria-label="Preview" className="inline-flex gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5">
               {(
                 [
-                  ["one", "This format"],
+                  ["one", "One size"],
                   ["all", "Every size"],
                 ] as const
               ).map(([k, l]) => (
@@ -825,9 +869,9 @@ division={brandId}
               <div role="group" aria-label="Layout" className="ml-2 inline-flex gap-0.5 rounded-sm border border-[color:var(--color-border)] p-0.5">
                 {(
                   [
-                    ["rebuilt", "Rebuilt for this size"],
+                    ["rebuilt", "Fitted"],
                     ...(format ? ([["editorial", "Editorial"]] as const) : []),
-                    ...(drawnSource ? ([["drawn", "Use the module as drawn"]] as const) : []),
+                    ...(drawnSource ? ([["drawn", "As designed"]] as const) : []),
                   ] as const
                 ).map(([k, l]) => (
                   <button
@@ -857,7 +901,7 @@ division={brandId}
               </label>
             ) : null}
             {!drawn && ground.dark && !format ? (
-              <p className="text-[12px] text-[color:var(--color-muted-foreground)]">Print pages keep dark text, so they use the light version of this background.</p>
+              <p className="w-full text-[12px] text-[color:var(--color-muted-foreground)]">Print pages keep dark text, so they use the light version of this background.</p>
             ) : null}
             {drawn ? (
               <p className="text-[12px] text-[color:var(--color-muted-foreground)]">
@@ -865,9 +909,18 @@ division={brandId}
               </p>
             ) : null}
 
+              {zipping !== null && !drawn ? (
+                <div aria-hidden="true" className="pointer-events-none fixed top-0 left-[-20000px]">
+                  {ADAPT_TARGETS.filter((t) => !adaptTargetFormat(t) && t.trimIn).map((t) => (
+                    <div key={t.id} data-full-print={t.id}>
+                      <PrintBriefPreview result={adaptContent(source, t.id)} brandId={brandId} displayWidth={Math.round((t.trimIn?.width ?? 0) * CSS_DPI)} ground={printGround} />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             {view === "all" ? (
-              <div className="grid items-start gap-4 border border-[color:var(--color-border)] bg-[color:var(--color-muted)] p-4 [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))]">
-                {ADAPT_TARGETS.map((t) => {
+              <div ref={wallRef} className="grid items-start gap-4 border border-[color:var(--color-border)] bg-[color:var(--color-muted)] p-4 [grid-template-columns:repeat(auto-fill,minmax(240px,1fr))]">
+                {ADAPT_TARGETS.map((t, ti) => {
                   const r = adaptContent(source, t.id);
                   const f = adaptTargetFormat(t);
                   // Fit every size inside the same 230 × 180 thumbnail box so wide banners never spill over.
@@ -876,9 +929,18 @@ division={brandId}
                   const thumbW = f ? Math.round(fit * f.width) : 140;
                   return (
                     <Fragment key={t.id}>
+                    {ti === 0 || (ADAPT_TARGETS[ti - 1].surface ?? ADAPT_TARGETS[ti - 1].medium) !== (t.surface ?? t.medium) ? (
+                      <h3 className="col-span-full pt-2 text-[12px] font-semibold tracking-[0.12em] text-[var(--tp-dark-gray)] uppercase first:pt-0">
+                        {t.surface === "event" ? "Event signage" : t.medium === "print" ? "Print" : "Social"}
+                      </h3>
+                    ) : null}
                     {(() => {
                       const card = (
                     <button
+                      data-wall-card={t.id}
+                      data-w={f ? f.width : Math.round((t.trimIn?.width ?? 0) * CSS_DPI)}
+                      data-h={f ? f.height : Math.round((t.trimIn?.height ?? 0) * CSS_DPI)}
+                      data-name={t.label}
                                             type="button"
                       onClick={() => {
                         setTargetId(t.id);
@@ -917,13 +979,16 @@ division={brandId}
                       </div>
                       <span className="text-[12px] font-semibold">{t.label}</span>
                       <span className="text-[11px] text-[color:var(--color-muted-foreground)]">
-                        {r.notes.length ? `${r.notes.length} change${r.notes.length === 1 ? "" : "s"} to fit` : "Everything fitted"}
+                        {f ? `${f.width} × ${f.height} px` : `${Math.round((t.trimIn?.width ?? 0) * 25.4)} × ${Math.round((t.trimIn?.height ?? 0) * 25.4)} mm`}
                       </span>
+                      {r.notes.length ? (
+                        <span className="rounded-sm bg-[var(--tp-yellow,#FFEB66)] px-1.5 py-0.5 text-[10.5px] font-semibold text-[var(--tp-ink)]">
+                          {r.notes.length} change{r.notes.length === 1 ? "" : "s"} to fit
+                        </span>
+                      ) : null}
                     </button>
                       );
-                      return f ? (
-                        <SocialCardDownload width={f.width} height={f.height} name={`${source.headline} ${t.label}`}>{card}</SocialCardDownload>
-                      ) : card;
+                      return card;
                     })()}
                     </Fragment>
                   );
