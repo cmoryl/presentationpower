@@ -111,7 +111,7 @@ export function HeroResizeHandle({
 
   return (
     <div
-      className="pointer-events-none absolute inset-x-0 z-30"
+      className="pointer-events-none absolute inset-x-0 z-40"
       style={{ top: `${heightPct}%`, transform: "translateY(-50%)" }}
       aria-hidden={!enabled}
       data-export-ignore="true"
