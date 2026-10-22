@@ -1,0 +1,2 @@
+ALTER TABLE public.print_assets DROP CONSTRAINT IF EXISTS print_assets_kind_check;
+ALTER TABLE public.print_assets ADD CONSTRAINT print_assets_kind_check CHECK (kind IN ('case-study','spotlight','ebrochure','adaptor-brief','msa-partnership','solution-proposal'));
