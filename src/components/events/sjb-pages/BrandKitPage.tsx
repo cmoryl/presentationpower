@@ -470,7 +470,10 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
 
           <ul className="list-disc space-y-1 pl-5 text-[13px] text-[#03002C]/80">
             <li>Use the artwork exactly as supplied — never redraw, stretch, recolour or crop the badge.</li>
-            <li>On dark backgrounds, use the dark-background variant; on light backgrounds, the full-colour variant.</li>
+            <li>Light backgrounds: use the main full-colour logo.</li>
+            <li>Dark backgrounds: use the white outline version (the dark-background variant).</li>
+            <li>Single colour: when we get to choose the one colour, navy is preferred.</li>
+            <li>If only black and white are available, use the black version on light backgrounds and the white version on dark backgrounds.</li>
             <li>{SJB_CLEAR_SPACE.rule}</li>
             <li>Don't place the badge over busy photography or patterns that fight the artwork.</li>
           </ul>

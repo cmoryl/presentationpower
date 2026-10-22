@@ -89,7 +89,7 @@ export const SJB_LOGOS = [
   },
   {
     id: "dark",
-    label: "For dark backgrounds",
+    label: "White outline — for dark backgrounds",
     svg: logoDarkSvg.url,
     png: logoDarkPng.url,
     previewBg: "#0D0E21",
@@ -283,7 +283,10 @@ export const SJB_MISUSE: ReadonlyArray<{ id: SjbMisuseDemo; title: string; detai
 
 export const SJB_LOGO_RULES = [
   "Use the artwork exactly as supplied — never redraw, stretch, recolour or crop the badge.",
-  "On dark backgrounds, use the dark-background variant; on light backgrounds, the full-colour variant.",
+  "Light backgrounds: use the main full-colour logo.",
+  "Dark backgrounds: use the white outline version (the dark-background variant).",
+  "Single colour: when we get to choose the one colour, navy is preferred.",
+  "If only black and white are available, use the black version on light backgrounds and the white version on dark backgrounds.",
   SJB_CLEAR_SPACE.rule,
   "Don't place the badge over busy photography or patterns that fight the artwork.",
 ];
