@@ -3739,6 +3739,39 @@ export type Database = {
         }
         Relationships: []
       }
+      module_catalogue_versions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: number
+          operation: string
+          revision: number
+          snapshot: Json
+          source_key: string
+          source_table: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: never
+          operation: string
+          revision: number
+          snapshot: Json
+          source_key: string
+          source_table: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: never
+          operation?: string
+          revision?: number
+          snapshot?: Json
+          source_key?: string
+          source_table?: string
+        }
+        Relationships: []
+      }
       module_families: {
         Row: {
           description: string | null
@@ -5901,6 +5934,10 @@ export type Database = {
       }
       record_vendor_download: {
         Args: { _label: string; _token: string }
+        Returns: undefined
+      }
+      restore_module_catalogue_version: {
+        Args: { _expected_revision: number; _id: number }
         Returns: undefined
       }
       style_expansion_scan: {

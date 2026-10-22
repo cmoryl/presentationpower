@@ -20,6 +20,7 @@ import {
   type SocialModuleLayout,
 } from "@/lib/social-module-layouts";
 import { reliefAt } from "@/lib/social-module-fit";
+import { useSocialModuleMasters } from "@/lib/social-module-masters";
 
 export function SocialModulePicker({
   open,
@@ -51,14 +52,15 @@ export function SocialModulePicker({
   }, [open]);
 
   const cls = aspectClass(format);
+  const masters = useSocialModuleMasters();
   const layouts = useMemo(() => {
-    const all = socialModulesForFormat(format);
+    const all = masters.isLoading ? [] : socialModulesForFormat(format, masters.layouts);
     return all.filter(
       (l) =>
         (family === "all" || l.family === family) &&
         (!query.trim() || socialModuleMatches(l, query)),
     );
-  }, [format, family, query]);
+  }, [format, family, query, masters.layouts, masters.isLoading]);
 
   if (!open) return null;
 

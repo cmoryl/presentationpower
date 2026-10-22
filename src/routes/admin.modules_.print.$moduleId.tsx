@@ -39,7 +39,7 @@ import { applyPrintOverride, indexOverrides, type ModuleOverrideRow } from "@/li
 import { listModuleOverrides, saveModuleOverride } from "@/lib/module-overrides.functions";
 
 export const Route = createFileRoute("/admin/modules_/print/$moduleId")({
-  head: () => ({ meta: [{ title: "Module studio · Admin · TransPerfect Element" }] }),
+  head: ({ params }) => ({ meta: [{ title: `${params.moduleId} · Print master · TransPerfect Element` }, { name: "description", content: "Edit reusable print master content and preview page formats before saving." }, { property: "og:title", content: `${params.moduleId} · Print master · TransPerfect Element` }, { property: "og:description", content: "Maintain the master content shared by print and social adaptations." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: PrintModuleStudioPage,
 });
 

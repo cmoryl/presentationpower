@@ -57,6 +57,7 @@ import {
   printModuleFamilyMeta,
 } from "@/lib/social-module-layouts";
 import { reliefAt } from "@/lib/social-module-fit";
+import { useSocialModuleMasters } from "@/lib/social-module-masters";
 import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 
@@ -231,7 +232,8 @@ export function KitWizard({
   // asset renders through the module frame instead of the default composition.
   const [moduleLayoutId, setModuleLayoutId] = useState<string | null>(null);
   const [modulePickerOpen, setModulePickerOpen] = useState(false);
-  const moduleLayout = moduleLayoutId ? findSocialModuleLayout(moduleLayoutId) : undefined;
+  const moduleMasters = useSocialModuleMasters();
+  const moduleLayout = moduleLayoutId ? moduleMasters.allLayouts.find((m) => m.id === moduleLayoutId) : undefined;
 
   // ─── Save state ────────────────────────────────────────────────────────
   const [savedKitId, setSavedKitId] = useState<string | undefined>(kitId);

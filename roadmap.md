@@ -1,5 +1,11 @@
 # Roadmap — build review (Week 1)
 
+# Master modules unification
+- [x] Build one searchable, filterable catalogue with a normalized module contract and direct maintenance actions.
+- [x] Derive social adaptations from print masters and expose compatibility, renderer authority and coverage.
+- [x] Show recorded usage/dependencies, governance, ownership and version history; add safe retirement impact checks.
+- [x] Verify signed-in catalogue, downloads, master save/restore and original read-back; document release boundaries and historical lineage limitations in docs/MODULE-CATALOGUE.md.
+
 - [x] San Juan Bowl: stadium target switched back to Hiram Bithorn, San Juan per user (21 Oct 2026); Loubriel handoff and geometry superseded.
 - [x] San Juan Bowl stadium 3D view switched back on — BoothHUB published Hiram Bithorn (21 Oct 2026); its model is photo-based, not surveyed.
 

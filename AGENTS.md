@@ -14,6 +14,7 @@
 - Admin menu lives only in `src/lib/admin-nav.ts` (ADMIN_NAV_GROUPS); AdminShell sidebar and AppShell Admin dropdown both render it; who sees which main-menu entry is decided only in `src/lib/role-nav.ts` — why: hand-kept lists drift.
 - Admin pages outside the `/admin` layout (e.g. `admin_.canvas`) wrap in `RequireAdmin` from AdminShell — why: they skip the `/admin` gate otherwise.
 - Approvals live on one page, `/approvals`: Brand (`approval_requests`), Modules (`custom_modules.review_status`), Sign templates (`sign_templates`); DB triggers enforce reviewer-only decisions — why: the old module queue read a table nothing wrote to.
+- Master modules is a projection of the existing registries, not a new renderer: social choices inherit print master overrides; registered slide renderers own every shipped variant; retirement checks explicit saved references, while database snapshots restore content without bypassing review — why: one governance view must not duplicate authorities or silently overwrite saved work.
 - The Knowledge screens share the `KnowledgeTabs` strip (Entries / Ask Oracle / Oracle KB / Sources); `/admin/knowledge-hub` redirects to `/knowledge`. Why: seven overlapping menu items.
 - Event, kiosk, signage, venue-map and logo extraction/viewer rules live in `src/lib/AGENTS.md`.
 
