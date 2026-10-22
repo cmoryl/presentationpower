@@ -17,7 +17,7 @@ from reportlab.lib.utils import ImageReader
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = "/tmp/sjb"
 ORIGIN = "https://transperfectelement.lovable.app"
-VERSION, RELEASED = "2.0", "22 October 2026"
+VERSION, RELEASED = "2.1", "22 October 2026"
 HISTORY = [
     ("2.0", "22 October 2026", ["Updated single-colour Black, Navy and White masters (AI/EPS/SVG/PNG as supplied).",
                                 "Added arched lettering only (Black, Navy, White) — limited use, by approval only; not an official Bowl logo.",
@@ -103,7 +103,7 @@ c.setFont("G", 10); c.setFillColor("#FFFFFF")
 para("Every image in this guide is the supplied artwork. Blue links open or download the live files — always use the latest from the live kit.", M, H - 240, 300, 10, color="#FFFFFF")
 y = 230
 c.setFont("GB", 10); c.setFillColor(GOLD)
-for label, u in [("Open the live brand kit", "/events/san-juan-bowl/brand-kit"), ("Designer construction pages", "/events/san-juan-bowl/brand-kit/designers"), ("Single-colour logos", "/events/san-juan-bowl/brand-kit/single-colour"), ("Share link (no sign-in)", "/share/san-juan-bowl")]:
+for label, u in [("Open the live brand kit", "/events/san-juan-bowl/brand-kit"), ("Single-colour logos", "/events/san-juan-bowl/brand-kit/single-colour"), ("Share link (no sign-in)", "/share/san-juan-bowl")]:
     t = label + "  ↗"; c.drawString(M, y, t); c.linkURL(ORIGIN + u, (M, y - 2, M + c.stringWidth(t, "GB", 10), y + 10)); y -= 20
 c.showPage()
 
@@ -168,21 +168,7 @@ for ctx, mn, note in [("Print", "40 mm wide", "Keeps the 7.8-unit keyline at 0.2
                       ("Embroidery / patch", "90 mm wide", "Stitching needs about 1 mm per detail; at 60 mm the keyline is 0.39 mm. Ask for the simplified stitch version for anything smaller.")]:
     c.setFont("GB", 9.5); c.setFillColor(INK); c.drawString(x0, y, f"{ctx} — {mn}"); y = para(note, x0, y - 13, W - x0 - M, 8.5) - 6
 link("Construction sheet (PDF)", ORIGIN + "/downloads/san-juan-bowl-logo-construction-sheet.pdf", x0, 90)
-link("Measurement sheets (PDF)", URL["SJB-Logo-Measurements.pdf"], x0 + 170, 90)
 c.showPage()
-
-# 5-6 measurement sheets
-sheets = sorted(k for k in URL if k.startswith("sheet-"))
-for start in (0, 5):
-    head("Measurement sheets" + (" (cont.)" if start else ""), "Construction")
-    part = sheets[start:start + 5]
-    cw = (W - 2 * M - 4 * 12) / 5
-    for i, s in enumerate(part):
-        x = M + i * (cw + 12)
-        c.setStrokeColor("#D9DCE5"); c.rect(x, 200, cw, cw, stroke=1, fill=0); img(s, x, 200, cw, cw, "#FFFFFF")
-        link(f"Sheet {int(s[6:8])} — full size", URL[s], x, 184, 8)
-    para("Each sheet is a supplied measurement view of the master artwork. Click a sheet link to open it at full resolution.", M, 150, W - 2 * M)
-    c.showPage()
 
 # 7 backgrounds
 head("Approved backgrounds", "Usage")
@@ -244,18 +230,6 @@ for n in ["HEX, RGB and HSL values are exact, taken from the supplied artwork �
     y = para("•  " + n, M, y, W - 2 * M, 9) - 3
 c.showPage()
 
-# 10 type + large format
-head("Typography and large format", "Type · Scale")
-y = para("Supporting type is Geist, the TransPerfect house face — Geist Bold for headlines, Geist Regular for body. The lettering inside the badge is part of the artwork and is never retyped.", M, H - 100, 340)
-for role, sz, f, s in [("Display", 30, "GB", "San Juan Bowl"), ("Headline", 20, "GB", "Game day in San Juan"), ("Body", 10, "G", "Supporting copy sits in Geist Regular with comfortable leading.")]:
-    y -= sz + 8; c.setFont(f, sz); c.setFillColor(INK); c.drawString(M, y, s); c.setFont("G", 7.5); c.setFillColor("#666666"); c.drawString(M, y - 12, role); y -= 12
-x0 = M + 380; c.setFont("GB", 11); c.setFillColor(INK); c.drawString(x0, H - 100, "Large-format scale (x = clear space per side)")
-y = H - 122
-for wd, xx, use in [("1 m (3.3 ft)", "14.5 cm", "Concourse signage, press backdrops"), ("2 m (6.6 ft)", "28.9 cm", "Stage surrounds, entrance features"), ("5 m (16.4 ft)", "72.4 cm", "Stadium fascia, large banners"), ("10 m (32.8 ft)", "1.45 m", "Building wraps, stand coverings"), ("20 m (65.6 ft)", "2.89 m", "Field application, midfield mark")]:
-    c.setFont("GB", 9); c.drawString(x0, y, wd); c.setFont("G", 9); c.drawString(x0 + 90, y, xx); c.drawString(x0 + 150, y, use); y -= 16
-y = para("Reproduce from the vector master only. Colour at scale is matched physically by the vendor with a contract proof — never from a screen. Clear space scales with the badge.", x0, y - 8, W - x0 - M, 9)
-c.showPage()
-
 D = os.path.join(ROOT, "public/downloads")
 def local(rel): return Image.open(os.path.join(D, rel))
 def dl(rel): return ORIGIN + "/downloads/" + rel
@@ -303,7 +277,7 @@ rows = [("Full-colour logo", ["sjb-logo-color.svg", "sjb-logo-color.png"]), ("Da
         ("Single-colour logos", ["1c-pack.zip"]), ("Original drawing components", ["original-components.zip"]),
         ("Lettering pieces", ["transperfect-lettering.svg", "san-juan-lettering.svg", "bowl-lettering.svg"]),
         ("Badge scene pieces", ["scene-banner.svg", "scene-fortress.svg", "scene-football.svg", "scene-palmL.svg", "scene-palmR.svg", "scene-bird.svg", "scene-clouds.svg", "scene-sky.svg", "scene-base.svg", "scene-trim.svg", "scene-ribbon-stars.svg", "waves-sun-trim.svg"]),
-        ("Measurements", ["SJB-Logo-Measurements.pdf"])]
+        ]
 for k, v in [("sjb-palms-pair.svg", "sjb-palms/sjb-palms-pair.svg"), ("sjb-palms-pair-1color.svg", "sjb-palms/sjb-palms-pair-1color.svg"), ("sjb-palm-left.svg", "sjb-palms/sjb-palm-left.svg"), ("sjb-palm-right.svg", "sjb-palms/sjb-palm-right.svg"),
              ("sjb-mark-pack.zip", "sjb-mark/sjb-mark-pack.zip"), ("sjb-lockups-pack.zip", "sjb-lockups/sjb-lockups-pack.zip")]:
     URL[k] = dl(v)
@@ -325,14 +299,5 @@ link("Construction sheet (PDF)", ORIGIN + "/downloads/san-juan-bowl-logo-constru
 y -= 30; para("Links open the live files on " + ORIGIN + ". Originals are never changed; if a file is updated, the next guide version links to it. Every link opens without sign-in.", M, y, W - 2 * M, 9, color="#444444")
 c.showPage()
 
-# version history
-head("Version history", "Version control")
-y = H - 104
-for v, d, notes in HISTORY:
-    c.setFont("GB", 12); c.setFillColor(INK); c.drawString(M, y, f"v{v}"); c.setFont("G", 9.5); c.setFillColor("#444444"); c.drawString(M + 50, y, d); y -= 18
-    for n in notes: y = para("•  " + n, M + 50, y, W - 2 * M - 50, 9) - 2
-    y -= 14
-para("Always download the current guide from the live kit. A file named with an older version number is superseded. Asset links in this PDF point to fixed copies, so a new version is issued whenever a file changes.", M, y, W - 2 * M, 9, color="#444444")
-c.showPage()
 c.save()
 print(OUT, page_no[0], "pages")
