@@ -20,7 +20,7 @@ export function DesignersPage() {
           <h1 className="mt-1 text-[32px] font-bold leading-tight">Brand guide, construction &amp; production</h1>
           <p className="mt-1 text-[14px] text-[#666666]">{SJB_EVENT.venue}, {SJB_EVENT.city}. The full brand guide and every brand-kit section, then the exact build of the badge and production specs.</p>
         </header>
-        <SjbGuideSections />
+        <SjbGuideSections withSingleColour={false} />
         <SjbBrandKitBody embedded />
         <ConstructionSection />
         <LargeFormatSection />
