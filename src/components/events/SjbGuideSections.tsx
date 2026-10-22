@@ -3,6 +3,7 @@ import { SJB_LETTERING_SPEC_VISIBLE } from "@/components/events/SjbShare";
 // type, don'ts). Rendered by the guide page and the designers kit so both carry
 // the full regular guide. Values come only from src/lib/san-juan-bowl.ts.
 import { X } from "lucide-react";
+import { SjbSingleColour } from "@/components/events/SjbSingleColour";
 import { Button } from "@/components/ui/button";
 import { SjbLink } from "@/components/events/SjbShare";
 import { SjbLetteringStacked } from "@/components/events/SjbLetteringStacked";
@@ -14,6 +15,7 @@ import {
   SJB_EVENT,
   SJB_LOGOS,
   SJB_LOGO_ANATOMY,
+  SJB_LOGO_RULES,
   SJB_MIN_SIZES,
   SJB_MISUSE,
   SJB_TYPE_NOTE,
@@ -38,7 +40,9 @@ const DONT: Record<SjbMisuseDemo, { img?: React.CSSProperties; ground?: React.CS
   retype: { text: "San Juan Bowl" },
 };
 
-export function SjbGuideSections() {
+export interface SjbGuideSectionsProps { withSingleColour?: boolean }
+
+export function SjbGuideSections({ withSingleColour = true }: SjbGuideSectionsProps = {}) {
   return (
     <>
       <Section n="01" title="Introduction">
@@ -84,6 +88,11 @@ export function SjbGuideSections() {
             </div>
           ))}
         </div>
+        <div className="mt-4 rounded-lg border border-border p-4">
+          <h3 className="font-semibold text-foreground">Which logo to use</h3>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">{SJB_LOGO_RULES.map((r) => <li key={r}>{r}</li>)}</ul>
+        </div>
+        {withSingleColour && <SjbSingleColour className="mt-6" />}
         <div className="mt-4 overflow-hidden rounded-lg border border-border">
           <div className="flex h-56 items-center justify-center p-6" style={{ background: NAVY }}>
             <img src={curvedSvg.url} alt="SAN JUAN BOWL curved lettering" className="max-h-full max-w-full" />
@@ -124,7 +133,7 @@ export function SjbGuideSections() {
             </div>
           ))}
         </div>
-        <SjbLink page="single" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">Single-colour versions</SjbLink>
+        {!withSingleColour && <SjbLink page="single" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">Single-colour versions</SjbLink>}
       </Section>
 
       <Section n="04" title="Colour palette">
