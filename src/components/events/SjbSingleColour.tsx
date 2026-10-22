@@ -59,7 +59,7 @@ const LETTERING = [
 const RULES = [
   "Use one-colour only when full colour cannot reproduce: one-ink print, embroidery, laser etch, foil, deboss, vinyl cut, stencil, fax and newsprint.",
   "Use the supplied file for the ink you need. Never make your own by recolouring or flattening the full-colour logo; the one-colour drawing is redrawn (white sun on dark sky, white reflections on a dark sea, 6 px wave lines) so it reads in a single ink.",
-  "Only the three supplied inks: Black, Navy (#0D0E21) or White. Any other single ink needs designer approval.",
+  "Only the three supplied inks: Black, Navy (#0D0E21) or White. When we get to choose the one colour, navy is preferred. If only black and white are available, use black on light backgrounds and white on dark backgrounds. Any other single ink needs designer approval.",
   "Dark on light, white on dark. Never place navy or black on a dark ground, or white on a light one.",
   "Framed adds an outer border line around the badge. Use it on busy or mid-tone grounds and merchandise where the edge must stay clear; use unframed on clean flat grounds.",
   "Clear space, minimum sizes and misuse rules are the same as the full-colour logo.",
