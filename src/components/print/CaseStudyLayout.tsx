@@ -190,7 +190,8 @@ export function CaseStudyLayout({
                 padding: `${cq(padTop(density))} ${padCq(padX(density))} ${cq(96)}`,
                 overflow: "hidden",
                 color: ink,
-                display: "flex",
+                // Starter templates open on their own hero section module.
+                display: hidden.has("masthead") ? "none" : "flex",
                 flexDirection: "column",
                 minHeight: content.heroMedia?.imageUrl
                   ? `${(content.heroMedia.heightPct ?? 46) - 4}%`

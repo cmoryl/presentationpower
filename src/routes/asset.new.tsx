@@ -10,6 +10,7 @@ import { BrandLockup } from "@/components/BrandLockup";
 import { createPrintAsset, createPrintAssetWithBrief } from "@/lib/print-assets.functions";
 import { curatedMasterFor } from "@/lib/print-library/catalog";
 import { toEditableContent } from "@/lib/print-library/editable";
+import { STARTER_GROUPS, STARTER_TEMPLATES, starterContent, type StarterTemplate } from "@/lib/print-library/starter-templates";
 import { FileText, Rocket, Layers, PenSquare } from "lucide-react";
 
 // Query-string seeds so all four entry points converge on this one wizard.
@@ -118,6 +119,34 @@ function NewAssetPage() {
 
   // Blank page: just a title over an empty page — no generated copy, no sample
   // stats or quote — so people add modules from the library and fill it in.
+  const [tplGroup, setTplGroup] = useState<(typeof STARTER_GROUPS)[number]["id"]>("brochure");
+  async function handleTemplate(t: StarterTemplate) {
+    setBusy(true);
+    setErr(null);
+    try {
+      const name = title.trim() || t.title;
+      const asset = await createBlank({
+        data: {
+          kind: "case-study",
+          title: name,
+          brandModeId,
+          content: starterContent(t, name),
+          context: {
+            pageSize: t.pageSize,
+            distribution,
+            contactCard: false,
+            starterTemplateId: t.id,
+            ...(t.exportPrefs ? { exportPrefs: t.exportPrefs } : {}),
+          },
+        },
+      });
+      navigate({ to: "/asset/$assetId", params: { assetId: asset.id } });
+    } catch (e) {
+      setErr((e as Error).message);
+      setBusy(false);
+    }
+  }
+
   async function handleBlank() {
     setBusy(true);
     setErr(null);
@@ -266,6 +295,44 @@ function NewAssetPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="min-w-0">
             {/* OUTCOME */}
+            <Section index="00" title="Start from a template">
+              <p className="text-xs text-black/55 dark:text-white/55">
+                Pick a ready-made layout instead of a blank page. Every block is an editable section — swap, remove or add more in the editor. Bracketed text is placeholder copy to replace.
+              </p>
+              <div role="tablist" aria-label="Template type" className="flex flex-wrap gap-2">
+                {STARTER_GROUPS.map((g) => (
+                  <button
+                    key={g.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={tplGroup === g.id}
+                    onClick={() => setTplGroup(g.id)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${tplGroup === g.id ? "border-[#003FC7] bg-[#003FC7] text-white" : "border-black/15 text-[#03002C] hover:border-[#003FC7] dark:border-white/20 dark:text-white"}`}
+                  >
+                    {g.label}
+                  </button>
+                ))}
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {STARTER_TEMPLATES.filter((t) => t.group === tplGroup).map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    disabled={busy}
+                    onClick={() => handleTemplate(t)}
+                    className="group flex gap-3 rounded-xl border border-black/10 p-3 text-left transition hover:border-[#003FC7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#003FC7] disabled:opacity-50 dark:border-white/10"
+                  >
+                    <TemplateThumb t={t} />
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold text-[#03002C] dark:text-white">{t.title}</span>
+                      <span className="mt-0.5 block text-xs text-black/55 dark:text-white/55">{t.description}</span>
+                      <span className="mt-1 block font-mono text-[10px] uppercase tracking-wider text-black/40 dark:text-white/40">{t.sizeLabel}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </Section>
+
             <Section index="01" title="Outcome">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {KINDS.map((k) => {
@@ -532,6 +599,19 @@ function NewAssetPage() {
 
 const inputCls =
   "w-full rounded-md border border-black/10 bg-white px-4 py-3 text-sm text-[#03002C] placeholder:text-[#03002C]/35 focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/15 transition-all dark:border-white/10 dark:bg-white/[0.03] dark:text-white dark:placeholder:text-white/35";
+
+/** Wireframe of the template's section stack at its page proportion. */
+function TemplateThumb({ t }: { t: StarterTemplate }) {
+  const ratio = t.exportPrefs?.customW && t.exportPrefs.customH ? t.exportPrefs.customH / t.exportPrefs.customW : t.pageSize === "Letter" ? 11 / 8.5 : 1.414;
+  const weight = (k: string) => (k === "hero" ? 3 : k === "logo-grid" || k === "feature-list" ? 2.2 : k === "contact" ? 0.9 : 1.4);
+  return (
+    <span aria-hidden className="flex w-14 shrink-0 flex-col gap-[3px] rounded-sm border border-black/10 bg-[#EEF1F7] p-[4px]" style={{ height: 56 * Math.min(ratio, 1.6) }}>
+      {t.sections.map((s, i) => (
+        <span key={i} className={`rounded-[2px] ${s.kind === "hero" ? "bg-[#03002C]" : s.kind === "contact" ? "bg-[#003FC7]" : "bg-white"}`} style={{ flex: weight(s.kind) }} />
+      ))}
+    </span>
+  );
+}
 
 function Section({
   index,
