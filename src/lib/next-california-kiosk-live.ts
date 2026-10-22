@@ -18,6 +18,7 @@ import GEIST_ADV from "./geist-advances.json";
 import layoutsJson from "@/lib/next-california-kiosk-live-layouts.json";
 import signLayoutsJson from "@/lib/legal-next-signage-layouts.json";
 import { marksSvg } from "@/lib/kiosk-marks";
+import { signScene } from "@/lib/sign-scene-backgrounds";
 import { VENUE_STEP_GUIDES } from "@/lib/venue-step-guides";
 
 export const KIOSK_W = 3240;
