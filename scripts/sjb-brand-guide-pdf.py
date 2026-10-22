@@ -264,7 +264,11 @@ para("A suggested share of each colour in a layout, then every text/background p
 x = M; bw = W - 2 * M
 for k, pct in [("navy", 60), ("white", 25), ("sky", 10), ("gold", 5)]:
     w = bw * pct / 100; c.setFillColor(HX[k]); c.rect(x, 400, w, 34, stroke=0, fill=1)
-    c.setFillColor(INK); c.setFont("GB", 9); c.drawString(x, 386, f"{NM[k]} {pct}%"); x += w
+    x += w
+lx = M
+for k, pct in [("navy", 60), ("white", 25), ("sky", 10), ("gold", 5)]:
+    c.setFillColor(HX[k]); c.setStrokeColor("#D9DCE5"); c.rect(lx, 384, 9, 9, stroke=1, fill=1)
+    t = f"{NM[k]} {pct}%"; c.setFillColor(INK); c.setFont("GB", 9); c.drawString(lx + 14, 385, t); lx += 34 + c.stringWidth(t, "GB", 9)
 c.setStrokeColor("#D9DCE5"); c.rect(M, 400, bw, 34, stroke=1, fill=0)
 c.setFont("G", 8.5); c.setFillColor("#444444"); c.drawString(M, 370, "Guidance only — gold stays the smallest share so it keeps its punch.")
 pairs = [("white","navy"),("gold","navy"),("sky","navy"),("navy","white"),("navy","gold"),("navy","sky"),("sky","white"),("gold","white")]
