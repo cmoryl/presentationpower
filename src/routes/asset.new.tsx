@@ -7,7 +7,7 @@ import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { BrandLockup } from "@/components/BrandLockup";
-import { createPrintAssetWithBrief } from "@/lib/print-assets.functions";
+import { createPrintAsset, createPrintAssetWithBrief } from "@/lib/print-assets.functions";
 import { curatedMasterFor } from "@/lib/print-library/catalog";
 import { toEditableContent } from "@/lib/print-library/editable";
 import { FileText, Rocket, Layers, PenSquare } from "lucide-react";
@@ -114,6 +114,44 @@ function NewAssetPage() {
   const search = Route.useSearch();
   const { brandModes } = useTaxonomy();
   const create = useServerFn(createPrintAssetWithBrief);
+  const createBlank = useServerFn(createPrintAsset);
+
+  // Blank page: just a title over an empty page — no generated copy, no sample
+  // stats or quote — so people add modules from the library and fill it in.
+  async function handleBlank() {
+    setBusy(true);
+    setErr(null);
+    try {
+      const name = title.trim() || "Untitled page";
+      const asset = await createBlank({
+        data: {
+          kind: "case-study",
+          title: name,
+          brandModeId,
+          content: {
+            title: name,
+            eyebrow: "",
+            client: prospect.trim(),
+            industry: "",
+            audience: "",
+            summary: "",
+            challenge: { heading: "", body: "" },
+            solution: { heading: "", body: "" },
+            result: { heading: "", body: "" },
+            stats: [],
+            engagement: { title: "", bullets: [] },
+            modules: [],
+            hiddenSections: ["story", "stats", "quote", "engagement", "cta"],
+          },
+          context: { pageSize, distribution, contactCard: false, blankStart: true },
+        },
+      });
+      navigate({ to: "/asset/$assetId", params: { assetId: asset.id } });
+    } catch (e) {
+      setErr((e as Error).message);
+      setBusy(false);
+    }
+  }
 
   const [kind, setKind] = useState<
     | "case-study"
@@ -451,6 +489,18 @@ function NewAssetPage() {
                 <Rocket size={14} />
                 {busy ? "Generating…" : "Generate print asset"}
               </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={handleBlank}
+                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#03002C]/20 px-6 py-2.5 text-sm font-semibold text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/20 dark:text-white"
+              >
+                <FileText size={14} />
+                Start a blank page
+              </button>
+              <p className="mt-1 text-center text-[11px] text-black/50 dark:text-white/50">
+                Just a title on an empty page — add sections from the library and fill it in yourself.
+              </p>
               {!canGenerate && (
                 <p className="mt-2 text-center text-[11px] text-black/50 dark:text-white/50">
                   {requiresProspect && !prospect.trim()

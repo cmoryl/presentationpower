@@ -387,7 +387,7 @@ export function CaseStudyLayout({
               className="relative flex flex-col"
               style={{ padding: `${cq(28)} ${padCq(padX(density))} 0`, flex: 1 }}
             >
-              {blocks.map((b, i) => (
+              {(hidden.has("story") ? [] : blocks).map((b, i) => (
                 <div
                   key={i}
                   className="flex"
