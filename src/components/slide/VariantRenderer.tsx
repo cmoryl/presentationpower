@@ -406,9 +406,8 @@ function renderVariantBody({
     );
   }
 
-  // Module registry first: families that have been extracted out of the legacy
-  // switch below claim their variants here (see module-registry.ts). Anything
-  // unclaimed falls through to the switch, so extraction is incremental.
+  // One authority for every shipped variant, including blank canvas.
+  // Keep a visibly honest fallback for unknown imported / future ids.
   const registered = findSlideModule(variant.id);
   if (registered) {
     return registered.render({
@@ -428,57 +427,10 @@ function renderVariantBody({
     });
   }
 
-  switch (variant.id) {
-    // ── Opening ────────────────────────────────────────────────────────
-    // The team family (MV-OP-INTRO-TEAM, MV-TEAM-BIOS-*) now lives in `modules/team.tsx`.
-
-    // ── Context & Challenge ───────────────────────────────────────────
-    // The narrative family (MV-CTX-*, MV-SOL-*, MV-INS-*, MV-PROOF-*) now
-    // lives in `modules/narrative.tsx`.
-
-    // The process family (MV-PROC-TIMELINE/STEP-CHAIN/PHASES/STEP-SPOTLIGHT)
-    // now lives in `modules/process.tsx`.
-
-    // MV-PROC-STAGE-ORBITS and MV-PROC-BEFORE-AFTER now live in `modules/process.tsx`.
-
-    // The MV-INFO-* diagram family now lives in `modules/info.tsx`.
-
-    // Remaining MV-PROC-* variants now live in `modules/process.tsx`.
-
-    // The MV-PROOF-TESTIMONIAL spread now lives in `modules/narrative.tsx`.
-
-    // The business family (MV-DEC-*, MV-COMM-*, MV-RISK-*, MV-CASE-*, MV-GOV-*, MV-REC-*, MV-SHOW-*, MV-CLIENT-*) now lives in `modules/business.tsx`.
-
-    // ── Expanded CTA / close variants ─────────────────────────────────
-    // The closing family (MV-CLOSE-*) now lives in `modules/close.tsx`.
-
-    // ── Advanced variants — BATCH 1 ──────────────────────────────────────
-    // MV-BENTO-5/6/7/8 now live in `modules/bento.tsx` (module registry).
-
-    // Bento — value grid + close. A full closing argument on one slide:
-    // title + accent promise line, a lead-in band, a bento grid of value cells
-    // (icon, coloured label, accent rule, proof line) and a two-clause close
-    // band. Bands are the shared SummaryBand so geometry never drifts.
-    // The advanced diagram family (bento value close, KPI dashboard, roadmap, funnel, flywheel, maturity curve, journey map, logo wall, 2x2 matrix, iceberg) now lives in `modules/advanced.tsx`.
-    // The editorial family (spreads, manifesto, triptych, comparisons, pull quotes, definition, principles, countdown, horizon, MV-ED-* posters) now lives in `modules/editorial.tsx`.
-    // The locations family (MV-LOC-*) now lives in `modules/locations.tsx`.
-
-    // Blank canvas base (custom modules): frame + brand chrome only. Canvas
-    // blocks supply every element, so nothing is painted here — an optional
-    // title is honoured when the author typed one.
-    case "MV-CANVAS-BLANK":
-      return (
-        <SlideFrame brand={brand} pageNumber={pageNumber}>
-          {c.title ? <SlideTitle brand={brand} title={s(c.title, "")} /> : null}
-        </SlideFrame>
-      );
-
-    default:
-      return (
-        <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8 text-3xl opacity-70">{variant.description}</div>
-        </SlideFrame>
-      );
-  }
+  return (
+    <SlideFrame brand={brand} pageNumber={pageNumber}>
+      <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+      <div role="alert" className="mt-8 text-3xl opacity-70">Renderer unavailable for {variant.id}</div>
+    </SlideFrame>
+  );
 }

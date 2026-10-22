@@ -27,5 +27,6 @@ import "./growth-orbits";
 import "./certifications";
 import "./density";
 import "./showcase-cards";
+import "./canvas";
 
 export {};

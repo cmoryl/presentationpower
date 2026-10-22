@@ -106,7 +106,7 @@ export function customModuleSlide(
       sectionId: opts?.sectionId ?? row.section_id ?? "SEC-01",
       variantId: variant.id,
       layoutId: variant.permittedLayoutIds[0] ?? "LF-01",
-      content: (row.content ?? {}) as SlideContent,
+      content: { ...(row.content ?? {}), __customModuleId: row.id } as SlideContent,
       changes: [],
       canvasBlocks: normalizeCanvasBlocks(row.canvas_blocks),
     },
