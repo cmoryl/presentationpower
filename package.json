@@ -106,6 +106,7 @@
     "nanoid": "^6.0.0",
     "opentype.js": "^2.0.0",
     "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "4.10.38",
     "pg": "^8.22.0",
     "polygon-clipping": "^0.15.7",
     "pptxgenjs": "^4.0.1",

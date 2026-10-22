@@ -13,8 +13,10 @@ const Input = z.object({
   filename: z.string().min(1).max(300),
   mime: z.string().max(200).optional(),
   /** Raw base64 (no data: prefix). */
-  base64: z.string().min(4).max(28_000_000),
-});
+  base64: z.string().min(4).max(28_000_000).optional(),
+  /** Text already read in the browser (large live .ai / PDF files). */
+  text: z.string().min(1).max(400_000).optional(),
+}).refine((d) => d.base64 || d.text, "No file content was sent.");
 
 const Structured = z.object({
   eyebrow: z.string().optional(),
@@ -138,15 +140,14 @@ export const structureConvertUpload = createServerFn({ method: "POST" })
   .validator((data: unknown) => Input.parse(data))
   .handler(async ({ data }) => {
     const ext = extOf(data.filename);
-    const bytes = Uint8Array.from(atob(data.base64), (c) => c.charCodeAt(0));
-
-    let text = "";
-    if (ext === "docx" || ext === "pptx" || ext === "xlsx") {
+    let text = data.text ?? "";
+    const bytes = data.base64 ? Uint8Array.from(atob(data.base64), (c) => c.charCodeAt(0)) : new Uint8Array();
+    if (!text && ext === "docx" || ext === "pptx" || ext === "xlsx") {
       text = await extractOfficeText(bytes, ext);
     }
 
     const apiKey = process.env["LOVABLE_API_KEY"];
-    if (!text.trim()) {
+    if (!text.trim() && data.base64) {
       if (!apiKey) throw new Error("File reading is not configured on this workspace.");
       const mime =
         data.mime && data.mime !== "application/octet-stream"
