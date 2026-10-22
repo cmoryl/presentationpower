@@ -1553,9 +1553,9 @@ body.export-mode [data-print-surface] {
 @utility editor-pin {
   @media (min-width: 1024px) {
     position: sticky;
-    top: calc(var(--app-header-h, 72px) + 12px);
+    top: calc(var(--app-header-h, 72px) + var(--editor-pin-offset, 12px));
     align-self: start;
-    max-height: calc(100dvh - var(--app-header-h, 72px) - 24px);
+    max-height: calc(100dvh - var(--app-header-h, 72px) - var(--editor-pin-offset, 12px) - 12px);
     overflow: auto;
   }
 }
