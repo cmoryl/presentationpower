@@ -152,6 +152,29 @@ for i, (n, bg, lab, files) in enumerate(arch):
 para("The arched TRANSPERFECT / SAN JUAN / BOWL wording from the logo, without the badge, as supplied with transparent backgrounds. Ask the brand team before using it; never re-set, stretch or flatten the arch.", M, 160, W - 2 * M, 9)
 c.showPage()
 
+D = os.path.join(ROOT, "public/downloads")
+def local(rel): return Image.open(os.path.join(D, rel))
+def dl(rel): return ORIGIN + "/downloads/" + rel
+
+# 14 curved lettering + palms
+import urllib.request, io
+head("Curved lettering and palm trees", "Logo pieces")
+curved = {k: ORIGIN + json.load(open(os.path.join(ROOT, f"src/assets/sjb/curved-lettering.{k}.asset.json")))["url"] for k in ("svg", "ai", "png")}
+cv = Image.open(io.BytesIO(urllib.request.urlopen(urllib.request.Request(curved["png"], headers={"User-Agent": "Mozilla/5.0"})).read())).convert("RGBA")
+img(cv, M, 250, 300, 190, NAVY)
+c.setFont("GB", 10); c.setFillColor(INK); c.drawString(M, 232, "Curved SAN JUAN BOWL — on navy")
+nx = link("SVG", curved["svg"], M, 216, 8.5); nx = link("AI", curved["ai"], nx, 216, 8.5); link("PNG", curved["png"], nx, 216, 8.5)
+para("The badge's own arched lettering. Use as supplied — never retype, re-curve or stretch.", M, 196, 300, 8.5)
+palms = [("sjb-palms-pair", "Palm pair, full colour"), ("sjb-palms-pair-1color", "Palm pair, one colour"), ("sjb-palm-left", "Left palm"), ("sjb-palm-right", "Right palm")]
+pw = (W - M - (M + 330) - 12) / 2
+for i, (pid, lab) in enumerate(palms):
+    x = M + 330 + (i % 2) * (pw + 12); y = 330 - (i // 2) * 150
+    img(local(f"sjb-palms/{pid}-2400.png"), x, y, pw, 110, "#F2F2F2")
+    c.setFont("GB", 9.5); c.setFillColor(INK); c.drawString(x, y - 13, lab)
+    nx = link("SVG", dl(f"sjb-palms/{pid}.svg"), x, y - 27, 8); link("PNG 2400", dl(f"sjb-palms/{pid}-2400.png"), nx, y - 27, 8)
+para("Palms are taken from the logo. Use as supplied; only the one-colour file may be recoloured.", M + 330, 120, W - 2 * M - 330, 8.5)
+c.showPage()
+
 # 4 clear space & minimum size
 head("Clear space and minimum size", "Construction")
 img("sheet-01.png", M, 110, 330, 330)
@@ -226,28 +249,6 @@ for n in ["HEX, RGB and HSL values are exact, taken from the supplied artwork �
     y = para("•  " + n, M, y, W - 2 * M, 9) - 3
 c.showPage()
 
-D = os.path.join(ROOT, "public/downloads")
-def local(rel): return Image.open(os.path.join(D, rel))
-def dl(rel): return ORIGIN + "/downloads/" + rel
-
-# 14 curved lettering + palms
-import urllib.request, io
-head("Curved lettering and palm trees", "Logo pieces")
-curved = {k: ORIGIN + json.load(open(os.path.join(ROOT, f"src/assets/sjb/curved-lettering.{k}.asset.json")))["url"] for k in ("svg", "ai", "png")}
-cv = Image.open(io.BytesIO(urllib.request.urlopen(urllib.request.Request(curved["png"], headers={"User-Agent": "Mozilla/5.0"})).read())).convert("RGBA")
-img(cv, M, 250, 300, 190, NAVY)
-c.setFont("GB", 10); c.setFillColor(INK); c.drawString(M, 232, "Curved SAN JUAN BOWL — on navy")
-nx = link("SVG", curved["svg"], M, 216, 8.5); nx = link("AI", curved["ai"], nx, 216, 8.5); link("PNG", curved["png"], nx, 216, 8.5)
-para("The badge's own arched lettering. Use as supplied — never retype, re-curve or stretch.", M, 196, 300, 8.5)
-palms = [("sjb-palms-pair", "Palm pair, full colour"), ("sjb-palms-pair-1color", "Palm pair, one colour"), ("sjb-palm-left", "Left palm"), ("sjb-palm-right", "Right palm")]
-pw = (W - M - (M + 330) - 12) / 2
-for i, (pid, lab) in enumerate(palms):
-    x = M + 330 + (i % 2) * (pw + 12); y = 330 - (i // 2) * 150
-    img(local(f"sjb-palms/{pid}-2400.png"), x, y, pw, 110, "#F2F2F2")
-    c.setFont("GB", 9.5); c.setFillColor(INK); c.drawString(x, y - 13, lab)
-    nx = link("SVG", dl(f"sjb-palms/{pid}.svg"), x, y - 27, 8); link("PNG 2400", dl(f"sjb-palms/{pid}-2400.png"), nx, y - 27, 8)
-para("Palms are taken from the logo. Use as supplied; only the one-colour file may be recoloured.", M + 330, 120, W - 2 * M - 330, 8.5)
-c.showPage()
 
 # 15 shield mark + lockups
 head("Small-size mark and lockups", "Logo pieces")
