@@ -19839,6 +19839,16 @@
   },
   "sign": {
    "margin": 36
-  }
+  },
+  "defaultMarks": [
+   {
+    "id": "qr1",
+    "kind": "brand",
+    "family": "qr-san-juan-bowl",
+    "x": 261.0,
+    "y": 640.0,
+    "w": 90.0
+   }
+  ]
  }
 }
