@@ -64,6 +64,7 @@ export function PrintAgentChat({
   onFirstUserMessage,
   pendingPrompt,
   onPendingPromptConsumed,
+  onTurnFinished,
 }: {
   threadId: string;
   initialMessages: UIMessage[];
@@ -71,6 +72,8 @@ export function PrintAgentChat({
   onFirstUserMessage?: (text: string) => void;
   pendingPrompt?: string | null;
   onPendingPromptConsumed?: () => void;
+  /** Fires when the agent finishes a reply, so a live preview can reload. */
+  onTurnFinished?: () => void;
 }) {
   const transport = useMemo(
     () =>
@@ -104,6 +107,12 @@ export function PrintAgentChat({
   useEffect(() => {
     if (!busy) inputRef.current?.focus();
   }, [busy, threadId]);
+
+  const wasBusy = useRef(false);
+  useEffect(() => {
+    if (wasBusy.current && !busy) onTurnFinished?.();
+    wasBusy.current = busy;
+  }, [busy, onTurnFinished]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });

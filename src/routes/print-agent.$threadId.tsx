@@ -61,6 +61,10 @@ function PrintAgentThreadPage() {
   const [assetId, setAssetId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<string | null>(null);
+  const [previewKey, setPreviewKey] = useState(0);
+  const [showLive, setShowLive] = useState(true);
+  const onTurnFinished = useCallback(() => setPreviewKey((k) => k + 1), []);
+  const live = !!assetId && showLive;
 
   // Pick up a prompt handed off from a hero / quick-start CTA.
   useEffect(() => {
@@ -144,7 +148,7 @@ function PrintAgentThreadPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-[1400px] px-4 pb-8 pt-6 sm:px-6">
+      <div className={`mx-auto w-full ${live ? "max-w-none" : "max-w-[1400px]"} px-4 pb-8 pt-6 sm:px-6">
         <header className="mb-4">
           <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
             <Printer className="size-3.5" aria-hidden /> Print agent
@@ -158,8 +162,14 @@ function PrintAgentThreadPage() {
           </p>
         </header>
 
-        <div className="grid min-w-0 gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <aside className="order-2 min-w-0 space-y-2 lg:order-1">
+        <div
+          className={`grid min-w-0 gap-4 ${
+            live
+              ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] xl:grid-cols-[220px_minmax(0,1fr)_minmax(0,1.5fr)]"
+              : "lg:grid-cols-[260px_minmax(0,1fr)]"
+          }`}
+        >
+          <aside className={`order-2 min-w-0 space-y-2 lg:order-1 ${live ? "lg:hidden xl:block" : ""}`}>
             <Button onClick={() => void newThread()} className="h-11 w-full justify-start gap-2">
               <Plus className="size-4" aria-hidden /> New print conversation
             </Button>
@@ -221,15 +231,48 @@ function PrintAgentThreadPage() {
                     onFirstUserMessage={onFirstUserMessage}
                     pendingPrompt={pending}
                     onPendingPromptConsumed={() => setPending(null)}
+                    onTurnFinished={onTurnFinished}
                   />
                 </div>
               </>
             )}
           </section>
+
+          {live && assetId ? (
+            <section className="order-3 flex min-h-[70vh] min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card lg:sticky lg:top-[calc(var(--app-header-h,64px)+12px)] lg:h-[calc(100vh-var(--app-header-h,64px)-24px)]">
+              <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  Live file · editor
+                </p>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => setPreviewKey((k) => k + 1)}>
+                    Refresh
+                  </Button>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/asset/$assetId" params={{ assetId }}>Open full editor</Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setShowLive(false)}>
+                    Hide
+                  </Button>
+                </div>
+              </div>
+              <iframe
+                key={`${assetId}-${previewKey}`}
+                title="Live print file editor"
+                src={`/asset/${assetId}`}
+                className="min-h-0 w-full flex-1 bg-background"
+              />
+            </section>
+          ) : null}
         </div>
 
         {assetId ? (
           <p className="mt-3 text-xs text-muted-foreground">
+            {!showLive ? (
+              <button type="button" className="mr-2 font-medium underline" onClick={() => setShowLive(true)}>
+                Show live file
+              </button>
+            ) : null}
             Current piece:{" "}
             <Link to="/asset/$assetId" params={{ assetId }} className="font-medium underline">
               open in the print editor
