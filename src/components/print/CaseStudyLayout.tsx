@@ -368,6 +368,18 @@ export function CaseStudyLayout({
               </div>
             )}
 
+            {/* Modules that replaced the stat pills land in their place. */}
+            <div style={{ padding: `${cq(14)} ${padCq(padX(density))} 0` }}>
+              <PrintSectionsStack
+                sections={content.modules}
+                mode={mode}
+                accent={accent}
+                density={density}
+                slots={(content as { moduleSlots?: Record<string, string> }).moduleSlots}
+                slot="stats"
+              />
+            </div>
+
             {/* CSR ROWS — Challenge / Solution / Result */}
             <div
               className="relative flex flex-col"
@@ -539,12 +551,32 @@ export function CaseStudyLayout({
                 </div>
               )}
 
+              {/* Modules that replaced the quote / engagement row */}
+              <PrintSectionsStack
+                sections={content.modules}
+                mode={mode}
+                accent={accent}
+                density={density}
+                slots={(content as { moduleSlots?: Record<string, string> }).moduleSlots}
+                slot="quote"
+              />
+              <PrintSectionsStack
+                sections={content.modules}
+                mode={mode}
+                accent={accent}
+                density={density}
+                slots={(content as { moduleSlots?: Record<string, string> }).moduleSlots}
+                slot="engagement"
+              />
+
               {/* SHARED MODULES — user-inserted reusable blocks */}
               <PrintSectionsStack
                 sections={content.modules}
                 mode={mode}
                 accent={accent}
                 density={density}
+                slots={(content as { moduleSlots?: Record<string, string> }).moduleSlots}
+                claimedSlots={["stats", "quote", "engagement"]}
               />
 
               {/* CTA BAND */}
