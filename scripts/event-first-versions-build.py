@@ -35,10 +35,13 @@ FORMATS = {
     "story": (1080, 1920, [240, 380, 600, 600], (86, 1180), (44, 1260), "center", 1050),
     "email": (600, 200, [24, 28, 210, 144], (22, 92), (15, 122), "left", 0),
     "pillar": (1728, 6912, [214, 500, 1300, 1300], (300, 3700), (0, 0), "center", 3240),
+    "flyer": (612, 792, [106, 64, 400, 400], (58, 566), (19, 622), "center", 520),
 }
 PLAN = [("nexus", "post"), ("nexus", "story"), ("nexus", "email"),
         ("hackathon", "post"), ("hackathon", "story"), ("hackathon", "email"),
-        ("sjb", "post"), ("sjb", "story"), ("sjb", "email"), ("sjb", "pillar")]
+        ("sjb", "post"), ("sjb", "story"), ("sjb", "email"), ("sjb", "pillar"), ("sjb", "flyer")]
+ONLY = sys.argv[2] if len(sys.argv) > 2 else None
+if ONLY: PLAN = [p for p in PLAN if f"{p[0]}-{p[1]}" == ONLY]
 
 
 def logo_pdf(svg, w, h):
