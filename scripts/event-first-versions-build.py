@@ -17,7 +17,8 @@ from reportlab.lib.colors import HexColor
 D = sys.argv[1]; SRC = os.path.join(D, "src"); os.makedirs(SRC, exist_ok=True)
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 for n in ("Poppins-Bold", "Poppins-Regular"):
-    pdfmetrics.registerFont(TTFont(n, f"/tmp/lwf/{n}.ttf"))
+    if os.path.exists(f"/tmp/lwf/{n}.ttf"):  # only needed for the NeXus/Hackathon pieces
+        pdfmetrics.registerFont(TTFont(n, f"/tmp/lwf/{n}.ttf"))
 pdfmetrics.registerFont(TTFont("Geist-Bold", os.path.join(ROOT, "public/fonts/Geist-Bold.ttf")))
 pdfmetrics.registerFont(TTFont("Geist-Regular", os.path.join(ROOT, "public/fonts/Geist-Regular.ttf")))
 
