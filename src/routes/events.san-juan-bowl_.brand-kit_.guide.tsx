@@ -40,7 +40,7 @@ function SjbGuide() {
           <h1 className="text-3xl font-bold leading-tight text-white">Brand guidelines</h1>
         </div>
         <Button asChild variant="secondary">
-          <a href="/__l5e/assets-v1/a4c1f1e6-7d2b-43c5-8a8a-4a20bd7ae08a/san-juan-bowl-brand-guide.pdf" download><Download className="h-4 w-4" /> Full brand guide (PDF)</a>
+          <a href="/__l5e/assets-v1/ed212e41-2afe-40af-a77b-1357722f6620/san-juan-bowl-brand-guide-v2.0.pdf" download><Download className="h-4 w-4" /> Full brand guide v2.0 (PDF)</a>
         </Button>
       </header>
 

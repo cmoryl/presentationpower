@@ -17,7 +17,16 @@ from reportlab.lib.utils import ImageReader
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = "/tmp/sjb"
 ORIGIN = "https://transperfectelement.lovable.app"
-OUT = "/tmp/san-juan-bowl-brand-guide.pdf"  # over 10 MB: upload with lovable-assets to src/assets/sjb/brand-guide.pdf.asset.json and update the two links
+VERSION, RELEASED = "2.0", "22 October 2026"
+HISTORY = [
+    ("2.0", "22 October 2026", ["Updated single-colour Black, Navy and White masters (AI/EPS/SVG/PNG as supplied).",
+                                "Added arched lettering only (Black, Navy, White) — limited use, by approval only; not an official Bowl logo.",
+                                "Logo usage rules: main logo on light, white outline on dark; navy preferred for one colour; black or white when only those are available.",
+                                "Single-line, stacked and lettering-specification pages withdrawn for now.",
+                                "Version number, release date and this history added; every download link opens without sign-in."]),
+    ("1.x", "earlier editions", ["16-page guide: logo, single colour, construction, colour, type, lettering, palms, mark and lockups. Superseded — do not use."]),
+]
+OUT = f"/tmp/san-juan-bowl-brand-guide-v{VERSION}.pdf"  # over 10 MB: upload with lovable-assets to src/assets/sjb/brand-guide.pdf.asset.json and update the two links
 pdfmetrics.registerFont(TTFont("G", os.path.join(ROOT, "public/fonts/Geist-Regular.ttf")))
 pdfmetrics.registerFont(TTFont("GB", os.path.join(ROOT, "public/fonts/Geist-Bold.ttf")))
 
@@ -64,7 +73,7 @@ def head(title, kicker):
     c.setFillColor(INK); c.setFont("GB", 22); c.drawString(M, H - 62, title)
     c.bookmarkPage(f"p{page_no[0]}"); TOC.append((title, page_no[0]))
     c.setFont("G", 7.5); c.setFillColor("#666666")
-    c.drawString(M, 24, "TransPerfect San Juan Bowl · Brand guide · Live kit: " + ORIGIN + "/events/san-juan-bowl/brand-kit")
+    c.drawString(M, 24, f"TransPerfect San Juan Bowl · Brand guide v{VERSION} · {RELEASED} · Live kit (open to all): " + ORIGIN + "/events/san-juan-bowl/brand-kit")
     c.drawRightString(W - M, 24, str(page_no[0]))
 
 
@@ -87,39 +96,64 @@ c.setFillColor(NAVY); c.rect(0, 0, W, H, stroke=0, fill=1)
 img("sjb-logo-dark.png", W / 2 - 40, 70, 400, 470)
 c.setFillColor("#FFFFFF"); c.setFont("GB", 34); c.drawString(M, H - 120, "TransPerfect")
 c.drawString(M, H - 160, "San Juan Bowl")
-c.setFont("G", 13); c.setFillColor(SKY); c.drawString(M, H - 192, "Brand guide · Logo, lettering, colour, type")
+c.setFont("G", 13); c.setFillColor(SKY); c.drawString(M, H - 192, "Brand guide · Logo, colour, type")
 c.setFont("G", 10.5); c.setFillColor("#FFFFFF"); c.drawString(M, H - 212, "Hiram Bithorn Stadium, San Juan, Puerto Rico")
+c.setFont("GB", 9); c.setFillColor(GOLD); c.drawString(M, 60, f"Version {VERSION} · Released {RELEASED} · Supersedes all earlier editions")
 c.setFont("G", 10); c.setFillColor("#FFFFFF")
 para("Every image in this guide is the supplied artwork. Blue links open or download the live files — always use the latest from the live kit.", M, H - 240, 300, 10, color="#FFFFFF")
 y = 230
 c.setFont("GB", 10); c.setFillColor(GOLD)
-for label, u in [("Open the live brand kit", "/events/san-juan-bowl/brand-kit"), ("Designer construction pages", "/events/san-juan-bowl/brand-kit/designers"), ("Single-colour logos", "/events/san-juan-bowl/brand-kit/single-colour")]:
+for label, u in [("Open the live brand kit", "/events/san-juan-bowl/brand-kit"), ("Designer construction pages", "/events/san-juan-bowl/brand-kit/designers"), ("Single-colour logos", "/events/san-juan-bowl/brand-kit/single-colour"), ("Share link (no sign-in)", "/share/san-juan-bowl")]:
     t = label + "  ↗"; c.drawString(M, y, t); c.linkURL(ORIGIN + u, (M, y - 2, M + c.stringWidth(t, "GB", 10), y + 10)); y -= 20
 c.showPage()
 
 # 2 logo variants
 head("Logo variants", "Logo")
-for i, (nm, bg, label) in enumerate([("color", "#FFFFFF", "Full colour — for light backgrounds"), ("dark", NAVY, "For dark backgrounds")]):
+for i, (nm, bg, label) in enumerate([("color", "#FFFFFF", "Full colour — for light backgrounds"), ("dark", NAVY, "White outline — for dark backgrounds")]):
     x = M + i * (W - 2 * M) / 2
     c.setStrokeColor("#D9DCE5"); c.rect(x, 150, 330, 300, stroke=1, fill=0)
     img(f"sjb-logo-{nm}.png", x, 150, 330, 300, bg)
     c.setFillColor(INK); c.setFont("GB", 11); c.drawString(x, 130, label)
     nx = link("SVG (vector)", URL[f"sjb-logo-{nm}.svg"], x, 112)
     link("PNG 2500 px", URL[f"sjb-logo-{nm}.png"], nx, 112)
-para("Use the artwork exactly as supplied — never redraw, stretch, recolour or crop the badge. On dark backgrounds use the dark-background variant; on light backgrounds, the full-colour variant. Reproduce from the vector master (SVG/PDF) only — never upscale a PNG.", M, 80, W - 2 * M)
+para("Use the artwork exactly as supplied — never redraw, stretch, recolour or crop the badge. Light backgrounds: the main full-colour logo. Dark backgrounds: the white outline version. Single colour: navy is preferred when we get the choice; if only black and white are available, black on light backgrounds and white on dark. Reproduce from the vector master (SVG/PDF) only — never upscale a PNG.", M, 80, W - 2 * M)
 c.showPage()
 
 # 3 single colour
 head("Single-colour logos", "Logo")
-ones = [("1c-navy", "#FFFFFF", "Navy"), ("1c-black", "#FFFFFF", "Black"), ("1c-white", NAVY, "White"),
+UP = {"1c-navy": ("u-sjb-1c-Navy", ["svg", "eps"]), "1c-black": ("u-sjb-1c-black", ["ai", "eps"]), "1c-white": ("u-sjb-1c-white", ["svg", "eps"])}
+ones = [("1c-navy", "#FFFFFF", "Navy (preferred)"), ("1c-black", "#FFFFFF", "Black"), ("1c-white", NAVY, "White"),
         ("1c-framed-navy", "#FFFFFF", "Framed navy"), ("1c-framed-black", "#FFFFFF", "Framed black"), ("1c-framed-white", NAVY, "Framed white")]
 cw = (W - 2 * M - 40) / 3
 for i, (n, bg, lab) in enumerate(ones):
     x = M + (i % 3) * (cw + 20); y = 300 - (i // 3) * 190
-    c.setStrokeColor("#D9DCE5"); c.rect(x, y, cw, 140, stroke=1, fill=0); img(n + ".png", x, y, cw, 140, bg)
+    u = UP.get(n)
+    c.setStrokeColor("#D9DCE5"); c.rect(x, y, cw, 140, stroke=1, fill=0); img((u[0] + ".png") if u else (n + ".png"), x, y, cw, 140, bg)
     c.setFillColor(INK); c.setFont("GB", 9.5); c.drawString(x, y - 14, lab)
-    nx = link("SVG", URL[n + ".svg"], x + 90, y - 14, 8.5); link("PNG", URL[n + ".png"], nx, y - 14, 8.5)
-link("Download all single-colour files (ZIP)", URL["1c-pack.zip"], M, 70, 10)
+    if u:
+        nx = x + 100
+        for ext in u[1] + ["png"]: nx = link(ext.upper(), URL[f"{u[0]}.{ext}"], nx, y - 14, 8.5)
+    else:
+        nx = link("SVG", URL[n + ".svg"], x + 100, y - 14, 8.5); link("PNG", URL[n + ".png"], nx, y - 14, 8.5)
+para("Navy is preferred when we get to choose the one colour. If only black and white are available, use black on light backgrounds and white on dark. Unframed files are the updated October 2026 masters; framed files are unchanged.", M, 70, W - 2 * M, 9)
+link("Framed and earlier single-colour files (ZIP)", URL["1c-pack.zip"], M, 44, 9)
+c.showPage()
+
+# 3b arched lettering only
+head("Lettering only (arched)", "Logo pieces")
+c.setFillColor("#FFF6CC"); c.setStrokeColor(GOLD); c.rect(M, H - 112, W - 2 * M, 32, stroke=1, fill=1)
+c.setFillColor(INK); c.setFont("GB", 11); c.drawString(M + 12, H - 101, "Limited use, by approval only. This is not an official Bowl logo.")
+arch = [("u-sjb-san-juan-lettering-black", "#FFFFFF", "Black — light backgrounds", [("AI", "u-sjb-san-juan-lettering_black.ai"), ("EPS", "u-sjb-san-juan-lettering_black.eps")]),
+        ("u-sjb-san-juan-lettering-Navy", "#FFFFFF", "Navy — light backgrounds (preferred)", [("SVG", "u-sjb-san-juan-lettering_Navy.svg"), ("EPS", "u-sjb-san-juan-lettering_Navy.eps")]),
+        ("u-sjb-san-juan-lettering-white", NAVY, "White — dark backgrounds", [("SVG", "u-sjb-san-juan-lettering_white.svg"), ("EPS", "u-sjb-san-juan-lettering_white.eps")])]
+cw = (W - 2 * M - 40) / 3
+for i, (n, bg, lab, files) in enumerate(arch):
+    x = M + i * (cw + 20)
+    img(n + ".png", x, 230, cw, 200, bg)
+    c.setFillColor(INK); c.setFont("GB", 9.5); c.drawString(x, 214, lab)
+    nx = x
+    for t, fn in files + [("PNG", n + ".png")]: nx = link(t, URL[fn], nx, 198, 8.5)
+para("The arched TRANSPERFECT / SAN JUAN / BOWL wording from the logo, without the badge, as supplied with transparent backgrounds. Ask the brand team before using it; never re-set, stretch or flatten the arch.", M, 160, W - 2 * M, 9)
 c.showPage()
 
 # 4 clear space & minimum size
@@ -222,45 +256,9 @@ for wd, xx, use in [("1 m (3.3 ft)", "14.5 cm", "Concourse signage, press backdr
 y = para("Reproduce from the vector master only. Colour at scale is matched physically by the vendor with a contract proof — never from a screen. Clear space scales with the badge.", x0, y - 8, W - x0 - M, 9)
 c.showPage()
 
-# 11 event name lettering (single line, three colourways)
 D = os.path.join(ROOT, "public/downloads")
 def local(rel): return Image.open(os.path.join(D, rel))
 def dl(rel): return ORIGIN + "/downloads/" + rel
-head("Event name lettering — single line", "Lettering")
-LW = W - 2 * M
-for i, (suf, bg, lab) in enumerate([("", NAVY, "White on Navy (master)"), ("-navy", "#FFFFFF", "Navy on White"), ("-navy-white", SKY, "Navy on Bowl blue")]):
-    y = H - 150 - i * 112
-    img(local(f"sjb-lettering/sjb-lettering-exact{suf}-2400.png"), M, y, 440, 86, bg)
-    c.setFont("GB", 10); c.setFillColor(INK); c.drawString(M + 460, y + 62, lab)
-    nx = link("SVG", dl(f"sjb-lettering/sjb-lettering-exact{suf}.svg"), M + 460, y + 42, 8.5)
-    for px in (1200, 2400, 4800): nx = link(f"PNG {px}", dl(f"sjb-lettering/sjb-lettering-exact{suf}-{px}.png"), nx, y + 42, 8.5)
-y = para("Artwork 1453.04 × 132.56 units (cap height 120), aspect 10.96 : 1. Stroke 33, letter gap 12, word space 29. Shadow offset 6.5625 right and down at 45°; chamfers 17 at 45°; A/W lean 7:24 (16.26°); N slope 2:1.", M, 118, LW, 9)
-para("Scale from the corners only, keep the shadow, leave clear space of one letter height, never retype. Use each colourway only on the background shown.", M, y - 2, LW, 9)
-link("Lettering spec (PDF, 10 pages)", dl("sjb-lettering/sjb-lettering-spec.pdf"), M, 60)
-c.showPage()
-
-# 12 stacked lettering
-head("Event name lettering — stacked", "Lettering")
-st_ids = [("2-line", "Two lines"), ("full-width-bowl", "Full-width BOWL"), ("3-line", "Three lines")]
-cw = (LW - 24) / 3
-for i, (sid, lab) in enumerate(st_ids):
-    x = M + i * (cw + 12)
-    img(local(f"sjb-lettering/stacked/sjb-lettering-stacked-{sid}-2400.png"), x, 220, cw, 220, NAVY)
-    c.setFont("GB", 10); c.setFillColor(INK); c.drawString(x, 202, lab)
-    nx = link("SVG", dl(f"sjb-lettering/stacked/sjb-lettering-stacked-{sid}.svg"), x, 186, 8.5)
-    link("PNG 2400", dl(f"sjb-lettering/stacked/sjb-lettering-stacked-{sid}-2400.png"), nx, 186, 8.5)
-para("Built from the same letters as the single line; lines are only moved. The full-width BOWL is the master BOWL scaled by exactly 13/8. Left- and right-aligned versions and all three colourways are in the pack.", M, 150, LW, 9)
-link("All stacked files (ZIP)", dl("sjb-lettering/stacked/sjb-lettering-stacked-pack.zip"), M, 110)
-c.showPage()
-
-# 13 lettering spec pages
-head("Lettering spec", "Lettering")
-cw = (LW - 4 * 10) / 5
-for i in range(10):
-    x = M + (i % 5) * (cw + 10); y = 290 - (i // 5) * 200
-    img(local(f"sjb-lettering/spec-page-{i+1:02d}.jpg"), x, y, cw, 180, "#FFFFFF")
-link("Open the full lettering spec (PDF)", dl("sjb-lettering/sjb-lettering-spec.pdf"), M, 60)
-c.showPage()
 
 # 14 curved lettering + palms
 import urllib.request, io
@@ -306,13 +304,12 @@ rows = [("Full-colour logo", ["sjb-logo-color.svg", "sjb-logo-color.png"]), ("Da
         ("Lettering pieces", ["transperfect-lettering.svg", "san-juan-lettering.svg", "bowl-lettering.svg"]),
         ("Badge scene pieces", ["scene-banner.svg", "scene-fortress.svg", "scene-football.svg", "scene-palmL.svg", "scene-palmR.svg", "scene-bird.svg", "scene-clouds.svg", "scene-sky.svg", "scene-base.svg", "scene-trim.svg", "scene-ribbon-stars.svg", "waves-sun-trim.svg"]),
         ("Measurements", ["SJB-Logo-Measurements.pdf"])]
-for k, v in [("sjb-lettering-exact.svg", "sjb-lettering/sjb-lettering-exact.svg"), ("sjb-lettering-exact-navy.svg", "sjb-lettering/sjb-lettering-exact-navy.svg"), ("sjb-lettering-exact-navy-white.svg", "sjb-lettering/sjb-lettering-exact-navy-white.svg"),
-             ("sjb-lettering-spec.pdf", "sjb-lettering/sjb-lettering-spec.pdf"), ("sjb-lettering-stacked-pack.zip", "sjb-lettering/stacked/sjb-lettering-stacked-pack.zip"),
-             ("sjb-palms-pair.svg", "sjb-palms/sjb-palms-pair.svg"), ("sjb-palms-pair-1color.svg", "sjb-palms/sjb-palms-pair-1color.svg"), ("sjb-palm-left.svg", "sjb-palms/sjb-palm-left.svg"), ("sjb-palm-right.svg", "sjb-palms/sjb-palm-right.svg"),
+for k, v in [("sjb-palms-pair.svg", "sjb-palms/sjb-palms-pair.svg"), ("sjb-palms-pair-1color.svg", "sjb-palms/sjb-palms-pair-1color.svg"), ("sjb-palm-left.svg", "sjb-palms/sjb-palm-left.svg"), ("sjb-palm-right.svg", "sjb-palms/sjb-palm-right.svg"),
              ("sjb-mark-pack.zip", "sjb-mark/sjb-mark-pack.zip"), ("sjb-lockups-pack.zip", "sjb-lockups/sjb-lockups-pack.zip")]:
     URL[k] = dl(v)
 URL["curved-lettering.svg"], URL["curved-lettering.ai"] = curved["svg"], curved["ai"]
-rows += [("Event name lettering", ["sjb-lettering-exact.svg", "sjb-lettering-exact-navy.svg", "sjb-lettering-exact-navy-white.svg", "sjb-lettering-spec.pdf", "sjb-lettering-stacked-pack.zip"]),
+rows[2] = ("Single-colour logos", ["u-sjb-1c-Navy.svg", "u-sjb-1c-Navy.eps", "u-sjb-1c-black.ai", "u-sjb-1c-black.eps", "u-sjb-1c-white.svg", "u-sjb-1c-white.eps", "1c-pack.zip"])
+rows += [("Arched lettering (approval only)", ["u-sjb-san-juan-lettering_black.ai", "u-sjb-san-juan-lettering_Navy.svg", "u-sjb-san-juan-lettering_Navy.eps", "u-sjb-san-juan-lettering_white.svg", "u-sjb-san-juan-lettering_white.eps"]),
          ("Curved lettering", ["curved-lettering.svg", "curved-lettering.ai"]),
          ("Palm trees", ["sjb-palms-pair.svg", "sjb-palms-pair-1color.svg", "sjb-palm-left.svg", "sjb-palm-right.svg"]),
          ("Small-size mark and lockups", ["sjb-mark-pack.zip", "sjb-lockups-pack.zip"])]
@@ -322,10 +319,20 @@ for lab, files in rows:
     for fn in files:
         t = fn
         if x + c.stringWidth(t + "  ↗", "GB", 8.5) > W - M: y -= 15; x = M + 190
-        x = link(t, URL[fn], x, y, 8.5)
+        x = link(t[2:] if t.startswith("u-") else t, URL[fn], x, y, 8.5)
     y -= 24
 link("Construction sheet (PDF)", ORIGIN + "/downloads/san-juan-bowl-logo-construction-sheet.pdf", M + 190, y); c.setFont("GB", 10); c.setFillColor(INK); c.drawString(M, y, "Construction sheet")
-y -= 30; para("Links open the live files on " + ORIGIN + ". Originals are never changed; if a file is updated, the link always serves the current one.", M, y, W - 2 * M, 9, color="#444444")
+y -= 30; para("Links open the live files on " + ORIGIN + ". Originals are never changed; if a file is updated, the next guide version links to it. Every link opens without sign-in.", M, y, W - 2 * M, 9, color="#444444")
+c.showPage()
+
+# version history
+head("Version history", "Version control")
+y = H - 104
+for v, d, notes in HISTORY:
+    c.setFont("GB", 12); c.setFillColor(INK); c.drawString(M, y, f"v{v}"); c.setFont("G", 9.5); c.setFillColor("#444444"); c.drawString(M + 50, y, d); y -= 18
+    for n in notes: y = para("•  " + n, M + 50, y, W - 2 * M - 50, 9) - 2
+    y -= 14
+para("Always download the current guide from the live kit. A file named with an older version number is superseded. Asset links in this PDF point to fixed copies, so a new version is issued whenever a file changes.", M, y, W - 2 * M, 9, color="#444444")
 c.showPage()
 c.save()
 print(OUT, page_no[0], "pages")
