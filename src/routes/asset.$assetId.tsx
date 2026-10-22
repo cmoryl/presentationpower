@@ -1649,7 +1649,7 @@ function AssetEditor() {
           )}
 
           {/* CANVAS + document inputs */}
-          <div className="min-w-0 space-y-6 rounded-sm bg-[#0B0A2A] pb-8 pl-12 pr-8 pt-12 ring-1 ring-white/5">
+          <div className="editor-pin min-w-0 space-y-6 rounded-sm bg-[#0B0A2A] pb-8 pl-12 pr-8 pt-12 ring-1 ring-white/5">
             <div className="relative">
             <div
               ref={canvasRef}

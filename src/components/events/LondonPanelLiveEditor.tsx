@@ -494,7 +494,7 @@ export function LondonPanelLiveEditor({
       }
     >
       {/* Live stage */}
-      <div>
+      <div className={stageSize === "fit" ? "editor-pin" : undefined}>
         <div className="flex items-center justify-between gap-2 pb-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <Move className="h-3.5 w-3.5" />{" "}
