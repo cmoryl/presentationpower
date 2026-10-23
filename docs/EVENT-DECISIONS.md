@@ -1,5 +1,13 @@
 # Event design decisions
 
+### 2026-10-23 — Bowl flyer uses a photo-referenced Hiram canopy option
+**Area:** San Juan Bowl flyer backgrounds.
+**Options tested:** the existing generic enclosed NFL-style bowl versus a generated night scene informed by real Hiram Bithorn canopy photographs and official architectural documentation.
+**Chosen:** add the photo-referenced scene as an explicitly labelled visualisation; preserve the saved flyer and original background.
+**Why:** Hiram's pointed concrete saddle-shell canopy identifies the actual venue; generic tall tiers misrepresent it. Generated imagery cannot establish exact architecture or native 300 ppi detail.
+**Would change if:** venue-approved licensed photography becomes available, or the organiser changes venue.
+**Applies to:** the optional Hiram roofline flyer background only; no BoothHUB geometry changes.
+
 ### 2026-10-21 — Bowl stadium target switched back to Hiram Bithorn
 **Area:** San Juan Bowl stadium reconstruction and BoothHUB handoff.
 **Options tested:** keep Juan Ramón Loubriel (chosen 2026-10-20) versus return to Hiram Bithorn.
