@@ -1,5 +1,14 @@
 # Hiram Bithorn flyer background — 23 October 2026
 
+## Cinematic landmark revision — master Puerto Rico v3
+
+The standalone v3 background refines the previous composition using real garita photographs and a real Hiram stadium photograph. Inspected the full output: the garita now has a simpler cylindrical stone body, small slit, low domed cap and projecting support; stone wall and rocky shoreline are more restrained. The generated stadium still cannot establish exact bay geometry or venue configuration. The sea and fort are symbolic montage elements, not a view from Hiram; generated attendance is not documentary evidence. Original versions and the app's saved flyer remain unchanged.
+
+Research-only image sources (downloaded outside the repository; not redistributed):
+- https://commons.wikimedia.org/wiki/File:Garita_morro_s.jpg
+- https://commons.wikimedia.org/wiki/File:La_Garita_del_Diablo_en_VJS.jpg — San Juan sentry-box detail reference; do not treat the filename or uploader's description as verification that it belongs to El Morro.
+- https://commons.wikimedia.org/wiki/File:Hiram_Bithorn_Stadium.jpg
+
 ## Result and limits
 
 `hiram-roofline-v1` is a photo-referenced generated promotional visualisation, not an exact photograph, survey, or approved football conversion. It preserves the existing kickoff background's navy/gold atmosphere while replacing its generic enclosed stadium with Hiram's pointed concrete shell canopy. The saved flyer remains unchanged until the user chooses and saves it.

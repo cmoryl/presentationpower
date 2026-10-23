@@ -1,5 +1,11 @@
 # Event lessons log
 
+### 2026-10-23 — Cinematic garita details can drift into fantasy architecture
+**Context:** Bowl cinematic background revision, master Puerto Rico v3.
+**What happened:** the earlier generated garita resembled an ornate castle turret rather than the narrow masonry sentry boxes seen in real San Juan photographs.
+**Rule now:** use photographic references for the cylindrical body, slit opening, low dome and projecting corbel; keep coastal motifs a symbolic montage separate from stadium architecture. Photo-referenced generation is not architectural exactness.
+**Enforced by:** visual comparison of v3 against reference photographs; judgement only.
+
 ### 2026-10-23 — Generic football stadiums misrepresent Hiram Bithorn
 **Context:** San Juan Bowl flyer background research.
 **What happened:** the chosen dramatic background showed an enclosed multi-tier stadium, unlike the real venue's low horseshoe grandstand and pointed concrete canopy.
