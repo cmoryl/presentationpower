@@ -26,4 +26,8 @@ These are optional backgrounds in the existing picker, not new templates or rear
 
 ## Visual inspection
 
+### Full-crowd companions — 23 October 2026
+
+Five crowd-filled edits of the existing Hiram backgrounds are available as `hiram-roofline-crowd`, `hiram-lower-space-crowd`, `hiram-left-callouts-crowd`, `hiram-right-callouts-crowd` and `hiram-midband-footer-crowd`. The original images and saved scene IDs remain unchanged. Each preserves the navy/gold lighting and reserved content areas, with small distant spectators filling the seating. These are generated crowds, not evidence of actual attendance or an actual game; exact individual anatomy cannot be guaranteed. No players, field conversion or game facts are asserted. Final QR scans remain required on the finished proof.
+
 The rendered option shows the identifying zigzag canopy, inclined concrete supports, glazed enclosure and modest blue/gray seating. Atmosphere, lighting, confetti, perspective and bay repetition are generated; exact bay counts, dimensions and current conditions are not verified. No players, footballs, sponsor marks or inferred football field markings were introduced. Check the live QR on the chosen export: the existing lower QR position can overlap seating or turf.
