@@ -8,6 +8,11 @@ import hiramLowerSpace from "@/assets/sjb-flyer/bg-hiram-lower-space.jpg";
 import hiramLeftCallouts from "@/assets/sjb-flyer/bg-hiram-left-callouts.jpg";
 import hiramRightCallouts from "@/assets/sjb-flyer/bg-hiram-right-callouts.jpg";
 import hiramMidbandFooter from "@/assets/sjb-flyer/bg-hiram-midband-footer.jpg";
+import hiramRooflineCrowd from "@/assets/sjb-flyer/bg-hiram-roofline-crowd.jpg";
+import hiramLowerCrowd from "@/assets/sjb-flyer/bg-hiram-lower-space-crowd.jpg";
+import hiramLeftCrowd from "@/assets/sjb-flyer/bg-hiram-left-callouts-crowd.jpg";
+import hiramRightCrowd from "@/assets/sjb-flyer/bg-hiram-right-callouts-crowd.jpg";
+import hiramFooterCrowd from "@/assets/sjb-flyer/bg-hiram-midband-footer-crowd.jpg";
 
 export type SignScene = { id: string; label: string; src: string };
 
@@ -15,6 +20,11 @@ const SJB = "/downloads/sjb-flyer";
 
 /** San Juan Bowl game flyer scenes (8.5 × 11 in portrait, calm centre). */
 export const SJB_FLYER_SCENES: SignScene[] = [
+  { id: "hiram-roofline-crowd", label: "Hiram · full crowd · visualisation", src: hiramRooflineCrowd },
+  { id: "hiram-lower-space-crowd", label: "Hiram · full crowd & lower space · visualisation", src: hiramLowerCrowd },
+  { id: "hiram-left-callouts-crowd", label: "Hiram · full crowd & left callouts · visualisation", src: hiramLeftCrowd },
+  { id: "hiram-right-callouts-crowd", label: "Hiram · full crowd & right callouts · visualisation", src: hiramRightCrowd },
+  { id: "hiram-midband-footer-crowd", label: "Hiram · full crowd & footer · visualisation", src: hiramFooterCrowd },
   { id: "hiram-roofline-v1", label: "Hiram roofline · visualisation", src: hiramRoofline },
   { id: "hiram-lower-space", label: "Hiram · open lower space · visualisation", src: hiramLowerSpace },
   { id: "hiram-left-callouts", label: "Hiram · left callouts · visualisation", src: hiramLeftCallouts },
