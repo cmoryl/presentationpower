@@ -16,6 +16,10 @@ import hiramFooterCrowd from "@/assets/sjb-flyer/bg-hiram-midband-footer-crowd.j
 import hiramBowlRoar from "@/assets/sjb-flyer/bg-hiram-bowl-roar.jpg";
 import hiramBowlGoldrush from "@/assets/sjb-flyer/bg-hiram-bowl-goldrush.jpg";
 import hiramBowlElectric from "@/assets/sjb-flyer/bg-hiram-bowl-electric.jpg";
+import sjbHarborNight from "@/assets/sjb-flyer/bg-sjb-harbor-night.jpg";
+import sjbGoldenHour from "@/assets/sjb-flyer/bg-sjb-golden-hour.jpg";
+import sjbFireworks from "@/assets/sjb-flyer/bg-sjb-fireworks.jpg";
+import sjbCoastalWide from "@/assets/sjb-flyer/bg-sjb-coastal-wide.jpg";
 
 export type SignScene = { id: string; label: string; src: string };
 
@@ -23,6 +27,10 @@ const SJB = "/downloads/sjb-flyer";
 
 /** San Juan Bowl game flyer scenes (8.5 × 11 in portrait, calm centre). */
 export const SJB_FLYER_SCENES: SignScene[] = [
+  { id: "sjb-harbor-night", label: "San Juan · Harbor night · visualisation", src: sjbHarborNight },
+  { id: "sjb-golden-hour", label: "San Juan · Golden hour · visualisation", src: sjbGoldenHour },
+  { id: "sjb-fireworks", label: "San Juan · Fireworks night · visualisation", src: sjbFireworks },
+  { id: "sjb-coastal-wide", label: "San Juan · Coastal wide · visualisation", src: sjbCoastalWide },
   { id: "hiram-bowl-roar", label: "Hiram · Bowl roar · visualisation", src: hiramBowlRoar },
   { id: "hiram-bowl-goldrush", label: "Hiram · Gold rush · visualisation", src: hiramBowlGoldrush },
   { id: "hiram-bowl-electric", label: "Hiram · Electric game night · visualisation", src: hiramBowlElectric },
