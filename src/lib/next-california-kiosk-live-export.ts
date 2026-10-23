@@ -46,6 +46,7 @@ import {
   type LiveLayout,
   type PlacedText,
 } from "@/lib/next-california-kiosk-live";
+import { signScene } from "@/lib/sign-scene-backgrounds";
 
 const cache = new Map<string, Promise<ArrayBuffer>>();
 function bytes(url: string) {
@@ -54,6 +55,15 @@ function bytes(url: string) {
     return r.arrayBuffer();
   }));
   return cache.get(url)!;
+}
+/** A picked scene background as a data URI, so exported SVGs and proof PNGs are self-contained. */
+async function sceneHref(L: LiveLayout, edits: KioskEdits): Promise<string | undefined> {
+  const s = signScene(L.id, edits.scene);
+  if (!s) return undefined;
+  const b = new Uint8Array(await bytes(s.src));
+  let bin = "";
+  for (let i = 0; i < b.length; i += 0x8000) bin += String.fromCharCode(...b.subarray(i, i + 0x8000));
+  return `data:image/jpeg;base64,${btoa(bin)}`;
 }
 /** The designer's CMYK file, split one object per page. Fails loudly if missing. */
 function nativeBytes(id: string) {
@@ -72,7 +82,7 @@ const liveFamily = (font: string) =>
   /times/i.test(font) ? "'Times New Roman', serif" : `${font}, '${font.replace(/-/g, " ")}', Geist, sans-serif`;
 
 export async function liveFrontSvg(L: LiveLayout, edits: KioskEdits) {
-  return buildKioskFrontSvg(L, await loadArtSvg(L.id), edits, { family: liveFamily });
+  return buildKioskFrontSvg(L, await loadArtSvg(L.id), edits, { family: liveFamily, sceneHref: await sceneHref(L, edits) });
 }
 
 type OT = { getPath: (t: string, x: number, y: number, s: number, o?: object) => { toPathData: (d?: number) => string }; getAdvanceWidth: (t: string, s: number) => number };
@@ -101,7 +111,7 @@ export async function pressFrontSvg(L: LiveLayout, edits: KioskEdits) {
       .map((l) => f.getPath(l.text, l.x, l.y, t.ksize, { letterSpacing: ls, kerning: true }).toPathData(2))
       .join(" ");
   };
-  const svg = buildKioskFrontSvg(L, await loadArtSvg(L.id), edits, { outline });
+  const svg = buildKioskFrontSvg(L, await loadArtSvg(L.id), edits, { outline, sceneHref: await sceneHref(L, edits) });
   if (missing.length) throw new Error(`Could not outline ${missing.length} text line(s): no font file on hand.`);
   return svg;
 }
@@ -176,7 +186,16 @@ export async function liveFrontPdf(L: LiveLayout, edits: KioskEdits): Promise<Ui
     const formOf = (id: string) => `KN${ids.indexOf(id) + 1}`;
     // Native page (PDF y-up, bleed-box origin) → kiosk space.
     const P: Affine = [1, 0, 0, -1, -L.originX, L.mediaH - L.originY];
-    if (edits.ground || L.groundOnly) groundShading();
+    const scene = signScene(L.id, edits.scene);
+    if (scene) {
+      // Picked scene photograph, full-bleed and cover-cropped to the bleed box.
+      const img = await doc.embedJpg(await bytes(scene.src));
+      const sc = Math.max(W / img.width, H / img.height);
+      const dw = img.width * sc, dh = img.height * sc;
+      page.pushOperators(pushGraphicsState(), rectangle(0, 0, W, H), clip(), endPath());
+      page.drawImage(img, { x: (W - dw) / 2, y: (H - dh) / 2, width: dw, height: dh });
+      page.pushOperators(popGraphicsState());
+    } else if (edits.ground || L.groundOnly) groundShading();
     else {
       // Ground page placed in its trim box (stretched for no-bleed or re-sized signs).
       const [bx, by, bw, bh] = nativeBgBox(L);
