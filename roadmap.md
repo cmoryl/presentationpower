@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Bowl flyer: add four photo-referenced Hiram stadium backgrounds with lower, left, right and split content spaces; verify the picker without changing saved edits.
+
 - [x] Bowl flyer: researched the real Hiram Bithorn roofline, added a photo-referenced night visualisation, verified the picker, and restored the prior saved background; exact photography and native 300 ppi remain unavailable.
 
 # Master modules unification
