@@ -27,6 +27,10 @@ export const SJB_FLYER_SCENES: SignScene[] = [
   { id: "collage-line", label: "Collage · line of scrimmage", src: `${SJB}/bg-collage-line.jpg` },
   { id: "collage-trophy", label: "Collage · trophy night", src: `${SJB}/bg-collage-trophy.jpg` },
   { id: "collage-spirit", label: "Collage · spirit & rainforest", src: `${SJB}/bg-collage-spirit.jpg` },
+  { id: "abs-arc", label: "Abstract · gold arc", src: `${SJB}/bg-abs-arc.jpg` },
+  { id: "abs-fluid", label: "Abstract · liquid wave", src: `${SJB}/bg-abs-fluid.jpg` },
+  { id: "abs-speed", label: "Abstract · floodlight speed", src: `${SJB}/bg-abs-speed.jpg` },
+  { id: "abs-cutout", label: "Abstract · tropical cut-outs", src: `${SJB}/bg-abs-cutout.jpg` },
 ];
 
 const SIGN_SCENES: Record<string, SignScene[]> = {
