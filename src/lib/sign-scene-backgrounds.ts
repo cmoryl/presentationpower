@@ -20,6 +20,10 @@ import sjbHarborNight from "@/assets/sjb-flyer/bg-sjb-harbor-night.jpg";
 import sjbGoldenHour from "@/assets/sjb-flyer/bg-sjb-golden-hour.jpg";
 import sjbFireworks from "@/assets/sjb-flyer/bg-sjb-fireworks.jpg";
 import sjbCoastalWide from "@/assets/sjb-flyer/bg-sjb-coastal-wide.jpg";
+import sjbLightStorm from "@/assets/sjb-flyer/bg-sjb-light-storm.jpg";
+import sjbNeonBowl from "@/assets/sjb-flyer/bg-sjb-neon-bowl.jpg";
+import sjbConfettiBlast from "@/assets/sjb-flyer/bg-sjb-confetti-blast.jpg";
+import sjbPrimeTime from "@/assets/sjb-flyer/bg-sjb-prime-time.jpg";
 
 export type SignScene = { id: string; label: string; src: string };
 
@@ -27,6 +31,10 @@ const SJB = "/downloads/sjb-flyer";
 
 /** San Juan Bowl game flyer scenes (8.5 × 11 in portrait, calm centre). */
 export const SJB_FLYER_SCENES: SignScene[] = [
+  { id: "sjb-light-storm", label: "Flashy · Light storm · visualisation", src: sjbLightStorm },
+  { id: "sjb-neon-bowl", label: "Flashy · Neon bowl · visualisation", src: sjbNeonBowl },
+  { id: "sjb-confetti-blast", label: "Flashy · Confetti blast · visualisation", src: sjbConfettiBlast },
+  { id: "sjb-prime-time", label: "Flashy · Prime time · visualisation", src: sjbPrimeTime },
   { id: "sjb-harbor-night", label: "San Juan · Harbor night · visualisation", src: sjbHarborNight },
   { id: "sjb-golden-hour", label: "San Juan · Golden hour · visualisation", src: sjbGoldenHour },
   { id: "sjb-fireworks", label: "San Juan · Fireworks night · visualisation", src: sjbFireworks },
