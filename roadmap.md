@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [x] Bowl flyer: researched the real Hiram Bithorn roofline, added a photo-referenced night visualisation, verified the picker, and restored the prior saved background; exact photography and native 300 ppi remain unavailable.
+
 # Master modules unification
 - [x] Build one searchable, filterable catalogue with a normalized module contract and direct maintenance actions.
 - [x] Derive social adaptations from print masters and expose compatibility, renderer authority and coverage.

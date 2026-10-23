@@ -3,12 +3,15 @@
 // designed with a calm centre so live pieces (badge, headline, QR) stay
 // readable on top. RGB only; CMYK stays opt-in per the print contract.
 
+import hiramRoofline from "@/assets/sjb-flyer/bg-hiram-roofline-v1.jpg";
+
 export type SignScene = { id: string; label: string; src: string };
 
 const SJB = "/downloads/sjb-flyer";
 
 /** San Juan Bowl game flyer scenes (8.5 × 11 in portrait, calm centre). */
 export const SJB_FLYER_SCENES: SignScene[] = [
+  { id: "hiram-roofline-v1", label: "Hiram roofline · visualisation", src: hiramRoofline },
   { id: "collage", label: "Torn-paper collage", src: `${SJB}/bg-collage.jpg` },
   { id: "stadium-night", label: "Stadium night", src: `${SJB}/bg-stadium-night.jpg` },
   { id: "el-morro", label: "El Morro coastline", src: `${SJB}/bg-el-morro.jpg` },

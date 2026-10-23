@@ -1,5 +1,11 @@
 # Event lessons log
 
+### 2026-10-23 — Generic football stadiums misrepresent Hiram Bithorn
+**Context:** San Juan Bowl flyer background research.
+**What happened:** the chosen dramatic background showed an enclosed multi-tier stadium, unlike the real venue's low horseshoe grandstand and pointed concrete canopy.
+**Rule now:** reference real venue photographs and official architecture; distinguish generated promotional visualisations from exact photographs, and report native pixel resolution rather than promising print detail through upscaling.
+**Enforced by:** visual comparison and `docs/SJB-HIRAM-ROOFLINE-RESEARCH.md`; judgement only.
+
 ### 2026-10-20 — Palm highlights are not complete palm symbols
 **Context:** San Juan Bowl source component previews.
 **What happened:** individual palm groups include white trunk highlights; navy contours belong to the shared badge base, so highlight-only extracts appear incomplete.
