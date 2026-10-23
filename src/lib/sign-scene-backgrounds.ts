@@ -23,6 +23,10 @@ export const SJB_FLYER_SCENES: SignScene[] = [
   { id: "collage-catch", label: "Collage · El Morro catch", src: `${SJB}/bg-collage-catch.jpg` },
   { id: "collage-gameday", label: "Collage · game day", src: `${SJB}/bg-collage-gameday.jpg` },
   { id: "collage-oldsj", label: "Collage · Old San Juan run", src: `${SJB}/bg-collage-oldsj.jpg` },
+  { id: "collage-kick", label: "Collage · kickoff & flag", src: `${SJB}/bg-collage-kick.jpg` },
+  { id: "collage-line", label: "Collage · line of scrimmage", src: `${SJB}/bg-collage-line.jpg` },
+  { id: "collage-trophy", label: "Collage · trophy night", src: `${SJB}/bg-collage-trophy.jpg` },
+  { id: "collage-spirit", label: "Collage · spirit & rainforest", src: `${SJB}/bg-collage-spirit.jpg` },
 ];
 
 const SIGN_SCENES: Record<string, SignScene[]> = {
