@@ -4,6 +4,10 @@
 // readable on top. RGB only; CMYK stays opt-in per the print contract.
 
 import hiramRoofline from "@/assets/sjb-flyer/bg-hiram-roofline-v1.jpg";
+import hiramLowerSpace from "@/assets/sjb-flyer/bg-hiram-lower-space.jpg";
+import hiramLeftCallouts from "@/assets/sjb-flyer/bg-hiram-left-callouts.jpg";
+import hiramRightCallouts from "@/assets/sjb-flyer/bg-hiram-right-callouts.jpg";
+import hiramMidbandFooter from "@/assets/sjb-flyer/bg-hiram-midband-footer.jpg";
 
 export type SignScene = { id: string; label: string; src: string };
 
@@ -12,6 +16,10 @@ const SJB = "/downloads/sjb-flyer";
 /** San Juan Bowl game flyer scenes (8.5 × 11 in portrait, calm centre). */
 export const SJB_FLYER_SCENES: SignScene[] = [
   { id: "hiram-roofline-v1", label: "Hiram roofline · visualisation", src: hiramRoofline },
+  { id: "hiram-lower-space", label: "Hiram · open lower space · visualisation", src: hiramLowerSpace },
+  { id: "hiram-left-callouts", label: "Hiram · left callouts · visualisation", src: hiramLeftCallouts },
+  { id: "hiram-right-callouts", label: "Hiram · right callouts · visualisation", src: hiramRightCallouts },
+  { id: "hiram-midband-footer", label: "Hiram · stadium band & footer · visualisation", src: hiramMidbandFooter },
   { id: "collage", label: "Torn-paper collage", src: `${SJB}/bg-collage.jpg` },
   { id: "stadium-night", label: "Stadium night", src: `${SJB}/bg-stadium-night.jpg` },
   { id: "el-morro", label: "El Morro coastline", src: `${SJB}/bg-el-morro.jpg` },
