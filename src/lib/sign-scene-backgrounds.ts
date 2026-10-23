@@ -32,6 +32,10 @@ import sjbForeHelmet from "@/assets/sjb-flyer/bg-sjb-fore-helmet.jpg";
 import sjbForePalms from "@/assets/sjb-flyer/bg-sjb-fore-palms.jpg";
 import sjbForeSpirit from "@/assets/sjb-flyer/bg-sjb-fore-spirit.jpg";
 import sjbForeTrophy from "@/assets/sjb-flyer/bg-sjb-fore-trophy.jpg";
+import sjbBadgeNight from "@/assets/sjb-flyer/bg-sjb-badge-night.jpg";
+import sjbBadgeDusk from "@/assets/sjb-flyer/bg-sjb-badge-dusk.jpg";
+import sjbBadgeFireworks from "@/assets/sjb-flyer/bg-sjb-badge-fireworks.jpg";
+import sjbBadgeBeams from "@/assets/sjb-flyer/bg-sjb-badge-beams.jpg";
 
 export type SignScene = { id: string; label: string; src: string };
 
@@ -39,6 +43,10 @@ const SJB = "/downloads/sjb-flyer";
 
 /** San Juan Bowl game flyer scenes (8.5 × 11 in portrait, calm centre). */
 export const SJB_FLYER_SCENES: SignScene[] = [
+  { id: "sjb-badge-night", label: "Badge frame · Night · visualisation", src: sjbBadgeNight },
+  { id: "sjb-badge-dusk", label: "Badge frame · Dusk · visualisation", src: sjbBadgeDusk },
+  { id: "sjb-badge-fireworks", label: "Badge frame · Fireworks · visualisation", src: sjbBadgeFireworks },
+  { id: "sjb-badge-beams", label: "Badge frame · Light beams · visualisation", src: sjbBadgeBeams },
   { id: "sjb-fore-helmet", label: "Foreground · Ball & helmet · visualisation", src: sjbForeHelmet },
   { id: "sjb-fore-palms", label: "Foreground · Tropical palms · visualisation", src: sjbForePalms },
   { id: "sjb-fore-spirit", label: "Foreground · Spirit gear · visualisation", src: sjbForeSpirit },
