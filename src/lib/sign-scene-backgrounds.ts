@@ -24,6 +24,10 @@ import sjbLightStorm from "@/assets/sjb-flyer/bg-sjb-light-storm.jpg";
 import sjbNeonBowl from "@/assets/sjb-flyer/bg-sjb-neon-bowl.jpg";
 import sjbConfettiBlast from "@/assets/sjb-flyer/bg-sjb-confetti-blast.jpg";
 import sjbPrimeTime from "@/assets/sjb-flyer/bg-sjb-prime-time.jpg";
+import sjbStraightNight from "@/assets/sjb-flyer/bg-sjb-straighton-night.jpg";
+import sjbStraightDusk from "@/assets/sjb-flyer/bg-sjb-straighton-dusk.jpg";
+import sjbStraightFireworks from "@/assets/sjb-flyer/bg-sjb-straighton-fireworks.jpg";
+import sjbStraightWide from "@/assets/sjb-flyer/bg-sjb-straighton-wide.jpg";
 
 export type SignScene = { id: string; label: string; src: string };
 
@@ -31,6 +35,10 @@ const SJB = "/downloads/sjb-flyer";
 
 /** San Juan Bowl game flyer scenes (8.5 × 11 in portrait, calm centre). */
 export const SJB_FLYER_SCENES: SignScene[] = [
+  { id: "sjb-straighton-night", label: "Straight-on · Night symmetry · visualisation", src: sjbStraightNight },
+  { id: "sjb-straighton-dusk", label: "Straight-on · Dusk symmetry · visualisation", src: sjbStraightDusk },
+  { id: "sjb-straighton-fireworks", label: "Straight-on · Fireworks symmetry · visualisation", src: sjbStraightFireworks },
+  { id: "sjb-straighton-wide", label: "Straight-on · Wide symmetry · visualisation", src: sjbStraightWide },
   { id: "sjb-light-storm", label: "Flashy · Light storm · visualisation", src: sjbLightStorm },
   { id: "sjb-neon-bowl", label: "Flashy · Neon bowl · visualisation", src: sjbNeonBowl },
   { id: "sjb-confetti-blast", label: "Flashy · Confetti blast · visualisation", src: sjbConfettiBlast },
