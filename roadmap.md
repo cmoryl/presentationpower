@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Bowl flyer: research the real Hiram Bithorn roofline, create a photo-referenced night background, and verify it in the existing picker without changing saved artwork.
+- [x] Bowl flyer: researched the real Hiram Bithorn roofline, added a photo-referenced night visualisation, verified the picker, and restored the prior saved background; exact photography and native 300 ppi remain unavailable.
 
 # Master modules unification
 - [x] Build one searchable, filterable catalogue with a normalized module contract and direct maintenance actions.
