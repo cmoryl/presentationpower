@@ -31,6 +31,10 @@ export const SJB_FLYER_SCENES: SignScene[] = [
   { id: "abs-fluid", label: "Abstract · liquid wave", src: `${SJB}/bg-abs-fluid.jpg` },
   { id: "abs-speed", label: "Abstract · floodlight speed", src: `${SJB}/bg-abs-speed.jpg` },
   { id: "abs-cutout", label: "Abstract · tropical cut-outs", src: `${SJB}/bg-abs-cutout.jpg` },
+  { id: "light-swiss", label: "Light · minimal sun & field", src: `${SJB}/bg-light-swiss.jpg` },
+  { id: "light-beach", label: "Light · watercolour beach", src: `${SJB}/bg-light-beach.jpg` },
+  { id: "light-memphis", label: "Light · confetti pop", src: `${SJB}/bg-light-memphis.jpg` },
+  { id: "light-turf", label: "Light · daylight turf", src: `${SJB}/bg-light-turf.jpg` },
 ];
 
 const SIGN_SCENES: Record<string, SignScene[]> = {
