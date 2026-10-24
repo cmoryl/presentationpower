@@ -1,5 +1,13 @@
 # Event design decisions
 
+### 2026-10-24 — Exact-scene Bowl kit uses non-generative photographic composition
+**Area:** first Wikimedia photo-based Bowl background kit.
+**Options tested:** generative rewriting of a reference versus deterministic colour grading and proportional layout from the downloaded original.
+**Chosen:** preserve the actual photograph and derive all 14 output sizes from it; retain sparse real spectators and baseball field rather than inventing crowds or football conversion.
+**Why:** the user explicitly requested visual exactness. Even reference-led AI edits can change canopy, lights, seats and people; a historical photograph provides actual recorded geometry but not current conditions.
+**Would change if:** licensed current full-crowd photography or organiser-approved football-conversion photography becomes available.
+**Applies to:** photo-based kit v1 only; prior generated visualisations and saved flyer unchanged. Credit Bryce Edwards, CC BY 2.0, disclose colour/framing changes.
+
 ### 2026-10-23 — Bowl flyer uses a photo-referenced Hiram canopy option
 **Area:** San Juan Bowl flyer backgrounds.
 **Options tested:** the existing generic enclosed NFL-style bowl versus a generated night scene informed by real Hiram Bithorn canopy photographs and official architectural documentation.

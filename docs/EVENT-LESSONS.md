@@ -1,5 +1,11 @@
 # Event lessons log
 
+### 2026-10-24 — A licensed stadium photograph may not satisfy the crowd brief
+**Context:** Wikimedia photo-based Bowl kit v1.
+**What happened:** the actual licensed 5993 × 2397 original depicts a 2010 baseball game with sparse spectators, not packed stands or the 2026 renovation. The first suggested CDN hash path returned 404; the verified Commons file page supplied the correct `/0/07/` original.
+**Rule now:** verify actual downloads and inspect original content before promising full crowds or current geometry; preserve reality when exactness is requested and disclose temporal/configuration limits. Do not generatively fill spectators under an exact-photo claim.
+**Enforced by:** source checksum, output manifest, full-source inspection and 14-output visual review; judgement only.
+
 ### 2026-10-23 — Cinematic garita details can drift into fantasy architecture
 **Context:** Bowl cinematic background revision, master Puerto Rico v3.
 **What happened:** the earlier generated garita resembled an ornate castle turret rather than the narrow masonry sentry boxes seen in real San Juan photographs.

@@ -1,5 +1,13 @@
 # Hiram Bithorn flyer background — 23 October 2026
 
+## Licensed photographic kit — 24 October 2026
+
+Downloaded the original `Hiram_Bithorn_Stadium.jpg` from the verified Commons file link, **https://upload.wikimedia.org/wikipedia/commons/0/07/Hiram_Bithorn_Stadium.jpg** (the previously proposed `/8/84/` path is invalid). Native size is 5993 × 2397; author Bryce Edwards; photographed 18 December 2010; CC BY 2.0, https://creativecommons.org/licenses/by/2.0/. Source SHA-256: `5164b70c4caab78ed1e4583538416da43847272aa3276bfecaf7fcfb29a305e4`.
+
+The downloadable photo-based kit v1 contains 14 backgrounds plus the byte-identical original, attribution and a checksum/dimension manifest. A pointwise navy/gold colour grade, uniform scaling, edge fades and navy canvas extensions preserve photographed geometry without generative editing. Portraits retain the full stadium panorama; the thin leaderboard uses a documented left-canopy crop. Visually inspected all 14 outputs in two contact sheets and the full master.
+
+**Limits:** the photograph depicts baseball with sparsely occupied stands, visible safety netting and original advertisements. It does not verify the 2026 renovation, packed crowds, football conversion or event attendance. No crowds, players, football markings, flags or garitas were fabricated. Print-sized JPEGs are RGB raster layout proofs with no bleed or CMYK approval, not press-ready masters. Public use must carry photographer credit, license link and changes notice. App scene picker and saved flyer remain unchanged.
+
 ## Cinematic landmark revision — master Puerto Rico v3
 
 The standalone v3 background refines the previous composition using real garita photographs and a real Hiram stadium photograph. Inspected the full output: the garita now has a simpler cylindrical stone body, small slit, low domed cap and projecting support; stone wall and rocky shoreline are more restrained. The generated stadium still cannot establish exact bay geometry or venue configuration. The sea and fort are symbolic montage elements, not a view from Hiram; generated attendance is not documentary evidence. Original versions and the app's saved flyer remain unchanged.
