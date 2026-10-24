@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Build a licensed Wikimedia Hiram photo-based master and matching social/ad sizes, with preserved stadium geometry, attribution and inspected downloads.
+
 - [x] Bowl flyer: added five full-crowd Hiram companion backgrounds with gold game-day flair and retained content spaces; verified all five in the signed-in picker with test saves blocked and eight export-layout tests passing.
 
 - [x] Bowl flyer: added four photo-referenced Hiram stadium visualisations with lower, left, right and split content spaces; verified every picker option with test autosaves blocked, preserving saved edits.
