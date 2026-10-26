@@ -267,6 +267,14 @@ function ReadyList({ title, items }: { title: string; items: ReadyItem[] }) {
               )}
               <div className="min-w-0 flex-1">
                 <div className="font-semibold text-[#03002C]">{i.label}</div>
+                {i.state === "ready" && i.detail && (
+                  <p className="mt-0.5 text-sm text-muted-foreground">{i.detail}</p>
+                )}
+                {i.source && (
+                  <a href={i.source.url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:underline">
+                    {i.source.label} <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                  </a>
+                )}
                 {i.state === "waiting" && i.blockedOn && (
                   <p className="mt-0.5 text-sm text-[#03002C]/70">Waiting on {i.blockedOn}</p>
                 )}

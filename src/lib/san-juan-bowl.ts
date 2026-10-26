@@ -2,8 +2,8 @@
 //
 // The logo and its colours come from the designer's supplied FINAL_LOGO_26
 // package (SVG/EPS/AI/PNG, colour and dark-background variants). Nothing here
-// invents a venue, date or room: those stay "to be confirmed" until the
-// organisers issue them.
+// invents a venue, date or room: event facts below come from the official
+// Sun Belt Conference announcement of 22 October 2026.
 
 import { BRAND } from "@/lib/brand-colors";
 import logoColorSvg from "@/assets/san-juan-bowl/sjb-logo-color.svg.asset.json";
@@ -16,9 +16,12 @@ export const SJB_EVENT = {
   name: "TransPerfect San Juan Bowl",
   shortName: "San Juan Bowl",
   city: "San Juan, Puerto Rico",
-  /** Confirmed by the event team (Oct 2026). */
+  /** Confirmed by the official Sun Belt Conference announcement. */
   venue: "Hiram Bithorn Stadium",
-  datesLabel: "",
+  datesLabel: "December 16, 2026",
+  kickoffLabel: "7:30 p.m. ET / 6:30 p.m. CT",
+  matchupLabel: "ACC vs. Sun Belt Conference",
+  announcementUrl: "https://sunbeltsports.org/news/2026/10/22/football-sun-belt-conference-announces-historic-primary-agreement-with-transperfect-san-juan-bowl.aspx",
 } as const;
 
 /**

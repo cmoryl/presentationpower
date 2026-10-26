@@ -61,6 +61,7 @@ export type ReadyItem = {
   detail?: string;
   blockedOn?: string;
   link?: LinkOptions;
+  source?: { label: string; url: string };
 };
 
 export type EventEntry = {
@@ -388,7 +389,12 @@ function sanJuanBowlEntry(): EventEntry {
         detail: "Supplied FINAL_LOGO_26 package: colour and dark-background variants.",
         link: { to: "/events/san-juan-bowl/brand-kit" },
       },
-      { label: "Venue and dates", state: "waiting", blockedOn: "the organisers' announcement" },
+      {
+        label: "Venue and dates",
+        state: "ready",
+        detail: `${SJB_EVENT.datesLabel} · ${SJB_EVENT.venue} · ${SJB_EVENT.city}. Kickoff: ${SJB_EVENT.kickoffLabel}. ${SJB_EVENT.matchupLabel}.`,
+        source: { label: "Official Sun Belt announcement", url: SJB_EVENT.announcementUrl },
+      },
       { label: "Floor plans", state: "waiting", blockedOn: "the venue's vector plans" },
       { label: "Sign list", state: "waiting", blockedOn: "the site survey" },
     ],
