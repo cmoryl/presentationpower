@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Update San Juan Bowl venue/date details from the official Sun Belt announcement and verify the public event page.
+- [x] Update San Juan Bowl venue/date details from the official Sun Belt announcement; eight tests passed and public event page verified with kickoff, conference matchup and source link.
 
 - [x] Build a licensed Wikimedia Hiram photo-based master and 13 matching social/ad/screen/print-proof sizes; preserved geometry, byte-identical original, credit/license, checksums and all-image inspection. Source is a 2010 sparse-crowd baseball photo, not current full-crowd football imagery; app and saved flyer unchanged.
 

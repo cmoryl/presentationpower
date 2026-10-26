@@ -17,6 +17,7 @@
 - Master modules is a projection of the existing registries, not a new renderer: social choices inherit print master overrides; registered slide renderers own every shipped variant; retirement checks explicit saved references, while database snapshots restore content without bypassing review — why: one governance view must not duplicate authorities or silently overwrite saved work.
 - The Knowledge screens share the `KnowledgeTabs` strip (Entries / Ask Oracle / Oracle KB / Sources); `/admin/knowledge-hub` redirects to `/knowledge`. Why: seven overlapping menu items.
 - Event, kiosk, signage, venue-map and logo extraction/viewer rules live in `src/lib/AGENTS.md`.
+- Bowl announced event facts live in `SJB_EVENT`; event registry readiness carries source links rendered by the shared event home — why: directory and overview must agree without duplicating dates or losing provenance.
 
 - Every html-to-image capture passes `includeQueryParams: true` — why: proxied images differ only by `?path=`, and without it every download reused the first image fetched.
 
