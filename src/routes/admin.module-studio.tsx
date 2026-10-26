@@ -10,6 +10,7 @@ import { SaveActionButton } from "@/components/editor/SaveActionButton";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Copy, Trash2 } from "lucide-react";
+import { Button } from "@/design-system/element";
 import { retintItemsForMode } from "@/lib/canvas-mode-ink";
 import {
   EditorMenu,
@@ -343,10 +344,21 @@ function ModuleStudioPage() {
 
   const del = useMutation({
     mutationFn: async (id: string) => remove({ data: { id } }),
-    onSuccess: () => {
+    onSuccess: (_result, id) => {
+      qc.setQueryData<CustomModuleRow[]>(["custom-modules"], (rows) =>
+        rows?.filter((row) => row.id !== id),
+      );
+      if (meta.id === id) patchMeta({ status: "archived" });
       void qc.invalidateQueries({ queryKey: ["custom-modules"] });
       void qc.invalidateQueries({ queryKey: ["custom-modules", "published"] });
+      toast.success("Module removed from the library", {
+        description: "Archived history is preserved in Master modules.",
+      });
     },
+    onError: (e: unknown) =>
+      toast.error("Could not remove the module", {
+        description: e instanceof Error ? e.message : "Please try again.",
+      }),
   });
 
   /** Export the composition as a single, fully editable module slide. */
@@ -586,14 +598,18 @@ function ModuleStudioPage() {
                       >
                         <Copy size={12} />
                       </button>
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={() => del.mutate(row.id)}
+                        disabled={del.isPending}
                         aria-label={`Delete ${row.name}`}
-                        className="rounded p-1 text-black/40 hover:bg-red-50 hover:text-red-600"
+                        title={`Remove ${row.name} from the library`}
+                        className="size-6 text-muted-foreground hover:text-destructive"
                       >
                         <Trash2 size={12} />
-                      </button>
+                      </Button>
                     </div>
                   ))}
                   {!modules.isLoading && (modules.data ?? []).length === 0 && (
