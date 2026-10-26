@@ -27,6 +27,7 @@ export const listCustomModules = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("custom_modules")
       .select("*")
+      .neq("status", "archived")
       .order("updated_at", { ascending: false });
     if (error) throw error;
     return data ?? [];
