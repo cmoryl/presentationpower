@@ -239,6 +239,7 @@ import { Route as EventsNextLondonTemplateRouteImport } from './routes/events.ne
 import { Route as EventsNextMapsEventIdRouteImport } from './routes/events.next_.maps.$eventId'
 import { Route as EventsNextMartStopIdRouteImport } from './routes/events.next_.mart_.$stopId'
 import { Route as EventsNextMartPriceListRouteImport } from './routes/events.next_.mart_.price-list'
+import { Route as EventsNextSanFranciscoReviewRouteImport } from './routes/events.next_.san-francisco_.review'
 import { Route as EventsNextSignEditorSignIdRouteImport } from './routes/events.next_.sign-editor.$signId'
 import { Route as EventsNextSignSetEditorSignIdRouteImport } from './routes/events.next_.sign-set-editor.$signId'
 import { Route as EventsNextSignsEventIdRouteImport } from './routes/events.next_.signs.$eventId'
@@ -1424,6 +1425,12 @@ const EventsNextMartPriceListRoute = EventsNextMartPriceListRouteImport.update({
   path: '/next/mart/price-list',
   getParentRoute: () => EventsRoute,
 } as any)
+const EventsNextSanFranciscoReviewRoute =
+  EventsNextSanFranciscoReviewRouteImport.update({
+    id: '/next_/san-francisco_/review',
+    path: '/next/san-francisco/review',
+    getParentRoute: () => EventsRoute,
+  } as any)
 const EventsNextSignEditorSignIdRoute =
   EventsNextSignEditorSignIdRouteImport.update({
     id: '/next_/sign-editor/$signId',
@@ -1702,6 +1709,7 @@ export interface FileRoutesByFullPath {
   '/events/next/maps/$eventId': typeof EventsNextMapsEventIdRoute
   '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
   '/events/next/mart/price-list': typeof EventsNextMartPriceListRoute
+  '/events/next/san-francisco/review': typeof EventsNextSanFranciscoReviewRoute
   '/events/next/sign-editor/$signId': typeof EventsNextSignEditorSignIdRoute
   '/events/next/sign-set-editor/$signId': typeof EventsNextSignSetEditorSignIdRoute
   '/events/next/signs/$eventId': typeof EventsNextSignsEventIdRoute
@@ -1938,6 +1946,7 @@ export interface FileRoutesByTo {
   '/events/next/maps/$eventId': typeof EventsNextMapsEventIdRoute
   '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
   '/events/next/mart/price-list': typeof EventsNextMartPriceListRoute
+  '/events/next/san-francisco/review': typeof EventsNextSanFranciscoReviewRoute
   '/events/next/sign-editor/$signId': typeof EventsNextSignEditorSignIdRoute
   '/events/next/sign-set-editor/$signId': typeof EventsNextSignSetEditorSignIdRoute
   '/events/next/signs/$eventId': typeof EventsNextSignsEventIdRoute
@@ -2179,6 +2188,7 @@ export interface FileRoutesById {
   '/events/next_/maps/$eventId': typeof EventsNextMapsEventIdRoute
   '/events/next_/mart_/$stopId': typeof EventsNextMartStopIdRoute
   '/events/next_/mart_/price-list': typeof EventsNextMartPriceListRoute
+  '/events/next_/san-francisco_/review': typeof EventsNextSanFranciscoReviewRoute
   '/events/next_/sign-editor/$signId': typeof EventsNextSignEditorSignIdRoute
   '/events/next_/sign-set-editor/$signId': typeof EventsNextSignSetEditorSignIdRoute
   '/events/next_/signs/$eventId': typeof EventsNextSignsEventIdRoute
@@ -2421,6 +2431,7 @@ export interface FileRouteTypes {
     | '/events/next/maps/$eventId'
     | '/events/next/mart/$stopId'
     | '/events/next/mart/price-list'
+    | '/events/next/san-francisco/review'
     | '/events/next/sign-editor/$signId'
     | '/events/next/sign-set-editor/$signId'
     | '/events/next/signs/$eventId'
@@ -2657,6 +2668,7 @@ export interface FileRouteTypes {
     | '/events/next/maps/$eventId'
     | '/events/next/mart/$stopId'
     | '/events/next/mart/price-list'
+    | '/events/next/san-francisco/review'
     | '/events/next/sign-editor/$signId'
     | '/events/next/sign-set-editor/$signId'
     | '/events/next/signs/$eventId'
@@ -2897,6 +2909,7 @@ export interface FileRouteTypes {
     | '/events/next_/maps/$eventId'
     | '/events/next_/mart_/$stopId'
     | '/events/next_/mart_/price-list'
+    | '/events/next_/san-francisco_/review'
     | '/events/next_/sign-editor/$signId'
     | '/events/next_/sign-set-editor/$signId'
     | '/events/next_/signs/$eventId'
@@ -4640,6 +4653,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsNextMartPriceListRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/next_/san-francisco_/review': {
+      id: '/events/next_/san-francisco_/review'
+      path: '/next/san-francisco/review'
+      fullPath: '/events/next/san-francisco/review'
+      preLoaderRoute: typeof EventsNextSanFranciscoReviewRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/sign-editor/$signId': {
       id: '/events/next_/sign-editor/$signId'
       path: '/next/sign-editor/$signId'
@@ -4839,6 +4859,7 @@ interface EventsRouteChildren {
   EventsNextMapsEventIdRoute: typeof EventsNextMapsEventIdRoute
   EventsNextMartStopIdRoute: typeof EventsNextMartStopIdRoute
   EventsNextMartPriceListRoute: typeof EventsNextMartPriceListRoute
+  EventsNextSanFranciscoReviewRoute: typeof EventsNextSanFranciscoReviewRoute
   EventsNextSignEditorSignIdRoute: typeof EventsNextSignEditorSignIdRoute
   EventsNextSignSetEditorSignIdRoute: typeof EventsNextSignSetEditorSignIdRoute
   EventsNextSignsEventIdRoute: typeof EventsNextSignsEventIdRoute
@@ -4901,6 +4922,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextMapsEventIdRoute: EventsNextMapsEventIdRoute,
   EventsNextMartStopIdRoute: EventsNextMartStopIdRoute,
   EventsNextMartPriceListRoute: EventsNextMartPriceListRoute,
+  EventsNextSanFranciscoReviewRoute: EventsNextSanFranciscoReviewRoute,
   EventsNextSignEditorSignIdRoute: EventsNextSignEditorSignIdRoute,
   EventsNextSignSetEditorSignIdRoute: EventsNextSignSetEditorSignIdRoute,
   EventsNextSignsEventIdRoute: EventsNextSignsEventIdRoute,

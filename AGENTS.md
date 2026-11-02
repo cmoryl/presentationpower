@@ -39,3 +39,4 @@
 
 - Send to Canva: one shared team account, tokens only in service-role `canva_shared_connection`; sends the export page's checked .pptx — why: one QA-gated file for PowerPoint and Canva.
 - Live editors pin their artwork preview with the `editor-pin` utility (src/styles.css; sits under the AppShell header via `--app-header-h`, extra offset via `--editor-pin-offset`) — why: long settings columns scrolled the preview out of view.
+- SF post-event reviews reuse private `event_photos` under `san-francisco`, issued `SF_VENUE` facts and the existing learning approval loop; sources, rights and missing outcomes remain explicit — why: research must not become marketing clearance or approved venue knowledge by implication.

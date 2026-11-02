@@ -1,5 +1,13 @@
 # Event design decisions
 
+### 2026-11-02 — SF research photographs stay private pending rights clearance
+**Area:** NEXT San Francisco post-event review v1.0.
+**Options tested:** publish downloaded attendee photographs in a public CDN/PDF; substitute historical event-gallery imagery; preserve sourced originals in the existing private event-photo library and cite the source in the downloadable report.
+**Chosen:** private originals and resized thumbnails, source attribution and marketing clearance off; the public report contains observations and source links, not the unlicensed photographs.
+**Why:** five directly sourced images support a limited on-site review, not a whole-event audit or a reuse license. Historical London/NYC imagery would misrepresent San Francisco.
+**Would change if:** the rights owner supplies publication permission, photographer credit and required participant releases, or an approved organiser archive replaces the references.
+**Applies to:** SF review v1.0; no other photo library or issued artwork changed.
+
 ### 2026-10-24 — Exact-scene Bowl kit uses non-generative photographic composition
 **Area:** first Wikimedia photo-based Bowl background kit.
 **Options tested:** generative rewriting of a reference versus deterministic colour grading and proportional layout from the downloaded original.

@@ -1,5 +1,11 @@
 # Event lessons log
 
+### 2026-11-02 — Event-calendar pages and historical galleries are not recap evidence
+**Context:** NEXT San Francisco post-event research, review v1.0.
+**What happened:** initial searches found advance promotion, an opening-day indexed post and historical NYC/London images. A second targeted search found two dated attendee/partner reflections and five real attendee images. Public access did not establish image reuse rights, and the photo set did not cover the whole event.
+**Rule now:** distinguish scheduled programme, indexed claims, directly retrieved reflections and photo observations. Verify city/year before reusing images; store rights-pending attendee imagery privately with marketing clearance off. Missing attendance, awards or ROI remain unknown, never zero or inferred success. Submit research through learning review rather than directly declaring approved knowledge.
+**Enforced by:** `next-sf-review.test.ts`, five private photo records with `marketing_ok=false`, source register and signed-in review verification.
+
 ### 2026-10-24 — A licensed stadium photograph may not satisfy the crowd brief
 **Context:** Wikimedia photo-based Bowl kit v1.
 **What happened:** the actual licensed 5993 × 2397 original depicts a 2010 baseball game with sparse spectators, not packed stands or the 2026 renovation. The first suggested CDN hash path returned 404; the verified Commons file page supplied the correct `/0/07/` original.

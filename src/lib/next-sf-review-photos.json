@@ -1,0 +1,67 @@
+[
+  {
+    "id": "P1",
+    "title": "Welcome banner",
+    "path": "san-francisco/review-v1/jessica-welcome-banner.jpg",
+    "thumbPath": "san-francisco/review-v1/jessica-welcome-banner-thumb.jpg",
+    "sourceUrl": "https://www.linkedin.com/posts/jessicawanamakerbd_a-slight-departure-from-my-usual-programming-activity-7521330977730699264-GT9m",
+    "published": "2026-10-28",
+    "width": 1152,
+    "height": 1536,
+    "sha256": "1e289638f9bedecac61bd4ffd2ae4d90b21b2ff1408951f1fa3b55ee58501665",
+    "marketingCleared": false,
+    "rights": "unconfirmed"
+  },
+  {
+    "id": "P2",
+    "title": "Branded staircase",
+    "path": "san-francisco/review-v1/jessica-branded-staircase.jpg",
+    "thumbPath": "san-francisco/review-v1/jessica-branded-staircase-thumb.jpg",
+    "sourceUrl": "https://www.linkedin.com/posts/jessicawanamakerbd_a-slight-departure-from-my-usual-programming-activity-7521330977730699264-GT9m",
+    "published": "2026-10-28",
+    "width": 1152,
+    "height": 1536,
+    "sha256": "d824de8bbab3a73750310a3fbb205fd4d516a9376ad4253ad2dcd015c0b27758",
+    "marketingCleared": false,
+    "rights": "unconfirmed"
+  },
+  {
+    "id": "P3",
+    "title": "On-site agenda",
+    "path": "san-francisco/review-v1/jessica-agenda-sign.jpg",
+    "thumbPath": "san-francisco/review-v1/jessica-agenda-sign-thumb.jpg",
+    "sourceUrl": "https://www.linkedin.com/posts/jessicawanamakerbd_a-slight-departure-from-my-usual-programming-activity-7521330977730699264-GT9m",
+    "published": "2026-10-28",
+    "width": 1152,
+    "height": 1536,
+    "sha256": "baccf626ca6c254ad03ed429a068c7f53df3909ab056ad310bb00cd5f3536068",
+    "marketingCleared": false,
+    "rights": "unconfirmed"
+  },
+  {
+    "id": "P4",
+    "title": "Digital health panel",
+    "path": "san-francisco/review-v1/jessica-digital-health-panel.jpg",
+    "thumbPath": "san-francisco/review-v1/jessica-digital-health-panel-thumb.jpg",
+    "sourceUrl": "https://www.linkedin.com/posts/jessicawanamakerbd_a-slight-departure-from-my-usual-programming-activity-7521330977730699264-GT9m",
+    "published": "2026-10-28",
+    "width": 800,
+    "height": 600,
+    "sha256": "72dfad3dd5fe33c762e61897443688d80afef683d1c3b8532275012cd5a9dee4",
+    "marketingCleared": false,
+    "rights": "unconfirmed"
+  },
+  {
+    "id": "P5",
+    "title": "Conference pins",
+    "path": "san-francisco/review-v1/jessica-conference-pins.jpg",
+    "thumbPath": "san-francisco/review-v1/jessica-conference-pins-thumb.jpg",
+    "sourceUrl": "https://www.linkedin.com/posts/jessicawanamakerbd_a-slight-departure-from-my-usual-programming-activity-7521330977730699264-GT9m",
+    "published": "2026-10-28",
+    "width": 800,
+    "height": 600,
+    "sha256": "ef71e894b7e8a54cc2f34168038c3d12749b2c8510ff22025c1a76ed93c87065",
+    "marketingCleared": false,
+    "rights": "unconfirmed"
+  }
+]
