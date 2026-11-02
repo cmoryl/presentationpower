@@ -32,6 +32,7 @@ export const LONDON_SECTIONS: CitySection[] = [
 ];
 
 export const SAN_FRANCISCO_SECTIONS: CitySection[] = [
+  { label: "After the event", target: { kind: "anchor", id: "sf-post-event" } },
   { label: "Overview", target: { kind: "anchor", id: "sf-gates" } },
   { label: "Divisions", target: { kind: "anchor", id: "edition-divisions" } },
   { label: "Rooms & maps", target: { kind: "pending" } },

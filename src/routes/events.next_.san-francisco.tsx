@@ -24,6 +24,7 @@ import { assetGates, type Gate as GateKind, type GateRow } from "@/lib/event-ass
 import { useEventAssets } from "@/lib/event-assets-data";
 import { AppShell } from "@/components/AppShell";
 import { EventLearningPanel } from "@/components/events/EventLearningPanel";
+import { SfPostEventReview } from "@/components/events/SfPostEventReview";
 import { EditionDivisionTiles } from "@/components/events/EditionDivisionTiles";
 import { CitySectionBar, SAN_FRANCISCO_SECTIONS } from "@/components/events/CitySectionBar";
 import { CaliforniaKioskBrowser } from "@/components/events/CaliforniaKioskBrowser";
@@ -193,6 +194,8 @@ function SanFranciscoPage() {
         </header>
 
         <CitySectionBar sections={SAN_FRANCISCO_SECTIONS} />
+
+        <SfPostEventReview />
 
         {/* Production stage gates. */}
         <section className="mt-10" aria-labelledby="sf-gates">
