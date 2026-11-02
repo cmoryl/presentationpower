@@ -47,7 +47,7 @@ export function SjbGuideSections({ withSingleColour = true }: SjbGuideSectionsPr
     <>
       <Section n="01" title="Introduction">
         <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
-          The {SJB_EVENT.name}, {SJB_EVENT.venue}, {SJB_EVENT.city}. Dates are to be confirmed and are not printed until the organisers issue them.
+          The {SJB_EVENT.name}, {SJB_EVENT.venue}, {SJB_EVENT.city}. {SJB_EVENT.datesLabel} · Kickoff {SJB_EVENT.kickoffLabel} · {SJB_EVENT.matchupLabel}.
         </p>
       </Section>
 
@@ -190,6 +190,7 @@ export function SjbCurvedLettering() {
           <div className="p-3">
             <p className="text-sm font-semibold text-foreground">Curved lettering — SAN JUAN BOWL only <span className="font-normal text-muted-foreground">· for dark backgrounds</span></p>
             <p className="text-xs text-muted-foreground">The badge's own arched lettering on its own, white with the Caribbean Sky shadow. Use as supplied; never retype, re-curve or stretch it.</p>
+            <p className="mt-2 text-sm font-semibold text-foreground">Limited use, by approval only. This is not an official Bowl logo.</p>
             <div className="mt-2 flex gap-3 text-xs font-semibold">
               <a href={curvedSvg.url} download="sjb-san-juan-bowl-curved-lettering.svg" className="text-primary hover:underline">SVG</a>
               <a href={curvedAi.url} download="sjb-san-juan-bowl-curved-lettering.ai" className="text-primary hover:underline">AI</a>

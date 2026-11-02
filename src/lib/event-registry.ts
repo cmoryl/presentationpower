@@ -11,6 +11,7 @@ import { HACKATHON_EVENT, LEGALWEEK_EVENT, NEXUS_EVENT } from "./supplied-event-
 
 export type EventTabId =
   | "checklist"
+  | "brand"
   | "maps"
   | "schedule"
   | "agendas"
@@ -22,6 +23,7 @@ export type EventTabId =
 
 export const EVENT_TAB_ORDER: readonly EventTabId[] = [
   "checklist",
+  "brand",
   "maps",
   "schedule",
   "agendas",
@@ -35,6 +37,7 @@ export const EVENT_TAB_ORDER: readonly EventTabId[] = [
 export const EVENT_TAB_LABEL: Record<EventTabId | "overview", string> = {
   overview: "Overview",
   checklist: "Checklist",
+  brand: "Brand guidelines",
   maps: "Maps",
   schedule: "Schedule",
   agendas: "Agendas",
@@ -331,6 +334,15 @@ function sanJuanBowlEntry(): EventEntry {
     dates: SJB_EVENT.datesLabel,
     tabs: [
       {
+        id: "brand",
+        tools: [
+          { label: "Complete Bowl brand kit", detail: "All established logo variants, single colours, small-size mark, lockups, palms, colour balance, readable pairings, Geist typography, clear space, minimum sizes and production guidance. Includes brand guide v1.0 and master logo ZIP.", link: { to: "/events/san-juan-bowl/brand-kit" } },
+          { label: "Full brand guide", detail: "Logo selection, colours, typography, usage restrictions and logo don’ts.", link: { to: "/events/san-juan-bowl/brand-kit/guide" } },
+          { label: "Single-colour logos", detail: "Supplied navy, black and white variants; arched lettering is limited use, approval only and not an official Bowl logo.", link: { to: "/events/san-juan-bowl/brand-kit/single-colour" } },
+          { label: "Public brand kit & share link", detail: "The same established guidelines and downloads, without sign-in or the Element menu.", link: { to: "/share/san-juan-bowl" } },
+        ],
+      },
+      {
         id: "checklist",
         tools: [
           {
@@ -386,7 +398,7 @@ function sanJuanBowlEntry(): EventEntry {
       {
         label: "Logo and brand kit",
         state: "ready",
-        detail: "Supplied FINAL_LOGO_26 package: colour and dark-background variants.",
+        detail: "Complete established brand guidelines, supplied colour/white-outline and single-colour logos, small-size mark, lockups, typography, production guidance, brand guide v1.0 PDF and master logo ZIP.",
         link: { to: "/events/san-juan-bowl/brand-kit" },
       },
       {

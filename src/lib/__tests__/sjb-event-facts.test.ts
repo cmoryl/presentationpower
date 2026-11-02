@@ -3,6 +3,15 @@ import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { builtInEvent, readinessProgress } from "@/lib/event-registry";
 
 describe("San Juan Bowl official announcement", () => {
+  it("connects the existing event to every established brand guideline entry point", () => {
+    const brand = builtInEvent("san-juan-bowl")?.tabs.find(t => t.id === "brand");
+    expect(brand?.tools.map(t => t.link.to)).toEqual([
+      "/events/san-juan-bowl/brand-kit",
+      "/events/san-juan-bowl/brand-kit/guide",
+      "/events/san-juan-bowl/brand-kit/single-colour",
+      "/share/san-juan-bowl",
+    ]);
+  });
   it("uses the announced inaugural date in the event directory", () => {
     expect(SJB_EVENT.datesLabel).toBe("December 16, 2026");
     expect(builtInEvent("san-juan-bowl")?.dates).toBe("December 16, 2026");
