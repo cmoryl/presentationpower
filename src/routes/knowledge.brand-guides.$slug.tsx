@@ -66,6 +66,10 @@ export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
     meta: [
       { title: `${loaderData?.guide.title} Brand Guide · TransPerfect` },
       { name: "description", content: loaderData?.guide.intro.slice(0, 155) },
+      { property: "og:title", content: `${loaderData?.guide.title} Brand Guide · TransPerfect Element` },
+      { property: "og:description", content: loaderData?.guide.intro.slice(0, 155) },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   notFoundComponent: () => (
@@ -130,11 +134,11 @@ function BrandGuideView() {
       {/* Hero */}
       <div className="mt-4"><BrandKitPdfExport guide={guide} /></div>
       <section
-        className="relative mt-4 overflow-hidden rounded-3xl p-10 md:p-16"
+        className="relative mt-4 overflow-hidden px-6 py-10 md:px-10"
         style={{ background: hero, color: "#fff" }}
       >
         {/* Approved backdrop layer */}
-        {heroBackdrop && (
+        {false && heroBackdrop && (
           <>
             <img
               src={heroBackdrop}
@@ -151,46 +155,37 @@ function BrandGuideView() {
             />
           </>
         )}
-        {/* Accent orb — brand secondary color pushed behind glass */}
-        <div
-          className="hidden pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full opacity-40 blur-3xl"
-          style={{ background: accent }}
-          aria-hidden
-        />
-
         <div className="relative">
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.3em] ring-1 ring-white/25 backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />
+          <div className="flex items-center gap-2 text-xs">
             {guide.divisionId === "master" ? "Master brand" : (division?.name ?? "Division")}
             <span className="opacity-60">·</span>
             <span className="opacity-70">v{guide.version}</span>
           </div>
 
-          <h1 className="mt-6 text-6xl font-medium leading-[95%] tracking-[-0.045em] md:text-7xl">
+          <h1 className="mt-4 text-4xl font-semibold leading-tight md:text-5xl">
             {guide.title}
           </h1>
-          <div className="mt-2 h-[2px] w-24 rounded-full" style={{ background: accent }} />
           <div className="mt-5 text-lg font-light opacity-85 md:text-xl">{guide.subtitle}</div>
           {guide.tagline && (
-            <div className="mt-8 max-w-2xl text-2xl leading-[115%] tracking-[-0.02em] md:text-[28px]">
+            <div className="mt-6 max-w-2xl text-xl leading-snug">
               {guide.tagline}
             </div>
           )}
           <p className="mt-6 max-w-2xl text-sm leading-[150%] opacity-80">{guide.intro}</p>
 
           {logos?.white || logos?.color ? (
-            <div className="mt-8 inline-flex items-center gap-4 rounded-2xl bg-white/10 px-5 py-4 ring-1 ring-white/20 backdrop-blur">
+            <div className="mt-8 flex flex-wrap items-center gap-4">
               <img
-                src={logos.white ?? logos.color!}
+                src={logos.white ?? logos.color}
                 alt={`${guide.title} logo`}
                 className="h-12 w-auto md:h-14"
                 loading="lazy"
               />
               <div className="hidden h-8 w-px bg-white/25 md:block" />
               <a
-                href={logos.white ?? logos.color!}
+                href={logos.white ?? logos.color}
                 download
-                className="hidden items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.25em] opacity-80 transition hover:opacity-100 md:inline-flex"
+                className="inline-flex items-center gap-1.5 text-xs underline underline-offset-4"
               >
                 <Download size={14} />
                 Download
@@ -198,11 +193,11 @@ function BrandGuideView() {
             </div>
           ) : null}
 
-          <div className="mt-10 flex items-center gap-2">
+          <div className="mt-8 flex items-center gap-2">
             {[...guide.primaryColors, ...guide.secondaryColors].map((c) => (
               <span
                 key={c.hex}
-                className="h-8 w-8 rounded-full ring-2 ring-white/30"
+                className="h-6 w-10 border border-white/30"
                 style={{ background: c.hex }}
                 title={`${c.name} ${c.hex}`}
               />
@@ -220,15 +215,9 @@ function BrandGuideView() {
               return (
                 <div
                   key={v.label}
-                  className="group rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:shadow-lg"
+                  className="border-t border-border py-4"
                 >
-                  <div
-                    className="flex h-10 w-10 items-center justify-center rounded-lg"
-                    style={{ background: `${hero}14`, color: hero }}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div className="mt-3 text-sm font-semibold" style={{ color: hero }}>
+                  <div className="text-sm font-semibold">
                     {v.label}
                   </div>
                   <div className="mt-1 text-xs text-muted-foreground">{v.description}</div>
@@ -265,15 +254,10 @@ function BrandGuideView() {
           {guide.logoRules.map((r) => (
             <div
               key={r.title}
-              className="flex gap-3 rounded-xl border p-4"
-              style={{
-                borderColor: r.do ? "#0A660A33" : "#E53D2E33",
-                background: r.do ? "#DDFAD255" : "#FACCC855",
-              }}
+              className="flex gap-3 border-t border-border py-4"
             >
               <div
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                style={{ background: r.do ? "#0A660A" : BRAND.red }}
+                className="shrink-0 text-xs font-semibold text-muted-foreground"
               >
                 {r.do ? "DO" : "×"}
               </div>
@@ -392,8 +376,7 @@ function BrandGuideView() {
             )}
             {guide.brandVisuals && (
               <div
-                className="rounded-2xl p-6 text-white"
-                style={{ background: `linear-gradient(135deg, ${hero}, ${accent})` }}
+                className="py-4"
               >
                 <div className="text-sm font-semibold">Brand visuals</div>
                 <p className="mt-2 text-sm opacity-90">{guide.brandVisuals}</p>
@@ -651,7 +634,7 @@ function BrandGuideView() {
         </Section>
       )}
 
-      {intel && <BrandhubIntelSections intel={intel} hero={hero} accent={accent} />}
+      {intel && <details className="mt-12 border-t border-border pt-5"><summary className="cursor-pointer text-sm font-semibold">Brand research & supporting knowledge</summary><BrandhubIntelSections intel={intel} hero={hero} accent={accent} /></details>}
 
       {/* Reported from real work — never edits the guide above. */}
       <GuideUsagePanel guide={guide} />
@@ -683,8 +666,7 @@ function Section({
   return (
     <section className="mt-14">
       <div className="flex items-baseline gap-4">
-        <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">{eyebrow}</div>
-        <h2 className="text-2xl font-semibold tracking-[-0.02em]">{title}</h2>
+        <h2 className="text-2xl font-semibold">{title}</h2>
       </div>
       <div className="mt-6">{children}</div>
     </section>
