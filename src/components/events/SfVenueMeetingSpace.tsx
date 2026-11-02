@@ -11,6 +11,7 @@ import { saveRoomsVersion, useEventAssets, useRefreshEventAssets } from "@/lib/e
 import { SF_VENUE_FACT_SHEET, SF_VENUE_FLOORS, SF_VENUE_ROOMS, sfVenueRoomList } from "@/lib/next-sf-venue-rooms";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
 import { EventMapView } from "@/components/events/EventMapView";
+import { SfIssuedMaps } from "@/components/events/SfIssuedMaps";
 
 const n = (v: number | null) => (v == null ? "–" : v.toLocaleString("en-US"));
 
@@ -59,6 +60,8 @@ export function SfVenueMeetingSpace() {
         </div>
       </div>
 
+      <div className="mt-6"><SfIssuedMaps /></div>
+      <h3 className="mt-8 text-base font-semibold">Hotel capacity reference</h3>
       <div role="tablist" aria-label="Floor" className="mt-4 flex gap-1">
         {SF_VENUE_FLOORS.map((f) => (
           <button key={f.floor} role="tab" type="button" aria-selected={f.floor === floor} onClick={() => setFloor(f.floor)}
@@ -67,20 +70,7 @@ export function SfVenueMeetingSpace() {
           </button>
         ))}
       </div>
-      <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-        <div>
-          <div className="rounded-md border border-[#03002C]/10 bg-white p-2">
-            <EventMapView eventId="san-francisco" marker={String(plan.floor)} fallback={
-              <PlanZoomFrame key={floor} label={plan.title}>
-                <img src={plan.vectorUrl} alt={`InterContinental San Francisco ${plan.title.toLowerCase()} plan`} className="h-auto w-full" loading="lazy" />
-              </PlanZoomFrame>
-            } />
-          </div>
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px]">
-            <a href={plan.vectorUrl} download={`InterContinental-SF-floor-${plan.floor}-vector.svg`} className="font-semibold text-[#003FC7] hover:underline">Download vector plan (SVG)</a>
-            <span className="text-[#666666]">Drawn paths from the hotel&rsquo;s 2017 sheet — confirm with the hotel before printing.</span>
-          </div>
-        </div>
+      <div className="mt-4">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-[12px] text-[#03002C]">
             <caption className="sr-only">{plan.title} room capacities</caption>

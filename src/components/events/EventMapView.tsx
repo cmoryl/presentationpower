@@ -13,6 +13,7 @@ import { listVenueMapEdits } from "@/lib/qeii-map-edits.functions";
 import { eventMapEdits, eventMapFloor, eventMapSheet, eventMapSvg, type EventMapRow } from "@/lib/event-floor-plan";
 import { QEII_MAP_LOOKS, QEII_MAP_LOOK_ORDER, type QeiiPlanFace } from "@/lib/next-london-qeii-style";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
+import { SfIssuedMaps } from "@/components/events/SfIssuedMaps";
 
 export interface EventMapViewProps {
   eventId: string;
@@ -23,6 +24,11 @@ export interface EventMapViewProps {
 }
 
 export function EventMapView({ eventId, marker, fallback }: EventMapViewProps) {
+  if (eventId === "san-francisco") return <SfIssuedMaps marker={marker} />;
+  return <EditableEventMapView eventId={eventId} marker={marker} fallback={fallback} />;
+}
+
+function EditableEventMapView({ eventId, marker, fallback }: EventMapViewProps) {
   const list = useServerFn(listEventMapFloors);
   const listEdits = useServerFn(listVenueMapEdits);
   const q = useQuery({ queryKey: ["event-map-floors", eventId], queryFn: () => list({ data: { eventId } }) });

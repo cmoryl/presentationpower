@@ -1,5 +1,12 @@
 # Event design decisions
 
+### 2026-11-02 — SF supplied final maps replace displayed drafts
+**Area:** San Francisco map displays and downloads.
+**Options tested:** retain the app-rendered room overlays, add reference downloads only, or replace displays with the supplied two-page artwork.
+**Chosen:** replace displays with SF_Maps3: floor 3 on page one and floors 4+5 together on page two. Serve byte-identical PDF/AI originals; reuse shared zoom controls, not a second editor.
+**Why:** the user selected replacement and the final artwork differs from earlier colours and labels. Existing draft records and hotel capacities are retained separately, not represented as the final maps.
+**Would change if:** the designer supplies a revised map or the user requests an editable reconstruction.
+
 ### 2026-11-02 — NEXT brand examples separate actual photos from master artwork
 **Area:** NEXT master brand guide and event kit visual examples.
 **Options tested:** generated event mockups, copying staff photographs into a public CDN gallery, or sharing one gallery with private staff photos and existing registry artwork.
