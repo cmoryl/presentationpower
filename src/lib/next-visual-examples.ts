@@ -28,16 +28,24 @@ export interface NextVisualExample {
   note: string;
 }
 
+/** Never request private photos from a partner-share gallery. */
+export function nextExamplesAllowPhotos(shared: boolean): boolean { return !shared; }
+
 export async function loadNextArtworkExamples(): Promise<NextVisualExample[]> {
   const rows = await loadNextRegistry();
-  return rows.filter(r => !!r.exampleUrl).map((r, i) => ({
+  const examples: NextVisualExample[] = rows.filter(r => !!r.exampleUrl).map((r, i) => ({
     id: `artwork-${r.divisionId}-${r.code}-${i}`,
     title: `${r.code} · ${r.format}`,
     area: r.group === "asset-subsection" ? "Social & email" : /pillar/i.test(r.format) ? "Pillars" : /desk/i.test(r.format) ? "Arrival & registration" : /kiosk|booth/i.test(r.format) ? "Booths & kiosks" : /surround/i.test(r.format) ? "Screens & sessions" : r.group === "sponsorship-deck" ? "Slides & sponsorship" : "Other event touchpoints",
     division: r.divisionId,
     event: "Master artwork",
-    kind: "artwork",
+    kind: "artwork" as const,
     src: r.exampleUrl,
     note: `${r.size} · Existing artwork preview, not a photograph or proof of installation.`,
   }));
+  const areas = [...new Set(examples.map(e => e.area))];
+  const groups = areas.map(a => examples.filter(e => e.area === a));
+  const balanced: NextVisualExample[] = [];
+  for (let i = 0; i < Math.max(0, ...groups.map(g => g.length)); i++) for (const g of groups) if (g[i]) balanced.push(g[i]);
+  return balanced;
 }

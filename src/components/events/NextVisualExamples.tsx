@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, X, Camera } from "lucide-react";
 import { Button } from "@/design-system/element";
 import { supabase } from "@/integrations/supabase/client";
 import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
-import { NEXT_EXAMPLE_AREAS, NEXT_EXAMPLE_EVENTS, loadNextArtworkExamples, type NextVisualExample } from "@/lib/next-visual-examples";
+import { NEXT_EXAMPLE_AREAS, NEXT_EXAMPLE_EVENTS, loadNextArtworkExamples, nextExamplesAllowPhotos, type NextVisualExample } from "@/lib/next-visual-examples";
 
 export interface NextVisualExamplesProps { shared?: boolean }
 
@@ -19,7 +19,7 @@ export function NextVisualExamples({ shared = false }: NextVisualExamplesProps) 
   const dialog = useRef<HTMLDialogElement>(null);
   const artwork = useQuery({ queryKey: ["next-visual-artwork"], queryFn: loadNextArtworkExamples });
   const photos = useQuery({
-    queryKey: ["next-visual-event-photos"], enabled: !shared, retry: false,
+    queryKey: ["next-visual-event-photos"], enabled: nextExamplesAllowPhotos(shared), retry: false,
     queryFn: async (): Promise<NextVisualExample[]> => {
       const result: NextVisualExample[] = [];
       for (let from = 0; ; from += 1000) {
@@ -100,7 +100,7 @@ export function NextVisualExamples({ shared = false }: NextVisualExamplesProps) 
     {!shared && <div className="mt-8 flex flex-wrap gap-3"><Button asChild variant="outline" size="sm"><Link to="/events/next/london/photos">London photo library</Link></Button><Button asChild variant="outline" size="sm"><Link to="/events/next/san-francisco/review">San Francisco sources & review</Link></Button></div>}
     <dialog ref={dialog} onClose={() => setSelected(null)} className="m-auto max-h-[90vh] w-[min(94vw,72rem)] overflow-auto rounded-md border border-border bg-background p-5 text-foreground backdrop:bg-foreground/70">
       <div className="flex items-center justify-between gap-4"><h3 className="min-w-0 break-words text-base font-semibold">{selected?.area} · {selected?.event}</h3><Button size="icon" variant="ghost" aria-label="Close example" onClick={() => dialog.current?.close()}><X /></Button></div>
-      <div className="mt-4 flex min-h-40 items-center justify-center bg-muted">{selected && (selected.src || full.data) ? <img src={selected.src ?? full.data ?? undefined} alt={selected.title} className="max-h-[65vh] max-w-full object-contain" /> : <p role="status" className="p-8 text-sm">{full.isError ? "Full photograph could not load." : "Loading photograph…"}</p>}</div>
+      <div className="mt-4 flex min-h-40 items-center justify-center bg-muted">{selected && (selected.src || full.data) ? <img src={selected.src ?? full.data ?? undefined} alt={selected.title} className="h-[60vh] w-full object-contain" /> : <p role="status" className="p-8 text-sm">{full.isError ? "Full photograph could not load." : "Loading photograph…"}</p>}</div>
       <p className="mt-4 text-sm text-muted-foreground">{selected?.note}</p>
       <div className="mt-4 flex items-center justify-between"><Button size="icon" variant="outline" aria-label="Previous example" disabled={selectedIndex <= 0} onClick={() => step(-1)}><ChevronLeft /></Button><span className="text-xs text-muted-foreground">{selectedIndex + 1} of {filtered.length}</span><Button size="icon" variant="outline" aria-label="Next example" disabled={selectedIndex >= filtered.length - 1} onClick={() => step(1)}><ChevronRight /></Button></div>
     </dialog>
