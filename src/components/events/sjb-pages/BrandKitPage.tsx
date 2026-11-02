@@ -42,7 +42,7 @@ import {
 } from "@/lib/san-juan-bowl";
 
 
-const card = "rounded-2xl border border-[#03002C]/12 bg-white p-5";
+const card = "border-t border-border bg-background py-5";
 
 /** Backgrounds offered in the per-variant preview switcher. */
 const PREVIEW_BGS = [
@@ -61,7 +61,7 @@ function LogoVariantCard({ logo }: { logo: (typeof SJB_LOGOS)[number] }) {
   return (
     <div className={`${card} space-y-3`}>
       <div
-        className="flex aspect-square items-center justify-center overflow-hidden rounded-xl border border-[#03002C]/10 p-8 transition-colors"
+        className="flex aspect-square items-center justify-center overflow-hidden rounded-md border border-[#03002C]/10 p-8 transition-colors"
         style={{ background: bg }}
       >
         <img src={logo.svg} alt={`${SJB_EVENT.name} logo — ${logo.label}`} className="max-h-full max-w-full object-contain" />
@@ -89,14 +89,14 @@ function LogoVariantCard({ logo }: { logo: (typeof SJB_LOGOS)[number] }) {
         <a
           href={logo.svg}
           download
-          className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/25 px-3 py-1.5 text-[12px] font-semibold hover:bg-[#F2F2F2]"
+          className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-[12px] font-semibold hover:bg-[#F2F2F2]"
         >
           <Download className="h-3.5 w-3.5" /> SVG
         </a>
         <a
           href={logo.png}
           download
-          className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/25 px-3 py-1.5 text-[12px] font-semibold hover:bg-[#F2F2F2]"
+          className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-[12px] font-semibold hover:bg-[#F2F2F2]"
         >
           <Download className="h-3.5 w-3.5" /> PNG
         </a>
@@ -105,7 +105,7 @@ function LogoVariantCard({ logo }: { logo: (typeof SJB_LOGOS)[number] }) {
             key={ext}
             href={`${SJB_PRINT_DIR}/sjb-logo-${logo.id}-cmyk.${ext}`}
             download
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/25 px-3 py-1.5 text-[12px] font-semibold hover:bg-[#F2F2F2]"
+            className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-[12px] font-semibold hover:bg-[#F2F2F2]"
           >
             <Download className="h-3.5 w-3.5" /> {ext.toUpperCase()} (CMYK)
           </a>
@@ -113,7 +113,7 @@ function LogoVariantCard({ logo }: { logo: (typeof SJB_LOGOS)[number] }) {
         <a
           href={`${SJB_PRINT_DIR}/sjb-logo-${logo.id}-cmyk-illustrator.ai`}
           download
-          className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/25 px-3 py-1.5 text-[12px] font-semibold hover:bg-[#F2F2F2]"
+          className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-[12px] font-semibold hover:bg-[#F2F2F2]"
         >
           <Download className="h-3.5 w-3.5" /> AI (CMYK)
         </a>
@@ -133,7 +133,7 @@ function ClearSpaceDiagram() {
     <div className={`${card} space-y-3`}>
       <h3 className="text-[15px] font-bold">Clear space</h3>
       <p className="text-[13px] text-[#03002C]/80">{SJB_CLEAR_SPACE.rule}</p>
-      <div className="flex justify-center rounded-xl border border-[#03002C]/10 bg-[#F2F2F2] p-6">
+      <div className="flex justify-center rounded-md border border-[#03002C]/10 bg-[#F2F2F2] p-6">
         <div className="relative w-full max-w-[320px]" style={{ aspectRatio: `${boxW} / ${boxH}` }}>
           <div className="absolute inset-0 rounded-sm border-2 border-dashed border-[#003FC7]/60" aria-hidden="true" />
           <img
@@ -175,7 +175,7 @@ function MinSizeCard() {
       </p>
       <ul className="space-y-2">
         {SJB_MIN_SIZES.map((m) => (
-          <li key={m.context} className="flex items-start gap-3 rounded-xl border border-[#03002C]/10 bg-[#F2F2F2]/60 px-3 py-2.5">
+          <li key={m.context} className="flex items-start gap-3 border-b border-border py-3">
             <span className="mt-0.5 min-w-[120px] text-[12px] font-bold uppercase tracking-wide text-[#03002C]/60">
               {m.context}
             </span>
@@ -237,7 +237,7 @@ function MisuseTile({ id, title, detail }: { id: SjbMisuseDemo; title: string; d
   return (
     <div className="space-y-2">
       <div
-        className="relative flex aspect-square items-center justify-center overflow-hidden rounded-xl border border-[#03002C]/10 p-6"
+        className="relative flex aspect-square items-center justify-center overflow-hidden rounded-md border border-[#03002C]/10 p-6"
         style={boxStyle}
       >
         <img src={logo} alt="" aria-hidden="true" className="max-h-full max-w-full object-contain" style={imgStyle} />
@@ -256,7 +256,7 @@ function ConstructionDiagram() {
   const g = SJB_CONSTRUCTION.grid;
   const cells = Array.from({ length: g - 1 }, (_, i) => ((i + 1) * 100) / g);
   return (
-    <div className="relative aspect-square w-full overflow-hidden rounded-xl border border-[#03002C]/10 bg-white">
+    <div className="relative aspect-square w-full overflow-hidden rounded-md border border-[#03002C]/10 bg-white">
       <img
         src={SJB_LOGOS[0].svg}
         alt="San Juan Bowl badge on its construction grid"
@@ -313,7 +313,7 @@ function CopyCode({ value, label }: { value: string; label: string }) {
           /* clipboard unavailable — value stays visible for manual copy */
         }
       }}
-      className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/20 px-2 py-0.5 text-[11px] font-semibold text-[#03002C]/70 hover:bg-[#F2F2F2]"
+      className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-0.5 text-[11px] font-semibold text-[#03002C]/70 hover:bg-[#F2F2F2]"
     >
       {copied ? <Check className="h-3 w-3 text-[#003FC7]" /> : <Copy className="h-3 w-3" />}
       {copied ? "Copied" : "Copy"}
@@ -341,21 +341,21 @@ export function SjbBrandKit() {
           <a
             href={brandGuide.url}
             download="san-juan-bowl-brand-guide-v1.0.pdf"
-            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#003FC7]"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#003FC7]"
           >
             <Download className="h-4 w-4" /> Full brand guide v1.0 (PDF)
           </a>
           <a
             href={masterKit.url}
             download="SJB-Master-Logo-Kit-v1.0.zip"
-            className="ml-2 mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#03002C]/20 px-4 py-2 text-[13px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]"
+            className="ml-2 mt-3 inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-[13px] font-semibold hover:border-[#003FC7] hover:text-[#003FC7]"
           >
             <Download className="h-4 w-4" /> Master logo kit v1.0 (ZIP, 16 MB)
           </a>
           {!share && (
             <Link
               to="/events/san-juan-bowl/brand-kit/guide"
-              className="ml-2 mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#03002C] px-4 py-2 text-[13px] font-semibold text-[#03002C] hover:bg-[#EEF1F7]"
+              className="ml-2 mt-3 inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-[13px] font-semibold text-[#03002C] hover:bg-[#EEF1F7]"
             >
               Open brand guide page
             </Link>
@@ -370,13 +370,7 @@ export function SjbBrandKit() {
         <LargeFormatSection />
         {!share && <KitSignList kit="san-juan-bowl" />}
 
-        <section className={`${card} space-y-2`}>
-          <h2 className="text-[17px] font-bold">What's next</h2>
-          <p className="text-[14px] text-[#03002C]/80">
-            Maps, signage and badges open from the event home as soon as the venue's floor plans and sign list arrive.
-            Room colours and uses are set per event, so nothing here is overwritten by other events.
-          </p>
-        </section>
+
       </div>
     </SjbShell>
   );
@@ -439,7 +433,7 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
                 return (
                   <div key={b.id} className="space-y-2">
                     <div
-                      className="flex aspect-[4/3] items-center justify-center rounded-xl border border-[#03002C]/10 p-5"
+                      className="flex aspect-[4/3] items-center justify-center rounded-md border border-[#03002C]/10 p-5"
                       style={{ background: b.hex }}
                     >
                       <img
@@ -477,7 +471,7 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
             </p>
             <dl className="grid gap-3 sm:grid-cols-2">
               {SJB_LOGO_ANATOMY.map((a) => (
-                <div key={a.part} className="rounded-xl border border-[#03002C]/10 bg-[#F2F2F2]/60 px-3 py-2.5">
+                <div key={a.part} className="border-b border-border py-3">
                   <dt className="text-[13px] font-bold">{a.part}</dt>
                   <dd className="mt-0.5 text-[12px] text-[#03002C]/75">{a.detail}</dd>
                 </div>
@@ -590,7 +584,7 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
               const r = sjbContrast(fg.hex, bg.hex);
               const verdict = r >= 4.5 ? "Any text" : r >= 3 ? "Large headlines only" : "Never for text";
               return (
-                <div key={`${p.fg}-${p.bg}`} className="overflow-hidden rounded-xl border border-[#03002C]/10">
+                <div key={`${p.fg}-${p.bg}`} className="overflow-hidden rounded-md border border-[#03002C]/10">
                   <div className="px-3 py-4 text-[18px] font-bold" style={{ background: bg.hex, color: fg.hex }}>
                     Aa Bowl
                   </div>
@@ -647,7 +641,7 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
           <h2 className="text-[17px] font-bold">Naming the event</h2>
           <dl className="grid gap-3 sm:grid-cols-3">
             {SJB_NAMING.map((n) => (
-              <div key={n.label} className="rounded-xl border border-[#03002C]/10 bg-[#F2F2F2]/60 px-3 py-2.5">
+              <div key={n.label} className="border-b border-border py-3">
                 <dt className="text-[11px] font-semibold uppercase text-[#666666]">{n.label}</dt>
                 <dd className="mt-0.5 text-[13px] font-bold">{n.value}</dd>
               </div>

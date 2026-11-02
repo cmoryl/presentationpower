@@ -34,7 +34,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   for (const [i, b] of bytes.entries()) { const name = `${model.font}-${i}.ttf`; doc.addFileToVFS(name, base64(b)); doc.addFont(name, model.font, i ? "bold" : "normal"); }
   const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight(), M = 42, bottom = H - 45;
   const ink: [number, number, number] = [3, 0, 44], muted: [number, number, number] = [83, 83, 83], white: [number, number, number] = [255, 255, 255];
-  const primary = rgb(model.primary), accent = rgb(model.accent);
+  const primary = rgb(model.primary);
   const missing: string[] = []; const contents: { title: string; page: number }[] = []; let y = M;
   function font(size: number, bold = false, colour = ink) { doc.setFont(model.font, bold ? "bold" : "normal").setFontSize(size).setTextColor(...colour); }
   function page(title: string) {
