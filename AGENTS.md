@@ -18,6 +18,7 @@
 - The Knowledge screens share the `KnowledgeTabs` strip (Entries / Ask Oracle / Oracle KB / Sources); `/admin/knowledge-hub` redirects to `/knowledge`. Why: seven overlapping menu items.
 - Event, kiosk, signage, venue-map and logo extraction/viewer rules live in `src/lib/AGENTS.md`.
 - Bowl announced event facts live in `SJB_EVENT`; event registry readiness carries source links rendered by the shared event home — why: directory and overview must agree without duplicating dates or losing provenance.
+- Bowl event brand navigation lives in the existing event registry and links to the shared kit/guide bodies; event-home logo guidance reads `SJB_LOGO_RULES` — why: discoverability must not create a second brand authority.
 
 - Every html-to-image capture passes `includeQueryParams: true` — why: proxied images differ only by `?path=`, and without it every download reused the first image fetched.
 
