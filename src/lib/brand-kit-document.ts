@@ -19,7 +19,7 @@ export function selectKitDocumentSections(doc: KitDocument, ids: string[]): KitD
 export async function makeBrandGuideDocument(g: BrandGuide): Promise<KitDocument> {
   const { getDivisionLogos } = await import("@/lib/division-logos");
   const logos = getDivisionLogos(g.divisionId) ?? getDivisionLogos(g.slug);
-  const assets: KitDocumentAsset[] = Object.entries(logos ?? {}).flatMap(([label, url]) => url ? [{ title: label.replace(/([A-Z])/g, " $1"), image: url, ground: /white/i.test(label) ? g.primaryColors[0]?.hex : undefined, links: [{ label: "Download logo", url }] }] : []);
+  const assets: KitDocumentAsset[] = Object.entries(logos ?? {}).flatMap(([label, url]) => url && !/stackedWhite/.test(label) ? [{ title: label.replace(/([A-Z])/g, " $1"), image: url, ground: /white/i.test(label) ? g.primaryColors[0]?.hex : undefined, links: [{ label: "Download logo", url }] }] : []);
   return {
     id: g.slug, name: g.title, version: g.version, intro: g.intro, primary: g.primaryColors[0]?.hex ?? "#03002C", accent: g.secondaryColors[0]?.hex ?? "#003FC7", font: "Geist", cover: logos?.color ?? logos?.black,
     sections: [

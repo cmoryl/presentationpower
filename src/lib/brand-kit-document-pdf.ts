@@ -82,10 +82,10 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     }
   }
   async function assetBlock(asset: KitDocumentAsset, title: string) {
-    // One large framed example per spread, with enough space for every link and note.
-    need(270, title); let img: Awaited<ReturnType<typeof image>> | null = null;
+    // Two generous example rows per spread, with full link/notes continuation.
+    need(208, title); let img: Awaited<ReturnType<typeof image>> | null = null;
     if (asset.image) try { img = await image(asset.image); } catch { missing.push(asset.title); }
-    const top = y, imageW = 280, imageH = 212, tx = M + 304, tw = W - M - tx;
+    const top = y, imageW = 280, imageH = 180, tx = M + 304, tw = W - M - tx;
     font(15, true); const heading = doc.splitTextToSize(asset.title, tw) as string[];
     doc.text(heading, tx, top + 17); let yy = top + heading.length * 19 + 14;
     if (asset.note) { font(10, false, muted); const notes = doc.splitTextToSize(asset.note, tw) as string[]; doc.text(notes, tx, yy); yy += notes.length * 14 + 14; }
@@ -98,7 +98,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
       if (yy + 30 > bottom) { page(title); yy = y; }
       yy += link(l.label, l.url, tx, yy, tw);
     }
-    y = Math.max(top + (asset.image ? imageH : 35), yy) + 25;
+    y = Math.max(top + (asset.image ? imageH : 35), yy) + 22;
   }
   doc.setPage(toc); y = 100;
   for (const entry of contents) { if (y > bottom - 25) break; font(11); doc.text(entry.title, M, y); font(10, true); doc.text(String(entry.page), W - M, y, { align: "right" }); doc.link(M, y - 11, W - 2 * M, 20, { pageNumber: entry.page }); y += 24; }
