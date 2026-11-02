@@ -73,9 +73,7 @@ export function NextVisualExamples({ shared = false }: NextVisualExamplesProps) 
   const selectedIndex = filtered.findIndex(p => p.id === selected?.id);
   const field = "h-9 min-w-0 rounded-md border border-border bg-background px-3 text-sm";
   return <section id="visual-examples" aria-labelledby="next-examples-heading" className="mt-12 scroll-mt-24 border-t border-border pt-8">
-    <p className="text-xs font-medium uppercase text-muted-foreground">NEXT 2026 · Look & feel in practice</p>
-    <h2 id="next-examples-heading" className="mt-2 text-2xl font-semibold">Event imagery & visual examples</h2>
-    <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">Arrival, registration, stages, room backdrops, booths, pillars, badges and smaller touchpoints. Original event photography is separate from artwork previews; neither changes the brand rules. NEXT track colours are event-only.</p>
+    <h2 id="next-examples-heading" className="text-2xl font-semibold">Event examples</h2>
     {!shared && <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Example type">
       <Button size="sm" variant={mode === "photo" ? "default" : "outline"} aria-pressed={mode === "photo"} onClick={() => changeMode("photo")}><Camera size={16} />Real event photographs</Button>
       <Button size="sm" variant={mode === "artwork" ? "default" : "outline"} aria-pressed={mode === "artwork"} onClick={() => changeMode("artwork")}>Artwork variations</Button>
@@ -93,7 +91,7 @@ export function NextVisualExamples({ shared = false }: NextVisualExamplesProps) 
     <div className="mt-6 grid gap-x-5 gap-y-8 sm:grid-cols-2 xl:grid-cols-3">
       {shown.map(p => { const src = p.src ?? thumbnails.data?.[p.thumbPath ?? ""]; return <figure key={p.id}>
         <Button variant="ghost" className="h-auto w-full overflow-hidden rounded-md border border-border bg-muted p-0" aria-label={`Enlarge ${p.title}`} disabled={!src} onClick={() => open(p)}><div className="flex aspect-[4/3] w-full items-center justify-center">{src ? <img src={src} alt={`${p.area} · ${p.event} · ${p.title}`} loading="lazy" className="h-full w-full object-contain" /> : <span className="text-xs text-muted-foreground">{thumbnails.isLoading ? "Loading photo…" : "Photo unavailable"}</span>}</div></Button>
-        <figcaption className="mt-3"><p className="text-xs font-medium text-muted-foreground">{p.event} · {divisionName(p.division)}</p><h3 className="mt-1 text-sm font-semibold">{p.area}</h3><p className="mt-1 break-words text-xs text-muted-foreground">{p.title}</p><p className="mt-1 text-xs leading-relaxed text-muted-foreground">{p.note}</p></figcaption>
+        <figcaption className="mt-3"><p className="text-xs font-medium text-muted-foreground">{p.event} · {divisionName(p.division)}</p><h3 className="mt-1 text-sm font-semibold">{p.area}</h3></figcaption>
       </figure>; })}
     </div>
     {filtered.length > limit && <Button className="mt-6" variant="outline" onClick={() => setLimit(n => n + 24)}>More examples</Button>}

@@ -33,7 +33,7 @@ export const Route = createFileRoute("/events/kits/$kitId")({
 
 function FileCard({ f }: { f: KitFile }) {
   return (
-    <li className="flex flex-col overflow-hidden rounded-md border border-border bg-card">
+    <li className="flex flex-col border-b border-border pb-4">
       <div className="flex aspect-[4/3] items-center justify-center bg-muted p-3">
         {f.preview ? (
           <img src={f.preview} alt={f.title} loading="lazy" className="max-h-full max-w-full object-contain" />
@@ -41,7 +41,7 @@ function FileCard({ f }: { f: KitFile }) {
           <FileText className="h-10 w-10 text-muted-foreground" aria-hidden />
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-1 p-3">
+      <div className="flex flex-1 flex-col gap-2 pt-3">
         <p className="text-sm font-semibold text-foreground">{f.title}</p>
         <p className="text-xs text-muted-foreground">
           {[f.size, `${f.format} · ${kitFileSize(f.bytes)}`].filter(Boolean).join(" · ")}
@@ -102,7 +102,7 @@ function KitPage() {
           {kit.logos.map((l) => {
             const ground = /LightBlueBG/i.test(l.name) ? "bg-[#139DD8]" : /DarkBlueBG|White/i.test(l.name) ? "bg-[#003B71]" : "bg-muted";
             return (
-              <li key={l.url} className="overflow-hidden rounded-md border border-border bg-card">
+              <li key={l.url} className="border-b border-border pb-2">
                 <div className={`flex h-28 items-center justify-center p-4 ${ground}`}>
                   <img src={l.url} alt={l.name} loading="lazy" className="max-h-full max-w-full object-contain" />
                 </div>

@@ -39,7 +39,6 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   function font(size: number, bold = false, colour = ink) { doc.setFont(model.font, bold ? "bold" : "normal").setFontSize(size).setTextColor(...colour); }
   function page(title: string) {
     doc.addPage(); y = M;
-    doc.setFillColor(...primary).rect(0, 0, 12, H, "F");
     font(10, true, muted); doc.text(model.name, M, 27);
     font(24, true); const lines = doc.splitTextToSize(title, W - 2 * M); doc.text(lines, M, y + 24); y += lines.length * 28 + 18;
   }
@@ -57,17 +56,15 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   }
   progress?.("Designing cover…");
   doc.setFillColor(...primary).rect(0, 0, W, H, "F");
-  // Brand-specific rail: solid palette accents; logos remain untouched.
-  doc.setFillColor(...accent).rect(0, H - 14, W, 14, "F");
-  font(11, true, white); doc.text("BRAND KIT · REFERENCE EDITION", M, 55);
+  font(11, true, white); doc.text("Brand kit", M, 55);
   if (model.cover) {
-    try { const img = await image(model.cover); doc.setFillColor(...white).rect(W - 298, 85, 256, 220, "F"); const k = Math.min(218 / img.w, 182 / img.h); doc.addImage(img.data, "PNG", W - 279 + (218 - img.w * k) / 2, 104 + (182 - img.h * k) / 2, img.w * k, img.h * k); }
+    try { const img = await image(model.cover); doc.setFillColor(...white).rect(W - 298, 85, 256, 220, "F"); const k = Math.min(238 / img.w, 202 / img.h); doc.addImage(img.data, "PNG", W - 289 + (238 - img.w * k) / 2, 94 + (202 - img.h * k) / 2, img.w * k, img.h * k); }
     catch { missing.push("Cover artwork"); }
   }
   font(36, true, white); const coverLines = doc.splitTextToSize(model.name, W - 385) as string[]; doc.text(coverLines, M, 150); const titleEnd = 150 + coverLines.length * 42;
   font(16, false, white); doc.text(`Brand kit · v${model.version}`, M, titleEnd + 20);
   font(11, false, white); const intro = doc.splitTextToSize(model.intro, W - 2 * M) as string[]; doc.text(intro.slice(0, 6), M, Math.max(345, titleEnd + 65));
-  font(10, false, white); doc.text(`${sections.length} selected sections · ${new Date().toISOString().slice(0, 10)} · RGB reference, not a press master`, M, H - 55);
+  font(10, false, white); doc.text("RGB reference · Not a press master", M, H - 55);
   if (model.publicUrl) { font(11, true, white); doc.textWithLink("Open the public brand kit", M, H - 85, { url: kitPdfUrl(model.publicUrl) }); }
   page("Contents"); const toc = doc.getNumberOfPages();
   for (const section of sections) {
@@ -83,14 +80,14 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   }
   async function assetBlock(asset: KitDocumentAsset, title: string) {
     // Two generous example rows per spread, with full link/notes continuation.
-    need(208, title); let img: Awaited<ReturnType<typeof image>> | null = null;
+    need(asset.image ? 208 : 100, title); let img: Awaited<ReturnType<typeof image>> | null = null;
     if (asset.image) try { img = await image(asset.image); } catch { missing.push(asset.title); }
-    const top = y, imageW = 280, imageH = 180, tx = M + 304, tw = W - M - tx;
+    const top = y, imageW = 280, imageH = 180, tx = asset.image ? M + 304 : M, tw = W - M - tx;
     font(15, true); const heading = doc.splitTextToSize(asset.title, tw) as string[];
     doc.text(heading, tx, top + 17); let yy = top + heading.length * 19 + 14;
     if (asset.note) { font(10, false, muted); const notes = doc.splitTextToSize(asset.note, tw) as string[]; doc.text(notes, tx, yy); yy += notes.length * 14 + 14; }
     if (asset.image) {
-      doc.setFillColor(...rgb(asset.ground ?? "#F2F2F2")).rect(M, top, imageW, imageH, "F");
+      if (asset.ground) doc.setFillColor(...rgb(asset.ground)).rect(M, top, imageW, imageH, "F");
       if (img) { const k = Math.min((imageW - 28) / img.w, (imageH - 28) / img.h); doc.addImage(img.data, "PNG", M + (imageW - img.w * k) / 2, top + (imageH - img.h * k) / 2, img.w * k, img.h * k); }
       else { font(10, false, muted); doc.text("Preview unavailable — use linked original", M + 16, top + imageH / 2); }
     }
