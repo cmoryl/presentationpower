@@ -11,6 +11,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, CircleDashed } from "lucide-react"
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/design-system/element";
 import { EventTimeline } from "@/components/events/EventTimeline";
+import { SJB_LOGOS, SJB_LOGO_RULES } from "@/lib/san-juan-bowl";
 import { getEventIntake } from "@/lib/event-intake.functions";
 import { EVENT_INTAKE_ITEMS, INTAKE_STATUS_LABEL, summarizeIntake, type IntakeStatus } from "@/lib/event-intake";
 import {
@@ -157,9 +158,15 @@ function EventHome() {
           {eventId === "san-juan-bowl" && (
             <div className="mt-4 flex flex-wrap gap-2">
               <Button asChild>
-                <Link to="/events/san-juan-bowl/stadium">
-                  Stadium 3D view <ArrowRight aria-hidden />
+                <Link to="/events/san-juan-bowl/brand-kit">
+                  Complete brand kit <ArrowRight aria-hidden />
                 </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/events/san-juan-bowl/brand-kit/guide">Brand guide <ArrowRight aria-hidden /></Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/share/san-juan-bowl">Public share link <ArrowRight aria-hidden /></Link>
               </Button>
               <Button asChild variant="outline">
                 <Link to="/events/next/sign-editor/$signId" params={{ signId: "sjb-first-flyer" }}>
@@ -203,6 +210,17 @@ function EventHome() {
             );
           })}
         </nav>
+
+        {eventId === "san-juan-bowl" && (tab === "overview" || tab === "brand") && (
+          <section aria-labelledby="bowl-brand-rules" className="mt-6 grid gap-6 border-y border-border py-6 sm:grid-cols-[180px_1fr]">
+            <img src={SJB_LOGOS[0].svg} alt="TransPerfect San Juan Bowl official full-colour logo" className="mx-auto max-h-48 w-full max-w-48 object-contain" />
+            <div>
+              <h2 id="bowl-brand-rules" className="text-lg font-semibold">Established Bowl logo guidelines</h2>
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted-foreground">{SJB_LOGO_RULES.map(rule => <li key={rule}>{rule}</li>)}</ul>
+              <p className="mt-3 text-sm text-muted-foreground">Arched lettering: limited use, by approval only; it is not an official Bowl logo. The complete kit contains the remaining brand and production guidance.</p>
+            </div>
+          </section>
+        )}
 
         {tab === "overview" || !active ? (
           <section className="mt-6 grid gap-6 lg:grid-cols-2">

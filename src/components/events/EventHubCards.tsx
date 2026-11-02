@@ -9,6 +9,7 @@ import { ArrowRight, Map, Plus } from "lucide-react";
 import { listStartedEvents } from "@/lib/event-intake.functions";
 import { summarizeIntake, type IntakeRow } from "@/lib/event-intake";
 import { BUILT_IN_EVENTS, readinessProgress } from "@/lib/event-registry";
+import { SJB_EVENT, SJB_LOGOS } from "@/lib/san-juan-bowl";
 
 type Card = { id: string; name: string; line: string; ready: number; total: number };
 
@@ -49,11 +50,12 @@ export function EventHubCards() {
               : { to: "/events/$eventId" as const, params: { eventId: c.id } })}
           className={cardCls}
         >
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#03002C]/10 text-[#03002C] dark:bg-card">
-            <Map size={16} />
-          </span>
+          {c.id === SJB_EVENT.id ? (
+            <img src={SJB_LOGOS[0].svg} alt={`${SJB_EVENT.shortName} official logo`} className="h-24 w-24 object-contain" />
+          ) : <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#03002C]/10 text-[#03002C] dark:bg-card"><Map size={16} /></span>}
           <div className="mt-4 text-lg font-semibold text-[#03002C]">{c.name}</div>
           <p className="mt-1 flex-1 text-sm text-[#03002C]/70">{c.line}</p>
+          {c.id === SJB_EVENT.id && <p className="mt-2 text-xs text-muted-foreground">Complete brand kit · Brand guide · Logo downloads</p>}
           <div className="mt-4">
             <div className="h-1.5 overflow-hidden rounded-full bg-[#03002C]/10 dark:bg-card">
               <div className="h-full bg-primary" style={{ width: `${c.total ? (c.ready / c.total) * 100 : 0}%` }} />
