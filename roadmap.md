@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Replace displayed SF map drafts with supplied SF_Maps3 pages and unchanged PDF/AI downloads; verify exact previews and both original downloads.
+- [x] Replace displayed SF map drafts with supplied SF_Maps3 pages and unchanged PDF/AI downloads; both pages visually verified, event overview uses the supplied set, both browser downloads match uploaded SHA-256 hashes. Two tests pass and preview build OK. Supplied artwork is revised through its Illustrator source; old editable drafts stay stored but hidden.
 
 - [x] Clean brand-kit pages and generated PDFs: removed decorative rails, repeated framing, pill downloads and redundant labels; retained artwork, rules and access warnings. Seven PDF downloads and all page sheets inspected, four live pages verified without overflow or page errors. Targeted 15 tests pass; full suite has the existing London map-export failure (2,592 pass). Issued originals unchanged.
 
