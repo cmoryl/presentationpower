@@ -7,6 +7,7 @@ import { saveFile } from "@/lib/save-file";
 import { selfContainedSvg } from "@/lib/export-self-contained-svg";
 import { Button } from "@/design-system/element";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
+import { SfIssuedMaps } from "@/components/events/SfIssuedMaps";
 import { listVenueMapEdits, saveVenueMapEdits } from "@/lib/qeii-map-edits.functions";
 import { EMPTY_QEII_MAP_EDITS, qeiiFloorMapEdits, qeiiApplyRoomEdit, qeiiClearRoomEdit, qeiiRoomEdit, type QeiiMapEdits, type QeiiRoomEdit } from "@/lib/qeii-map-edits";
 import { qeiiPlanLayout } from "@/lib/next-london-qeii-layout";
@@ -60,6 +61,12 @@ const keyFrom = (t: string) =>
   t.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "floor";
 
 function MapsPage() {
+  const { eventId } = Route.useParams();
+  if (eventId === "san-francisco") return <AppShell><main className="mx-auto max-w-5xl px-6 py-8"><h1 className="mb-6 text-3xl font-semibold">San Francisco event maps</h1><SfIssuedMaps /><p className="mt-4 text-sm text-muted-foreground">This supplied set replaces the earlier map drafts. Edit the Illustrator source to revise this issued artwork.</p></main></AppShell>;
+  return <EditableMapsPage />;
+}
+
+function EditableMapsPage() {
   const { eventId } = Route.useParams();
   const qc = useQueryClient();
   const list = useServerFn(listEventMapFloors);

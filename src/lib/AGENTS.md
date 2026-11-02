@@ -8,6 +8,7 @@
 - Generated map SVG downloads (including ZIP entries) and PDF/PNG inputs pass through `selfContainedSvg` before delivery; SVG logos are nested vector paths with unique IDs, raster images embedded, and missing assets block export — why: Illustrator cannot reliably resolve linked web logos and proofs must not silently lose them. Issued source files remain byte-for-byte unchanged.
 
 - Map previews reuse `PlanZoomFrame` for zoom, pan and an accessible enlarged dialog — why: venue and event pages should share the same inspection controls without altering exports.
+- San Francisco event map displays use `SF_ISSUED_MAPS` and `SfIssuedMaps` for the supplied SF_Maps3 set (floor 3, then floors 4+5); PDF/AI originals stay unchanged and prior editable drafts remain stored but not displayed — why: re-rendering the final designer artwork would change its labels, colours and composition. Hotel capacity data remains a separate reference.
 
 - QEII symbol cleanup applies only to the issued QEII floor IDs; imported venues retain every symbol path — why: restroom heads also resemble structural pillar dots.
 
