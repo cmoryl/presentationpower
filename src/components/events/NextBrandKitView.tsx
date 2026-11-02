@@ -107,13 +107,9 @@ export function NextBrandKitView({ shared = false, shareToken }: { shared?: bool
     <div className="mx-auto max-w-6xl px-6 py-10">
       <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">TransPerfect NEXT</p>
-          <h1 className="mt-1 text-3xl font-bold leading-tight">Master event brand kit</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            The NEXT look every city starts from: logos, colours, type, sign templates and digital formats.
-          </p>
+          <h1 className="text-3xl font-bold leading-tight">TransPerfect NEXT brand kit</h1>
           <p className="mt-1 text-xs text-muted-foreground">
-            Designer pack v{DESIGNER_PACK_VERSION} · kit {BRAND_KIT_VERSION.replace(/-kit$/, "")} · latest
+            Designer pack v{DESIGNER_PACK_VERSION} · kit {BRAND_KIT_VERSION.replace(/-kit$/, "")}
           </p>
           <details className="mt-1 text-xs text-muted-foreground">
             <summary className="cursor-pointer">What changed</summary>
@@ -168,7 +164,7 @@ export function NextBrandKitView({ shared = false, shareToken }: { shared?: bool
           {NEXT_DIVISIONS.map((d) => {
             const shown = d.lockups.filter((l) => (ground === "light" ? l.variant === "color" : l.variant !== "color"));
             return (
-              <article key={d.id} className="rounded-lg border border-border p-4">
+              <article key={d.id} className="border-t border-border pt-4">
                 <h3 className="text-sm font-semibold">{d.name}</h3>
                 <div className={`mt-3 grid gap-3 rounded-md p-4 ${ground === "light" ? "bg-white" : "bg-[#03002C]"}`}>
                   {shown.map((l) => {
@@ -191,7 +187,7 @@ export function NextBrandKitView({ shared = false, shareToken }: { shared?: bool
             );
           })}
           {NEXT_MARKS.map((m) => (
-            <article key={m.id} className="rounded-lg border border-border p-4">
+            <article key={m.id} className="border-t border-border pt-4">
               <h3 className="text-sm font-semibold">{m.name}</h3>
               <div className="mt-3 rounded-md bg-[#03002C] p-4">
                 <img src={m.src} alt={m.name} className="mx-auto max-h-16 w-auto" />
@@ -269,7 +265,6 @@ export function NextBrandKitView({ shared = false, shareToken }: { shared?: bool
             >
               {signDivisions.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
             </select>
-            <span className="text-xs text-muted-foreground">Each design is shown once; pick a division to see its version.</span>
           </div>
         ) : null}
         {!families ? (
@@ -283,9 +278,9 @@ export function NextBrandKitView({ shared = false, shareToken }: { shared?: bool
               <h3 className="text-sm font-semibold">{f.label} <span className="text-muted-foreground">({shown.length})</span></h3>
               <ul className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {shown.map((t) => (
-                  <li key={`${t.divisionId}-${t.code}-${t.format}`} className="rounded-lg border border-border">
+                  <li key={`${t.divisionId}-${t.code}-${t.format}`} className="border-b border-border pb-4">
                     {t.exampleUrl ? (
-                      <img src={t.exampleUrl} alt={t.format} loading="lazy" className="h-40 w-full rounded-t-lg bg-muted object-contain" />
+                      <img src={t.exampleUrl} alt={t.format} loading="lazy" className="h-40 w-full bg-muted object-contain" />
                     ) : null}
                     <div className="p-3">
                       <p className="text-sm font-semibold leading-snug">{t.code} · {t.format}</p>
@@ -318,7 +313,7 @@ export function NextBrandKitView({ shared = false, shareToken }: { shared?: bool
         <h2 className="text-xl font-semibold">Digital & slides</h2>
         <ul className="mt-4 grid gap-2 text-sm sm:grid-cols-3 lg:grid-cols-4">
           {KIT_DIGITAL_FORMATS.map((f) => (
-            <li key={f.id} className="rounded-md border border-border px-3 py-2">
+            <li key={f.id} className="border-b border-border py-2">
               <span className="font-medium">{f.label}</span>
               <span className="block text-xs text-muted-foreground">{f.width} × {f.height}</span>
             </li>
@@ -350,7 +345,7 @@ export function NextBrandKitView({ shared = false, shareToken }: { shared?: bool
 
       <BrandKitGuideSections shared={shared} part={shared ? "all" : "brand"} />
       {shared ? <BrandKitPillarAreaSections /> : (
-        <Link to="/events/next/planning-guide" className="mt-12 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border p-4 hover:border-[#003FC7]">
+        <Link to="/events/next/planning-guide" className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-border py-6 hover:text-primary">
           <span>
             <span className="block text-sm font-semibold">Planning the event?</span>
             <span className="block text-sm text-muted-foreground">Event sections, NEXT Mart, NEXTbrew, pillar and area options, and starting a new city are in the planning guide.</span>
