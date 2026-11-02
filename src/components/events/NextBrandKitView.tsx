@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Button } from "@/design-system/element";
 import { BrandKitGuideSections, GUIDE_SECTIONS, PLANNING_GUIDE_SECTIONS } from "@/components/events/brand-kit/BrandKitGuideSections";
 import { BrandKitPillarAreaSections, PILLAR_AREA_SECTIONS } from "@/components/events/brand-kit/BrandKitPillarAreaSections";
+import { NextVisualExamples } from "@/components/events/NextVisualExamples";
 import {
   BRAND_KIT_COLOUR_NOTE,
   BRAND_KIT_PRINT_NOTES,
@@ -28,6 +29,7 @@ import {
 } from "@/lib/next-brand-kit";
 
 const BRAND_SECTIONS = [
+  ["visual-examples", "Event imagery & examples"],
   ["logos", "Logos & lockups"],
   ["colour", "Colour & type"],
   ["templates", "Sign templates"],
@@ -146,6 +148,8 @@ export function NextBrandKitView({ shared = false, shareToken }: { shared?: bool
         ))}
       </nav>
       <div className="min-w-0">
+
+      <NextVisualExamples shared={shared} />
 
       <section id="logos" className="mt-8 scroll-mt-16">
         <div className="flex items-center justify-between gap-4">

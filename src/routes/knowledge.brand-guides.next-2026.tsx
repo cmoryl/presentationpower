@@ -7,6 +7,7 @@ import { QEII_ROOM_GRADIENTS } from "@/lib/next-london-qeii-rooms";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
+import { NextVisualExamples } from "@/components/events/NextVisualExamples";
 import {
   NEXT_EVENT_ICON_SLUG,
   brandIconSet,
@@ -329,6 +330,7 @@ function NextBrandGuide() {
       {/* Contents */}
       <nav className="mt-8 flex flex-wrap gap-2" aria-label="Guide sections">
         {[
+          ["visual-examples", "Event imagery & examples"],
           ["logo-system", "Logo system"],
           ["lockups", "Lockups by track"],
           ["marks", "Marks & motifs"],
@@ -351,6 +353,7 @@ function NextBrandGuide() {
       </nav>
 
       <div className="mt-12 space-y-14 pb-24">
+        <NextVisualExamples />
         {/* Logo system */}
         <Section id="logo-system" eyebrow="01 · Foundation" title="The NEXT logo system">
           <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">

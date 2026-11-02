@@ -1,5 +1,13 @@
 # Event design decisions
 
+### 2026-11-02 — NEXT brand examples separate actual photos from master artwork
+**Area:** NEXT master brand guide and event kit visual examples.
+**Options tested:** generated event mockups, copying staff photographs into a public CDN gallery, or sharing one gallery with private staff photos and existing registry artwork.
+**Chosen:** real London/SF photographs stay in the existing private library with short-lived signed viewing; partner shares show artwork only. Area tags remain labelled automatic when unchecked. No new generated imagery or PDF/pack photo export.
+**Why:** the established in-event look is best evidenced by actual installations, but none of the current photos is cleared for marketing. Artwork previews can illustrate format/track variations without claiming installation.
+**Would change if:** approved organiser photography and participant permissions allow a deliberately reviewed partner/public gallery.
+**Applies to:** NEXT visual examples only; originals, clearance fields, issued artwork and exports unchanged.
+
 ### 2026-11-02 — SF research photographs stay private pending rights clearance
 **Area:** NEXT San Francisco post-event review v1.0.
 **Options tested:** publish downloaded attendee photographs in a public CDN/PDF; substitute historical event-gallery imagery; preserve sourced originals in the existing private event-photo library and cite the source in the downloadable report.
