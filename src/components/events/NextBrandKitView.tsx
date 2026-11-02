@@ -11,6 +11,7 @@ import { Button } from "@/design-system/element";
 import { BrandKitGuideSections, GUIDE_SECTIONS, PLANNING_GUIDE_SECTIONS } from "@/components/events/brand-kit/BrandKitGuideSections";
 import { BrandKitPillarAreaSections, PILLAR_AREA_SECTIONS } from "@/components/events/brand-kit/BrandKitPillarAreaSections";
 import { NextVisualExamples } from "@/components/events/NextVisualExamples";
+import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 import {
   BRAND_KIT_COLOUR_NOTE,
   BRAND_KIT_PRINT_NOTES,
@@ -126,6 +127,7 @@ export function NextBrandKitView({ shared = false, shareToken }: { shared?: bool
           </details>
         </div>
         <div className="flex flex-wrap gap-2">
+          <BrandKitPdfExport kitId="next" shareUrl={shared && shareToken ? `/share/next-brand-kit/${shareToken}` : undefined} />
           {!shared && families ? <SendToVendorDialog families={families} /> : null}
           <Button variant="outline" onClick={downloadGuide} disabled={!families || !!busy}>
             <FileText className="size-4" aria-hidden />

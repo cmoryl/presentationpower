@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { SJB_COLORS, SJB_EVENT, SJB_LOGOS } from "@/lib/san-juan-bowl";
 import masterKit from "@/assets/sjb/master-logo-kit.zip.asset.json";
 import { SjbGuideSections } from "@/components/events/SjbGuideSections";
+import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 
 const TITLE = "San Juan Bowl brand guide — TransPerfect Element";
 const DESC = "San Juan Bowl badge, variants, clear space, colours with CMYK/RGB/HEX, Geist typography and logo don’ts.";
@@ -49,6 +50,7 @@ function SjbGuide() {
       </header>
 
       <SjbGuideSections />
+      <div className="mt-6"><BrandKitPdfExport kitId="san-juan-bowl" /></div>
     </main>
   );
 }

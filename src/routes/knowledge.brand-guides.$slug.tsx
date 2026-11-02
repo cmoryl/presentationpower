@@ -52,6 +52,7 @@ import { applyBrandGuidePatch } from "@/lib/brand-guide-edits";
 import { getBrandGuideEdit } from "@/lib/brand-guide-edits.functions";
 import { GuideUsagePanel } from "@/components/brand/GuideUsagePanel";
 import { GlobalLinkUniverse } from "@/components/brand/GlobalLinkUniverse";
+import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
   loader: async ({ params }) => {
@@ -127,6 +128,7 @@ function BrandGuideView() {
 
 
       {/* Hero */}
+      <div className="mt-4"><BrandKitPdfExport guide={guide} /></div>
       <section
         className="relative mt-4 overflow-hidden rounded-3xl p-10 md:p-16"
         style={{ background: hero, color: "#fff" }}
