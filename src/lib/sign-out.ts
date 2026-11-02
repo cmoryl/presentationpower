@@ -40,7 +40,11 @@ const PUBLIC_NO_LOGIN_PATHS = [
   "/.lovable",
   "/~oauth",
 ];
-const PUBLIC_NO_LOGIN_EXACT = new Set<string>();
+const PUBLIC_NO_LOGIN_EXACT = new Set<string>([
+  "/events/kits/nexus", "/events/kits/nexus/guide",
+  "/events/kits/hackathon", "/events/kits/hackathon/guide",
+  "/events/kits/legalweek", "/events/kits/legalweek/guide",
+]);
 
 export function requiresSignInPath(pathname: string): boolean {
   return !isPublicNoLoginPath(pathname);

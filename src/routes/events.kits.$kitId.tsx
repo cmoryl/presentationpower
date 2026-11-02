@@ -1,4 +1,5 @@
 import { KitSignList } from "@/components/events/KitSignList";
+import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -67,6 +68,7 @@ function KitPage() {
       </Link>
       <h1 className="mt-3 text-3xl font-bold leading-tight text-foreground">{kit.name} brand kit</h1>
       <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-muted-foreground">{kit.intro}</p>
+      <div className="mt-4"><BrandKitPdfExport kitId={kit.id} /></div>
       {kit.guide ? (
         <div className="mt-4 flex flex-wrap gap-2">
           <Button asChild>

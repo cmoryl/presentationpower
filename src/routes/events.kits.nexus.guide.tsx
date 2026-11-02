@@ -6,6 +6,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SUPPLIED_KITS } from "@/lib/supplied-event-kits";
+import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 
 const TITLE = "NeXus London ’26 brand guidelines — TransPerfect Element";
 const DESC = "NeXus London ’26 logo, variations, Dark Blue and Light Blue with Pantone and CMYK, Poppins typography and logo don’ts.";
@@ -73,6 +74,7 @@ function NexusGuide() {
           </Button>
         )}
       </header>
+      <div className="mt-4"><BrandKitPdfExport kitId="nexus" /></div>
 
       <Section n="01" title="Introduction">
         <h3 className="text-lg font-semibold text-foreground" style={POPPINS}>The event</h3>

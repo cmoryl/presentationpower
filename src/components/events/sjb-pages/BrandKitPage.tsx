@@ -7,6 +7,7 @@ import { SjbCurvedLettering, SjbPalms } from "@/components/events/SjbGuideSectio
 import { ConstructionSection, LargeFormatSection } from "@/components/events/SjbDesignerSections";
 import masterKit from "@/assets/sjb/master-logo-kit.zip.asset.json";
 import brandGuide from "@/assets/sjb/brand-guide.pdf.asset.json";
+import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 import { SjbLettering } from "@/components/events/SjbLettering";
 import { SJB_LETTERING_SPEC_VISIBLE } from "@/components/events/SjbShare";
 
@@ -360,6 +361,7 @@ export function SjbBrandKit() {
             </Link>
           )}
           <SjbShareLinkButton />
+          <div className="mt-3"><BrandKitPdfExport kitId="san-juan-bowl" /></div>
         </header>
 
         <SjbBrandKitBody />

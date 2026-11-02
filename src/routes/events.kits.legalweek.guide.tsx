@@ -6,6 +6,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SUPPLIED_KITS } from "@/lib/supplied-event-kits";
+import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 
 const TITLE = "Legalweek 2026 brand guide — TransPerfect Element";
 const DESC = "TransPerfect Legal at Legalweek 2026: screen and print colours read from the live files, Poppins typography and supplied artwork.";
@@ -45,6 +46,7 @@ function LegalweekGuide() {
         <h1 className="mt-2 text-3xl font-bold leading-tight text-white" style={POPPINS}>Brand guide</h1>
         <p className="mt-2 max-w-2xl text-sm text-white/80">Built from the supplied live files. No brand guide PDF was supplied for this event.</p>
       </header>
+      <div className="mt-4"><BrandKitPdfExport kitId="legalweek" /></div>
 
       <Section n="01" title="Introduction">
         <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">{kit.intro}</p>

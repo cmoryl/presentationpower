@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
 import { NextVisualExamples } from "@/components/events/NextVisualExamples";
+import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 import {
   NEXT_EVENT_ICON_SLUG,
   brandIconSet,
@@ -328,6 +329,7 @@ function NextBrandGuide() {
       </header>
 
       {/* Contents */}
+      <div className="mt-5"><BrandKitPdfExport kitId="next" /></div>
       <nav className="mt-8 flex flex-wrap gap-2" aria-label="Guide sections">
         {[
           ["visual-examples", "Event imagery & examples"],
