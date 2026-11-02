@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Clean brand-kit pages and generated PDFs: remove generic decorative framing and filler, retain approved artwork/rules and download controls, verify page and PDF output.
+- [x] Clean brand-kit pages and generated PDFs: removed decorative rails, repeated framing, pill downloads and redundant labels; retained artwork, rules and access warnings. Seven PDF downloads and all page sheets inspected, four live pages verified without overflow or page errors. Targeted 15 tests pass; full suite has the existing London map-export failure (2,592 pass). Issued originals unchanged.
 
 - [x] Add individually branded, section-selectable PDF exports across master/event kits and public kit pages; embed absolute asset links, retain source guides, exclude private imagery and hidden Bowl sections. Seven browser downloads verified and all rendered pages inspected; reduced excessive pagination. Targeted 15 tests pass; full suite: 2,592 pass, one existing London map-export assertion fails. Preview build reports OK.
 
