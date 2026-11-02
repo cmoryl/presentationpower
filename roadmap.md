@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Add a shared NEXT visual examples gallery to the brand guide and event kit: actual private event photography, existing artwork variations, area/division filters and enlarged viewing; verify privacy boundaries and live gallery.
+
 - [x] Surface San Juan Bowl’s existing event with its official logo, dedicated Brand guidelines tab, complete kit/guide/single-colour/public-share links; update stale date copy using announced facts and preserve established usage restrictions.
 
 - [x] Research NEXT San Francisco post-event coverage: eight sourced references, two directly retrieved reflections, five private original photos, six-page report v1.0 and event review page; signed-in photo viewing/PDF download/learning submission verified. Awaiting external evidence for marketing photo rights, official archive, delivered programme/awards, attendance/survey/CRM outcomes. Targeted 22 tests pass; full suite has one existing London map-export assertion failure (2,582 pass).
