@@ -43,7 +43,9 @@ describe("Brand-kit PDF infographic blocks", () => {
 import { kitColourRows } from "../brand-kit-document";
 describe("Brand-kit PDF colour values", () => {
   it("always lists RGB, CMYK and Pantone, deriving only RGB", () => {
-    expect(kitColourRows("#003FC7", "Primary")).toEqual(["RGB 0 · 63 · 199 (from HEX)", "CMYK — Not supplied", "Pantone — Not supplied", "Primary"]);
+    expect(kitColourRows("#003FC7", "Primary")).toEqual(["RGB 0 · 63 · 199 (from HEX)", "CMYK 100 83 0 6 (signed-off build)", "Pantone — Not supplied", "Primary"]);
+    expect(kitColourRows("#666666", "")[1]).toBe("CMYK — Not supplied");
+    expect(kitColourRows("#003FC7", "CMYK 1 2 3 4")[1]).toBe("CMYK 1 2 3 4");
   });
   it("keeps supplied print values unchanged", () => {
     expect(kitColourRows("#003B71", "RGB 0 · 59 · 113 · CMYK 100 · 84 · 30 · 16 · Pantone 541 C").slice(0, 3)).toEqual(["RGB 0 · 59 · 113", "CMYK 100 · 84 · 30 · 16", "Pantone 541 C"]);
