@@ -148,7 +148,7 @@ export const SJB_SOCIAL_TEMPLATES_BY_ID: Record<string, SjbSocialTemplate> = Obj
 export interface SjbGround {
   id: string;
   label: string;
-  kind: "navy" | "waves" | "gold-band" | "light";
+  kind: "navy" | "waves" | "gold-band" | "light" | "photo";
   /** Scene photo URL when the ground is a photograph. */
   photo?: string;
   /** Which logo variant reads correctly on this ground. */
