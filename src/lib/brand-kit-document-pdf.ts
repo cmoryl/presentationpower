@@ -64,8 +64,16 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     if (current.title) { font(8, false, muted); doc.text(`${current.no}  ${current.title}`, W - M, 30, { align: "right" }); }
     doc.setDrawColor(...line).setLineWidth(0.6).line(M, 40, W - M, 40);
   }
-  function need(h: number) { if (y + h > BOTTOM) { newPage(); return true; } return false; }
-  function heading(t: string) { need(40); font(13, true); doc.text(t, M, y + 12); y += 26; }
+  // Headings are queued and drawn by the next block's need(), so a title always moves with its first content.
+  let pending: { h: number; fresh?: boolean; draw: () => void }[] = [];
+  function need(h: number) {
+    const ph = pending.reduce((n, p) => n + p.h, 0); let broke = false;
+    if (y + ph + h > BOTTOM) { newPage(); broke = true; }
+    const queue = pending; pending = [];
+    for (const p of queue) { if (broke && p.fresh) continue; p.draw(); }
+    return broke;
+  }
+  function heading(t: string) { pending.push({ h: 26, draw: () => { font(13, true); doc.text(t, M, y + 12); y += 26; } }); }
   function chip(label: string, url: string, x: number, yy: number, maxX: number) {
     font(8, true, primary); const w = Math.min(doc.getTextWidth(label) + 18, maxX - x);
     doc.setDrawColor(...primary).setLineWidth(0.7).roundedRect(x, yy, w, 18, 9, 9, "S");
@@ -229,10 +237,14 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   for (const [i, section] of sections.entries()) {
     progress?.(`Designing ${section.title}…`);
     current = { no: String(i + 1).padStart(2, "0"), title: section.title };
-    if (i === 0 || y > BOTTOM - (section.assets?.some(a => a.image) && !section.paragraphs?.length ? 380 : 230)) newPage(); else { y += 18; doc.setDrawColor(...line).setLineWidth(0.6).line(M, y, W - M, y); y += 26; }
-    contents.push({ no: current.no, title: section.title, page: doc.getNumberOfPages() });
-    font(44, true, accent); doc.text(current.no, M, y + 30); font(24, true); const tl = wrap(section.title, CW - 90); doc.text(tl, M + 84, y + 26); y += Math.max(48, tl.length * 28 + 18);
-    doc.setFillColor(...primary).rect(M, y, 40, 3, "F"); y += 22;
+    const no = current.no, title = section.title;
+    if (i === 0) newPage(); else pending.push({ h: 44, fresh: true, draw: () => { y += 18; doc.setDrawColor(...line).setLineWidth(0.6).line(M, y, W - M, y); y += 26; } });
+    font(24, true); const tl = wrap(title, CW - 90); const headH = Math.max(48, tl.length * 28 + 18) + 25;
+    pending.push({ h: headH, draw: () => {
+      current = { no, title }; contents.push({ no, title, page: doc.getNumberOfPages() });
+      font(44, true, accent); doc.text(no, M, y + 30); font(24, true); doc.text(tl, M + 84, y + 26); y += headH - 25;
+      doc.setFillColor(...primary).rect(M, y, 40, 3, "F"); y += 22;
+    } });
     const blocks = classifyKitParagraphs(section.paragraphs);
     for (const b of blocks) if (b.kind === "text") text(b.text);
     const sp = blocks.filter((b): b is Extract<KitBlock, { kind: "spec" }> => b.kind === "spec"); if (sp.length) specs(sp);
@@ -240,6 +252,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     const ru = blocks.filter((b): b is Extract<KitBlock, { kind: "rule" }> => b.kind === "rule"); if (ru.length) rules(ru);
     if (section.colours?.length) colours(section.colours);
     if (section.assets?.length) { if (blocks.length || section.colours?.length) heading("Files & downloads"); await assets(section.assets); }
+    if (pending.length) need(0);
   }
 
   // ---------- Contents fill, outline, footers ----------

@@ -52,3 +52,11 @@ describe("Brand-kit PDF colour values", () => {
     expect((await makeKitDocument("san-juan-bowl")).sections.some(s => s.id === "icons")).toBe(true);
   });
 });
+
+import { KIT_RELEASES } from "../brand-kit-releases";
+describe("Released brand-kit PDFs", () => {
+  it("has a dated release for all 16 brand, division and event kits", () => {
+    expect(Object.keys(KIT_RELEASES)).toHaveLength(16);
+    for (const r of Object.values(KIT_RELEASES)) expect(r.released).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
