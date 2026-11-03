@@ -233,7 +233,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   async function safeZone(z: NonNullable<KitDocumentSection["safeZone"]>) {
     heading("Clear space");
     const im = await img(z.image, "Clear-space logo"); if (!im) return;
-    const lh = 54, lw = Math.min(260, im.w * (lh / im.h)), x = lh, pad = x * z.ratio;
+    const lh = 40, lw = Math.min(260, im.w * (lh / im.h)), x = lh, pad = x * z.ratio;
     const bw = lw + pad * 2, bh = lh + pad * 2, ph = bh + 40;
     need(ph + G);
     doc.setFillColor(...tint).roundedRect(M, y, CW, ph, 4, 4, "F");
