@@ -150,7 +150,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     font(8, false, muted); need(14); doc.text("Contrast is WCAG 2.x for text in this colour on white / ink. AA = 4.5:1 body text; AA large = 3:1 for 18pt+ or bold 14pt+.", M, y + 4); y += 22;
   }
   async function assets(list: KitDocumentAsset[]) {
-    const cols = list.some(a => a.image) ? 2 : 3, w = (CW - G * (cols - 1)) / cols, imgH = cols === 2 ? 150 : 0;
+    const hasImg = list.some(a => a.image), cols = 3, w = (CW - G * (cols - 1)) / cols, imgH = hasImg ? 200 : 0;
     for (let i = 0; i < list.length; i += cols) {
       const row = list.slice(i, i + cols);
       const meta = row.map(a => { font(12, true); const t = wrap(a.title, w - 24); font(9); const n = a.note ? wrap(a.note, w - 24) : []; return { t, n, ch: chips(a.links, 0, 0, w - 24, true) }; });
@@ -163,7 +163,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
         if (imgH && a.image) {
           doc.setFillColor(...(a.ground ? rgb(a.ground) : tint)).roundedRect(x, y, w, imgH, 4, 4, "F").rect(x, y + imgH - 6, w, 6, "F");
           const im = await img(a.image, a.title);
-          if (im) { const k = Math.min((w - 48) / im.w, (imgH - 32) / im.h); doc.addImage(im.data, "PNG", x + (w - im.w * k) / 2, y + (imgH - im.h * k) / 2, im.w * k, im.h * k, undefined, "FAST"); }
+          if (im) { const k = Math.min((w - 28) / im.w, (imgH - 24) / im.h); doc.addImage(im.data, "PNG", x + (w - im.w * k) / 2, y + (imgH - im.h * k) / 2, im.w * k, im.h * k, undefined, "FAST"); }
           else { font(9, false, muted); doc.text("Preview unavailable — use the linked original", x + 16, y + imgH / 2); }
           yy = y + imgH + 20;
         } else if (imgH) yy = y + 18;
@@ -229,7 +229,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   for (const [i, section] of sections.entries()) {
     progress?.(`Designing ${section.title}…`);
     current = { no: String(i + 1).padStart(2, "0"), title: section.title };
-    if (i === 0 || y > BOTTOM - 230) newPage(); else { y += 18; doc.setDrawColor(...line).setLineWidth(0.6).line(M, y, W - M, y); y += 26; }
+    if (i === 0 || y > BOTTOM - (section.assets?.some(a => a.image) && !section.paragraphs?.length ? 380 : 230)) newPage(); else { y += 18; doc.setDrawColor(...line).setLineWidth(0.6).line(M, y, W - M, y); y += 26; }
     contents.push({ no: current.no, title: section.title, page: doc.getNumberOfPages() });
     font(44, true, accent); doc.text(current.no, M, y + 30); font(24, true); const tl = wrap(section.title, CW - 90); doc.text(tl, M + 84, y + 26); y += Math.max(48, tl.length * 28 + 18);
     doc.setFillColor(...primary).rect(M, y, 40, 3, "F"); y += 22;
