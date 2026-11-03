@@ -129,7 +129,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     const cols = 4, w = (CW - G * (cols - 1)) / cols;
     for (let i = 0; i < list.length; i += cols) {
       const row = list.slice(i, i + cols);
-      const details = row.map(c => c.detail.replace(/\s+/g, " ").split(" · ").map(d => d.trim()).filter(Boolean));
+      const details = row.map(c => c.detail.replace(/\s+/g, " ").split(/ · (?=[A-Za-z])/).map(d => d.trim()).filter(Boolean));
       font(8.5); const h = 84 + 32 + 14 + Math.max(...details.map(d => d.reduce((n, v) => n + wrap(v, w - 20).length, 0))) * 12 + 34;
       need(h + G);
       row.forEach((c, j) => {
