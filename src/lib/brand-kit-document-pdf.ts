@@ -90,7 +90,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   let pending: { h: number; fresh?: boolean; draw: () => void }[] = [];
   function need(h: number) {
     const ph = pending.reduce((n, p) => n + p.h, 0); let broke = false;
-    if (y + ph + h > BOTTOM) { newPage(); broke = true; }
+    if (y + ph + h > BOTTOM && y > TOP) { newPage(); broke = true; }
     const queue = pending; pending = [];
     for (const p of queue) { if (broke && p.fresh) continue; p.draw(); }
     return broke;
