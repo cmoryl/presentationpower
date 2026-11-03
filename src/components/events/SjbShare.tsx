@@ -55,6 +55,7 @@ export const SJB_SHARE_STADIUM_VISIBLE = false;
 
 const TABS: { page: Exclude<SjbPage, "event">; label: string }[] = [
   { page: "kit", label: "Brand kit" },
+  { page: "social", label: "Social templates" },
   { page: "single", label: "Single colour" },
   ...(SJB_LETTERING_SPEC_VISIBLE ? [{ page: "lettering" as const, label: "Lettering spec" }] : []),
   ...(SJB_SHARE_STADIUM_VISIBLE ? [{ page: "stadium" as const, label: "Stadium 3D" }] : []),
