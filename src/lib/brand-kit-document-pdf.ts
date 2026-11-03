@@ -217,7 +217,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
       { label: "Don't stretch or distort", draw: async (x, yy, w, h) => { const im = await img(src, "Misuse logo"); if (im) { const k = fit(im, w - 40, h - 40); doc.addImage(im.data, "PNG", x + 10, yy + (h - im.h * k * 0.55) / 2, w - 20, im.h * k * 0.55, undefined, "FAST"); } } },
       { label: "Don't recolour", draw: async (x, yy, w, h) => { const im = await img(src, "Misuse logo", "hue-rotate(150deg) saturate(2.5)"); if (im) { const k = fit(im, w - 40, h - 40); doc.addImage(im.data, "PNG", x + (w - im.w * k) / 2, yy + (h - im.h * k) / 2, im.w * k, im.h * k, undefined, "FAST"); } } },
       { label: "Don't add keylines or outlines", draw: async (x, yy, w, h) => { const im = await img(src, "Misuse logo"); if (im) { const k = fit(im, w - 50, h - 50); const iw = im.w * k, ih = im.h * k, ix = x + (w - iw) / 2, iy = yy + (h - ih) / 2; doc.setDrawColor(...noC).setLineWidth(2).roundedRect(ix - 8, iy - 8, iw + 16, ih + 16, 4, 4, "S"); doc.addImage(im.data, "PNG", ix, iy, iw, ih, undefined, "FAST"); } } },
-      { label: "Don't place on busy backgrounds", draw: async (x, yy, w, h) => { for (let i = 0; i < 9; i++) { const c = [primary, accent, tint, noC, okC][i % 5]; doc.setFillColor(...c).rect(x + (i % 3) * (w / 3), yy + Math.floor(i / 3) * (h / 3), w / 3, h / 3, "F"); } const im = await img(src, "Misuse logo"); if (im) { const k = fit(im, w - 40, h - 40); doc.addImage(im.data, "PNG", x + (w - im.w * k) / 2, yy + (h - im.h * k) / 2, im.w * k, im.h * k, undefined, "FAST"); } } },
+      { label: "Don't use busy grounds", draw: async (x, yy, w, h) => { for (let i = 0; i < 9; i++) { const c = [primary, accent, tint, noC, okC][i % 5]; doc.setFillColor(...c).rect(x + (i % 3) * (w / 3), yy + Math.floor(i / 3) * (h / 3), w / 3, h / 3, "F"); } const im = await img(src, "Misuse logo"); if (im) { const k = fit(im, w - 40, h - 40); doc.addImage(im.data, "PNG", x + (w - im.w * k) / 2, yy + (h - im.h * k) / 2, im.w * k, im.h * k, undefined, "FAST"); } } },
     ];
     const cols = 4, w = (CW - G * (cols - 1)) / cols, ih = 110, h = ih + 34;
     need(h + G);
@@ -237,7 +237,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
       for (const [j, it] of list.slice(i, i + cols).entries()) {
         const x = M + j * (w + 8); doc.setFillColor(...tint).roundedRect(x, y, w, h, 4, 4, "F");
         const Icon = iconByName(it.name);
-        if (Icon) { const svg = renderToStaticMarkup(createElement(Icon, { size: 96, color: it.colour, strokeWidth: 1.75 })).replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"'); const im = await img(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`, `Icon ${it.label}`); if (im) doc.addImage(im.data, "PNG", x + (w - 30) / 2, y + 12, 30, 30, undefined, "FAST"); }
+        if (Icon) { const svg = renderToStaticMarkup(createElement(Icon, { size: 96, color: it.colour, strokeWidth: 1.75 })).replace(/^<svg(?![^>]*xmlns=)/, '<svg xmlns="http://www.w3.org/2000/svg"'); const im = await img(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`, `Icon ${it.label}`); if (im) doc.addImage(im.data, "PNG", x + (w - 30) / 2, y + 12, 30, 30, undefined, "FAST"); }
         font(7.5, true); doc.text(wrap(it.label, w - 10)[0], x + w / 2, y + 58, { align: "center" }); font(6.5, false, muted); doc.text(it.name, x + w / 2, y + 68, { align: "center" });
       }
       y += h + 8;
