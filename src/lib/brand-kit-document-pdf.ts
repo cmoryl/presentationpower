@@ -48,6 +48,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   const okC = rgb("#1F7A3A"), noC = rgb(BRAND.red);
   const primary = rgb(model.primary), accent = rgb(model.accent);
   const missing: string[] = []; const contents: { no: string; title: string; page: number }[] = [];
+  let strip: string | null = null;
   let y = TOP, current = { no: "", title: "" };
   const imgCache = new Map<string, Awaited<ReturnType<typeof image>> | null>();
   async function img(src: string, label: string, filter?: string) {
@@ -55,6 +56,23 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     if (!imgCache.has(key)) { try { imgCache.set(key, await image(src, filter)); } catch { imgCache.set(key, null); missing.push(label); } }
     return imgCache.get(key) ?? null;
   }
+  async function lucide(name: string, colour: string, label: string) {
+    const [{ renderToStaticMarkup }, { createElement }, { iconByName }] = await Promise.all([import("react-dom/server"), import("react"), import("@/lib/icon-library")]);
+    const Icon = iconByName(name); if (!Icon) return null;
+    const svg = renderToStaticMarkup(createElement(Icon, { size: 96, color: colour, strokeWidth: 1.75 })).replace(/^<svg(?![^>]*xmlns=)/, '<svg xmlns="http://www.w3.org/2000/svg"');
+    return img(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`, label);
+  }
+  // Aura ground: brand orbs behind frosted glass, drawn on canvas (no external art).
+  function aura(w: number, h: number, seed = 0) {
+    const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d"); if (!x) return null;
+    x.fillStyle = model.primary; x.fillRect(0, 0, w, h);
+    const orbs: [string, number, number, number][] = [[model.accent, 0.78, 0.25, 0.55], [BRAND.aqua, 0.95, 0.85, 0.38], [BRAND.lavender, 0.15, 1.05, 0.45], [BRAND.blue, 0.45, -0.1, 0.4]];
+    x.filter = `blur(${Math.round(w * 0.06)}px)`;
+    for (const [col, ox, oy, r] of orbs) { const cx = ((ox + seed * 0.07) % 1.1) * w, cy = oy * h, rr = r * Math.max(w, h); const g = x.createRadialGradient(cx, cy, 0, cx, cy, rr); g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,0)"); x.globalAlpha = 0.7; x.fillStyle = g; x.fillRect(0, 0, w, h); }
+    x.filter = "none"; x.globalAlpha = 0.18; x.fillStyle = BRAND.ink; x.fillRect(0, 0, w, h); x.globalAlpha = 1;
+    return c.toDataURL("image/jpeg", 0.9);
+  }
+  const IDENTITY_ICONS: [RegExp, string][] = [[/integrity|trust/i, "ShieldCheck"], [/quality/i, "BadgeCheck"], [/respect/i, "Handshake"], [/service/i, "HeartHandshake"], [/diversity|inclusi/i, "Users"], [/own/i, "Target"], [/transparen/i, "Eye"], [/result/i, "TrendingUp"], [/team/i, "UsersRound"], [/urgen/i, "Zap"], [/financ/i, "Landmark"], [/innovat/i, "Lightbulb"], [/global/i, "Globe"], [/primary|typeface|web/i, "Type"]];
   const fit = (im: { w: number; h: number }, w: number, h: number) => Math.min(w / im.w, h / im.h);
 
   const font = (size: number, bold = false, colour: RGB = ink) => doc.setFont(model.font, bold ? "bold" : "normal").setFontSize(size).setTextColor(...colour);
@@ -63,6 +81,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
 
   function newPage() {
     doc.addPage(); y = TOP;
+    if (strip) doc.addImage(strip, "JPEG", 0, 0, W, 6, "aura-strip", "FAST");
     eyebrow(model.name, M, 30);
     if (current.title) { font(8, false, muted); doc.text(`${current.no}  ${current.title}`, W - M, 30, { align: "right" }); }
     doc.setDrawColor(...line).setLineWidth(0.6).line(M, 40, W - M, 40);
@@ -98,7 +117,25 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   function text(t: string) {
     font(10.5); for (const l of wrap(t, MEASURE)) { need(15); font(10.5); doc.text(l, M, y + 10.5); y += 15; } y += 8;
   }
-  function specs(rows: Extract<KitBlock, { kind: "spec" }>[]) {
+  async function specs(rows: Extract<KitBlock, { kind: "spec" }>[]) {
+    const withIcons = rows.filter(r => IDENTITY_ICONS.some(([re]) => re.test(r.label))).length >= Math.ceil(rows.length / 2);
+    if (withIcons) {
+      // Icon cards: 3 per row, accent icon tile + label + value.
+      const cols = 3, w = (CW - G * (cols - 1)) / cols;
+      for (let i = 0; i < rows.length; i += cols) {
+        const row = rows.slice(i, i + cols); font(9.5); const h = Math.max(...row.map(r => wrap(r.value, w - 76).length)) * 13 + 44;
+        need(h + 10);
+        for (const [j, r] of row.entries()) {
+          const x = M + j * (w + G); doc.setFillColor(...tint).roundedRect(x, y, w, h, 4, 4, "F");
+          doc.setFillColor(...primary).roundedRect(x + 12, y + 12, 40, 40, 6, 6, "F");
+          const name = IDENTITY_ICONS.find(([re]) => re.test(r.label))?.[1] ?? "Sparkles";
+          const im = await lucide(name, BRAND.white, `Icon ${r.label}`); if (im) doc.addImage(im.data, "PNG", x + 21, y + 21, 22, 22, undefined, "FAST");
+          font(11, true); doc.text(wrap(r.label, w - 76)[0], x + 64, y + 26); font(9.5, false, muted); doc.text(wrap(r.value, w - 76), x + 64, y + 41);
+        }
+        y += h + 10;
+      }
+      y += 8; return;
+    }
     const lw = 190; y += 4;
     for (const r of rows) {
       font(10); const v = wrap(r.value, CW - lw - 12); const h = Math.max(1, v.length) * 14 + 12;
@@ -211,7 +248,25 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     font(9, false, muted); doc.text(wrap("x = height of the T symbol at the size used. Dashed outer line = minimum clear space; inner line = logo bounds. Diagram is to proportion, not to print scale.", tw), tx, y + 60 + r.length * 14);
     y += ph + G;
   }
-  async function misuse(src: string) {
+  async function misuse(src: string, whiteSrc?: string) {
+    heading("Correct use");
+    {
+      const place = async (s2: string, x: number, yy: number, w: number, h: number, pad: number) => { const im = await img(s2, "Logo example"); if (im) { const k = fit(im, w - pad * 2, h - pad * 2); doc.addImage(im.data, "PNG", x + (w - im.w * k) / 2, yy + (h - im.h * k) / 2, im.w * k, im.h * k, undefined, "FAST"); } };
+      const goods: { label: string; ground: RGB; src: string; pad: number }[] = [
+        { label: "Full colour on white or light", ground: white, src, pad: 24 },
+        ...(whiteSrc ? [{ label: "White logo on brand dark", ground: primary, src: whiteSrc, pad: 24 }] : []),
+        { label: "Generous clear space", ground: tint, src, pad: 46 },
+        ...(whiteSrc ? [{ label: "White on a quiet image wash", ground: rgb(BRAND.ink), src: whiteSrc, pad: 30 }] : []),
+      ];
+      const cols = 4, w = (CW - G * (cols - 1)) / cols, ih = 110, h = ih + 34; need(h + G);
+      for (const [j, c] of goods.entries()) {
+        const x = M + j * (w + G); doc.setDrawColor(...line).setLineWidth(0.8).setFillColor(...c.ground).roundedRect(x, y, w, ih, 4, 4, "FD");
+        if (j === 3) { const a = aura(320, 140, 3); if (a) doc.addImage(a, "JPEG", x, y, w, ih, undefined, "FAST"); }
+        await place(c.src, x, y, w, ih, c.pad); doc.setFillColor(...okC).rect(x, y + ih, w, 2, "F");
+        icon(true, x + 10, y + ih + 10); font(9, true); doc.text(wrap(c.label, w - 40)[0], x + 30, y + ih + 21);
+      }
+      y += h + G;
+    }
     heading("Logo misuse");
     const cards: { label: string; draw: (x: number, yy: number, w: number, h: number) => Promise<void> }[] = [
       { label: "Don't stretch or distort", draw: async (x, yy, w, h) => { const im = await img(src, "Misuse logo"); if (im) { const k = fit(im, w - 40, h - 40); doc.addImage(im.data, "PNG", x + 10, yy + (h - im.h * k * 0.55) / 2, w - 20, im.h * k * 0.55, undefined, "FAST"); } } },
@@ -230,14 +285,12 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   }
   async function iconGrid(list: NonNullable<KitDocumentSection["icons"]>) {
     heading("Approved icon examples");
-    const [{ renderToStaticMarkup }, { createElement }, { iconByName }] = await Promise.all([import("react-dom/server"), import("react"), import("@/lib/icon-library")]);
     const cols = 8, w = (CW - 8 * (cols - 1)) / cols, h = 78;
     for (let i = 0; i < list.length; i += cols) {
       need(h + 8);
       for (const [j, it] of list.slice(i, i + cols).entries()) {
         const x = M + j * (w + 8); doc.setFillColor(...tint).roundedRect(x, y, w, h, 4, 4, "F");
-        const Icon = iconByName(it.name);
-        if (Icon) { const svg = renderToStaticMarkup(createElement(Icon, { size: 96, color: it.colour, strokeWidth: 1.75 })).replace(/^<svg(?![^>]*xmlns=)/, '<svg xmlns="http://www.w3.org/2000/svg"'); const im = await img(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`, `Icon ${it.label}`); if (im) doc.addImage(im.data, "PNG", x + (w - 30) / 2, y + 12, 30, 30, undefined, "FAST"); }
+        const im = await lucide(it.name, it.colour, `Icon ${it.label}`); if (im) doc.addImage(im.data, "PNG", x + (w - 30) / 2, y + 12, 30, 30, undefined, "FAST");
         font(7.5, true); doc.text(wrap(it.label, w - 10)[0], x + w / 2, y + 58, { align: "center" }); font(6.5, false, muted); doc.text(it.name, x + w / 2, y + 68, { align: "center" });
       }
       y += h + 8;
@@ -278,9 +331,11 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   }
 
   // ---------- Cover ----------
+  strip = aura(1200, 12, 1);
   progress?.("Designing cover…");
   doc.setFillColor(...primary).rect(0, 0, W, H, "F");
-  doc.setFillColor(...accent).rect(M, 62, 40, 4, "F");
+  { const a = aura(1684, 1190); if (a) doc.addImage(a, "JPEG", 0, 0, W, H, undefined, "FAST"); }
+  doc.setFillColor(...white).rect(M, 62, 40, 4, "F");
   eyebrow("Brand kit", M, 52, white);
   const panel = { x: W - M - 300, y: 62, w: 300, h: 300 };
   if (model.cover) {
@@ -341,12 +396,12 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     } });
     const blocks = classifyKitParagraphs(section.paragraphs);
     for (const b of blocks) if (b.kind === "text") text(b.text);
-    const sp = blocks.filter((b): b is Extract<KitBlock, { kind: "spec" }> => b.kind === "spec"); if (sp.length) specs(sp);
+    const sp = blocks.filter((b): b is Extract<KitBlock, { kind: "spec" }> => b.kind === "spec"); if (sp.length) await specs(sp);
     const ty = blocks.filter((b): b is Extract<KitBlock, { kind: "type" }> => b.kind === "type"); if (ty.length) types(ty);
     const ru = blocks.filter((b): b is Extract<KitBlock, { kind: "rule" }> => b.kind === "rule"); if (ru.length) rules(ru);
     if (section.typeExample) typeExample(section.typeExample);
     if (section.safeZone) await safeZone(section.safeZone);
-    if (section.misuse) await misuse(section.misuse.image);
+    if (section.misuse) await misuse(section.misuse.image, section.misuse.white);
     if (section.colours?.length) colours(section.colours);
     if (section.balance?.length) balanceBar(section.balance);
     if (section.icons?.length) await iconGrid(section.icons);

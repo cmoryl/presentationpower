@@ -1,3 +1,4 @@
+import { londonCmykBuild } from "@/lib/next-london-cmyk";
 import type { BrandGuide } from "@/lib/brand-guides";
 
 export interface KitDocumentLink { label: string; url: string }
@@ -11,7 +12,7 @@ export interface KitDocumentSection {
   /** Diagram: clear space around the logo, `ratio` × x on every side. */
   safeZone?: KitSafeZone;
   /** Visual misuse cards drawn from this logo (distort, recolour, keyline, busy ground). */
-  misuse?: { image: string };
+  misuse?: { image: string; white?: string };
   /** Approved icon samples (Lucide names). */
   icons?: KitIconExample[];
   /** Approved imagery samples from the existing pool. */
@@ -52,7 +53,7 @@ export async function makeBrandGuideDocument(g: BrandGuide): Promise<KitDocument
     sections: [
       { id: "identity", title: "Identity & positioning", paragraphs: [g.subtitle, g.tagline ?? "", g.intro, ...(g.values ?? []).map(v => `${v.label}: ${v.description}`)] },
       { id: "logos", title: "Logos & usage", paragraphs: [g.logoNotes?.headline ?? "", g.logoNotes?.body ?? "", ...g.logoRules.map(r => `${r.do ? "Do" : "Don't"}: ${r.title}. ${r.description}`)], assets,
-        ...(mainLogo ? { safeZone: { image: mainLogo, ratio: 1.5, rule: "Clear space is 1.5× the height of the T symbol (x) on every side. Keep text, edges and other marks outside it." }, misuse: { image: mainLogo } } : {}) },
+        ...(mainLogo ? { safeZone: { image: mainLogo, ratio: 1.5, rule: "Clear space is 1.5× the height of the T symbol (x) on every side. Keep text, edges and other marks outside it." }, misuse: { image: mainLogo, white: logos?.white } } : {}) },
       { id: "colours", title: "Colour & accessibility", paragraphs: [g.colorAccessibility?.headline ?? "", ...(g.colorAccessibility?.notes ?? [])], colours: [...g.primaryColors, ...g.secondaryColors, ...g.tertiaryColors, ...g.neutrals].map(c => ({ name: c.name, hex: c.hex, detail: [c.role, c.rgb && `RGB ${c.rgb}`, c.cmyk && `CMYK ${c.cmyk}`, c.pantone && `Pantone ${c.pantone}`].filter(Boolean).join(" · ") })),
         ...(lead && second ? { balance: [{ name: lead.name, hex: lead.hex, share: 60 }, ...(neutral ? [{ name: neutral.name, hex: neutral.hex, share: 30 }] : []), { name: second.name, hex: second.hex, share: neutral ? 10 : 40 }] } : {}) },
       { id: "type", title: "Typography", paragraphs: [`Primary: ${g.typefacePrimary}. Web: ${g.typefaceWeb}.`, g.typeScaleNotes ?? "", ...[...g.headingScale, ...g.bodyScale].map(t => `${t.label} · ${t.sizePx}px · weight ${t.weight} · ${t.leading ?? ""} leading · ${t.sample}`)],
@@ -161,7 +162,9 @@ export function kitColourRows(hex: string, detail: string): string[] {
   const parts = detail.replace(/\s+/g, " ").split(/ · (?=[A-Za-z])/).map(d => d.trim()).filter(Boolean);
   const find = (re: RegExp) => parts.find(p => re.test(p));
   const rgbPart = find(/^RGB\b/) ?? `RGB ${[1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)).join(" · ")} (from HEX)`;
-  const cmyk = find(/^CMYK\b/) ?? "CMYK — Not supplied";
+  const signed = londonCmykBuild(hex);
+  const pct = (v: number) => Math.round(v * 100);
+  const cmyk = find(/^CMYK\b/) ?? (signed.approved ? `CMYK ${pct(signed.c)} ${pct(signed.m)} ${pct(signed.y)} ${pct(signed.k)} (signed-off build)` : "CMYK — Not supplied");
   const pantone = find(/^Pantone\b|\b\d{3,4} ?C\b|PMS/) ?? "Pantone — Not supplied";
   const rest = parts.filter(p => p !== rgbPart && p !== cmyk && p !== pantone);
   return [rgbPart, cmyk, pantone, ...rest];
