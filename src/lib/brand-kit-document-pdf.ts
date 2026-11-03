@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
 import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import { BRAND } from "@/lib/brand-colors";
-import { classifyKitParagraphs, kitContrast, selectKitDocumentSections, type KitBlock, type KitDocument, type KitDocumentAsset, type KitDocumentSection } from "@/lib/brand-kit-document";
+import { classifyKitParagraphs, kitColourRows, kitContrast, selectKitDocumentSections, type KitBlock, type KitDocument, type KitDocumentAsset, type KitDocumentSection } from "@/lib/brand-kit-document";
 import poppinsRegular from "@/assets/fonts-live/Poppins-Regular.ttf.asset.json";
 import poppinsBold from "@/assets/fonts-live/Poppins-Bold.ttf.asset.json";
 
@@ -129,7 +129,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     const cols = 4, w = (CW - G * (cols - 1)) / cols;
     for (let i = 0; i < list.length; i += cols) {
       const row = list.slice(i, i + cols);
-      const details = row.map(c => c.detail.replace(/\s+/g, " ").split(/ · (?=[A-Za-z])/).map(d => d.trim()).filter(Boolean));
+      const details = row.map(c => kitColourRows(c.hex, c.detail));
       font(8.5); const h = 84 + 32 + 14 + Math.max(...details.map(d => d.reduce((n, v) => n + wrap(v, w - 20).length, 0))) * 12 + 34;
       need(h + G);
       row.forEach((c, j) => {
@@ -140,7 +140,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
         font(16, true, onWhite >= onInk ? white : ink); doc.text("Aa", x + 10, y + 26);
         font(11, true); doc.text(wrap(c.name, w - 20)[0], x + 10, y + 102); font(9, true, primary); doc.text(c.hex.toUpperCase(), x + 10, y + 115);
         let yy = y + 131; font(8.5, false, muted);
-        for (const d of details[j]) { const ls = wrap(d, w - 20); doc.text(ls, x + 10, yy); yy += ls.length * 12; }
+        for (const d of details[j]) { const ls = wrap(d, w - 20); font(8.5, /^(RGB|CMYK|Pantone)\b/.test(d), /Not supplied/.test(d) ? noC : /^(RGB|CMYK|Pantone)\b/.test(d) ? ink : muted); doc.text(ls, x + 10, yy); yy += ls.length * 12; }
         const badge = (label: string, r: number, by: number) => { const pass = r >= 4.5; font(7.5, true, pass ? okC : muted); doc.text(`${label} ${r.toFixed(1)}:1 · ${pass ? "AA" : r >= 3 ? "AA large only" : "not for text"}`, x + 10, by); };
         doc.setDrawColor(...line).line(x + 10, y + h - 36, x + w - 10, y + h - 36);
         badge("On white", onWhite, y + h - 22); badge("On ink", onInk, y + h - 10);

@@ -12,7 +12,7 @@ describe("Brand-kit PDF selection", () => {
   });
   it("keeps the Bowl measurement sheet, type scale and version history out of PDFs", async () => {
     const bowl = await makeKitDocument("san-juan-bowl");
-    expect(bowl.sections.map(s => s.id)).toEqual(["logos", "single", "lettering", "small", "lockups", "colours", "type", "resources"]);
+    expect(bowl.sections.map(s => s.id)).toEqual(["logos", "single", "lettering", "small", "icons", "lockups", "colours", "type", "resources"]);
     expect(bowl.version).toBe("1.0");
   });
   it("does not invent Legalweek logo rules or a supplied guide", async () => {
@@ -37,5 +37,18 @@ describe("Brand-kit PDF infographic blocks", () => {
   it("computes WCAG contrast (white on ink passes AA)", () => {
     expect(kitContrast("#FFFFFF", "#000000")).toBeCloseTo(21, 0);
     expect(kitContrast("#FFFFFF", "#03002C")).toBeGreaterThan(4.5);
+  });
+});
+
+import { kitColourRows } from "../brand-kit-document";
+describe("Brand-kit PDF colour values", () => {
+  it("always lists RGB, CMYK and Pantone, deriving only RGB", () => {
+    expect(kitColourRows("#003FC7", "Primary")).toEqual(["RGB 0 · 63 · 199 (from HEX)", "CMYK — Not supplied", "Pantone — Not supplied", "Primary"]);
+  });
+  it("keeps supplied print values unchanged", () => {
+    expect(kitColourRows("#003B71", "RGB 0 · 59 · 113 · CMYK 100 · 84 · 30 · 16 · Pantone 541 C").slice(0, 3)).toEqual(["RGB 0 · 59 · 113", "CMYK 100 · 84 · 30 · 16", "Pantone 541 C"]);
+  });
+  it("adds the Bowl icon section", async () => {
+    expect((await makeKitDocument("san-juan-bowl")).sections.some(s => s.id === "icons")).toBe(true);
   });
 });
