@@ -158,18 +158,22 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     heading("Usage rules · do / don't");
     const w = (CW - G) / 2;
     const dos = rows.filter(r => r.do), donts = rows.filter(r => !r.do);
+    font(9.5);
+    const rowHeights = Array.from({ length: Math.max(dos.length, donts.length) }, (_, i) => Math.max(...[dos[i], donts[i]].map(r => r ? wrap(r.text, w - 54).length : 0)) * 13 + 32);
+    const totalHeight = rowHeights.reduce((sum, h) => sum + h + 8, 0);
+    if (totalHeight + 26 <= BOTTOM - TOP) need(totalHeight);
     for (let i = 0; i < Math.max(dos.length, donts.length); i++) {
       const row = [dos[i], donts[i]]; font(9.5);
-      const h = Math.max(...row.map(r => r ? wrap(r.text, w - 54).length : 0)) * 13 + 40;
-      need(h + G);
+      const h = rowHeights[i];
+      need(h + 8);
       row.forEach((r, j) => {
         if (!r) return;
         const x = M + j * (w + G); doc.setFillColor(...tint).roundedRect(x, y, w, h, 4, 4, "F");
         doc.setFillColor(...(r.do ? okC : noC)).rect(x, y, 3, h, "F");
-        icon(r.do, x + 14, y + 13); eyebrow(r.do ? "Do" : "Don't", x + 34, y + 23, r.do ? okC : noC);
-        font(9.5); doc.text(wrap(r.text, w - 54), x + 34, y + 39);
+        icon(r.do, x + 14, y + 9); eyebrow(r.do ? "Do" : "Don't", x + 34, y + 19, r.do ? okC : noC);
+        font(9.5); doc.text(wrap(r.text, w - 54), x + 34, y + 33);
       });
-      y += h + G;
+      y += h + 8;
     }
     y += 4;
   }
@@ -386,7 +390,7 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     progress?.(`Designing ${section.title}…`);
     current = { no: String(i + 1).padStart(2, "0"), title: section.title };
     const no = current.no, title = section.title;
-    if (i === 0) newPage(); else pending.push({ h: 44, fresh: true, draw: () => { y += 18; doc.setDrawColor(...line).setLineWidth(0.6).line(M, y, W - M, y); y += 26; } });
+    if (i === 0 || section.safeZone || section.misuse) newPage(); else pending.push({ h: 44, fresh: true, draw: () => { y += 18; doc.setDrawColor(...line).setLineWidth(0.6).line(M, y, W - M, y); y += 26; } });
     font(24, true); const tl = wrap(title, CW - 90); const headH = Math.max(48, tl.length * 28 + 18) + 25;
     pending.push({ h: headH, draw: () => {
       current = { no, title }; contents.push({ no, title, page: doc.getNumberOfPages() });
