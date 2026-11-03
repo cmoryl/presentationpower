@@ -14,7 +14,7 @@ type RGB = [number, number, number];
 const rgb = (hex: string): RGB => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)) as RGB;
 async function file(url: string) { const r = await fetch(url); if (!r.ok) throw new Error(`Could not load PDF resource (${r.status}).`); return new Uint8Array(await r.arrayBuffer()); }
 function base64(b: Uint8Array) { let s = ""; for (let i = 0; i < b.length; i += 8192) s += String.fromCharCode(...b.subarray(i, i + 8192)); return btoa(s); }
-async function image(src: string): Promise<{ data: string; w: number; h: number }> {
+async function image(src: string, filter?: string): Promise<{ data: string; w: number; h: number }> {
   const url = src.startsWith("https://brandhubcreator.lovable.app/") ? `/api/public/brandhub-image?path=${encodeURIComponent(new URL(src).pathname)}` : src;
   const r = await fetch(url); if (!r.ok) throw new Error(`Artwork preview unavailable (${r.status}).`);
   const blob = await r.blob(); const object = URL.createObjectURL(blob);
@@ -23,6 +23,7 @@ async function image(src: string): Promise<{ data: string; w: number; h: number 
     const scale = Math.min(1, 1400 / Math.max(img.naturalWidth, img.naturalHeight));
     const c = document.createElement("canvas"); c.width = Math.max(1, Math.round(img.naturalWidth * scale)); c.height = Math.max(1, Math.round(img.naturalHeight * scale));
     const ctx = c.getContext("2d"); if (!ctx) throw new Error("Image conversion unavailable.");
+    if (filter) ctx.filter = filter;
     ctx.drawImage(img, 0, 0, c.width, c.height);
     return { data: c.toDataURL("image/png"), w: c.width, h: c.height };
   } finally { URL.revokeObjectURL(object); }
@@ -49,10 +50,12 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   const missing: string[] = []; const contents: { no: string; title: string; page: number }[] = [];
   let y = TOP, current = { no: "", title: "" };
   const imgCache = new Map<string, Awaited<ReturnType<typeof image>> | null>();
-  async function img(src: string, label: string) {
-    if (!imgCache.has(src)) { try { imgCache.set(src, await image(src)); } catch { imgCache.set(src, null); missing.push(label); } }
-    return imgCache.get(src) ?? null;
+  async function img(src: string, label: string, filter?: string) {
+    const key = filter ? `${src}#${filter}` : src;
+    if (!imgCache.has(key)) { try { imgCache.set(key, await image(src, filter)); } catch { imgCache.set(key, null); missing.push(label); } }
+    return imgCache.get(key) ?? null;
   }
+  const fit = (im: { w: number; h: number }, w: number, h: number) => Math.min(w / im.w, h / im.h);
 
   const font = (size: number, bold = false, colour: RGB = ink) => doc.setFont(model.font, bold ? "bold" : "normal").setFontSize(size).setTextColor(...colour);
   const wrap = (t: string, w: number) => doc.splitTextToSize(t, w) as string[];
@@ -183,6 +186,97 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     }
   }
 
+
+  // ---------- Visual example blocks ----------
+  async function safeZone(z: NonNullable<KitDocumentSection["safeZone"]>) {
+    heading("Clear space");
+    const im = await img(z.image, "Clear-space logo"); if (!im) return;
+    const lh = 54, lw = Math.min(260, im.w * (lh / im.h)), x = lh, pad = x * z.ratio;
+    const bw = lw + pad * 2, bh = lh + pad * 2, ph = bh + 40;
+    need(ph + G);
+    doc.setFillColor(...tint).roundedRect(M, y, CW, ph, 4, 4, "F");
+    const bx = M + 30, by = y + 20;
+    doc.setFillColor(...(z.ground ? rgb(z.ground) : white)).rect(bx, by, bw, bh, "F");
+    doc.setDrawColor(...accent).setLineWidth(0.8); doc.setLineDashPattern([4, 3], 0); doc.rect(bx, by, bw, bh, "S"); doc.rect(bx + pad, by + pad, lw, lh, "S"); doc.setLineDashPattern([], 0);
+    const k = Math.min(lw / im.w, lh / im.h); doc.addImage(im.data, "PNG", bx + pad, by + pad + (lh - im.h * k) / 2, im.w * k, im.h * k, undefined, "FAST");
+    font(8, true, accent);
+    // dimension marks on each side
+    const mark = (x1: number, y1: number, x2: number, y2: number, lx: number, ly: number) => { doc.setDrawColor(...accent).setLineWidth(0.6).line(x1, y1, x2, y2); doc.text(`${z.ratio}x`, lx, ly, { align: "center" }); };
+    mark(bx, by + bh / 2, bx + pad, by + bh / 2, bx + pad / 2, by + bh / 2 - 4);
+    mark(bx + pad + lw, by + bh / 2, bx + bw, by + bh / 2, bx + bw - pad / 2, by + bh / 2 - 4);
+    mark(bx + bw / 2, by, bx + bw / 2, by + pad, bx + bw / 2 + 12, by + pad / 2);
+    mark(bx + bw / 2, by + pad + lh, bx + bw / 2, by + bh, bx + bw / 2 + 12, by + bh - pad / 2);
+    const tx = bx + bw + 32, tw = M + CW - tx - 24;
+    eyebrow("Rule", tx, y + 34, accent); font(11, true); const r = wrap(z.rule, tw); doc.text(r, tx, y + 52);
+    font(9, false, muted); doc.text(wrap("x = height of the T symbol at the size used. Dashed outer line = minimum clear space; inner line = logo bounds. Diagram is to proportion, not to print scale.", tw), tx, y + 60 + r.length * 14);
+    y += ph + G;
+  }
+  async function misuse(src: string) {
+    heading("Logo misuse");
+    const cards: { label: string; draw: (x: number, yy: number, w: number, h: number) => Promise<void> }[] = [
+      { label: "Don't stretch or distort", draw: async (x, yy, w, h) => { const im = await img(src, "Misuse logo"); if (im) { const k = fit(im, w - 40, h - 40); doc.addImage(im.data, "PNG", x + 10, yy + (h - im.h * k * 0.55) / 2, w - 20, im.h * k * 0.55, undefined, "FAST"); } } },
+      { label: "Don't recolour", draw: async (x, yy, w, h) => { const im = await img(src, "Misuse logo", "hue-rotate(150deg) saturate(2.5)"); if (im) { const k = fit(im, w - 40, h - 40); doc.addImage(im.data, "PNG", x + (w - im.w * k) / 2, yy + (h - im.h * k) / 2, im.w * k, im.h * k, undefined, "FAST"); } } },
+      { label: "Don't add keylines or outlines", draw: async (x, yy, w, h) => { const im = await img(src, "Misuse logo"); if (im) { const k = fit(im, w - 50, h - 50); const iw = im.w * k, ih = im.h * k, ix = x + (w - iw) / 2, iy = yy + (h - ih) / 2; doc.setDrawColor(...noC).setLineWidth(2).roundedRect(ix - 8, iy - 8, iw + 16, ih + 16, 4, 4, "S"); doc.addImage(im.data, "PNG", ix, iy, iw, ih, undefined, "FAST"); } } },
+      { label: "Don't use busy grounds", draw: async (x, yy, w, h) => { for (let i = 0; i < 9; i++) { const c = [primary, accent, tint, noC, okC][i % 5]; doc.setFillColor(...c).rect(x + (i % 3) * (w / 3), yy + Math.floor(i / 3) * (h / 3), w / 3, h / 3, "F"); } const im = await img(src, "Misuse logo"); if (im) { const k = fit(im, w - 40, h - 40); doc.addImage(im.data, "PNG", x + (w - im.w * k) / 2, yy + (h - im.h * k) / 2, im.w * k, im.h * k, undefined, "FAST"); } } },
+    ];
+    const cols = 4, w = (CW - G * (cols - 1)) / cols, ih = 110, h = ih + 34;
+    need(h + G);
+    for (const [j, c] of cards.entries()) {
+      const x = M + j * (w + G); doc.setFillColor(...white).setDrawColor(...line).setLineWidth(0.8).roundedRect(x, y, w, h, 4, 4, "FD");
+      await c.draw(x, y, w, ih); doc.setFillColor(...noC).rect(x, y + ih, w, 2, "F");
+      icon(false, x + 10, y + ih + 10); font(9, true); doc.text(wrap(c.label, w - 40)[0], x + 30, y + ih + 21);
+    }
+    y += h + G;
+  }
+  async function iconGrid(list: NonNullable<KitDocumentSection["icons"]>) {
+    heading("Approved icon examples");
+    const [{ renderToStaticMarkup }, { createElement }, { iconByName }] = await Promise.all([import("react-dom/server"), import("react"), import("@/lib/icon-library")]);
+    const cols = 8, w = (CW - 8 * (cols - 1)) / cols, h = 78;
+    for (let i = 0; i < list.length; i += cols) {
+      need(h + 8);
+      for (const [j, it] of list.slice(i, i + cols).entries()) {
+        const x = M + j * (w + 8); doc.setFillColor(...tint).roundedRect(x, y, w, h, 4, 4, "F");
+        const Icon = iconByName(it.name);
+        if (Icon) { const svg = renderToStaticMarkup(createElement(Icon, { size: 96, color: it.colour, strokeWidth: 1.75 })).replace(/^<svg(?![^>]*xmlns=)/, '<svg xmlns="http://www.w3.org/2000/svg"'); const im = await img(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`, `Icon ${it.label}`); if (im) doc.addImage(im.data, "PNG", x + (w - 30) / 2, y + 12, 30, 30, undefined, "FAST"); }
+        font(7.5, true); doc.text(wrap(it.label, w - 10)[0], x + w / 2, y + 58, { align: "center" }); font(6.5, false, muted); doc.text(it.name, x + w / 2, y + 68, { align: "center" });
+      }
+      y += h + 8;
+    }
+    font(8, false, muted); need(14); doc.text("Outline icons, 1.75 stroke on a 24 grid, one approved colour per layout. Download the full set as SVG or PNG from the live guide.", M, y + 6); y += 22;
+  }
+  async function galleryGrid(list: NonNullable<KitDocumentSection["gallery"]>) {
+    heading("Example imagery");
+    const cols = 3, w = (CW - G * (cols - 1)) / cols, h = w * 0.5;
+    for (let i = 0; i < list.length; i += cols) {
+      need(h + 20 + G);
+      for (const [j, it] of list.slice(i, i + cols).entries()) {
+        const x = M + j * (w + G); const im = await img(it.image, it.title);
+        doc.setFillColor(...tint).roundedRect(x, y, w, h, 4, 4, "F");
+        if (im) { const k = Math.max(w / im.w, h / im.h); const sw = w / k, sh = h / k; const c = document.createElement("canvas"); c.width = Math.round(sw); c.height = Math.round(sh); const el = new Image(); el.src = im.data; await el.decode(); c.getContext("2d")?.drawImage(el, (im.w - sw) / 2, (im.h - sh) / 2, sw, sh, 0, 0, sw, sh); doc.addImage(c.toDataURL("image/jpeg", 0.85), "JPEG", x, y, w, h, undefined, "FAST"); }
+        font(8.5, true); doc.text(it.title, x, y + h + 13);
+      }
+      y += h + 20 + G;
+    }
+    font(8, false, muted); need(14); doc.text("Samples from the approved imagery pool used across decks and exports. Photography leads hero layouts; abstracts back stats, quotes and dividers.", M, y + 2); y += 20;
+  }
+  function balanceBar(list: NonNullable<KitDocumentSection["balance"]>) {
+    heading("Colour balance");
+    need(80); let x = M;
+    for (const c of list) { const w = CW * c.share / 100; doc.setFillColor(...rgb(c.hex)).rect(x, y, w, 40, "F"); const on = kitContrast(c.hex, BRAND.white) >= kitContrast(c.hex, BRAND.ink) ? white : ink; font(9, true, on); if (w > 60) doc.text(`${c.share}%`, x + 8, y + 16); font(7.5, false, on); if (w > 60) doc.text(wrap(c.name, w - 14)[0], x + 8, y + 30); x += w; }
+    doc.setDrawColor(...line).rect(M, y, CW, 40, "S"); y += 50;
+    font(8, false, muted); doc.text("Illustrative proportion for a typical layout: lead colour dominant, neutrals for space, secondary accents kept to about 10%.", M, y + 4); y += 22;
+  }
+  function typeExample(t: NonNullable<KitDocumentSection["typeExample"]>) {
+    heading("Hierarchy in use");
+    const h = 150; need(h + G);
+    doc.setFillColor(...primary).roundedRect(M, y, CW, h, 4, 4, "F");
+    eyebrow("Eyebrow · 11pt bold, tracked", M + 28, y + 30, white);
+    font(26, true, white); doc.text(wrap(t.heading, CW - 56).slice(0, 2), M + 28, y + 62);
+    font(11, false, white); doc.text(wrap(t.body, Math.min(MEASURE, CW - 56)).slice(0, 3), M + 28, y + 108);
+    doc.setFillColor(...accent).rect(M + 28, y + h - 18, 40, 3, "F");
+    y += h + G;
+  }
+
   // ---------- Cover ----------
   progress?.("Designing cover…");
   doc.setFillColor(...primary).rect(0, 0, W, H, "F");
@@ -250,7 +344,13 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     const sp = blocks.filter((b): b is Extract<KitBlock, { kind: "spec" }> => b.kind === "spec"); if (sp.length) specs(sp);
     const ty = blocks.filter((b): b is Extract<KitBlock, { kind: "type" }> => b.kind === "type"); if (ty.length) types(ty);
     const ru = blocks.filter((b): b is Extract<KitBlock, { kind: "rule" }> => b.kind === "rule"); if (ru.length) rules(ru);
+    if (section.typeExample) typeExample(section.typeExample);
+    if (section.safeZone) await safeZone(section.safeZone);
+    if (section.misuse) await misuse(section.misuse.image);
     if (section.colours?.length) colours(section.colours);
+    if (section.balance?.length) balanceBar(section.balance);
+    if (section.icons?.length) await iconGrid(section.icons);
+    if (section.gallery?.length) await galleryGrid(section.gallery);
     if (section.assets?.length) { if (blocks.length || section.colours?.length) heading("Files & downloads"); await assets(section.assets); }
     if (pending.length) need(0);
   }
