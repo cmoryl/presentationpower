@@ -65,11 +65,11 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   // Aura ground: brand orbs behind frosted glass, drawn on canvas (no external art).
   function aura(w: number, h: number, seed = 0) {
     const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d"); if (!x) return null;
-    x.fillStyle = model.primary; x.fillRect(0, 0, w, h);
+    x.fillStyle = BRAND.ink; x.fillRect(0, 0, w, h);
     const orbs: [string, number, number, number][] = [[model.accent, 0.78, 0.25, 0.55], [BRAND.aqua, 0.95, 0.85, 0.38], [BRAND.lavender, 0.15, 1.05, 0.45], [BRAND.blue, 0.45, -0.1, 0.4]];
-    x.filter = `blur(${Math.round(w * 0.06)}px)`;
-    for (const [col, ox, oy, r] of orbs) { const cx = ((ox + seed * 0.07) % 1.1) * w, cy = oy * h, rr = r * Math.max(w, h); const g = x.createRadialGradient(cx, cy, 0, cx, cy, rr); g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,0)"); x.globalAlpha = 0.7; x.fillStyle = g; x.fillRect(0, 0, w, h); }
-    x.filter = "none"; x.globalAlpha = 0.18; x.fillStyle = BRAND.ink; x.fillRect(0, 0, w, h); x.globalAlpha = 1;
+    x.filter = `blur(${Math.round(w * 0.035)}px)`;
+    for (const [col, ox, oy, r] of orbs) { const cx = ((ox + seed * 0.07) % 1.1) * w, cy = oy * h, rr = r * Math.max(w, h); const g = x.createRadialGradient(cx, cy, 0, cx, cy, rr); g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,0)"); x.globalAlpha = 0.95; x.fillStyle = g; x.fillRect(0, 0, w, h); }
+    x.filter = "none"; x.globalAlpha = 0.08; x.fillStyle = BRAND.ink; x.fillRect(0, 0, w, h); x.globalAlpha = 1;
     return c.toDataURL("image/jpeg", 0.9);
   }
   const IDENTITY_ICONS: [RegExp, string][] = [[/integrity|trust/i, "ShieldCheck"], [/quality/i, "BadgeCheck"], [/respect/i, "Handshake"], [/service/i, "HeartHandshake"], [/diversity|inclusi/i, "Users"], [/own/i, "Target"], [/transparen/i, "Eye"], [/result/i, "TrendingUp"], [/team/i, "UsersRound"], [/urgen/i, "Zap"], [/financ/i, "Landmark"], [/innovat/i, "Lightbulb"], [/global/i, "Globe"], [/primary|typeface|web/i, "Type"]];
