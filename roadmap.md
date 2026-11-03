@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Organize shared brand-kit PDF logo guidance: clear space, two-column usage rules, same-topic visual comparisons kept together, then original downloads; verify a real exported guide.
+
 - [x] Replace displayed SF map drafts with supplied SF_Maps3 pages and unchanged PDF/AI downloads; both pages visually verified, event overview uses the supplied set, both browser downloads match uploaded SHA-256 hashes. Two tests pass and preview build OK. Supplied artwork is revised through its Illustrator source; old editable drafts stay stored but hidden.
 
 - [x] Clean brand-kit pages and generated PDFs: removed decorative rails, repeated framing, pill downloads and redundant labels; retained artwork, rules and access warnings. Seven PDF downloads and all page sheets inspected, four live pages verified without overflow or page errors. Targeted 15 tests pass; full suite has the existing London map-export failure (2,592 pass). Issued originals unchanged.

@@ -155,18 +155,19 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     y += 16;
   }
   function rules(rows: Extract<KitBlock, { kind: "rule" }>[]) {
-    heading("Do and don't");
-    const cols = 3, w = (CW - G * (cols - 1)) / cols;
-    const ordered = [...rows.filter(r => r.do), ...rows.filter(r => !r.do)];
-    for (let i = 0; i < ordered.length; i += cols) {
-      const row = ordered.slice(i, i + cols); font(9.5);
-      const h = Math.max(...row.map(r => wrap(r.text, w - 46).length)) * 13 + 40;
+    heading("Usage rules · do / don't");
+    const w = (CW - G) / 2;
+    const dos = rows.filter(r => r.do), donts = rows.filter(r => !r.do);
+    for (let i = 0; i < Math.max(dos.length, donts.length); i++) {
+      const row = [dos[i], donts[i]]; font(9.5);
+      const h = Math.max(...row.map(r => r ? wrap(r.text, w - 54).length : 0)) * 13 + 40;
       need(h + G);
       row.forEach((r, j) => {
+        if (!r) return;
         const x = M + j * (w + G); doc.setFillColor(...tint).roundedRect(x, y, w, h, 4, 4, "F");
         doc.setFillColor(...(r.do ? okC : noC)).rect(x, y, 3, h, "F");
         icon(r.do, x + 14, y + 13); eyebrow(r.do ? "Do" : "Don't", x + 34, y + 23, r.do ? okC : noC);
-        font(9.5); doc.text(wrap(r.text, w - 46), x + 34, y + 39);
+        font(9.5); doc.text(wrap(r.text, w - 54), x + 34, y + 39);
       });
       y += h + G;
     }
@@ -249,39 +250,37 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     y += ph + G;
   }
   async function misuse(src: string, whiteSrc?: string) {
-    heading("Correct use");
-    {
       const place = async (s2: string, x: number, yy: number, w: number, h: number, pad: number) => { const im = await img(s2, "Logo example"); if (im) { const k = fit(im, w - pad * 2, h - pad * 2); doc.addImage(im.data, "PNG", x + (w - im.w * k) / 2, yy + (h - im.h * k) / 2, im.w * k, im.h * k, undefined, "FAST"); } };
-      const goods: { label: string; ground: RGB; src: string; pad: number }[] = [
-        { label: "Full colour on white or light", ground: white, src, pad: 24 },
-        ...(whiteSrc ? [{ label: "White logo on brand dark", ground: primary, src: whiteSrc, pad: 24 }] : []),
-        { label: "Generous clear space", ground: tint, src, pad: 46 },
-        ...(whiteSrc ? [{ label: "White on a quiet image wash", ground: rgb(BRAND.ink), src: whiteSrc, pad: 30 }] : []),
-      ];
-      const cols = 4, w = (CW - G * (cols - 1)) / cols, ih = 110, h = ih + 34; need(h + G);
-      for (const [j, c] of goods.entries()) {
-        const x = M + j * (w + G); doc.setDrawColor(...line).setLineWidth(0.8).setFillColor(...c.ground).roundedRect(x, y, w, ih, 4, 4, "FD");
-        if (j === 3) { const a = aura(320, 140, 3); if (a) doc.addImage(a, "JPEG", x, y, w, ih, undefined, "FAST"); }
-        await place(c.src, x, y, w, ih, c.pad); doc.setFillColor(...okC).rect(x, y + ih, w, 2, "F");
-        icon(true, x + 10, y + ih + 10); font(9, true); doc.text(wrap(c.label, w - 40)[0], x + 30, y + ih + 21);
-      }
-      y += h + G;
-    }
-    heading("Logo misuse");
     const cards: { label: string; draw: (x: number, yy: number, w: number, h: number) => Promise<void> }[] = [
       { label: "Don't stretch or distort", draw: async (x, yy, w, h) => { const im = await img(src, "Misuse logo"); if (im) { const k = fit(im, w - 40, h - 40); doc.addImage(im.data, "PNG", x + 10, yy + (h - im.h * k * 0.55) / 2, w - 20, im.h * k * 0.55, undefined, "FAST"); } } },
       { label: "Don't recolour", draw: async (x, yy, w, h) => { const im = await img(src, "Misuse logo", "hue-rotate(150deg) saturate(2.5)"); if (im) { const k = fit(im, w - 40, h - 40); doc.addImage(im.data, "PNG", x + (w - im.w * k) / 2, yy + (h - im.h * k) / 2, im.w * k, im.h * k, undefined, "FAST"); } } },
       { label: "Don't add keylines or outlines", draw: async (x, yy, w, h) => { const im = await img(src, "Misuse logo"); if (im) { const k = fit(im, w - 50, h - 50); const iw = im.w * k, ih = im.h * k, ix = x + (w - iw) / 2, iy = yy + (h - ih) / 2; doc.setDrawColor(...noC).setLineWidth(2).roundedRect(ix - 8, iy - 8, iw + 16, ih + 16, 4, 4, "S"); doc.addImage(im.data, "PNG", ix, iy, iw, ih, undefined, "FAST"); } } },
       { label: "Don't use busy grounds", draw: async (x, yy, w, h) => { for (let i = 0; i < 9; i++) { const c = [primary, accent, tint, noC, okC][i % 5]; doc.setFillColor(...c).rect(x + (i % 3) * (w / 3), yy + Math.floor(i / 3) * (h / 3), w / 3, h / 3, "F"); } const im = await img(src, "Misuse logo"); if (im) { const k = fit(im, w - 40, h - 40); doc.addImage(im.data, "PNG", x + (w - im.w * k) / 2, yy + (h - im.h * k) / 2, im.w * k, im.h * k, undefined, "FAST"); } } },
     ];
-    const cols = 4, w = (CW - G * (cols - 1)) / cols, ih = 110, h = ih + 34;
-    need(h + G);
-    for (const [j, c] of cards.entries()) {
-      const x = M + j * (w + G); doc.setFillColor(...white).setDrawColor(...line).setLineWidth(0.8).roundedRect(x, y, w, h, 4, 4, "FD");
-      await c.draw(x, y, w, ih); doc.setFillColor(...noC).rect(x, y + ih, w, 2, "F");
-      icon(false, x + 10, y + ih + 10); font(9, true); doc.text(wrap(c.label, w - 40)[0], x + 30, y + ih + 21);
+    const goods = [
+      { label: "Do · preserve the original proportions", ground: white, src },
+      { label: "Do · use the supplied colour artwork", ground: white, src },
+      { label: "Do · keep the supplied edges unchanged", ground: white, src },
+      { label: whiteSrc ? "Do · use the white logo on a quiet dark ground" : "Do · use a quiet light ground", ground: whiteSrc ? primary : white, src: whiteSrc ?? src },
+    ];
+    const topics = ["Proportions", "Approved colours", "Original artwork", "Background contrast"];
+    const w = (CW - G) / 2, ih = 110;
+    for (const [i, c] of cards.entries()) {
+      const good = goods[i];
+      font(9, true); const captions = [wrap(good.label, w - 44), wrap(c.label, w - 44)];
+      const h = ih + 22 + Math.max(...captions.map(ls => ls.length)) * 12;
+      // Each topic is an indivisible comparison: correct and incorrect never split across pages.
+      heading(`Logo comparison · ${topics[i]}`);
+      need(h + G);
+      for (const j of [0, 1]) {
+        const x = M + j * (w + G), ok = j === 0;
+        doc.setFillColor(...(ok ? good.ground : white)).setDrawColor(...line).setLineWidth(0.8).roundedRect(x, y, w, ih, 4, 4, "FD");
+        if (ok) await place(good.src, x, y, w, ih, 30); else await c.draw(x, y, w, ih);
+        doc.setFillColor(...(ok ? okC : noC)).rect(x, y + ih, w, 2, "F");
+        icon(ok, x + 10, y + ih + 10); font(9, true); doc.text(captions[j], x + 32, y + ih + 21);
+      }
+      y += h + G;
     }
-    y += h + G;
   }
   async function iconGrid(list: NonNullable<KitDocumentSection["icons"]>) {
     heading("Approved icon examples");
@@ -398,9 +397,10 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     for (const b of blocks) if (b.kind === "text") text(b.text);
     const sp = blocks.filter((b): b is Extract<KitBlock, { kind: "spec" }> => b.kind === "spec"); if (sp.length) await specs(sp);
     const ty = blocks.filter((b): b is Extract<KitBlock, { kind: "type" }> => b.kind === "type"); if (ty.length) types(ty);
-    const ru = blocks.filter((b): b is Extract<KitBlock, { kind: "rule" }> => b.kind === "rule"); if (ru.length) rules(ru);
+    const ru = blocks.filter((b): b is Extract<KitBlock, { kind: "rule" }> => b.kind === "rule");
     if (section.typeExample) typeExample(section.typeExample);
     if (section.safeZone) await safeZone(section.safeZone);
+    if (ru.length) rules(ru);
     if (section.misuse) await misuse(section.misuse.image, section.misuse.white);
     if (section.colours?.length) colours(section.colours);
     if (section.balance?.length) balanceBar(section.balance);
