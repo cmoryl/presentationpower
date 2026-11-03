@@ -23,7 +23,7 @@ export const Route = createFileRoute("/share/san-juan-bowl/social")({
     ],
   }),
   component: () => (
-    <SjbShareProvider value>
+    <SjbShareProvider>
       <SjbSocialStudio />
     </SjbShareProvider>
   ),

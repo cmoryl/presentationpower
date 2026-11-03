@@ -169,6 +169,11 @@ function EventHome() {
                 <Link to="/share/san-juan-bowl">Public share link <ArrowRight aria-hidden /></Link>
               </Button>
               <Button asChild variant="outline">
+                <Link to="/events/san-juan-bowl/social">
+                  Social templates <ArrowRight aria-hidden />
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
                 <Link to="/events/next/sign-editor/$signId" params={{ signId: "sjb-first-flyer" }}>
                   Game flyer <ArrowRight aria-hidden />
                 </Link>
