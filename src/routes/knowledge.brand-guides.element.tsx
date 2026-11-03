@@ -1,3 +1,4 @@
+import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ElementLockup, ElementMark, ElementMonogram } from "@/components/brand/ElementLogo";
 import logoSheet from "@/assets/element-logo-set.png.asset.json";
@@ -81,7 +82,8 @@ function ElementIdentityPage() {
       </header>
       <div className="mt-4"><BrandKitPdfExport kitId="element" /></div>
 
-      <section className="mt-8 grid gap-5 md:grid-cols-3">
+      <BrandKitSectionNav sections={[["logo-system", "Logo system"], ["palette", "Palette"], ["usage-rules", "Usage rules"]]} />
+      <section id="logo-system" className="mt-8 scroll-mt-24 grid gap-5 md:grid-cols-3">
         <Panel label="1 · Primary lockup — light">
           <ElementLockup layout="stacked" markSize={54} className="text-[#0D131D]" />
         </Panel>
@@ -106,7 +108,7 @@ function ElementIdentityPage() {
         </Panel>
       </section>
 
-      <section className="mt-10">
+      <section id="palette" className="mt-10 scroll-mt-24">
         <h2 className="text-lg font-semibold dark:text-white">Palette</h2>
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {PALETTE.map((c) => (
@@ -123,7 +125,7 @@ function ElementIdentityPage() {
         </div>
       </section>
 
-      <section className="mt-10 grid gap-6 lg:grid-cols-[1.1fr_1fr]">
+      <section id="usage-rules" className="mt-10 scroll-mt-24 grid gap-6 lg:grid-cols-[1.1fr_1fr]">
         <div>
           <h2 className="text-lg font-semibold dark:text-white">Usage rules</h2>
           <ul className="mt-4 space-y-3">

@@ -1,3 +1,4 @@
+import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
 import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LONDON_PACK_GROUNDS, LONDON_PACK_GROUND_NOTE } from "@/lib/next-london-pack-grounds";
@@ -330,8 +331,7 @@ function NextBrandGuide() {
 
       {/* Contents */}
       <div className="mt-5"><BrandKitPdfExport kitId="next" /></div>
-      <nav className="mt-8 flex flex-wrap gap-2" aria-label="Guide sections">
-        {[
+      <BrandKitSectionNav sections={[
           ["visual-examples", "Event imagery & examples"],
           ["logo-system", "Logo system"],
           ["lockups", "Lockups by track"],
@@ -343,16 +343,7 @@ function NextBrandGuide() {
           ["applications", "Applications"],
           ["files", "File formats"],
           ["icons", "Icon system"],
-        ].map(([id, label]) => (
-          <a
-            key={id}
-            href={`#${id}`}
-            className="rounded-full border border-black/15 px-4 py-1.5 text-xs text-black/70 transition hover:border-black/40 dark:border-white/15 dark:text-white/70 dark:hover:border-white/40"
-          >
-            {label}
-          </a>
-        ))}
-      </nav>
+        ]} />
 
       <div className="mt-12 space-y-14 pb-24">
         <NextVisualExamples />

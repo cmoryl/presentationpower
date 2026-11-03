@@ -1,3 +1,4 @@
+import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
 // Master NEXT event brand kit — shared by the signed-in page and the partner
 // share view. `shared` hides editors and internal links.
 import { useEffect, useState } from "react";
@@ -138,13 +139,7 @@ export function NextBrandKitView({ shared = false, shareToken }: { shared?: bool
       {shared && shareToken ? <PartnerSubmissionBox token={shareToken} /> : null}
 
       <div className="lg:grid lg:grid-cols-[200px_1fr] lg:gap-10">
-      <nav aria-label="Brand kit sections" className="sticky top-0 z-10 -mx-6 flex gap-4 overflow-x-auto bg-background/95 px-6 py-3 text-sm lg:top-6 lg:mx-0 lg:h-fit lg:flex-col lg:gap-2 lg:px-0 lg:py-8">
-        {(shared ? SHARED_SECTIONS : BRAND_SECTIONS).map(([id, label]) => (
-          <a key={id} href={`#${id}`} className="whitespace-nowrap font-medium text-muted-foreground hover:text-foreground">
-            {label}
-          </a>
-        ))}
-      </nav>
+      <BrandKitSectionNav sections={shared ? SHARED_SECTIONS : BRAND_SECTIONS} variant="rail" aria-label="Brand kit sections" className="lg:sticky lg:top-24 lg:h-fit" />
       <div className="min-w-0">
 
       <NextVisualExamples shared={shared} />

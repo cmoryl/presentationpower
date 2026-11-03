@@ -1,3 +1,4 @@
+import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
 import { BRAND } from "@/lib/brand-colors";
 import { GuideGrounds, guideHasGrounds, GUIDE_GROUND_FAMILY } from "@/components/brand/GuideGrounds";
 import { DivisionSignageKit } from "@/components/events/DivisionSignageKit";
@@ -104,6 +105,21 @@ function BrandGuideView() {
   // stays for content sections), fall back to the first photograph.
   const heroBackdrop = heroImagery?.abstracts?.[0] ?? heroImagery?.photos?.[0] ?? null;
 
+  const guideSections: [string, string][] = [];
+  if (guide.values?.length) guideSections.push(["core-values", "Core values"]);
+  guideSections.push(["logo-system", "Logo system"], ["color-palette", "Color palette"], ["typography", "Typography"]);
+  if (guide.colorAccessibility) guideSections.push(["colour-and-legibility", "Colour and legibility"]);
+  if (guide.photography || guide.brandVisuals) guideSections.push(["imagery", "Imagery"]);
+  if (guide.motion?.videoIds.some((id) => brandVideoById(id))) guideSections.push(["motion", "Motion"]);
+  if (heroImagery && (heroImagery.photos.length || heroImagery.abstracts.length)) guideSections.push(["imagery-library", "Imagery library"]);
+  if (guide.subBrands?.length) guideSections.push(["sub-brand-architecture", "Sub-brand architecture"]);
+  if (guide.iconography) guideSections.push(["iconography", "Iconography"]);
+  if (guideHasGrounds(guide.slug)) guideSections.push(["backgrounds-gradients", "Backgrounds & gradients"]);
+  if (GUIDE_GROUND_FAMILY[guide.slug]) guideSections.push(["event-signage", "Event signage"]);
+  guideSections.push(["approved-icons", "Approved icons"]);
+  if (guide.socialMedia?.length) guideSections.push(["social-image-watermarks", "Social image watermarks"]);
+  if (guide.slug === "globallink") guideSections.push(["product-ecosystem", "Product ecosystem"]);
+
   return (
     <AppShell>
       {/* Breadcrumb */}
@@ -205,6 +221,8 @@ function BrandGuideView() {
           </div>
         </div>
       </section>
+
+      <BrandKitSectionNav sections={guideSections} />
 
       {/* Values */}
       {guide.values && guide.values.length > 0 && (
@@ -664,7 +682,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-14">
+    <section id={title.toLowerCase().replace(/[^a-z0-9]+/g, "-")} className="mt-14 scroll-mt-24">
       <div className="flex items-baseline gap-4">
         <h2 className="text-2xl font-semibold">{title}</h2>
       </div>
