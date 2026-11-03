@@ -34,6 +34,7 @@ const PUBLIC_NO_LOGIN_PATHS = [
   "/events/next/kiosk-editor", // opened inside BoothHub
   "/events/san-juan-bowl", // Bowl event info, brand kit, guide, lettering, single-colour and stadium: public by request
   "/convert", // cross-format adapter: shared with clients; account-bound features stay gated
+  "/public/icons", // approved icon bank: freelancers and partners without TP accounts, by request
   "/api",
   "/mcp",
   "/.well-known",
