@@ -13,7 +13,8 @@ function sectionVisual(id: string, label: string): { icon: LucideIcon; detail: s
   if (/misuse|rule|usage/.test(key)) return { icon: ShieldCheck, detail: "Correct use & common mistakes" };
   if (/icon/.test(key)) return { icon: Grid2X2, detail: "Symbols & approved sets" };
   if (/colour|color|palette/.test(key)) return { icon: Palette, detail: /type/.test(key) ? "Palette & typography" : "Values & approved combinations" };
-  if (/type|font/.test(key)) return { icon: Type, detail: "Typefaces & hierarchy" };
+  if (/type|typo|font/.test(key)) return { icon: Type, detail: "Typefaces & hierarchy" };
+  if (/social|digital|motion/.test(key)) return { icon: Globe, detail: "Screen & digital artwork" };
   if (/imag|visual|photo/.test(key)) return { icon: Image, detail: "Photography & visual references" };
   if (/file|download|format/.test(key)) return { icon: FileDown, detail: "Artwork & production files" };
   if (/logo|lockup/.test(key)) return { icon: Shapes, detail: "Original artwork & variants" };
@@ -29,16 +30,11 @@ export const BrandKitSectionNav = forwardRef<HTMLElement, BrandKitSectionNavProp
   ({ sections, variant = "grid", className, ...props }, ref) => {
     const [active, setActive] = useState("");
     useEffect(() => {
-      const observer = new IntersectionObserver((entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible[0]) setActive(visible[0].target.id);
-      }, { rootMargin: "-10% 0px -65% 0px" });
-      sections.forEach(([id]) => {
-        const section = document.getElementById(id);
-        if (section) observer.observe(section);
-      });
-      return () => observer.disconnect();
-    }, [sections]);
+      const syncHash = () => setActive(window.location.hash.slice(1));
+      syncHash();
+      window.addEventListener("hashchange", syncHash);
+      return () => window.removeEventListener("hashchange", syncHash);
+    }, []);
 
     return (
       <nav ref={ref} aria-label="Guide sections" className={cn("mt-8", className)} {...props}>
