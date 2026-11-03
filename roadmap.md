@@ -1,5 +1,8 @@
 # Roadmap — build review (Week 1)
 
+- [x] Live San Juan Bowl social template studio at /events/san-juan-bowl/social (+ public /share/san-juan-bowl/social): 6 templates × 5 native channel sizes, editable copy from announced facts only, brand grounds + 47 scene visualisations, per-size PNG and full-set ZIP downloads. Verified signed out with a real 1080×1080 download; matchup/final-score stack on narrow formats. 6 new tests; full suite has only the known London map-export failure.
+
+
 - [x] Replace brand-guide text section menus with shared visual icon navigation across NEXT, division/product guides and the NEXT kit; verified signed-out NEXT, GlobalLink and Element section destinations, narrow-screen width and 14 guide tests.
 
 - [x] Regenerated all 16 released brand/division/product/event PDFs with the latest shared layout; inspected every page, removed a blank NEXT page, and verified every released download, date and page count. Guide tests pass and preview build OK.

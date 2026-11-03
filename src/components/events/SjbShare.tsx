@@ -12,7 +12,7 @@ import logoColor from "@/assets/san-juan-bowl/sjb-logo-color.svg.asset.json";
 const SjbShareCtx = createContext(false);
 export const useSjbShare = () => useContext(SjbShareCtx);
 
-export type SjbPage = "event" | "kit" | "designers" | "single" | "lettering" | "stadium";
+export type SjbPage = "event" | "kit" | "designers" | "single" | "lettering" | "stadium" | "social";
 
 const APP_PATHS = {
   kit: "/events/san-juan-bowl/brand-kit",
@@ -20,6 +20,7 @@ const APP_PATHS = {
   single: "/events/san-juan-bowl/brand-kit/single-colour",
   lettering: "/events/san-juan-bowl/brand-kit/lettering",
   stadium: "/events/san-juan-bowl/stadium",
+  social: "/events/san-juan-bowl/social",
 } as const;
 const SHARE_PATHS = {
   kit: "/share/san-juan-bowl",
@@ -27,6 +28,7 @@ const SHARE_PATHS = {
   single: "/share/san-juan-bowl/single-colour",
   lettering: "/share/san-juan-bowl/lettering",
   stadium: "/share/san-juan-bowl/stadium",
+  social: "/share/san-juan-bowl/social",
 } as const;
 
 /** Link between Bowl guide pages; in the share view it stays inside the share link
@@ -53,6 +55,7 @@ export const SJB_SHARE_STADIUM_VISIBLE = false;
 
 const TABS: { page: Exclude<SjbPage, "event">; label: string }[] = [
   { page: "kit", label: "Brand kit" },
+  { page: "social", label: "Social templates" },
   { page: "single", label: "Single colour" },
   ...(SJB_LETTERING_SPEC_VISIBLE ? [{ page: "lettering" as const, label: "Lettering spec" }] : []),
   ...(SJB_SHARE_STADIUM_VISIBLE ? [{ page: "stadium" as const, label: "Stadium 3D" }] : []),
