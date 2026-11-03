@@ -2,7 +2,25 @@ import type { BrandGuide } from "@/lib/brand-guides";
 
 export interface KitDocumentLink { label: string; url: string }
 export interface KitDocumentAsset { title: string; image?: string; ground?: string; note?: string; links: KitDocumentLink[] }
-export interface KitDocumentSection { id: string; title: string; paragraphs?: string[]; assets?: KitDocumentAsset[]; colours?: { name: string; hex: string; detail: string }[] }
+export interface KitSafeZone { image: string; ground?: string; ratio: number; rule: string }
+export interface KitIconExample { name: string; label: string; colour: string }
+export interface KitImageExample { title: string; image: string }
+export interface KitTypeExample { heading: string; body: string }
+export interface KitDocumentSection {
+  id: string; title: string; paragraphs?: string[]; assets?: KitDocumentAsset[]; colours?: { name: string; hex: string; detail: string }[];
+  /** Diagram: clear space around the logo, `ratio` × x on every side. */
+  safeZone?: KitSafeZone;
+  /** Visual misuse cards drawn from this logo (distort, recolour, keyline, busy ground). */
+  misuse?: { image: string };
+  /** Approved icon samples (Lucide names). */
+  icons?: KitIconExample[];
+  /** Approved imagery samples from the existing pool. */
+  gallery?: KitImageExample[];
+  /** Colour balance bar: share of layout per colour. */
+  balance?: { name: string; hex: string; share: number }[];
+  /** Sample layout showing type hierarchy in use. */
+  typeExample?: KitTypeExample;
+}
 export interface KitDocument {
   id: string; name: string; version: string; intro: string;
   primary: string; accent: string; font: "Geist" | "Poppins";
@@ -19,16 +37,28 @@ export function selectKitDocumentSections(doc: KitDocument, ids: string[]): KitD
 export async function makeBrandGuideDocument(g: BrandGuide): Promise<KitDocument> {
   const { getDivisionLogos } = await import("@/lib/division-logos");
   const logos = getDivisionLogos(g.divisionId) ?? getDivisionLogos(g.slug);
+  const { getDivisionImagery } = await import("@/assets/backdrops/divisions");
+  const { brandIconSet, flatIcons, iconColorOptions } = await import("@/lib/brand-icon-sets");
+  const imagery = getDivisionImagery(g.divisionId);
+  const iconColour = iconColorOptions(g)[0]?.hex ?? g.primaryColors[0]?.hex ?? "#03002C";
+  const iconSamples = flatIcons(brandIconSet(g.slug)).slice(0, 24).map(i => ({ name: i.name, label: i.label, colour: iconColour }));
+  const gallery = imagery ? [...imagery.photos.slice(0, 6).map((image, i) => ({ title: `Photography P${String(i + 1).padStart(2, "0")}`, image })), ...imagery.abstracts.slice(0, 3).map((image, i) => ({ title: `Abstract A${String(i + 1).padStart(2, "0")}`, image }))] : [];
+  const mainLogo = logos?.color ?? logos?.black;
+  const lead = g.primaryColors[0], second = g.secondaryColors[0] ?? g.primaryColors[1], neutral = g.neutrals[0];
+  const head = g.headingScale[0], body = g.bodyScale[0];
   const assets: KitDocumentAsset[] = Object.entries(logos ?? {}).flatMap(([label, url]) => url && !/stackedWhite/.test(label) ? [{ title: label.replace(/([A-Z])/g, " $1"), image: url, ground: /white/i.test(label) ? g.primaryColors[0]?.hex : undefined, links: [{ label: "Download logo", url }] }] : []);
   return {
     id: g.slug, name: g.title, version: g.version, intro: g.intro, primary: g.primaryColors[0]?.hex ?? "#03002C", accent: g.secondaryColors[0]?.hex ?? "#003FC7", font: "Geist", cover: logos?.color ?? logos?.black,
     sections: [
       { id: "identity", title: "Identity & positioning", paragraphs: [g.subtitle, g.tagline ?? "", g.intro, ...(g.values ?? []).map(v => `${v.label}: ${v.description}`)] },
-      { id: "logos", title: "Logos & usage", paragraphs: [g.logoNotes?.headline ?? "", g.logoNotes?.body ?? "", ...g.logoRules.map(r => `${r.do ? "Do" : "Don't"}: ${r.title}. ${r.description}`)], assets },
-      { id: "colours", title: "Colour & accessibility", paragraphs: [g.colorAccessibility?.headline ?? "", ...(g.colorAccessibility?.notes ?? [])], colours: [...g.primaryColors, ...g.secondaryColors, ...g.tertiaryColors, ...g.neutrals].map(c => ({ name: c.name, hex: c.hex, detail: [c.role, c.rgb && `RGB ${c.rgb}`, c.cmyk && `CMYK ${c.cmyk}`, c.pantone && `Pantone ${c.pantone}`].filter(Boolean).join(" · ") })) },
-      { id: "type", title: "Typography", paragraphs: [`Primary: ${g.typefacePrimary}. Web: ${g.typefaceWeb}.`, g.typeScaleNotes ?? "", ...[...g.headingScale, ...g.bodyScale].map(t => `${t.label} · ${t.sizePx}px · weight ${t.weight} · ${t.leading ?? ""} leading · ${t.sample}`)] },
-      { id: "imagery", title: "Photography & visual direction", paragraphs: [g.photography ?? "", g.brandVisuals ?? "", ...(g.photographyRules?.do ?? []).map(t => `Do: ${t}`), ...(g.photographyRules?.dont ?? []).map(t => `Don't: ${t}`)] },
-      ...(g.iconography ? [{ id: "icons", title: "Iconography", paragraphs: [g.iconography.headline, g.iconography.body], assets: g.iconography.sourceUrl ? [{ title: "Icon library", note: "Approved icon foundation named in the brand guide.", links: [{ label: "Open icon library", url: g.iconography.sourceUrl }] }] : [] }] : []),
+      { id: "logos", title: "Logos & usage", paragraphs: [g.logoNotes?.headline ?? "", g.logoNotes?.body ?? "", ...g.logoRules.map(r => `${r.do ? "Do" : "Don't"}: ${r.title}. ${r.description}`)], assets,
+        ...(mainLogo ? { safeZone: { image: mainLogo, ratio: 1.5, rule: "Clear space is 1.5× the height of the T symbol (x) on every side. Keep text, edges and other marks outside it." }, misuse: { image: mainLogo } } : {}) },
+      { id: "colours", title: "Colour & accessibility", paragraphs: [g.colorAccessibility?.headline ?? "", ...(g.colorAccessibility?.notes ?? [])], colours: [...g.primaryColors, ...g.secondaryColors, ...g.tertiaryColors, ...g.neutrals].map(c => ({ name: c.name, hex: c.hex, detail: [c.role, c.rgb && `RGB ${c.rgb}`, c.cmyk && `CMYK ${c.cmyk}`, c.pantone && `Pantone ${c.pantone}`].filter(Boolean).join(" · ") })),
+        ...(lead && second ? { balance: [{ name: lead.name, hex: lead.hex, share: 60 }, ...(neutral ? [{ name: neutral.name, hex: neutral.hex, share: 30 }] : []), { name: second.name, hex: second.hex, share: neutral ? 10 : 40 }] } : {}) },
+      { id: "type", title: "Typography", paragraphs: [`Primary: ${g.typefacePrimary}. Web: ${g.typefaceWeb}.`, g.typeScaleNotes ?? "", ...[...g.headingScale, ...g.bodyScale].map(t => `${t.label} · ${t.sizePx}px · weight ${t.weight} · ${t.leading ?? ""} leading · ${t.sample}`)],
+        ...(head && body ? { typeExample: { heading: head.sample, body: body.sample } } : {}) },
+      { id: "imagery", title: "Photography & visual direction", paragraphs: [g.photography ?? "", g.brandVisuals ?? "", ...(g.photographyRules?.do ?? []).map(t => `Do: ${t}`), ...(g.photographyRules?.dont ?? []).map(t => `Don't: ${t}`)], gallery },
+      ...(g.iconography || iconSamples.length ? [{ id: "icons", title: "Iconography", paragraphs: [g.iconography?.headline ?? "", g.iconography?.body ?? ""], icons: iconSamples, assets: g.iconography?.sourceUrl ? [{ title: "Icon library", note: "Approved icon foundation named in the brand guide.", links: [{ label: "Open icon library", url: g.iconography.sourceUrl }] }] : [] }] : []),
       { id: "applications", title: "Applications & brand family", paragraphs: [...(g.subBrands ?? []).flatMap(s => [s.group, s.items.join(" · ")]), ...(g.socialMedia ?? []).flatMap(s => [s.platform, ...s.rules]), g.motion?.headline ?? "", g.motion?.body ?? ""] },
       { id: "resources", title: "Sources & downloads", assets: [{ title: "Brand source", note: "The web guide may require staff sign-in. Original source access is controlled by its owner.", links: [{ label: "Live brand guide (staff)", url: `/knowledge/brand-guides/${g.slug}` }, ...(g.sourceUrl ? [{ label: "Original source", url: g.sourceUrl }] : [])] }] },
     ],
