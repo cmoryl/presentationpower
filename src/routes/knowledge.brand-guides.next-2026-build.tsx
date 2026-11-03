@@ -130,10 +130,6 @@ function NextBuildReference() {
     })).filter((s) => s.blocks.length > 0);
   }, [query]);
 
-  const tableCount = SECTIONS.reduce(
-    (n, s) => n + s.blocks.filter((b) => b.t === "table").length,
-    0,
-  );
 
   return (
     <AppShell>
@@ -150,18 +146,6 @@ function NextBuildReference() {
             formats, Canva asset and element IDs for direct API edits, build status and decisions,
             the team knowledge base, the live folder directory and the native PowerPoint masters.
           </p>
-          <div className="mt-8 flex flex-wrap gap-8 text-sm">
-            {[
-              [String(SECTIONS.length), "Reference sections"],
-              [String(tableCount), "ID / spec tables"],
-              ["28", "Documented formats"],
-            ].map(([n, l]) => (
-              <div key={l}>
-                <div className="text-3xl font-semibold tabular-nums">{n}</div>
-                <div className="text-white/55">{l}</div>
-              </div>
-            ))}
-          </div>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link
               to={"/knowledge/brand-guides/next-2026" as never}

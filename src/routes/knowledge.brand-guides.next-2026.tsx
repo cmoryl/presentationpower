@@ -242,12 +242,6 @@ function NextBrandGuide() {
 
   const [iconSlug, setIconSlug] = useState(NEXT_EVENT_ICON_SLUG);
   const iconHero = useMemo(() => iconColorOptions(iconSlug)[1]?.hex ?? NAVY, [iconSlug]);
-  const iconGlyphCount = useMemo(
-    () => brandIconSet(NEXT_EVENT_ICON_SLUG).subAreas.reduce((n, a) => n + a.icons.length, 0),
-    [],
-  );
-
-  const lockupCount = NEXT_DIVISIONS.reduce((n, d) => n + d.lockups.length, 0);
 
   return (
     <AppShell>
@@ -280,19 +274,6 @@ function NextBrandGuide() {
             Twelve track lockups, one master lockup, one palette, one set of rules — built directly
             from the released vector masters.
           </p>
-          <div className="mt-8 flex flex-wrap gap-8 text-sm">
-            {[
-              [String(NEXT_DIVISIONS.length), "Lockup families"],
-              [String(lockupCount), "Approved lockups"],
-              [String(NEXT_DIVISIONS.length - 2), "Track accents"],
-              [String(iconGlyphCount), "Event icons"],
-            ].map(([n, l]) => (
-              <div key={l}>
-                <div className="text-3xl font-semibold tabular-nums">{n}</div>
-                <div className="text-white/55">{l}</div>
-              </div>
-            ))}
-          </div>
           <div className="mt-9 flex flex-wrap gap-3">
             <a
               href={NEXT_DROPBOX_URL}
