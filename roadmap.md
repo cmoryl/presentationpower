@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Replace brand-guide text section menus with shared visual icon navigation; verify destinations and signed-out browsing.
+- [x] Replace brand-guide text section menus with shared visual icon navigation across NEXT, division/product guides and the NEXT kit; verified signed-out NEXT, GlobalLink and Element section destinations, narrow-screen width and 14 guide tests.
 
 - [x] Regenerated all 16 released brand/division/product/event PDFs with the latest shared layout; inspected every page, removed a blank NEXT page, and verified every released download, date and page count. Guide tests pass and preview build OK.
 
