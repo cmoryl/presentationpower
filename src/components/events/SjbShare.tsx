@@ -12,7 +12,7 @@ import logoColor from "@/assets/san-juan-bowl/sjb-logo-color.svg.asset.json";
 const SjbShareCtx = createContext(false);
 export const useSjbShare = () => useContext(SjbShareCtx);
 
-export type SjbPage = "event" | "kit" | "designers" | "single" | "lettering" | "stadium";
+export type SjbPage = "event" | "kit" | "designers" | "single" | "lettering" | "stadium" | "social";
 
 const APP_PATHS = {
   kit: "/events/san-juan-bowl/brand-kit",
@@ -20,6 +20,7 @@ const APP_PATHS = {
   single: "/events/san-juan-bowl/brand-kit/single-colour",
   lettering: "/events/san-juan-bowl/brand-kit/lettering",
   stadium: "/events/san-juan-bowl/stadium",
+  social: "/events/san-juan-bowl/social",
 } as const;
 const SHARE_PATHS = {
   kit: "/share/san-juan-bowl",
@@ -27,6 +28,7 @@ const SHARE_PATHS = {
   single: "/share/san-juan-bowl/single-colour",
   lettering: "/share/san-juan-bowl/lettering",
   stadium: "/share/san-juan-bowl/stadium",
+  social: "/share/san-juan-bowl/social",
 } as const;
 
 /** Link between Bowl guide pages; in the share view it stays inside the share link
