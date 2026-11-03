@@ -1,3 +1,4 @@
+import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
@@ -186,18 +187,8 @@ function NextBuildReference() {
         </div>
       </header>
 
-      <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <nav className="flex flex-wrap gap-2" aria-label="Reference sections">
-          {SECTIONS.map((s) => (
-            <a
-              key={s.id}
-              href={`#${s.id}`}
-              className="rounded-full border border-black/15 px-4 py-1.5 text-xs text-black/70 transition hover:border-black/40 dark:border-white/15 dark:text-white/70 dark:hover:border-white/40"
-            >
-              {s.title}
-            </a>
-          ))}
-        </nav>
+      <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <BrandKitSectionNav sections={SECTIONS.map((s) => [s.id, s.title] as const)} aria-label="Reference sections" className="mt-0 flex-1" />
         <label className="flex items-center gap-2 text-sm">
           <span className="sr-only">Search the build reference</span>
           <input
