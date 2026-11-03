@@ -111,7 +111,9 @@ interface CardProps {
 
 /** One social card at native export size. Text is live Geist. */
 export function SjbSocialCard({ template, format, copy, ground }: CardProps) {
-  const u = format.height / 1080;
+  // Scale by the smaller edge so wide rows never overflow tall-narrow formats.
+  const u = Math.min(format.width, format.height) / 1080;
+  const narrow = format.width < 1300;
   const dark = ground.logoVariant === "dark";
   const logo = dark ? SJB_LOGOS[1] : SJB_LOGOS[0];
   const ink = dark ? WHITE : NAVY;
@@ -159,9 +161,16 @@ export function SjbSocialCard({ template, format, copy, ground }: CardProps) {
       body = (
         <div style={center}>
           <p style={detail}>{SJB_EVENT.name}</p>
-          <div style={{ display: "flex", alignItems: "center", gap: 48 * u }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: narrow ? "column" : "row",
+              alignItems: "center",
+              gap: (narrow ? 20 : 48) * u,
+            }}
+          >
             <span style={{ ...headline, fontSize: 92 * u, textTransform: "uppercase" }}>{text("teamA")}</span>
-            {badge(200)}
+            {badge(narrow ? 170 : 200)}
             <span style={{ ...headline, fontSize: 92 * u, textTransform: "uppercase" }}>{text("teamB")}</span>
           </div>
           {rule}
