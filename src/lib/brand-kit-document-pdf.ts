@@ -129,8 +129,8 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
     const cols = 4, w = (CW - G * (cols - 1)) / cols;
     for (let i = 0; i < list.length; i += cols) {
       const row = list.slice(i, i + cols);
-      const details = row.map(c => c.detail.split(" · ").filter(Boolean));
-      font(8.5); const h = 84 + 32 + Math.max(...details.map(d => d.reduce((n, v) => n + wrap(v, w - 20).length, 0))) * 12 + 34;
+      const details = row.map(c => c.detail.replace(/\s+/g, " ").split(" · ").map(d => d.trim()).filter(Boolean));
+      font(8.5); const h = 84 + 32 + 14 + Math.max(...details.map(d => d.reduce((n, v) => n + wrap(v, w - 20).length, 0))) * 12 + 34;
       need(h + G);
       row.forEach((c, j) => {
         const x = M + j * (w + G);
@@ -141,8 +141,9 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
         font(11, true); doc.text(wrap(c.name, w - 20)[0], x + 10, y + 102); font(9, true, primary); doc.text(c.hex.toUpperCase(), x + 10, y + 115);
         let yy = y + 131; font(8.5, false, muted);
         for (const d of details[j]) { const ls = wrap(d, w - 20); doc.text(ls, x + 10, yy); yy += ls.length * 12; }
-        const badge = (label: string, r: number, bx: number) => { const pass = r >= 4.5; font(7.5, true, pass ? okC : muted); doc.text(`${label} ${r.toFixed(1)}:1 ${pass ? "AA" : r >= 3 ? "AA large" : "—"}`, bx, y + h - 12); };
-        badge("on white", onWhite, x + 10); badge("on ink", onInk, x + w / 2 + 2);
+        const badge = (label: string, r: number, by: number) => { const pass = r >= 4.5; font(7.5, true, pass ? okC : muted); doc.text(`${label} ${r.toFixed(1)}:1 · ${pass ? "AA" : r >= 3 ? "AA large only" : "not for text"}`, x + 10, by); };
+        doc.setDrawColor(...line).line(x + 10, y + h - 36, x + w - 10, y + h - 36);
+        badge("On white", onWhite, y + h - 22); badge("On ink", onInk, y + h - 10);
       });
       y += h + G;
     }
@@ -227,7 +228,8 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   // ---------- Sections ----------
   for (const [i, section] of sections.entries()) {
     progress?.(`Designing ${section.title}…`);
-    current = { no: String(i + 1).padStart(2, "0"), title: section.title }; newPage();
+    current = { no: String(i + 1).padStart(2, "0"), title: section.title };
+    if (i === 0 || y > BOTTOM - 230) newPage(); else { y += 18; doc.setDrawColor(...line).setLineWidth(0.6).line(M, y, W - M, y); y += 26; }
     contents.push({ no: current.no, title: section.title, page: doc.getNumberOfPages() });
     font(44, true, accent); doc.text(current.no, M, y + 30); font(24, true); const tl = wrap(section.title, CW - 90); doc.text(tl, M + 84, y + 26); y += Math.max(48, tl.length * 28 + 18);
     doc.setFillColor(...primary).rect(M, y, 40, 3, "F"); y += 22;
