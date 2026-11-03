@@ -93,3 +93,29 @@ export async function makeKitDocument(id: KitDocumentId, shareUrl?: string): Pro
     ],
   };
 }
+/** Content blocks the PDF lays out as infographics instead of running text. */
+export type KitBlock =
+  | { kind: "text"; text: string }
+  | { kind: "rule"; do: boolean; text: string }
+  | { kind: "spec"; label: string; value: string }
+  | { kind: "type"; label: string; size: number; weight: number; sample: string };
+
+/** Classifies authored paragraph strings; never rewrites their wording. */
+export function classifyKitParagraphs(paragraphs: string[] = []): KitBlock[] {
+  return paragraphs.map(p => p.trim()).filter(Boolean).map((p): KitBlock => {
+    const rule = /^(Do|Don't|Don’t):\s*(.+)$/s.exec(p);
+    if (rule) return { kind: "rule", do: rule[1] === "Do", text: rule[2] };
+    const type = /^(.+?) · (\d+(?:\.\d+)?)px · weight (\d+)(?: · .*?)? · (.+)$/.exec(p);
+    if (type) return { kind: "type", label: type[1], size: Number(type[2]), weight: Number(type[3]), sample: type[4] };
+    const spec = /^([^:.]{2,42}):\s+(.{1,220})$/s.exec(p);
+    if (spec && !/https?$/i.test(spec[1])) return { kind: "spec", label: spec[1], value: spec[2] };
+    return { kind: "text", text: p };
+  });
+}
+
+/** WCAG 2.x contrast ratio between two #RRGGBB colours. */
+export function kitContrast(a: string, b: string): number {
+  const lum = (hex: string) => { const [r, g, bl] = [1, 3, 5].map(i => { const c = parseInt(hex.slice(i, i + 2), 16) / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * bl; };
+  const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m);
+  return (x + 0.05) / (y + 0.05);
+}

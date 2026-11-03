@@ -26,3 +26,16 @@ describe("Brand-kit PDF selection", () => {
     expect(isPublicNoLoginPath(`/events/kits/${id}/edit`)).toBe(false);
   });
 });
+import { classifyKitParagraphs, kitContrast } from "../brand-kit-document";
+describe("Brand-kit PDF infographic blocks", () => {
+  it("turns Do/Don't lines into rule cards and keeps their wording", () => {
+    expect(classifyKitParagraphs(["Don't: Stretch the badge."])).toEqual([{ kind: "rule", do: false, text: "Stretch the badge." }]);
+  });
+  it("reads type-scale lines as specimens", () => {
+    expect(classifyKitParagraphs(["H1 · 48px · weight 700 · tight leading · Hello"])[0]).toEqual({ kind: "type", label: "H1", size: 48, weight: 700, sample: "Hello" });
+  });
+  it("computes WCAG contrast (white on ink passes AA)", () => {
+    expect(kitContrast("#FFFFFF", "#000000")).toBeCloseTo(21, 0);
+    expect(kitContrast("#FFFFFF", "#03002C")).toBeGreaterThan(4.5);
+  });
+});
