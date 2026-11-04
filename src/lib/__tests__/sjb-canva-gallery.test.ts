@@ -19,7 +19,7 @@ describe('Bowl Canva gallery', () => {
     expect(saved).toHaveLength(10);
     expect(saved.every(d => !d.draftTransactionId)).toBe(true);
     const drafts = stadium.filter(d => d.status === 'draft');
-    expect(drafts.map(d => d.id).sort()).toEqual(['DAHZ-KEtDD4', 'DAHZ-M0tbyNo', 'DAHZ-MakbIc', 'DAHZ-OfkGy2w'].sort());
+    expect(drafts.map(d => d.id).sort()).toEqual(['DAHZ-KEtDD4', 'DAHZ-Qz7ysE', 'DAHZ-aWPdWY', 'DAHZ-eoZTJU'].sort());
     expect(drafts.every(d => Boolean(d.draftTransactionId))).toBe(true);
     expect(new Set(drafts.map(d => d.draftTransactionId)).size).toBe(4);
   });
