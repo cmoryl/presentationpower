@@ -31,14 +31,14 @@ describe('Bowl Canva gallery', () => {
   it('ticket versions belong to each existing look, never a separate collection', () => {
     expect(SJB_CANVA_COLLECTIONS.map(c => c.id)).not.toContain('tickets');
     const tickets = SJB_CANVA_GALLERY.filter(d => d.campaign === 'tickets');
-    expect(tickets).toHaveLength(25);
-    for (const style of ['bold-graphic', 'stadium-night', 'action-spotlight', 'launch', 'light-action']) {
+    expect(tickets).toHaveLength(30);
+    for (const style of ['bold-graphic', 'stadium-night', 'action-spotlight', 'launch', 'light-action', 'light-cinematic']) {
       const versions = tickets.filter(d => d.collectionId === style);
       expect(versions).toHaveLength(5);
       expect(versions.map(d => `${d.width}×${d.height}`).sort()).toEqual(['1080×1350', '1080×1440', '1080×1920', '1600×900', style === 'bold-graphic' ? '1200×630' : '1200×628'].sort());
       expect(filterSjbCanvaDesigns(style, 'all', 'Tickets on sale')).toHaveLength(5);
     }
-    expect(new Set(tickets.map(d => d.id)).size).toBe(25);
+    expect(new Set(tickets.map(d => d.id)).size).toBe(30);
     expect(tickets.every(d => d.status === 'saved' && !d.draftTransactionId)).toBe(true);
   });
   it('email artwork stays within each established look at the three supplied sizes', () => {
