@@ -7,6 +7,14 @@ describe('Bowl Canva gallery', () => {
     expect(drafts.filter(d => d.collectionId === 'stadium-night')).toHaveLength(6);
     expect(drafts.filter(d => d.collectionId === 'bold-graphic')).toHaveLength(5);
   });
+  it('keeps all eleven Stadium Night render revisions unsaved and traceable', () => {
+    const stadium = filterSjbCanvaDesigns('stadium-night', 'all', 'all');
+    expect(stadium).toHaveLength(11);
+    expect(stadium.every(d => d.provenance === 'artistic-render')).toBe(true);
+    expect(stadium.every(d => d.status === 'draft' && Boolean(d.draftTransactionId))).toBe(true);
+    expect(new Set(stadium.map(d => d.draftTransactionId)).size).toBe(11);
+    expect(stadium.find(d => d.id === 'DAHZ9kjer6Y')?.draftTransactionId).toBe('7169125843754127139');
+  });
   it('uses actual Canva sizes, not the old square label', () => {
     expect(SJB_CANVA_GALLERY.find(d => d.id === 'DAHZ9nvVT-Q')).toMatchObject({ width: 1080, height: 1440 });
     expect(SJB_CANVA_GALLERY.find(d => d.id === 'DAHZ9qo9-Do')).toMatchObject({ width: 1200, height: 628 });
