@@ -50,10 +50,10 @@ import emailActionHeader from '@/assets/sjb-canva/canopy-email-action-header.png
 import emailActionSignature from '@/assets/sjb-canva/canopy-email-action-signature.png.asset.json';
 
 export const SJB_CANVA_COLLECTIONS = [
-  { id: 'bold-graphic', name: 'Bold Graphic Campaign', folderId: 'FAHZ9_NN2FQ' },
-  { id: 'stadium-night', name: 'Stadium Night Campaign', folderId: 'FAHZ93d8ki8' },
-  { id: 'action-spotlight', name: 'Action Spotlight Campaign', folderId: 'FAHZ90BI6Mo' },
-  { id: 'launch', name: 'Launch Campaign', folderId: 'FAHZ99Po6eg' },
+  { id: 'bold-graphic', name: 'Design Set 1', folderId: 'FAHZ9_NN2FQ' },
+  { id: 'stadium-night', name: 'Design Set 2', folderId: 'FAHZ93d8ki8' },
+  { id: 'action-spotlight', name: 'Design Set 3', folderId: 'FAHZ90BI6Mo' },
+  { id: 'launch', name: 'Design Set 4', folderId: 'FAHZ99Po6eg' },
 ] as const;
 export type SjbCanvaCollectionId = typeof SJB_CANVA_COLLECTIONS[number]['id'];
 export interface SjbCanvaGalleryDesign {
