@@ -43,19 +43,19 @@ describe('Bowl Canva gallery', () => {
   });
   it('email artwork stays within each established look at the three supplied sizes', () => {
     expect(SJB_CANVA_COLLECTIONS.map(c => c.id)).not.toContain('email');
-    expect(SJB_CANVA_GALLERY.filter(d => d.format)).toHaveLength(15);
-    for (const style of ['bold-graphic', 'stadium-night', 'action-spotlight', 'launch', 'light-action']) {
+    expect(SJB_CANVA_GALLERY.filter(d => d.format)).toHaveLength(18);
+    for (const style of ['bold-graphic', 'stadium-night', 'action-spotlight', 'launch', 'light-action', 'light-cinematic']) {
       const email = filterSjbCanvaDesigns(style, 'all', 'all').filter(d => d.format);
       expect(email.map(d => [d.format, d.width, d.height])).toEqual(
-        style === 'light-action'
+        style === 'light-action' || style === 'light-cinematic'
           ? [['email-hero', 600, 200], ['email-header', 600, 200], ['email-signature', 400, 200]]
           : [['email-hero', 1200, 600], ['email-header', 1200, 300], ['email-signature', 1200, 200]],
       );
       expect(email.every(d => d.status === 'saved' && !d.draftTransactionId)).toBe(true);
     }
   });
-  it('covers all five social formats in every one of the five design sets', () => {
-    expect(SJB_CANVA_COLLECTIONS).toHaveLength(5);
+  it('covers all five social formats in every one of the six design sets', () => {
+    expect(SJB_CANVA_COLLECTIONS).toHaveLength(6);
     for (const { id } of SJB_CANVA_COLLECTIONS) {
       const social = filterSjbCanvaDesigns(id, 'all', 'all').filter(d => ['Instagram post', 'Portrait post', 'Instagram Story', 'Wide post', 'Facebook ad'].includes(d.name));
       expect(social).toHaveLength(5);
