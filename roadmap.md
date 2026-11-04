@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Complete campaign parity: common five top-level categories and six Campaign Variations folders created for all four looks; Launch social/ticket/email copies filed. Bold three portrait/social drafts, five gold football/palm ticket previews and three reflowed emails synced to Element; Launch three emails and wide ticket synced. Six gallery tests pass, live Bold ticket/Launch header filters verified, build OK. Remaining: populate six variation folders in Bold/Stadium/Action, finish Launch size adaptations, normalize legacy social folder names, and verify every Canva draft pairing before saving. All artwork edits remain unsaved pending explicit approval.
+
 - [x] Replace rejected palm emails with nine style-specific hero/header/signature previews and refresh eleven Stadium Night social/ticket previews with original canopy/action artwork; reviewed all twenty, removed empty logo frames and refined venue-text spacing, six gallery tests pass, both public/signed-in pages and mobile enlargement verified, learning signal logged. All twenty Canva revisions remain unsaved.
 
 - [x] Restored five original saved Bold Graphic layouts in Element instead of simplified helmet drafts; Canva originals and ticket versions untouched. All five downloaded previews inspected, six gallery tests pass, live original images and enlargement verified, build OK; actual Facebook original is 1200×630.
