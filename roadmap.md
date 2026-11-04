@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Replace rejected palm emails with each look's own hero/header/signature artwork and refresh Stadium Night with the referenced original upper-canopy shots in Canva and Element.
+
 - [x] Restored five original saved Bold Graphic layouts in Element instead of simplified helmet drafts; Canva originals and ticket versions untouched. All five downloaded previews inspected, six gallery tests pass, live original images and enlargement verified, build OK; actual Facebook original is 1200×630.
 - [x] Refreshed eleven Stadium Night previews with original Element stadium renders: six social layouts and five ticket sizes; all inspected and added to the shared gallery as artistic visualisations. Six gallery tests pass; public filters, ticket images, enlargement and phone width verified. Canva revisions remain unsaved pending approval.
 - [x] Replaced separate Tickets On Sale collection with fifteen ticket previews: five existing sizes each under Bold Graphic, Stadium Night and Action Spotlight. Canva copies filed in each look's Tickets On Sale subfolder; old separate collection preserved under Assets. Gallery tests and desktop/mobile checks pass. Ticket artwork revisions remain unsaved pending explicit preview approval; transaction IDs are recorded with each gallery entry.
