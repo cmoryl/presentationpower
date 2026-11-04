@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { SJB_CANVA_COLLECTIONS, SJB_CANVA_GALLERY, filterSjbCanvaDesigns } from '../sjb-canva-gallery';
 describe('Bowl Canva gallery', () => {
-  it('keeps reviewed campaign adaptations unsaved', () => {
+  it('keeps only un-reviewed campaign adaptations unsaved', () => {
     const drafts = SJB_CANVA_GALLERY.filter(d => d.status === 'draft' && !d.format && d.campaign !== 'tickets');
-    expect(drafts).toHaveLength(8);
+    expect(drafts).toHaveLength(5);
     expect(drafts.filter(d => d.collectionId === 'stadium-night')).toHaveLength(0);
-    expect(drafts.filter(d => d.collectionId === 'bold-graphic')).toHaveLength(3);
+    expect(drafts.filter(d => d.collectionId === 'bold-graphic')).toHaveLength(0);
     const originals = SJB_CANVA_GALLERY.filter(d => d.collectionId === 'bold-graphic' && !d.format && d.campaign !== 'tickets');
     expect(originals).toHaveLength(5);
-    expect(originals.filter(d => d.status === 'saved')).toHaveLength(2);
+    expect(originals.filter(d => d.status === 'saved')).toHaveLength(5);
     expect(originals.every(d => d.provenance === 'illustration')).toBe(true);
   });
   it('tracks the fourteen Stadium Night render revisions, thirteen saved and one still drafting', () => {
