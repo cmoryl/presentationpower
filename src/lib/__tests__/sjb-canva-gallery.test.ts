@@ -11,16 +11,13 @@ describe('Bowl Canva gallery', () => {
     expect(originals.filter(d => d.status === 'saved')).toHaveLength(5);
     expect(originals.every(d => d.provenance === 'illustration')).toBe(true);
   });
-  it('tracks the fourteen Stadium Night render revisions, thirteen saved and one still drafting', () => {
+  it('tracks the fourteen Stadium Night render revisions, all saved', () => {
     const stadium = filterSjbCanvaDesigns('stadium-night', 'all', 'all');
     expect(stadium).toHaveLength(14);
     expect(stadium.every(d => d.provenance === 'artistic-render')).toBe(true);
     const saved = stadium.filter(d => d.status === 'saved');
-    expect(saved).toHaveLength(13);
+    expect(saved).toHaveLength(14);
     expect(saved.every(d => !d.draftTransactionId)).toBe(true);
-    const drafts = stadium.filter(d => d.status === 'draft');
-    expect(drafts.map(d => d.id)).toEqual(['DAHZ-KEtDD4']);
-    expect(drafts.every(d => Boolean(d.draftTransactionId))).toBe(true);
   });
   it('uses actual Canva sizes, not the old square label', () => {
     expect(SJB_CANVA_GALLERY.find(d => d.id === 'DAHZ-Soacj8')).toMatchObject({ width: 1080, height: 1440 });
@@ -42,13 +39,7 @@ describe('Bowl Canva gallery', () => {
       expect(filterSjbCanvaDesigns(style, 'all', 'Tickets on sale')).toHaveLength(5);
     }
     expect(new Set(tickets.map(d => d.id)).size).toBe(20);
-    const boldTickets = tickets.filter(d => d.collectionId === 'bold-graphic');
-    expect(boldTickets.every(d => d.status === 'saved' && !d.draftTransactionId)).toBe(true);
-    const nonStadium = tickets.filter(d => d.collectionId !== 'stadium-night' && d.collectionId !== 'bold-graphic');
-    expect(nonStadium.every(d => d.status === 'draft' && Boolean(d.draftTransactionId))).toBe(true);
-    const stadiumTickets = tickets.filter(d => d.collectionId === 'stadium-night');
-    expect(stadiumTickets.filter(d => d.status === 'saved')).toHaveLength(4);
-    expect(stadiumTickets.find(d => d.id === 'DAHZ-KEtDD4')?.status).toBe('draft');
+    expect(tickets.every(d => d.status === 'saved' && !d.draftTransactionId)).toBe(true);
   });
   it('email artwork stays within each established look at the three supplied sizes', () => {
     expect(SJB_CANVA_COLLECTIONS.map(c => c.id)).not.toContain('email');
