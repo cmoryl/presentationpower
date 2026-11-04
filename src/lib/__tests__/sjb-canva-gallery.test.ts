@@ -17,7 +17,7 @@ describe('Bowl Canva gallery', () => {
     expect(stadium.every(d => d.provenance === 'artistic-render')).toBe(true);
     expect(stadium.every(d => d.status === 'draft' && Boolean(d.draftTransactionId))).toBe(true);
     expect(new Set(stadium.map(d => d.draftTransactionId)).size).toBe(14);
-    expect(stadium.find(d => d.id === 'DAHZ9kjer6Y')?.draftTransactionId).toBe('5463387488312995695');
+    expect(stadium.find(d => d.id === 'DAHZ9kjer6Y')?.draftTransactionId).toBe('4256422794818486742');
   });
   it('uses actual Canva sizes, not the old square label', () => {
     expect(SJB_CANVA_GALLERY.find(d => d.id === 'DAHZ-Soacj8')).toMatchObject({ width: 1080, height: 1440 });
