@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Unify Stadium Night / Design Set 2 across fourteen social, ticket and email examples with shared gold separators, consistent typography and clear logo/content separation; preserve supplied stadium imagery and keep Canva changes as reviewed drafts.
+
 - [ ] Complete Design Set 1–4 matching variation/size coverage in Canva and Element using each set's own master assets. Four sets confirmed; no fifth set. Five socials, five tickets and three emails now have verified examples in every set. Six portrait variation copies filed per set; remaining variation sizes and final visual review still needed. Review all adaptations before any Canva draft save.
 
 - [ ] Six supplied stadium backgrounds uploaded successfully and applied to fourteen Stadium Night social/ticket/email drafts, synced to Element. No re-render or upscale. Filing into existing Assets folder blocked by Canva access refusal; draft saving awaits explicit approval.
