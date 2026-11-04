@@ -30,6 +30,15 @@ import ticketsWide1 from '@/assets/sjb-canva/tickets-wide-1.png.asset.json';
 import ticketsWide2 from '@/assets/sjb-canva/tickets-wide-2.png.asset.json';
 import ticketsLink1 from '@/assets/sjb-canva/tickets-link-1.png.asset.json';
 import ticketsLink2 from '@/assets/sjb-canva/tickets-link-2.png.asset.json';
+import emailHeroBadge from '@/assets/sjb-canva/email-hero-badge.png.asset.json';
+import emailHeroMatchup from '@/assets/sjb-canva/email-hero-matchup.png.asset.json';
+import emailHeroAction from '@/assets/sjb-canva/email-hero-action.png.asset.json';
+import emailHeaderBadge from '@/assets/sjb-canva/email-header-badge-draft.png.asset.json';
+import emailHeaderMatchup from '@/assets/sjb-canva/email-header-matchup-draft.png.asset.json';
+import emailHeaderAction from '@/assets/sjb-canva/email-header-action.png.asset.json';
+import emailSignatureBadge from '@/assets/sjb-canva/email-signature-badge-draft.png.asset.json';
+import emailSignatureMatchup from '@/assets/sjb-canva/email-signature-matchup-draft.png.asset.json';
+import emailSignatureAction from '@/assets/sjb-canva/email-signature-action.png.asset.json';
 
 export const SJB_CANVA_COLLECTIONS = [
   { id: 'bold-graphic', name: 'Bold Graphic', folderId: 'FAHZ9_NN2FQ' },
@@ -37,6 +46,7 @@ export const SJB_CANVA_COLLECTIONS = [
   { id: 'action-spotlight', name: 'Action Spotlight', folderId: 'FAHZ90BI6Mo' },
   { id: 'launch', name: 'Launch Ads', folderId: 'FAHZ99Po6eg' },
   { id: 'tickets', name: 'Tickets On Sale', folderId: 'FAHZ-E2iiCU' },
+  { id: 'email', name: 'Email Campaign', folderId: 'FAHZ-NXtUsQ' },
 ] as const;
 export type SjbCanvaCollectionId = typeof SJB_CANVA_COLLECTIONS[number]['id'];
 export interface SjbCanvaGalleryDesign {
@@ -88,6 +98,15 @@ export const SJB_CANVA_GALLERY: readonly SjbCanvaGalleryDesign[] = [
     `${format.id}:page-${index + 1}`, 'tickets', index === 0 ? 'Tickets on sale · Badge' : 'Tickets on sale · Matchup',
     format.width, format.height, asset, 'saved', 'supplied-artwork', format.url,
   ))),
+  design('DAHZ-P9AtRQ:page-1', 'email', 'Email hero · Tickets', 1200, 600, emailHeroBadge, 'saved', 'supplied-artwork', 'https://www.canva.com/d/aKZWJqiNBpEEFG0'),
+  design('DAHZ-P9AtRQ:page-2', 'email', 'Email hero · Matchup', 1200, 600, emailHeroMatchup, 'saved', 'supplied-artwork', 'https://www.canva.com/d/aKZWJqiNBpEEFG0'),
+  design('DAHZ-DriNbg', 'email', 'Email hero · Action', 1200, 600, emailHeroAction, 'saved', 'illustration', 'https://www.canva.com/d/KygXhOJv_JKO1Qb'),
+  design('DAHZ-HQ5HSY:page-1', 'email', 'Email header · Tickets', 1200, 300, emailHeaderBadge, 'draft', 'supplied-artwork', 'https://www.canva.com/d/b_-YwPht-y-7VjI'),
+  design('DAHZ-HQ5HSY:page-2', 'email', 'Email header · Matchup', 1200, 300, emailHeaderMatchup, 'draft', 'supplied-artwork', 'https://www.canva.com/d/b_-YwPht-y-7VjI'),
+  design('DAHZ-FqKmoM', 'email', 'Email header · Action', 1200, 300, emailHeaderAction, 'saved', 'illustration', 'https://www.canva.com/d/KyxaAUc2EXzvaPp'),
+  design('DAHZ-DoHqJI:page-1', 'email', 'Signature banner · Tickets', 1200, 200, emailSignatureBadge, 'draft', 'supplied-artwork', 'https://www.canva.com/d/m8wv9F0eKEQELfp'),
+  design('DAHZ-DoHqJI:page-2', 'email', 'Signature banner · Matchup', 1200, 200, emailSignatureMatchup, 'draft', 'supplied-artwork', 'https://www.canva.com/d/m8wv9F0eKEQELfp'),
+  design('DAHZ-NCRcNQ', 'email', 'Signature banner · Action', 1200, 200, emailSignatureAction, 'saved', 'illustration', 'https://www.canva.com/d/QnKz_2M0AVLFbbJ'),
 ];
 export function sjbCanvaSize(d: Pick<SjbCanvaGalleryDesign, 'width' | 'height'>) { return `${d.width}×${d.height}`; }
 export function filterSjbCanvaDesigns(collectionId: string, size: string, name: string) {
