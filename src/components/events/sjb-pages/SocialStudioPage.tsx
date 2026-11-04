@@ -24,8 +24,8 @@ export function SjbSocialStudio() {
         <div><p className="text-sm text-muted-foreground">{SJB_EVENT.name}</p><h1 className="mt-1 text-3xl font-bold">Social designs</h1><p className="mt-2 text-sm text-muted-foreground">Canva collection · {SJB_CANVA_GALLERY.length} designs · Preview edition</p></div>
         <Button asChild variant="outline"><a href={SJB_CANVA_FOLDER_URL} target="_blank" rel="noreferrer"><ExternalLink />Canva folder</a></Button>
       </header>
-      <nav aria-label="Design collections" className="mt-6 flex flex-wrap gap-2">
-        <Button variant={collectionId === 'all' ? 'default' : 'outline'} onClick={() => setCollectionId('all')} aria-pressed={collectionId === 'all'}>All collections</Button>
+      <nav aria-label="Design campaigns" className="mt-6 flex flex-wrap gap-2">
+        <Button variant={collectionId === 'all' ? 'default' : 'outline'} onClick={() => setCollectionId('all')} aria-pressed={collectionId === 'all'}>All campaigns</Button>
         {SJB_CANVA_COLLECTIONS.map(c => <Button key={c.id} variant={collectionId === c.id ? 'default' : 'outline'} aria-pressed={collectionId === c.id} onClick={() => setCollectionId(c.id)}>{c.name}</Button>)}
       </nav>
       <div className="mt-5 flex flex-wrap items-end gap-4">
@@ -39,7 +39,7 @@ export function SjbSocialStudio() {
         const designs = visible.filter(d => d.collectionId === collection.id);
         if (!designs.length) return null;
         return <section key={collection.id} aria-labelledby={`collection-${collection.id}`} className="mt-10">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3"><h2 id={`collection-${collection.id}`} className="text-xl font-bold">{collection.name}</h2><Button asChild variant="link" size="sm"><a href={`https://www.canva.com/folder/${collection.folderId}`} target="_blank" rel="noreferrer">Open collection<ExternalLink /></a></Button></div>
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3"><h2 id={`collection-${collection.id}`} className="text-xl font-bold">{collection.name}</h2><Button asChild variant="link" size="sm"><a href={`https://www.canva.com/folder/${collection.folderId}`} target="_blank" rel="noreferrer">Open campaign folder<ExternalLink /></a></Button></div>
           {collection.id === 'stadium-night' && <p className="mb-5 text-sm text-muted-foreground">Original Element canopy and football-action artwork · Artistic visualisations, not verified venue photography or a field-conversion plan.</p>}
           {designs.some(d => d.format) && <p className="mb-5 text-sm text-muted-foreground">Heroes 1200×600 · Headers 1200×300 · Signature banners 1200×200. Intended display width: 600 px. Email artwork is an unsaved Canva draft; email sending and ticket links are not configured.</p>}
           <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
