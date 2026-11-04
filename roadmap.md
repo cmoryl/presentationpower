@@ -1,5 +1,6 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Replace Bowl native social editor with Canva collection previews by style, ad type and actual dimensions; keep unsaved redesigns labelled drafts and verify both social pages.
 - [ ] Stadium Night: six architecture-focused Canva drafts prepared and previews inspected; saving awaits explicit preview approval. Historical 2010 photo is credited, not represented as current football imagery; two additional collection variants remain unchanged.
 - [ ] Bold Graphic: all five supplied-helmet Canva drafts prepared and previews inspected; saving awaits explicit preview approval.
 
