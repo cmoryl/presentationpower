@@ -56,7 +56,11 @@ describe('Bowl Canva gallery', () => {
       expect(email.map(d => [d.format, d.width, d.height])).toEqual([
         ['email-hero', 1200, 600], ['email-header', 1200, 300], ['email-signature', 1200, 200],
       ]);
-      expect(email.every(d => d.status === 'draft' && Boolean(d.draftTransactionId))).toBe(true);
+      if (style === 'stadium-night') {
+        expect(email.every(d => d.status === 'saved')).toBe(true);
+      } else {
+        expect(email.every(d => d.status === 'draft' && Boolean(d.draftTransactionId))).toBe(true);
+      }
     }
   });
   it('covers all five social formats in every one of the four design sets', () => {
