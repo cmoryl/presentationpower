@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Rename collections Design Set 1–5; complete matching ad-type/size coverage per set in Canva and Element using each set's own master assets. Existing four sets map in current order; fifth set awaits user direction. Review all adaptations before any Canva draft save.
+
 - [ ] Six supplied stadium backgrounds uploaded successfully and applied to fourteen Stadium Night social/ticket/email drafts, synced to Element. No re-render or upscale. Filing into existing Assets folder blocked by Canva access refusal; draft saving awaits explicit approval.
 
 - [ ] Complete campaign parity: common five top-level categories and six Campaign Variations folders created for all four looks; Launch social/ticket/email copies filed. Bold three portrait/social drafts, five gold football/palm ticket previews and three reflowed emails synced to Element; Launch three emails and wide ticket synced. Six gallery tests pass, live Bold ticket/Launch header filters verified, build OK. Remaining: populate six variation folders in Bold/Stadium/Action, finish Launch size adaptations, normalize legacy social folder names, and verify every Canva draft pairing before saving. All artwork edits remain unsaved pending explicit approval.
