@@ -1,3 +1,12 @@
+import set4SocialPortrait from '@/assets/sjb-canva/set4-social-portrait.png.asset.json';
+import set4SocialTall from '@/assets/sjb-canva/set4-social-tall.png.asset.json';
+import set4SocialStory from '@/assets/sjb-canva/set4-social-story.png.asset.json';
+import set4SocialWide from '@/assets/sjb-canva/set4-social-wide.png.asset.json';
+import set4SocialLink from '@/assets/sjb-canva/set4-social-link.png.asset.json';
+import set4TicketPortrait from '@/assets/sjb-canva/set4-ticket-portrait.png.asset.json';
+import set4TicketTall from '@/assets/sjb-canva/set4-ticket-tall.png.asset.json';
+import set4TicketStory from '@/assets/sjb-canva/set4-ticket-story.png.asset.json';
+import set4TicketLink from '@/assets/sjb-canva/set4-ticket-link.png.asset.json';
 import launchEmailHero from '@/assets/sjb-canva/launch-email-hero-review.png.asset.json';
 import launchEmailHeader from '@/assets/sjb-canva/launch-email-header-review.png.asset.json';
 import launchEmailSignature from '@/assets/sjb-canva/launch-email-signature-review.png.asset.json';
@@ -92,6 +101,11 @@ export const SJB_CANVA_GALLERY: readonly SjbCanvaGalleryDesign[] = [
   design('DAHZ9lwpgeY', 'action-spotlight', 'Instagram Story', 1080, 1920, actionStory, 'saved', 'illustration', 'https://www.canva.com/d/szxKC_ms6jUFfPq'),
   design('DAHZ9gXp6qo', 'action-spotlight', 'Wide post', 1600, 900, actionWide, 'saved', 'illustration', 'https://www.canva.com/d/Z5t1NpV0hchS-XC'),
   design('DAHZ9u2WHbw', 'action-spotlight', 'Facebook ad', 1200, 628, actionLink, 'saved', 'illustration', 'https://www.canva.com/d/urZU_r3ZXyrtLd_'),
+  { ...design('DAHZ-SifCjs', 'launch', 'Instagram post', 1080, 1350, set4SocialPortrait, 'draft', 'illustration'), draftTransactionId: '5237081611608688361' },
+  { ...design('DAHZ-et9N3M', 'launch', 'Portrait post', 1080, 1440, set4SocialTall, 'draft', 'illustration'), draftTransactionId: '2711688122096671543' },
+  { ...design('DAHZ-dbu5-o', 'launch', 'Instagram Story', 1080, 1920, set4SocialStory, 'draft', 'illustration'), draftTransactionId: '2005748879735986844' },
+  { ...design('DAHZ-c_lW7M', 'launch', 'Wide post', 1600, 900, set4SocialWide, 'draft', 'illustration'), draftTransactionId: '850575576657504511' },
+  { ...design('DAHZ-eY_-Lg', 'launch', 'Facebook ad', 1200, 628, set4SocialLink, 'draft', 'illustration'), draftTransactionId: '5047930426720387008' },
   design('DAHZ9mUpIQY', 'launch', 'Game day', 1080, 1350, launchGameDay, 'saved', 'supplied-artwork', 'https://www.canva.com/d/J7Tgz72gRGAYu0k'),
   design('DAHZ9pe47-Q', 'launch', 'Matchup', 1080, 1350, launchMatchup, 'saved', 'illustration', 'https://www.canva.com/d/W37aGaxcMLi4972'),
   design('DAHZ9vTP7Xw', 'launch', 'Countdown', 1080, 1350, launchCountdown, 'saved', 'illustration', 'https://www.canva.com/d/yQ6sSYAdlE7n-WT'),
@@ -126,6 +140,10 @@ export const SJB_CANVA_GALLERY: readonly SjbCanvaGalleryDesign[] = [
   { ...design('DAHZ-U8rDwo', 'launch', 'Email header', 1200, 300, launchEmailHeader, 'draft', 'illustration'), format: 'email-header', draftTransactionId: '8431259644166711706' },
   { ...design('DAHZ-VP1heY', 'launch', 'Signature banner', 1200, 200, launchEmailSignature, 'draft', 'illustration'), format: 'email-signature', draftTransactionId: '110859331556479713' },
   { ...design('DAHZ-TTRcKU', 'launch', 'Tickets on sale', 1600, 900, launchTicketWide, 'draft', 'illustration'), campaign: 'tickets', draftTransactionId: '8837709509885405027' },
+  { ...design('DAHZ-UjWPds', 'launch', 'Tickets on sale', 1080, 1350, set4TicketPortrait, 'draft', 'illustration'), campaign: 'tickets', draftTransactionId: '2262454058549592735' },
+  { ...design('DAHZ-YjfF04', 'launch', 'Tickets on sale', 1080, 1440, set4TicketTall, 'draft', 'illustration'), campaign: 'tickets', draftTransactionId: '2534921835841596116' },
+  { ...design('DAHZ-ThB-v8', 'launch', 'Tickets on sale', 1080, 1920, set4TicketStory, 'draft', 'illustration'), campaign: 'tickets', draftTransactionId: '5008523931598344622' },
+  { ...design('DAHZ-U-Ytrw', 'launch', 'Tickets on sale', 1200, 628, set4TicketLink, 'draft', 'illustration'), campaign: 'tickets', draftTransactionId: '7352647537621375104' },
 ];
 export function sjbCanvaSize(d: Pick<SjbCanvaGalleryDesign, 'width' | 'height'>) { return `${d.width}×${d.height}`; }
 export function filterSjbCanvaDesigns(collectionId: string, size: string, name: string) {
