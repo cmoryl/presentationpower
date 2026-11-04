@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   SJB_BRAND_GROUNDS,
+  SJB_CANVA_STYLE_SETS,
   SJB_SOCIAL_FORMATS,
   SJB_SOCIAL_FORMATS_BY_ID,
   SJB_SOCIAL_TEMPLATES,
