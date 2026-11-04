@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Create Canva Bowl email heroes, headers and signature banners; add size-specific previews in Element.
+- [x] Created Email Campaign folder with Heroes, Headers and Signature Banners subfolders: nine artwork previews across 1200×600, 1200×300 and 1200×200, verified on both pages. Thirteen tests pass. Four refined ticket header/signature pages remain unsaved pending explicit approval (transactions 2264705847746530317 and 155895322416542160); sending/ticket links not configured.
 - [x] Created Tickets On Sale Canva folder with five two-page size adaptations and ten previews in both Bowl social pages; kept original unchanged and excluded outdated January page. All images, filtering and Canva links verified; twelve tests pass. Adaptations remain pending final campaign review.
 - [x] Replace Bowl native social editor with 22 Canva collection previews by style, ad type and actual dimensions; all previews, filters, enlarged viewing, Canva links, phone width and both social pages verified. Eleven tests pass; pending Canva redesigns remain explicitly unsaved.
 - [ ] Stadium Night: six architecture-focused Canva drafts prepared and previews inspected; saving awaits explicit preview approval. Historical 2010 photo is credited, not represented as current football imagery; two additional collection variants remain unchanged.
