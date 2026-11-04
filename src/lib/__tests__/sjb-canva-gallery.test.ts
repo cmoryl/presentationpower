@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { SJB_CANVA_COLLECTIONS, SJB_CANVA_GALLERY, filterSjbCanvaDesigns } from '../sjb-canva-gallery';
 describe('Bowl Canva gallery', () => {
-  it('keeps reviewed campaign adaptations unsaved', () => {
+  it('keeps only un-reviewed campaign adaptations unsaved', () => {
     const drafts = SJB_CANVA_GALLERY.filter(d => d.status === 'draft' && !d.format && d.campaign !== 'tickets');
-    expect(drafts).toHaveLength(8);
+    expect(drafts).toHaveLength(0);
     expect(drafts.filter(d => d.collectionId === 'stadium-night')).toHaveLength(0);
-    expect(drafts.filter(d => d.collectionId === 'bold-graphic')).toHaveLength(3);
+    expect(drafts.filter(d => d.collectionId === 'bold-graphic')).toHaveLength(0);
     const originals = SJB_CANVA_GALLERY.filter(d => d.collectionId === 'bold-graphic' && !d.format && d.campaign !== 'tickets');
     expect(originals).toHaveLength(5);
-    expect(originals.filter(d => d.status === 'saved')).toHaveLength(2);
+    expect(originals.filter(d => d.status === 'saved')).toHaveLength(5);
     expect(originals.every(d => d.provenance === 'illustration')).toBe(true);
   });
   it('tracks the fourteen Stadium Night render revisions, thirteen saved and one still drafting', () => {
@@ -42,7 +42,9 @@ describe('Bowl Canva gallery', () => {
       expect(filterSjbCanvaDesigns(style, 'all', 'Tickets on sale')).toHaveLength(5);
     }
     expect(new Set(tickets.map(d => d.id)).size).toBe(20);
-    const nonStadium = tickets.filter(d => d.collectionId !== 'stadium-night');
+    const boldTickets = tickets.filter(d => d.collectionId === 'bold-graphic');
+    expect(boldTickets.every(d => d.status === 'saved' && !d.draftTransactionId)).toBe(true);
+    const nonStadium = tickets.filter(d => d.collectionId !== 'stadium-night' && d.collectionId !== 'bold-graphic');
     expect(nonStadium.every(d => d.status === 'draft' && Boolean(d.draftTransactionId))).toBe(true);
     const stadiumTickets = tickets.filter(d => d.collectionId === 'stadium-night');
     expect(stadiumTickets.filter(d => d.status === 'saved')).toHaveLength(4);
@@ -56,11 +58,7 @@ describe('Bowl Canva gallery', () => {
       expect(email.map(d => [d.format, d.width, d.height])).toEqual([
         ['email-hero', 1200, 600], ['email-header', 1200, 300], ['email-signature', 1200, 200],
       ]);
-      if (style === 'stadium-night') {
-        expect(email.every(d => d.status === 'saved')).toBe(true);
-      } else {
-        expect(email.every(d => d.status === 'draft' && Boolean(d.draftTransactionId))).toBe(true);
-      }
+      expect(email.every(d => d.status === 'saved' && !d.draftTransactionId)).toBe(true);
     }
   });
   it('covers all five social formats in every one of the four design sets', () => {
