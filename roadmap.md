@@ -1,5 +1,8 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Stadium Night: six architecture-focused Canva drafts prepared and previews inspected; saving awaits explicit preview approval. Historical 2010 photo is credited, not represented as current football imagery; two additional collection variants remain unchanged.
+- [ ] Bold Graphic: all five supplied-helmet Canva drafts prepared and previews inspected; saving awaits explicit preview approval.
+
 - [x] Expand Bowl social templates into Canva: six editable Canva designs (one per template) created on the shared team account; each studio template now carries an "Edit in Canva" button that switches with the selection. Verified live (link swaps per template, no page errors), build OK, new uniqueness test passes.
 
 - [x] Live San Juan Bowl social template studio at /events/san-juan-bowl/social (+ public /share/san-juan-bowl/social): 6 templates × 5 native channel sizes, editable copy from announced facts only, brand grounds + 47 scene visualisations, per-size PNG and full-set ZIP downloads. Verified signed out with a real 1080×1080 download; matchup/final-score stack on narrow formats. 6 new tests; full suite has only the known London map-export failure.
