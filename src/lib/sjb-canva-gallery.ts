@@ -70,6 +70,19 @@ import lightTicketsFacebook from '@/assets/sjb-canva/light-tickets-facebook.png.
 import lightEmailHero from '@/assets/sjb-canva/light-email-hero.png.asset.json';
 import lightEmailHeader from '@/assets/sjb-canva/light-email-header.png.asset.json';
 import lightEmailSignature from '@/assets/sjb-canva/light-email-signature.png.asset.json';
+import cineSocialIg from '@/assets/sjb-canva/cine-social-ig.png.asset.json';
+import cineSocialPortrait from '@/assets/sjb-canva/cine-social-portrait.png.asset.json';
+import cineSocialStory from '@/assets/sjb-canva/cine-social-story.png.asset.json';
+import cineSocialWide from '@/assets/sjb-canva/cine-social-wide.png.asset.json';
+import cineSocialFacebook from '@/assets/sjb-canva/cine-social-facebook.png.asset.json';
+import cineTicketsIg from '@/assets/sjb-canva/cine-tickets-ig.png.asset.json';
+import cineTicketsPortrait from '@/assets/sjb-canva/cine-tickets-portrait.png.asset.json';
+import cineTicketsStory from '@/assets/sjb-canva/cine-tickets-story.png.asset.json';
+import cineTicketsWide from '@/assets/sjb-canva/cine-tickets-wide.png.asset.json';
+import cineTicketsFacebook from '@/assets/sjb-canva/cine-tickets-facebook.png.asset.json';
+import cineEmailHero from '@/assets/sjb-canva/cine-email-hero.png.asset.json';
+import cineEmailHeader from '@/assets/sjb-canva/cine-email-header.png.asset.json';
+import cineEmailSignature from '@/assets/sjb-canva/cine-email-signature.png.asset.json';
 
 export const SJB_CANVA_COLLECTIONS = [
   { id: 'bold-graphic', name: 'Design Set 1', folderId: 'FAHZ9_NN2FQ' },
@@ -77,6 +90,7 @@ export const SJB_CANVA_COLLECTIONS = [
   { id: 'action-spotlight', name: 'Design Set 3', folderId: 'FAHZ90BI6Mo' },
   { id: 'launch', name: 'Design Set 4', folderId: 'FAHZ99Po6eg' },
   { id: 'light-action', name: 'Design Set 5', folderId: 'FAHZ_aTVaIg' },
+  { id: 'light-cinematic', name: 'Design Set 6', folderId: 'FAHZ_qwxXeQ' },
 ] as const;
 export type SjbCanvaCollectionId = typeof SJB_CANVA_COLLECTIONS[number]['id'];
 export interface SjbCanvaGalleryDesign {
@@ -171,6 +185,19 @@ export const SJB_CANVA_GALLERY: readonly SjbCanvaGalleryDesign[] = [
   { ...design('DAHZ_UGKVpo', 'light-action', 'Email hero', 600, 200, lightEmailHero, 'saved', 'artistic-render'), format: 'email-hero' },
   { ...design('DAHZ_RFCog4', 'light-action', 'Email header', 600, 200, lightEmailHeader, 'saved', 'artistic-render'), format: 'email-header' },
   { ...design('DAHZ_dXoWZg', 'light-action', 'Signature banner', 400, 200, lightEmailSignature, 'saved', 'artistic-render'), format: 'email-signature' },
+  design('DAHZ_p1G_WU', 'light-cinematic', 'Instagram post', 1080, 1350, cineSocialPortrait, 'saved', 'artistic-render'),
+  design('DAHZ_rrsOh8', 'light-cinematic', 'Portrait post', 1080, 1440, cineSocialIg, 'saved', 'artistic-render'),
+  design('DAHZ_r-kh_I', 'light-cinematic', 'Instagram Story', 1080, 1920, cineSocialStory, 'saved', 'artistic-render'),
+  design('DAHZ_hPJWo8', 'light-cinematic', 'Wide post', 1600, 900, cineSocialWide, 'saved', 'artistic-render'),
+  design('DAHZ_mOxP3M', 'light-cinematic', 'Facebook ad', 1200, 628, cineSocialFacebook, 'saved', 'artistic-render'),
+  { ...design('DAHZ_nCyBEA', 'light-cinematic', 'Tickets on sale', 1080, 1350, cineTicketsPortrait, 'saved', 'artistic-render'), campaign: 'tickets' },
+  { ...design('DAHZ_iQq1c8', 'light-cinematic', 'Tickets on sale', 1080, 1440, cineTicketsIg, 'saved', 'artistic-render'), campaign: 'tickets' },
+  { ...design('DAHZ_kyyz8c', 'light-cinematic', 'Tickets on sale', 1080, 1920, cineTicketsStory, 'saved', 'artistic-render'), campaign: 'tickets' },
+  { ...design('DAHZ_rw_Ss4', 'light-cinematic', 'Tickets on sale', 1600, 900, cineTicketsWide, 'saved', 'artistic-render'), campaign: 'tickets' },
+  { ...design('DAHZ_mAi7nw', 'light-cinematic', 'Tickets on sale', 1200, 628, cineTicketsFacebook, 'saved', 'artistic-render'), campaign: 'tickets' },
+  { ...design('DAHZ_nzeP1c', 'light-cinematic', 'Email hero', 600, 200, cineEmailHero, 'saved', 'artistic-render'), format: 'email-hero' },
+  { ...design('DAHZ_qvzQss', 'light-cinematic', 'Email header', 600, 200, cineEmailHeader, 'saved', 'artistic-render'), format: 'email-header' },
+  { ...design('DAHZ_tVchSs', 'light-cinematic', 'Signature banner', 400, 200, cineEmailSignature, 'saved', 'artistic-render'), format: 'email-signature' },
 ];
 export function sjbCanvaSize(d: Pick<SjbCanvaGalleryDesign, 'width' | 'height'>) { return `${d.width}×${d.height}`; }
 export function filterSjbCanvaDesigns(collectionId: string, size: string, name: string) {
