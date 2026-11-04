@@ -15,6 +15,8 @@ import { SJB_FLYER_SCENES } from "@/lib/sign-scene-backgrounds";
 import { exportNodeFilter, withExportChrome } from "@/lib/export-chrome-suppress";
 import {
   SJB_BRAND_GROUNDS,
+  SJB_CANVA_FOLDER_URL,
+  SJB_CANVA_STYLE_SETS,
   SJB_SOCIAL_COLORS as C,
   SJB_SOCIAL_FORMATS,
   SJB_SOCIAL_TEMPLATES,
