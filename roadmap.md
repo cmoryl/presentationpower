@@ -1,5 +1,6 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Redesign Stadium Night with original Element upper-stadium renders and stronger football excitement; update size-specific previews and request approval before saving Canva drafts.
 - [x] Replaced separate Tickets On Sale collection with fifteen ticket previews: five existing sizes each under Bold Graphic, Stadium Night and Action Spotlight. Canva copies filed in each look's Tickets On Sale subfolder; old separate collection preserved under Assets. Gallery tests and desktop/mobile checks pass. Ticket artwork revisions remain unsaved pending explicit preview approval; transaction IDs are recorded with each gallery entry.
 - [x] Created Email Campaign folder with Heroes, Headers and Signature Banners subfolders: nine artwork previews across 1200×600, 1200×300 and 1200×200, verified on both pages. Thirteen tests pass. Four refined ticket header/signature pages remain unsaved pending explicit approval (transactions 2264705847746530317 and 155895322416542160); sending/ticket links not configured.
 - [x] Created Tickets On Sale Canva folder with five two-page size adaptations and ten previews in both Bowl social pages; kept original unchanged and excluded outdated January page. All images, filtering and Canva links verified; twelve tests pass. Adaptations remain pending final campaign review.
