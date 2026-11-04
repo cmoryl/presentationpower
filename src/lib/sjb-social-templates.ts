@@ -177,3 +177,74 @@ export function sjbSocialTemplate(id: string | null | undefined): SjbSocialTempl
 export function sjbSocialFormat(id: string | null | undefined): SjbSocialFormat {
   return SJB_SOCIAL_FORMATS_BY_ID[id ?? ""] ?? SJB_SOCIAL_FORMATS[0];
 }
+
+/**
+ * Canva design versions generated in the shared Canva account (folder
+ * "San Juan Bowl — Social 2026"): four visual styles, each in all five
+ * native sizes. Links open the editable Canva design.
+ */
+export const SJB_CANVA_FOLDER_URL = "https://www.canva.com/folder/FAHZ9pAyzcU";
+
+export interface SjbCanvaStyleSet {
+  id: string;
+  name: string;
+  blurb: string;
+  /** Canva media id of the custom background artwork generated for this style. */
+  artworkMediaId: string;
+  designs: readonly { formatId: string; url: string }[];
+}
+
+export const SJB_CANVA_STYLE_SETS: readonly SjbCanvaStyleSet[] = [
+  {
+    id: "stadium-night",
+    name: "Stadium Night",
+    blurb: "Cinematic night stadium under golden floodlights, deep navy sky.",
+    artworkMediaId: "MAHZ9geTeZU",
+    designs: [
+      { formatId: "square", url: "https://canva.link/tm5tvhuwm2oxbv4" },
+      { formatId: "portrait", url: "https://canva.link/cshh5ojaemathxl" },
+      { formatId: "story", url: "https://canva.link/h3vzab0824z58rg" },
+      { formatId: "wide", url: "https://canva.link/b0bfmojvbonqo2c" },
+      { formatId: "link", url: "https://canva.link/r64z9u45tlvbeeq" },
+    ],
+  },
+  {
+    id: "action-spotlight",
+    name: "Action Spotlight",
+    blurb: "Player silhouette mid-action, gold rim light on deep navy.",
+    artworkMediaId: "MAHZ9gyDQ0s",
+    designs: [
+      { formatId: "square", url: "https://canva.link/uv1mad4o0c0mg6g" },
+      { formatId: "portrait", url: "https://canva.link/pq7jx9dvb2qo15k" },
+      { formatId: "story", url: "https://canva.link/nbpcy2n68ow1sy2" },
+      { formatId: "wide", url: "https://canva.link/wcrwrd3zbmi450v" },
+      { formatId: "link", url: "https://canva.link/9v7e6l44msgngu0" },
+    ],
+  },
+  {
+    id: "bold-graphic",
+    name: "Bold Graphic",
+    blurb: "Flat vector football and Caribbean wave poster art.",
+    artworkMediaId: "MAHZ9ki16Rg",
+    designs: [
+      { formatId: "square", url: "https://canva.link/nzfpntgyezm0ck9" },
+      { formatId: "portrait", url: "https://canva.link/l460d76k6bva8ce" },
+      { formatId: "story", url: "https://canva.link/138oz4ybbrax9dy" },
+      { formatId: "wide", url: "https://canva.link/w117w0wxfh72st7" },
+      { formatId: "link", url: "https://canva.link/mcvyodc5hv8y756" },
+    ],
+  },
+  {
+    id: "golden-hour",
+    name: "Golden Hour",
+    blurb: "Warm golden-hour crowd, palms on the horizon, navy shadows.",
+    artworkMediaId: "MAHZ9gyS9Tg",
+    designs: [
+      { formatId: "square", url: "https://canva.link/zh9na7cnjqw06pr" },
+      { formatId: "portrait", url: "https://canva.link/fiqqmeye482qfxz" },
+      { formatId: "story", url: "https://canva.link/6cqbxxaywg443a6" },
+      { formatId: "wide", url: "https://canva.link/ljfddfep4wsih93" },
+      { formatId: "link", url: "https://canva.link/3gj5zazdofvd9ft" },
+    ],
+  },
+] as const;

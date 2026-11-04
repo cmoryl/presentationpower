@@ -15,6 +15,8 @@ import { SJB_FLYER_SCENES } from "@/lib/sign-scene-backgrounds";
 import { exportNodeFilter, withExportChrome } from "@/lib/export-chrome-suppress";
 import {
   SJB_BRAND_GROUNDS,
+  SJB_CANVA_FOLDER_URL,
+  SJB_CANVA_STYLE_SETS,
   SJB_SOCIAL_COLORS as C,
   SJB_SOCIAL_FORMATS,
   SJB_SOCIAL_TEMPLATES,
@@ -398,6 +400,58 @@ export function SjbSocialStudio() {
             Download set · all {SJB_SOCIAL_FORMATS.length} sizes
           </button>
         </header>
+
+        {/* Canva design versions — 4 styles × 5 sizes in the shared Canva folder */}
+        <section aria-labelledby="sjb-canva" className="mt-8 rounded-2xl border border-[#03002C]/12 bg-white p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 id="sjb-canva" className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#03002C]/50">
+              Canva design versions
+            </h2>
+            <a
+              href={SJB_CANVA_FOLDER_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md border border-[#03002C]/15 bg-white px-3 py-1.5 text-[12px] font-semibold text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7]"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Open the Canva folder
+            </a>
+          </div>
+          <p className="mt-2 max-w-2xl text-[13px] text-[#03002C]/65">
+            Four art-directed styles with custom football imagery, each generated in all five native
+            sizes. Opening a design needs access to the shared Canva account; the live studio below
+            stays open to everyone.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {SJB_CANVA_STYLE_SETS.map((set) => (
+              <div key={set.id} className="rounded-xl border border-[#03002C]/12 p-4">
+                <div className="text-[14px] font-bold text-[#03002C]">{set.name}</div>
+                <p className="mt-1 text-[12px] leading-snug text-[#03002C]/60">{set.blurb}</p>
+                <ul className="mt-3 space-y-1.5">
+                  {set.designs.map((d) => {
+                    const fmt = SJB_SOCIAL_FORMATS.find((f) => f.id === d.formatId);
+                    return (
+                      <li key={d.formatId}>
+                        <a
+                          href={d.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#003FC7] hover:underline"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          {fmt?.label ?? d.formatId}
+                          <span className="font-normal text-[#03002C]/45">
+                            {fmt ? `${fmt.width}×${fmt.height}` : ""}
+                          </span>
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* Step 1 — template */}
         <section aria-labelledby="sjb-tpl" className="mt-8">
