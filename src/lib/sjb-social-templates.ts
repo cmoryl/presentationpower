@@ -68,7 +68,7 @@ export const SJB_SOCIAL_TEMPLATES: readonly SjbSocialTemplate[] = [
       subline: SJB_EVENT.matchupLabel,
       detail: `${SJB_EVENT.datesLabel} · ${SJB_EVENT.venue}`,
     },
-    canvaUrl: "https://canva.link/oev1vx7l4j79t64",
+    canvaUrl: "https://canva.link/kip1akqoebeqy50",
   },
   {
     id: "matchup",
@@ -84,7 +84,7 @@ export const SJB_SOCIAL_TEMPLATES: readonly SjbSocialTemplate[] = [
       teamB: "Sun Belt",
       detail: `${SJB_EVENT.datesLabel} · ${SJB_EVENT.kickoffLabel}`,
     },
-    canvaUrl: "https://canva.link/etpyb40pqj7blhw",
+    canvaUrl: "https://canva.link/truvqclpdn2pyni",
   },
   {
     id: "countdown",
@@ -100,7 +100,7 @@ export const SJB_SOCIAL_TEMPLATES: readonly SjbSocialTemplate[] = [
       label: "days to kickoff",
       detail: `${SJB_EVENT.datesLabel} · ${SJB_EVENT.venue}`,
     },
-    canvaUrl: "https://canva.link/lzft6d2f35rdh5d",
+    canvaUrl: "https://canva.link/eggqu4l1kz0kw5v",
   },
   {
     id: "final-score",
@@ -114,7 +114,7 @@ export const SJB_SOCIAL_TEMPLATES: readonly SjbSocialTemplate[] = [
       { key: "label", label: "Label" },
     ],
     defaults: { teamA: "ACC", scoreA: "0", teamB: "Sun Belt", scoreB: "0", label: "Final" },
-    canvaUrl: "https://canva.link/x7kckrud42oie8u",
+    canvaUrl: "https://canva.link/xofw710sxe4y9f0",
   },
   {
     id: "quote",
@@ -128,7 +128,7 @@ export const SJB_SOCIAL_TEMPLATES: readonly SjbSocialTemplate[] = [
       quote: "College football arrives in San Juan.",
       attribution: SJB_EVENT.name,
     },
-    canvaUrl: "https://canva.link/m2n91vbo496pep2",
+    canvaUrl: "https://canva.link/gebjn3yyh2s4sb4",
   },
   {
     id: "save-the-date",
@@ -144,7 +144,7 @@ export const SJB_SOCIAL_TEMPLATES: readonly SjbSocialTemplate[] = [
       date: SJB_EVENT.datesLabel,
       detail: `${SJB_EVENT.venue} · ${SJB_EVENT.city}`,
     },
-    canvaUrl: "https://canva.link/7zxgtyhn8i4wfmv",
+    canvaUrl: "https://canva.link/i955sa4n8dz546l",
   },
 ] as const;
 
