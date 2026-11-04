@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { SJB_CANVA_GALLERY, filterSjbCanvaDesigns } from '../sjb-canva-gallery';
 describe('Bowl Canva gallery', () => {
   it('keeps all eleven pending Canva revisions unsaved', () => {
-    const drafts = SJB_CANVA_GALLERY.filter(d => d.status === 'draft');
+    const drafts = SJB_CANVA_GALLERY.filter(d => d.status === 'draft' && d.collectionId !== 'email');
     expect(drafts).toHaveLength(11);
     expect(drafts.filter(d => d.collectionId === 'stadium-night')).toHaveLength(6);
     expect(drafts.filter(d => d.collectionId === 'bold-graphic')).toHaveLength(5);
@@ -24,5 +24,12 @@ describe('Bowl Canva gallery', () => {
     }
     expect(new Set(tickets.map(d => d.id)).size).toBe(10);
     expect(tickets.every(d => d.status === 'saved')).toBe(true);
+  });
+  it('email campaign covers heroes, headers and signature banners at double display resolution', () => {
+    expect(filterSjbCanvaDesigns('email', 'all', 'all')).toHaveLength(9);
+    for (const size of ['1200×600', '1200×300', '1200×200']) {
+      expect(filterSjbCanvaDesigns('email', size, 'all')).toHaveLength(3);
+    }
+    expect(filterSjbCanvaDesigns('email', 'all', 'all').filter(d => d.status === 'draft')).toHaveLength(4);
   });
 });

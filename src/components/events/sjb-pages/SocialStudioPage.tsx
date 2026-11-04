@@ -33,7 +33,7 @@ export function SjbSocialStudio() {
         <label className="grid gap-1.5 text-sm font-medium" htmlFor="sjb-type">Ad type<select id="sjb-type" value={adType} onChange={e => setAdType(e.target.value)} className="h-10 max-w-full rounded-md border border-input bg-background px-3 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option value="all">All ad types</option>{types.map(t => <option key={t}>{t}</option>)}</select></label>
         <p role="status" className="pb-2 text-sm text-muted-foreground">{visible.length} designs</p>
       </div>
-      <p className="mt-5 border-l-2 border-border pl-3 text-sm text-muted-foreground">Stadium Night and Bold Graphic: unsaved Canva drafts, pending revision. Other designs: saved Canva snapshots. Preview images are not full-resolution downloads.</p>
+      <p className="mt-5 border-l-2 border-border pl-3 text-sm text-muted-foreground">Draft labels identify unsaved Canva revisions. Saved labels identify Canva snapshots, not campaign approval. Preview images are not full-resolution downloads.</p>
       {visible.length === 0 && <div className="py-20 text-center"><p>No designs in this selection.</p><Button variant="link" onClick={() => { setSize('all'); setAdType('all'); setCollectionId('all'); }}>Reset filters</Button></div>}
       {SJB_CANVA_COLLECTIONS.map(collection => {
         const designs = visible.filter(d => d.collectionId === collection.id);
@@ -42,6 +42,7 @@ export function SjbSocialStudio() {
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3"><h2 id={`collection-${collection.id}`} className="text-xl font-bold">{collection.name}</h2><Button asChild variant="link" size="sm"><a href={`https://www.canva.com/folder/${collection.folderId}`} target="_blank" rel="noreferrer">Open collection<ExternalLink /></a></Button></div>
           {collection.id === 'stadium-night' && <p className="mb-5 text-sm text-muted-foreground">Historical Hiram Bithorn photography · Bryce Edwards, 2010 · <a href="https://creativecommons.org/licenses/by/2.0/" className="underline" target="_blank" rel="noreferrer">CC BY 2.0</a> · Cropped. Not current game-day photography.</p>}
           {collection.id === 'tickets' && <p className="mb-5 text-sm text-muted-foreground">Badge and conference-matchup versions · Five sizes · Two pages per Canva design. Supplied December artwork; outdated January page excluded. Adaptations pending final campaign review.</p>}
+          {collection.id === 'email' && <p className="mb-5 text-sm text-muted-foreground">Heroes 1200×600 · Headers 1200×300 · Signature banners 1200×200. Intended display width: 600 px. Ticket header and signature refinements are unsaved drafts; email sending and ticket links are not configured.</p>}
           <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {designs.map(d => <article key={d.id} className="min-w-0 overflow-hidden rounded-lg border border-border bg-background" data-canva-design={d.id}>
               <Button variant="ghost" className="relative block h-[360px] w-full rounded-none bg-muted p-3" aria-label={`Enlarge ${collection.name} ${d.name} ${sjbCanvaSize(d)}`} onClick={() => setSelected(d)}>
