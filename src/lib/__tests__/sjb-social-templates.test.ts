@@ -49,6 +49,14 @@ describe("sjb-social-templates", () => {
     expect(SJB_SOCIAL_FORMATS_BY_ID.portrait).toMatchObject({ width: 1080, height: 1350 });
   });
 
+  it("every template links to a unique editable Canva design", () => {
+    const urls = SJB_SOCIAL_TEMPLATES.map((t) => t.canvaUrl);
+    expect(new Set(urls).size).toBe(urls.length);
+    for (const url of urls) {
+      expect(url).toMatch(/^https:\/\/canva\.link\//);
+    }
+  });
+
   it("brand grounds pick the correct logo variant", () => {
     for (const g of SJB_BRAND_GROUNDS) {
       expect(g.logoVariant).toBe(g.kind === "light" ? "color" : "dark");
