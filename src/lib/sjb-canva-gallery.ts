@@ -1,8 +1,8 @@
-import boldTall from '@/assets/sjb-canva/bold-tall.png.asset.json';
-import boldWide from '@/assets/sjb-canva/bold-wide.png.asset.json';
-import boldLink from '@/assets/sjb-canva/bold-link.png.asset.json';
-import boldPortrait from '@/assets/sjb-canva/bold-portrait.png.asset.json';
-import boldStory from '@/assets/sjb-canva/bold-story.png.asset.json';
+import boldTall from '@/assets/sjb-canva/bold-original-tall.png.asset.json';
+import boldWide from '@/assets/sjb-canva/bold-original-wide.png.asset.json';
+import boldLink from '@/assets/sjb-canva/bold-original-link.png.asset.json';
+import boldPortrait from '@/assets/sjb-canva/bold-original-portrait.png.asset.json';
+import boldStory from '@/assets/sjb-canva/bold-original-story.png.asset.json';
 import stadiumWide from '@/assets/sjb-canva/stadium-refresh-wide.png.asset.json';
 import stadiumSocialWide from '@/assets/sjb-canva/stadium-refresh-social-wide.png.asset.json';
 import stadiumLink from '@/assets/sjb-canva/stadium-refresh-link.png.asset.json';
@@ -72,11 +72,11 @@ function design(id: string, collectionId: SjbCanvaCollectionId, name: string, wi
 // Canva artwork snapshots, not a second renderer. Actual artboard sizes are
 // independent of the legacy native editor's format labels. Drafts are NOT saved.
 export const SJB_CANVA_GALLERY: readonly SjbCanvaGalleryDesign[] = [
-  design('DAHZ9jq7cVQ', 'bold-graphic', 'Instagram post', 1080, 1350, boldPortrait, 'draft', 'supplied-artwork'),
-  design('DAHZ9nvVT-Q', 'bold-graphic', 'Portrait post', 1080, 1440, boldTall, 'draft', 'supplied-artwork'),
-  design('DAHZ9tOPYr4', 'bold-graphic', 'Instagram Story', 1080, 1920, boldStory, 'draft', 'supplied-artwork'),
-  design('DAHZ9vWnYJ0', 'bold-graphic', 'Wide post', 1600, 900, boldWide, 'draft', 'supplied-artwork'),
-  design('DAHZ9qo9-Do', 'bold-graphic', 'Facebook ad', 1200, 628, boldLink, 'draft', 'supplied-artwork'),
+  design('DAHZ9jq7cVQ', 'bold-graphic', 'Instagram post', 1080, 1350, boldPortrait, 'saved', 'illustration', 'https://www.canva.com/d/NJ6vod9UTnOr5eY'),
+  design('DAHZ9nvVT-Q', 'bold-graphic', 'Portrait post', 1080, 1440, boldTall, 'saved', 'illustration'),
+  design('DAHZ9tOPYr4', 'bold-graphic', 'Instagram Story', 1080, 1920, boldStory, 'saved', 'illustration'),
+  design('DAHZ9vWnYJ0', 'bold-graphic', 'Wide post', 1600, 900, boldWide, 'saved', 'illustration'),
+  design('DAHZ9qo9-Do', 'bold-graphic', 'Facebook ad', 1200, 630, boldLink, 'saved', 'illustration'),
   { ...design('DAHZ9shQ9M8', 'stadium-night', 'Instagram post', 1080, 1350, stadiumPortrait, 'draft', 'artistic-render'), draftTransactionId: '8278137251297431667' },
   { ...design('DAHZ9opoks4', 'stadium-night', 'Portrait post', 1080, 1440, stadiumTall, 'draft', 'artistic-render'), draftTransactionId: '1819975385219273103' },
   { ...design('DAHZ9lBM3mI', 'stadium-night', 'Instagram Story', 1080, 1920, stadiumStory, 'draft', 'artistic-render'), draftTransactionId: '8837709504835823871' },
