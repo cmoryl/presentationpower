@@ -1,7 +1,7 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Redesign the Canva Stadium Night collection around real upper-grandstand photography; prepare all six size-specific drafts, then save after preview approval.
-- [ ] Rebuild all five Canva Bold Graphic layouts using supplied football artwork and restrained shapes; save after preview approval.
+- [ ] Stadium Night: six architecture-focused Canva drafts prepared and previews inspected; saving awaits explicit preview approval. Historical 2010 photo is credited, not represented as current football imagery; two additional collection variants remain unchanged.
+- [ ] Bold Graphic: all five supplied-helmet Canva drafts prepared and previews inspected; saving awaits explicit preview approval.
 
 - [x] Expand Bowl social templates into Canva: six editable Canva designs (one per template) created on the shared team account; each studio template now carries an "Edit in Canva" button that switches with the selection. Verified live (link swaps per template, no page errors), build OK, new uniqueness test passes.
 
