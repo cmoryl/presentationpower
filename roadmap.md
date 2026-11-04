@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Audit all live Bowl design previews for proportional scaling, edge clipping and logo/text placement across desktop, phone and enlarged sizes; correct reproducible issues without changing saved Canva originals.
+- [x] Audited all 59 live Bowl previews at 1950, 1280, 768, 390 and 320px widths, including 295 enlarged-preview checks: no stretching, preview cropping, page overflow or browser errors. Visual review found no definite text/logo clipping; Set 3 Story has tight lower copy margins, so platform-overlay safety is not certified. Saved Canva originals unchanged; arbitrary Canva auto-resizes are not verified by snapshot checks.
 
 - [x] Refresh fourteen Stadium Night / Design Set 2 social, ticket and email examples with shared gold separators, upright white headlines/dates and clearer logo/content separation. Reviewed all fourteen previews; seven gallery tests and public/member gallery, Story enlargement and mobile width checks pass. Canva revisions remain unsaved pending approval.
 
