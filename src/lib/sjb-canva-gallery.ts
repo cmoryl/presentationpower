@@ -70,19 +70,21 @@ import lightTicketsFacebook from '@/assets/sjb-canva/light-tickets-facebook.png.
 import lightEmailHero from '@/assets/sjb-canva/light-email-hero.png.asset.json';
 import lightEmailHeader from '@/assets/sjb-canva/light-email-header.png.asset.json';
 import lightEmailSignature from '@/assets/sjb-canva/light-email-signature.png.asset.json';
-import cineSocialIg from '@/assets/sjb-canva/cine-social-ig.png.asset.json';
-import cineSocialPortrait from '@/assets/sjb-canva/cine-social-portrait.png.asset.json';
-import cineSocialStory from '@/assets/sjb-canva/cine-social-story.png.asset.json';
-import cineSocialWide from '@/assets/sjb-canva/cine-social-wide.png.asset.json';
-import cineSocialFacebook from '@/assets/sjb-canva/cine-social-facebook.png.asset.json';
-import cineTicketsIg from '@/assets/sjb-canva/cine-tickets-ig.png.asset.json';
-import cineTicketsPortrait from '@/assets/sjb-canva/cine-tickets-portrait.png.asset.json';
-import cineTicketsStory from '@/assets/sjb-canva/cine-tickets-story.png.asset.json';
-import cineTicketsWide from '@/assets/sjb-canva/cine-tickets-wide.png.asset.json';
-import cineTicketsFacebook from '@/assets/sjb-canva/cine-tickets-facebook.png.asset.json';
-import cineEmailHero from '@/assets/sjb-canva/cine-email-hero.png.asset.json';
-import cineEmailHeader from '@/assets/sjb-canva/cine-email-header.png.asset.json';
-import cineEmailSignature from '@/assets/sjb-canva/cine-email-signature.png.asset.json';
+// Set 6 previews are served from public/sjb-canva so they can be refreshed
+// straight from Canva thumbnails without re-uploading asset pointers.
+const cineSocialIg = { url: '/sjb-canva/cine-social-ig.png' };
+const cineSocialPortrait = { url: '/sjb-canva/cine-social-portrait.png' };
+const cineSocialStory = { url: '/sjb-canva/cine-social-story.png' };
+const cineSocialWide = { url: '/sjb-canva/cine-social-wide.png' };
+const cineSocialFacebook = { url: '/sjb-canva/cine-social-facebook.png' };
+const cineTicketsIg = { url: '/sjb-canva/cine-tickets-ig.png' };
+const cineTicketsPortrait = { url: '/sjb-canva/cine-tickets-portrait.png' };
+const cineTicketsStory = { url: '/sjb-canva/cine-tickets-story.png' };
+const cineTicketsWide = { url: '/sjb-canva/cine-tickets-wide.png' };
+const cineTicketsFacebook = { url: '/sjb-canva/cine-tickets-facebook.png' };
+const cineEmailHero = { url: '/sjb-canva/cine-email-hero.png' };
+const cineEmailHeader = { url: '/sjb-canva/cine-email-header.png' };
+const cineEmailSignature = { url: '/sjb-canva/cine-email-signature.png' };
 
 export const SJB_CANVA_COLLECTIONS = [
   { id: 'bold-graphic', name: 'Design Set 1', folderId: 'FAHZ9_NN2FQ' },
