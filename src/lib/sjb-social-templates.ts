@@ -49,6 +49,8 @@ export interface SjbSocialTemplate {
   fields: readonly SjbCopyField[];
   /** Default copy, drawn from announced event facts only. */
   defaults: Record<string, string>;
+  /** Editable Canva version of this template (shared team account). */
+  canvaUrl: string;
 }
 
 export const SJB_SOCIAL_TEMPLATES: readonly SjbSocialTemplate[] = [
