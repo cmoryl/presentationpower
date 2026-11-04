@@ -63,4 +63,19 @@ describe("sjb-social-templates", () => {
       expect(g.logoVariant).toBe(g.kind === "light" ? "color" : "dark");
     }
   });
+
+  it("every Canva style set covers all five native formats with unique links", () => {
+    expect(SJB_CANVA_STYLE_SETS).toHaveLength(4);
+    const allUrls: string[] = [];
+    for (const set of SJB_CANVA_STYLE_SETS) {
+      expect(set.designs).toHaveLength(SJB_SOCIAL_FORMATS.length);
+      for (const f of SJB_SOCIAL_FORMATS) {
+        const d = set.designs.find((x) => x.formatId === f.id);
+        expect(d, `${set.id}.${f.id}`).toBeDefined();
+        expect(d!.url).toMatch(/^https:\/\/canva\.link\//);
+        allUrls.push(d!.url);
+      }
+    }
+    expect(new Set(allUrls).size).toBe(allUrls.length);
+  });
 });
