@@ -3,21 +3,25 @@ import { SJB_CANVA_COLLECTIONS, SJB_CANVA_GALLERY, filterSjbCanvaDesigns } from 
 describe('Bowl Canva gallery', () => {
   it('keeps reviewed campaign adaptations unsaved', () => {
     const drafts = SJB_CANVA_GALLERY.filter(d => d.status === 'draft' && !d.format && d.campaign !== 'tickets');
-    expect(drafts).toHaveLength(14);
-    expect(drafts.filter(d => d.collectionId === 'stadium-night')).toHaveLength(6);
+    expect(drafts).toHaveLength(8);
+    expect(drafts.filter(d => d.collectionId === 'stadium-night')).toHaveLength(0);
     expect(drafts.filter(d => d.collectionId === 'bold-graphic')).toHaveLength(3);
     const originals = SJB_CANVA_GALLERY.filter(d => d.collectionId === 'bold-graphic' && !d.format && d.campaign !== 'tickets');
     expect(originals).toHaveLength(5);
     expect(originals.filter(d => d.status === 'saved')).toHaveLength(2);
     expect(originals.every(d => d.provenance === 'illustration')).toBe(true);
   });
-  it('keeps all fourteen Stadium Night render revisions unsaved and traceable', () => {
+  it('tracks the fourteen Stadium Night render revisions, ten saved and four still drafting', () => {
     const stadium = filterSjbCanvaDesigns('stadium-night', 'all', 'all');
     expect(stadium).toHaveLength(14);
     expect(stadium.every(d => d.provenance === 'artistic-render')).toBe(true);
-    expect(stadium.every(d => d.status === 'draft' && Boolean(d.draftTransactionId))).toBe(true);
-    expect(new Set(stadium.map(d => d.draftTransactionId)).size).toBe(14);
-    expect(stadium.find(d => d.id === 'DAHZ9kjer6Y')?.draftTransactionId).toBe('4256422794818486742');
+    const saved = stadium.filter(d => d.status === 'saved');
+    expect(saved).toHaveLength(10);
+    expect(saved.every(d => !d.draftTransactionId)).toBe(true);
+    const drafts = stadium.filter(d => d.status === 'draft');
+    expect(drafts.map(d => d.id).sort()).toEqual(['DAHZ-KEtDD4', 'DAHZ-M0tbyNo', 'DAHZ-MakbIc', 'DAHZ-OfkGy2w'].sort());
+    expect(drafts.every(d => Boolean(d.draftTransactionId))).toBe(true);
+    expect(new Set(drafts.map(d => d.draftTransactionId)).size).toBe(4);
   });
   it('uses actual Canva sizes, not the old square label', () => {
     expect(SJB_CANVA_GALLERY.find(d => d.id === 'DAHZ-Soacj8')).toMatchObject({ width: 1080, height: 1440 });
@@ -39,7 +43,11 @@ describe('Bowl Canva gallery', () => {
       expect(filterSjbCanvaDesigns(style, 'all', 'Tickets on sale')).toHaveLength(5);
     }
     expect(new Set(tickets.map(d => d.id)).size).toBe(20);
-    expect(tickets.every(d => d.status === 'draft' && Boolean(d.draftTransactionId))).toBe(true);
+    const nonStadium = tickets.filter(d => d.collectionId !== 'stadium-night');
+    expect(nonStadium.every(d => d.status === 'draft' && Boolean(d.draftTransactionId))).toBe(true);
+    const stadiumTickets = tickets.filter(d => d.collectionId === 'stadium-night');
+    expect(stadiumTickets.filter(d => d.status === 'saved')).toHaveLength(4);
+    expect(stadiumTickets.find(d => d.id === 'DAHZ-KEtDD4')?.status).toBe('draft');
   });
   it('email artwork stays within each established look at the three supplied sizes', () => {
     expect(SJB_CANVA_COLLECTIONS.map(c => c.id)).not.toContain('email');
