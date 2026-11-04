@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Standardize all four Bowl Canva campaign folder structures and variation coverage; make Bold Graphic adaptations inherit its gold football/palm wide-post artwork, and sync reviewed previews to Element.
+- [ ] Complete campaign parity: common five top-level categories and six Campaign Variations folders created for all four looks; Launch social/ticket/email copies filed. Bold three portrait/social drafts, five gold football/palm ticket previews and three reflowed emails synced to Element; Launch three emails and wide ticket synced. Six gallery tests pass, live Bold ticket/Launch header filters verified, build OK. Remaining: populate six variation folders in Bold/Stadium/Action, finish Launch size adaptations, normalize legacy social folder names, and verify every Canva draft pairing before saving. All artwork edits remain unsaved pending explicit approval.
 
 - [x] Replace rejected palm emails with nine style-specific hero/header/signature previews and refresh eleven Stadium Night social/ticket previews with original canopy/action artwork; reviewed all twenty, removed empty logo frames and refined venue-text spacing, six gallery tests pass, both public/signed-in pages and mobile enlargement verified, learning signal logged. All twenty Canva revisions remain unsaved.
 
