@@ -3,7 +3,7 @@ import { SJB_CANVA_COLLECTIONS, SJB_CANVA_GALLERY, filterSjbCanvaDesigns } from 
 describe('Bowl Canva gallery', () => {
   it('keeps only un-reviewed campaign adaptations unsaved', () => {
     const drafts = SJB_CANVA_GALLERY.filter(d => d.status === 'draft' && !d.format && d.campaign !== 'tickets');
-    expect(drafts).toHaveLength(5);
+    expect(drafts).toHaveLength(0);
     expect(drafts.filter(d => d.collectionId === 'stadium-night')).toHaveLength(0);
     expect(drafts.filter(d => d.collectionId === 'bold-graphic')).toHaveLength(0);
     const originals = SJB_CANVA_GALLERY.filter(d => d.collectionId === 'bold-graphic' && !d.format && d.campaign !== 'tickets');
@@ -42,7 +42,9 @@ describe('Bowl Canva gallery', () => {
       expect(filterSjbCanvaDesigns(style, 'all', 'Tickets on sale')).toHaveLength(5);
     }
     expect(new Set(tickets.map(d => d.id)).size).toBe(20);
-    const nonStadium = tickets.filter(d => d.collectionId !== 'stadium-night');
+    const boldTickets = tickets.filter(d => d.collectionId === 'bold-graphic');
+    expect(boldTickets.every(d => d.status === 'saved' && !d.draftTransactionId)).toBe(true);
+    const nonStadium = tickets.filter(d => d.collectionId !== 'stadium-night' && d.collectionId !== 'bold-graphic');
     expect(nonStadium.every(d => d.status === 'draft' && Boolean(d.draftTransactionId))).toBe(true);
     const stadiumTickets = tickets.filter(d => d.collectionId === 'stadium-night');
     expect(stadiumTickets.filter(d => d.status === 'saved')).toHaveLength(4);
@@ -56,7 +58,7 @@ describe('Bowl Canva gallery', () => {
       expect(email.map(d => [d.format, d.width, d.height])).toEqual([
         ['email-hero', 1200, 600], ['email-header', 1200, 300], ['email-signature', 1200, 200],
       ]);
-      if (style === 'stadium-night') {
+      if (style === 'stadium-night' || style === 'bold-graphic') {
         expect(email.every(d => d.status === 'saved')).toBe(true);
       } else {
         expect(email.every(d => d.status === 'draft' && Boolean(d.draftTransactionId))).toBe(true);
