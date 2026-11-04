@@ -384,7 +384,8 @@ export function SjbSocialStudio() {
             <h1 className="mt-1 text-3xl font-bold leading-tight text-[#03002C]">Social templates</h1>
             <p className="mt-1 max-w-2xl text-[15px] text-[#03002C]/70">
               Live Bowl designs for every channel. Pick a template, edit the words, choose a ground,
-              and download PNGs at exact native sizes — no design tool needed.
+              and download PNGs at exact native sizes — or open the matching Canva template for
+              full design editing.
             </p>
           </div>
           <button
