@@ -183,7 +183,7 @@ export function sjbSocialFormat(id: string | null | undefined): SjbSocialFormat 
  * "San Juan Bowl — Social 2026"): four visual styles, each in all five
  * native sizes. Links open the editable Canva design.
  */
-export const SJB_CANVA_FOLDER_URL = "https://www.canva.com/folder/FAHZ9pAyzcU";
+export const SJB_CANVA_FOLDER_URL = "https://www.canva.com/folder/FAHZ9iIZXxc";
 
 export interface SjbCanvaStyleSet {
   id: string;
@@ -199,52 +199,52 @@ export const SJB_CANVA_STYLE_SETS: readonly SjbCanvaStyleSet[] = [
     id: "stadium-night",
     name: "Stadium Night",
     blurb: "Cinematic night stadium under golden floodlights, deep navy sky.",
-    artworkMediaId: "MAHZ9geTeZU",
+    artworkMediaId: "MAHZ9r1WG20",
     designs: [
-      { formatId: "square", url: "https://canva.link/tm5tvhuwm2oxbv4" },
-      { formatId: "portrait", url: "https://canva.link/cshh5ojaemathxl" },
-      { formatId: "story", url: "https://canva.link/h3vzab0824z58rg" },
-      { formatId: "wide", url: "https://canva.link/b0bfmojvbonqo2c" },
-      { formatId: "link", url: "https://canva.link/r64z9u45tlvbeeq" },
+      { formatId: "square", url: "https://canva.link/xbnimmqoik1cidp" },
+      { formatId: "portrait", url: "https://canva.link/pxgu1jl300vl06c" },
+      { formatId: "story", url: "https://canva.link/modfmlg00r0xojw" },
+      { formatId: "wide", url: "https://canva.link/w8jzzm70rsy3hvp" },
+      { formatId: "link", url: "https://canva.link/27pqe8dwp0wouig" },
     ],
   },
   {
     id: "action-spotlight",
     name: "Action Spotlight",
     blurb: "Player silhouette mid-action, gold rim light on deep navy.",
-    artworkMediaId: "MAHZ9gyDQ0s",
+    artworkMediaId: "MAHZ9sY1lMU",
     designs: [
-      { formatId: "square", url: "https://canva.link/uv1mad4o0c0mg6g" },
-      { formatId: "portrait", url: "https://canva.link/pq7jx9dvb2qo15k" },
-      { formatId: "story", url: "https://canva.link/nbpcy2n68ow1sy2" },
-      { formatId: "wide", url: "https://canva.link/wcrwrd3zbmi450v" },
-      { formatId: "link", url: "https://canva.link/9v7e6l44msgngu0" },
+      { formatId: "square", url: "https://canva.link/xniaekzpsmdmfhu" },
+      { formatId: "portrait", url: "https://canva.link/cr5t0kav5butddw" },
+      { formatId: "story", url: "https://canva.link/ihq01cy2qcpgkdh" },
+      { formatId: "wide", url: "https://canva.link/uqw3rsio4ymc6zy" },
+      { formatId: "link", url: "https://canva.link/bia5w3uybio69x9" },
     ],
   },
   {
     id: "bold-graphic",
     name: "Bold Graphic",
     blurb: "Flat vector football and Caribbean wave poster art.",
-    artworkMediaId: "MAHZ9ki16Rg",
+    artworkMediaId: "MAHZ9omWbug",
     designs: [
-      { formatId: "square", url: "https://canva.link/nzfpntgyezm0ck9" },
-      { formatId: "portrait", url: "https://canva.link/l460d76k6bva8ce" },
-      { formatId: "story", url: "https://canva.link/138oz4ybbrax9dy" },
-      { formatId: "wide", url: "https://canva.link/w117w0wxfh72st7" },
-      { formatId: "link", url: "https://canva.link/mcvyodc5hv8y756" },
+      { formatId: "square", url: "https://canva.link/udrc2kleswq6gbu" },
+      { formatId: "portrait", url: "https://canva.link/uhlk9ttnqgf6qk2" },
+      { formatId: "story", url: "https://canva.link/jmn8bd3tzy91wgl" },
+      { formatId: "wide", url: "https://canva.link/ad4dj6b7hyckr0o" },
+      { formatId: "link", url: "https://canva.link/q0k3r7tfwpz1z7m" },
     ],
   },
   {
     id: "golden-hour",
     name: "Golden Hour",
     blurb: "Warm golden-hour crowd, palms on the horizon, navy shadows.",
-    artworkMediaId: "MAHZ9gyS9Tg",
+    artworkMediaId: "MAHZ9lonBvA",
     designs: [
-      { formatId: "square", url: "https://canva.link/zh9na7cnjqw06pr" },
-      { formatId: "portrait", url: "https://canva.link/fiqqmeye482qfxz" },
-      { formatId: "story", url: "https://canva.link/6cqbxxaywg443a6" },
-      { formatId: "wide", url: "https://canva.link/ljfddfep4wsih93" },
-      { formatId: "link", url: "https://canva.link/3gj5zazdofvd9ft" },
+      { formatId: "square", url: "https://canva.link/g256d45ju81ot85" },
+      { formatId: "portrait", url: "https://canva.link/4rxxqz7guk4gc9a" },
+      { formatId: "story", url: "https://canva.link/hz0shb2w6phhl02" },
+      { formatId: "wide", url: "https://canva.link/pjm1y9msl5avnnw" },
+      { formatId: "link", url: "https://canva.link/xxwzdkg05ntbsls" },
     ],
   },
 ] as const;
