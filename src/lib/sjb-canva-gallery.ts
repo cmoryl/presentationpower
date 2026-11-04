@@ -3,12 +3,12 @@ import boldWide from '@/assets/sjb-canva/bold-wide.png.asset.json';
 import boldLink from '@/assets/sjb-canva/bold-link.png.asset.json';
 import boldPortrait from '@/assets/sjb-canva/bold-portrait.png.asset.json';
 import boldStory from '@/assets/sjb-canva/bold-story.png.asset.json';
-import stadiumWide from '@/assets/sjb-canva/stadium-wide.png.asset.json';
-import stadiumSocialWide from '@/assets/sjb-canva/stadium-social-wide.png.asset.json';
-import stadiumLink from '@/assets/sjb-canva/stadium-link.png.asset.json';
-import stadiumTall from '@/assets/sjb-canva/stadium-tall.png.asset.json';
-import stadiumPortrait from '@/assets/sjb-canva/stadium-portrait.png.asset.json';
-import stadiumStory from '@/assets/sjb-canva/stadium-story.png.asset.json';
+import stadiumWide from '@/assets/sjb-canva/stadium-refresh-wide.png.asset.json';
+import stadiumSocialWide from '@/assets/sjb-canva/stadium-refresh-social-wide.png.asset.json';
+import stadiumLink from '@/assets/sjb-canva/stadium-refresh-link.png.asset.json';
+import stadiumTall from '@/assets/sjb-canva/stadium-refresh-tall.png.asset.json';
+import stadiumPortrait from '@/assets/sjb-canva/stadium-refresh-portrait.png.asset.json';
+import stadiumStory from '@/assets/sjb-canva/stadium-refresh-story.png.asset.json';
 import actionWide from '@/assets/sjb-canva/action-wide.png.asset.json';
 import actionLink from '@/assets/sjb-canva/action-link.png.asset.json';
 import actionTall from '@/assets/sjb-canva/action-tall.png.asset.json';
@@ -25,11 +25,11 @@ import ticketBoldTall from '@/assets/sjb-canva/style-tickets-bold-tall.png.asset
 import ticketBoldStory from '@/assets/sjb-canva/style-tickets-bold-story.png.asset.json';
 import ticketBoldWide from '@/assets/sjb-canva/style-tickets-bold-wide.png.asset.json';
 import ticketBoldLink from '@/assets/sjb-canva/style-tickets-bold-link.png.asset.json';
-import ticketStadiumPortrait from '@/assets/sjb-canva/style-tickets-stadium-portrait.png.asset.json';
-import ticketStadiumTall from '@/assets/sjb-canva/style-tickets-stadium-tall.png.asset.json';
-import ticketStadiumStory from '@/assets/sjb-canva/style-tickets-stadium-story.png.asset.json';
-import ticketStadiumWide from '@/assets/sjb-canva/style-tickets-stadium-wide.png.asset.json';
-import ticketStadiumLink from '@/assets/sjb-canva/style-tickets-stadium-link.png.asset.json';
+import ticketStadiumPortrait from '@/assets/sjb-canva/stadium-refresh-ticket-portrait.png.asset.json';
+import ticketStadiumTall from '@/assets/sjb-canva/stadium-refresh-ticket-tall.png.asset.json';
+import ticketStadiumStory from '@/assets/sjb-canva/stadium-refresh-ticket-story.png.asset.json';
+import ticketStadiumWide from '@/assets/sjb-canva/stadium-refresh-ticket-wide.png.asset.json';
+import ticketStadiumLink from '@/assets/sjb-canva/stadium-refresh-ticket-link.png.asset.json';
 import ticketActionPortrait from '@/assets/sjb-canva/style-tickets-action-portrait.png.asset.json';
 import ticketActionTall from '@/assets/sjb-canva/style-tickets-action-tall.png.asset.json';
 import ticketActionStory from '@/assets/sjb-canva/style-tickets-action-story.png.asset.json';
@@ -64,7 +64,7 @@ export interface SjbCanvaGalleryDesign {
   status: 'draft' | 'saved';
   campaign?: 'tickets';
   draftTransactionId?: string;
-  provenance: 'historical-photo' | 'supplied-artwork' | 'illustration';
+  provenance: 'historical-photo' | 'artistic-render' | 'supplied-artwork' | 'illustration';
 }
 function design(id: string, collectionId: SjbCanvaCollectionId, name: string, width: number, height: number, asset: { url: string }, status: SjbCanvaGalleryDesign['status'], provenance: SjbCanvaGalleryDesign['provenance'], canvaUrl?: string): SjbCanvaGalleryDesign {
   return { id, collectionId, name, width, height, previewUrl: asset.url, status, provenance, canvaUrl: canvaUrl ?? `https://www.canva.com/design/${id}/edit` };
@@ -77,12 +77,12 @@ export const SJB_CANVA_GALLERY: readonly SjbCanvaGalleryDesign[] = [
   design('DAHZ9tOPYr4', 'bold-graphic', 'Instagram Story', 1080, 1920, boldStory, 'draft', 'supplied-artwork'),
   design('DAHZ9vWnYJ0', 'bold-graphic', 'Wide post', 1600, 900, boldWide, 'draft', 'supplied-artwork'),
   design('DAHZ9qo9-Do', 'bold-graphic', 'Facebook ad', 1200, 628, boldLink, 'draft', 'supplied-artwork'),
-  design('DAHZ9shQ9M8', 'stadium-night', 'Instagram post', 1080, 1350, stadiumPortrait, 'draft', 'historical-photo'),
-  design('DAHZ9opoks4', 'stadium-night', 'Portrait post', 1080, 1440, stadiumTall, 'draft', 'historical-photo'),
-  design('DAHZ9lBM3mI', 'stadium-night', 'Instagram Story', 1080, 1920, stadiumStory, 'draft', 'historical-photo'),
-  design('DAHZ9kjer6Y', 'stadium-night', 'Wide post', 1600, 900, stadiumWide, 'draft', 'historical-photo'),
-  design('DAHZ9uJCTzk', 'stadium-night', 'Social post', 1600, 900, stadiumSocialWide, 'draft', 'historical-photo'),
-  design('DAHZ9qKVbrI', 'stadium-night', 'Facebook ad', 1200, 628, stadiumLink, 'draft', 'historical-photo'),
+  { ...design('DAHZ9shQ9M8', 'stadium-night', 'Instagram post', 1080, 1350, stadiumPortrait, 'draft', 'artistic-render'), draftTransactionId: '8278137251297431667' },
+  { ...design('DAHZ9opoks4', 'stadium-night', 'Portrait post', 1080, 1440, stadiumTall, 'draft', 'artistic-render'), draftTransactionId: '1819975385219273103' },
+  { ...design('DAHZ9lBM3mI', 'stadium-night', 'Instagram Story', 1080, 1920, stadiumStory, 'draft', 'artistic-render'), draftTransactionId: '8837709504835823871' },
+  { ...design('DAHZ9kjer6Y', 'stadium-night', 'Wide post', 1600, 900, stadiumWide, 'draft', 'artistic-render'), draftTransactionId: '7169125843754127139' },
+  { ...design('DAHZ9uJCTzk', 'stadium-night', 'Social post', 1600, 900, stadiumSocialWide, 'draft', 'artistic-render'), draftTransactionId: '5463387484003916578' },
+  { ...design('DAHZ9qKVbrI', 'stadium-night', 'Facebook ad', 1200, 628, stadiumLink, 'draft', 'artistic-render'), draftTransactionId: '6929309164735758292' },
   design('DAHZ9m49-nA', 'action-spotlight', 'Instagram post', 1080, 1350, actionPortrait, 'saved', 'illustration', 'https://www.canva.com/d/mbgzbxD3RkNvPQO'),
   design('DAHZ9nPhkZ0', 'action-spotlight', 'Portrait post', 1080, 1440, actionTall, 'saved', 'illustration', 'https://www.canva.com/d/plo9nR8OtHjXWk-'),
   design('DAHZ9lwpgeY', 'action-spotlight', 'Instagram Story', 1080, 1920, actionStory, 'saved', 'illustration', 'https://www.canva.com/d/szxKC_ms6jUFfPq'),
@@ -99,11 +99,11 @@ export const SJB_CANVA_GALLERY: readonly SjbCanvaGalleryDesign[] = [
   { ...design('DAHZ-LMMFrI', 'bold-graphic', 'Tickets on sale', 1080, 1920, ticketBoldStory, 'draft', 'supplied-artwork'), campaign: 'tickets', draftTransactionId: '2711688111659700200' },
   { ...design('DAHZ-Pk8fbQ', 'bold-graphic', 'Tickets on sale', 1600, 900, ticketBoldWide, 'draft', 'supplied-artwork'), campaign: 'tickets', draftTransactionId: '2448227531979153122' },
   { ...design('DAHZ-L486O8', 'bold-graphic', 'Tickets on sale', 1200, 630, ticketBoldLink, 'draft', 'supplied-artwork'), campaign: 'tickets', draftTransactionId: '1815471784207980601' },
-  { ...design('DAHZ-JE36VU', 'stadium-night', 'Tickets on sale', 1080, 1350, ticketStadiumPortrait, 'draft', 'historical-photo'), campaign: 'tickets', draftTransactionId: '3362458255991776269' },
-  { ...design('DAHZ-LEwyYM', 'stadium-night', 'Tickets on sale', 1080, 1440, ticketStadiumTall, 'draft', 'historical-photo'), campaign: 'tickets', draftTransactionId: '562345187704546197' },
-  { ...design('DAHZ-KzmDcI', 'stadium-night', 'Tickets on sale', 1080, 1920, ticketStadiumStory, 'draft', 'historical-photo'), campaign: 'tickets', draftTransactionId: '4800232438928425933' },
-  { ...design('DAHZ-GDY4eA', 'stadium-night', 'Tickets on sale', 1600, 900, ticketStadiumWide, 'draft', 'historical-photo'), campaign: 'tickets', draftTransactionId: '8998713192058624692' },
-  { ...design('DAHZ-KEtDD4', 'stadium-night', 'Tickets on sale', 1200, 628, ticketStadiumLink, 'draft', 'historical-photo'), campaign: 'tickets', draftTransactionId: '7274960434453339635' },
+  { ...design('DAHZ-JE36VU', 'stadium-night', 'Tickets on sale', 1080, 1350, ticketStadiumPortrait, 'draft', 'artistic-render'), campaign: 'tickets', draftTransactionId: '3566246140922845966' },
+  { ...design('DAHZ-LEwyYM', 'stadium-night', 'Tickets on sale', 1080, 1440, ticketStadiumTall, 'draft', 'artistic-render'), campaign: 'tickets', draftTransactionId: '587114985962709785' },
+  { ...design('DAHZ-KzmDcI', 'stadium-night', 'Tickets on sale', 1080, 1920, ticketStadiumStory, 'draft', 'artistic-render'), campaign: 'tickets', draftTransactionId: '5208934104370216805' },
+  { ...design('DAHZ-GDY4eA', 'stadium-night', 'Tickets on sale', 1600, 900, ticketStadiumWide, 'draft', 'artistic-render'), campaign: 'tickets', draftTransactionId: '587114987910896619' },
+  { ...design('DAHZ-KEtDD4', 'stadium-night', 'Tickets on sale', 1200, 628, ticketStadiumLink, 'draft', 'artistic-render'), campaign: 'tickets', draftTransactionId: '850575565497915490' },
   { ...design('DAHZ-Atic_E', 'action-spotlight', 'Tickets on sale', 1080, 1350, ticketActionPortrait, 'draft', 'illustration'), campaign: 'tickets', draftTransactionId: '2788249304273450131' },
   { ...design('DAHZ-NpZy44', 'action-spotlight', 'Tickets on sale', 1080, 1440, ticketActionTall, 'draft', 'illustration'), campaign: 'tickets', draftTransactionId: '1961838772873181076' },
   { ...design('DAHZ-NF5PtA', 'action-spotlight', 'Tickets on sale', 1080, 1920, ticketActionStory, 'draft', 'illustration'), campaign: 'tickets', draftTransactionId: '2053036667138260088' },
