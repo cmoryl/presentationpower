@@ -10,10 +10,19 @@ describe('Bowl Canva gallery', () => {
   it('uses actual Canva sizes, not the old square label', () => {
     expect(SJB_CANVA_GALLERY.find(d => d.id === 'DAHZ9nvVT-Q')).toMatchObject({ width: 1080, height: 1440 });
     expect(SJB_CANVA_GALLERY.find(d => d.id === 'DAHZ9qo9-Do')).toMatchObject({ width: 1200, height: 628 });
-    expect(SJB_CANVA_GALLERY.some(d => d.width === 1080 && d.height === 1080)).toBe(false);
+    expect(SJB_CANVA_GALLERY.some(d => d.collectionId !== 'tickets' && d.width === 1080 && d.height === 1080)).toBe(false);
   });
   it('combines collection, size and ad type without inventing unavailable sizes', () => {
     expect(filterSjbCanvaDesigns('bold-graphic', '1080×1920', 'Instagram Story').map(d => d.id)).toEqual(['DAHZ9tOPYr4']);
     expect(filterSjbCanvaDesigns('launch', '1600×900', 'all')).toEqual([]);
+  });
+  it('ticket campaign provides two supplied versions in five exact sizes', () => {
+    const tickets = filterSjbCanvaDesigns('tickets', 'all', 'all');
+    expect(tickets).toHaveLength(10);
+    for (const size of ['1080×1350', '1080×1080', '1080×1920', '1600×900', '1200×628']) {
+      expect(filterSjbCanvaDesigns('tickets', size, 'all')).toHaveLength(2);
+    }
+    expect(new Set(tickets.map(d => d.id)).size).toBe(10);
+    expect(tickets.every(d => d.status === 'saved')).toBe(true);
   });
 });

@@ -20,12 +20,23 @@ import launchScore from '@/assets/sjb-canva/launch-score.png.asset.json';
 import launchCountdown from '@/assets/sjb-canva/launch-countdown.png.asset.json';
 import launchMatchup from '@/assets/sjb-canva/launch-matchup.png.asset.json';
 import launchGameDay from '@/assets/sjb-canva/launch-game-day.png.asset.json';
+import ticketsPortrait1 from '@/assets/sjb-canva/tickets-portrait-1.png.asset.json';
+import ticketsPortrait2 from '@/assets/sjb-canva/tickets-portrait-2.png.asset.json';
+import ticketsSquare1 from '@/assets/sjb-canva/tickets-square-1.png.asset.json';
+import ticketsSquare2 from '@/assets/sjb-canva/tickets-square-2.png.asset.json';
+import ticketsStory1 from '@/assets/sjb-canva/tickets-story-1.png.asset.json';
+import ticketsStory2 from '@/assets/sjb-canva/tickets-story-2.png.asset.json';
+import ticketsWide1 from '@/assets/sjb-canva/tickets-wide-1.png.asset.json';
+import ticketsWide2 from '@/assets/sjb-canva/tickets-wide-2.png.asset.json';
+import ticketsLink1 from '@/assets/sjb-canva/tickets-link-1.png.asset.json';
+import ticketsLink2 from '@/assets/sjb-canva/tickets-link-2.png.asset.json';
 
 export const SJB_CANVA_COLLECTIONS = [
   { id: 'bold-graphic', name: 'Bold Graphic', folderId: 'FAHZ9_NN2FQ' },
   { id: 'stadium-night', name: 'Stadium Night', folderId: 'FAHZ93d8ki8' },
   { id: 'action-spotlight', name: 'Action Spotlight', folderId: 'FAHZ90BI6Mo' },
   { id: 'launch', name: 'Launch Ads', folderId: 'FAHZ99Po6eg' },
+  { id: 'tickets', name: 'Tickets On Sale', folderId: 'FAHZ-E2iiCU' },
 ] as const;
 export type SjbCanvaCollectionId = typeof SJB_CANVA_COLLECTIONS[number]['id'];
 export interface SjbCanvaGalleryDesign {
@@ -67,6 +78,16 @@ export const SJB_CANVA_GALLERY: readonly SjbCanvaGalleryDesign[] = [
   design('DAHZ9ll6m0A', 'launch', 'Final score', 1080, 1350, launchScore, 'saved', 'illustration', 'https://www.canva.com/d/fsDIjvMGkEy7ti3'),
   design('DAHZ9hR5aI4', 'launch', 'Quote card', 1080, 1350, launchQuote, 'saved', 'illustration', 'https://www.canva.com/d/OM2Zo5qnCSfn8fH'),
   design('DAHZ9lAkSN4', 'launch', 'Save the date', 1080, 1350, launchDate, 'saved', 'illustration', 'https://www.canva.com/d/hq22hG4ig3mw66E'),
+  ...[
+    { id: 'DAHZ-D4CwjU', width: 1080, height: 1350, assets: [ticketsPortrait1, ticketsPortrait2], url: 'https://www.canva.com/d/Vhh_Qj-cYSDj6nP' },
+    { id: 'DAHZ-GobKqc', width: 1080, height: 1080, assets: [ticketsSquare1, ticketsSquare2], url: 'https://www.canva.com/d/Tqdg34NUFpsE-mp' },
+    { id: 'DAHZ-PdonI8', width: 1080, height: 1920, assets: [ticketsStory1, ticketsStory2], url: 'https://www.canva.com/d/cU17XZEuMgqLqlX' },
+    { id: 'DAHZ-B1mOFw', width: 1600, height: 900, assets: [ticketsWide1, ticketsWide2], url: 'https://www.canva.com/d/UV8ZgLKZ6aPNLcA' },
+    { id: 'DAHZ-MivkpE', width: 1200, height: 628, assets: [ticketsLink1, ticketsLink2], url: 'https://www.canva.com/d/SH1Fn9LcZjINDna' },
+  ].flatMap(format => format.assets.map((asset, index) => design(
+    `${format.id}:page-${index + 1}`, 'tickets', index === 0 ? 'Tickets on sale · Badge' : 'Tickets on sale · Matchup',
+    format.width, format.height, asset, 'saved', 'supplied-artwork', format.url,
+  ))),
 ];
 export function sjbCanvaSize(d: Pick<SjbCanvaGalleryDesign, 'width' | 'height'>) { return `${d.width}×${d.height}`; }
 export function filterSjbCanvaDesigns(collectionId: string, size: string, name: string) {
