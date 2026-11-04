@@ -49,7 +49,7 @@ export interface SjbSocialTemplate {
   fields: readonly SjbCopyField[];
   /** Default copy, drawn from announced event facts only. */
   defaults: Record<string, string>;
-  /** Editable Canva version of this template (shared team account). */
+  /** Editable Canva version of this template (TransPerfect Canva account). */
   canvaUrl: string;
 }
 
@@ -179,7 +179,7 @@ export function sjbSocialFormat(id: string | null | undefined): SjbSocialFormat 
 }
 
 /**
- * Canva design versions generated in the shared Canva account (folder
+ * Canva design versions generated in the TransPerfect Canva account (folder
  * "San Juan Bowl — Social 2026"): four visual styles, each in all five
  * native sizes. Links open the editable Canva design.
  */
