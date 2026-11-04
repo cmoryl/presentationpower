@@ -49,7 +49,7 @@ export const SJB_CANVA_GALLERY: readonly SjbCanvaGalleryDesign[] = [
   design('DAHZ9nvVT-Q', 'bold-graphic', 'Portrait post', 1080, 1440, boldTall, 'draft', 'supplied-artwork'),
   design('DAHZ9tOPYr4', 'bold-graphic', 'Instagram Story', 1080, 1920, boldStory, 'draft', 'supplied-artwork'),
   design('DAHZ9vWnYJ0', 'bold-graphic', 'Wide post', 1600, 900, boldWide, 'draft', 'supplied-artwork'),
-  design('DAHZ9qo9-Do', 'bold-graphic', 'Facebook ad', 1200, 630, boldLink, 'draft', 'supplied-artwork'),
+  design('DAHZ9qo9-Do', 'bold-graphic', 'Facebook ad', 1200, 628, boldLink, 'draft', 'supplied-artwork'),
   design('DAHZ9shQ9M8', 'stadium-night', 'Instagram post', 1080, 1350, stadiumPortrait, 'draft', 'historical-photo'),
   design('DAHZ9opoks4', 'stadium-night', 'Portrait post', 1080, 1440, stadiumTall, 'draft', 'historical-photo'),
   design('DAHZ9lBM3mI', 'stadium-night', 'Instagram Story', 1080, 1920, stadiumStory, 'draft', 'historical-photo'),
