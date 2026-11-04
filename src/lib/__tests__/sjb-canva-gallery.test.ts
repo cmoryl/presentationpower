@@ -31,29 +31,31 @@ describe('Bowl Canva gallery', () => {
   it('ticket versions belong to each existing look, never a separate collection', () => {
     expect(SJB_CANVA_COLLECTIONS.map(c => c.id)).not.toContain('tickets');
     const tickets = SJB_CANVA_GALLERY.filter(d => d.campaign === 'tickets');
-    expect(tickets).toHaveLength(20);
-    for (const style of ['bold-graphic', 'stadium-night', 'action-spotlight', 'launch']) {
+    expect(tickets).toHaveLength(25);
+    for (const style of ['bold-graphic', 'stadium-night', 'action-spotlight', 'launch', 'light-action']) {
       const versions = tickets.filter(d => d.collectionId === style);
       expect(versions).toHaveLength(5);
       expect(versions.map(d => `${d.width}×${d.height}`).sort()).toEqual(['1080×1350', '1080×1440', '1080×1920', '1600×900', style === 'bold-graphic' ? '1200×630' : '1200×628'].sort());
       expect(filterSjbCanvaDesigns(style, 'all', 'Tickets on sale')).toHaveLength(5);
     }
-    expect(new Set(tickets.map(d => d.id)).size).toBe(20);
+    expect(new Set(tickets.map(d => d.id)).size).toBe(25);
     expect(tickets.every(d => d.status === 'saved' && !d.draftTransactionId)).toBe(true);
   });
   it('email artwork stays within each established look at the three supplied sizes', () => {
     expect(SJB_CANVA_COLLECTIONS.map(c => c.id)).not.toContain('email');
-    expect(SJB_CANVA_GALLERY.filter(d => d.format)).toHaveLength(12);
-    for (const style of ['bold-graphic', 'stadium-night', 'action-spotlight', 'launch']) {
+    expect(SJB_CANVA_GALLERY.filter(d => d.format)).toHaveLength(15);
+    for (const style of ['bold-graphic', 'stadium-night', 'action-spotlight', 'launch', 'light-action']) {
       const email = filterSjbCanvaDesigns(style, 'all', 'all').filter(d => d.format);
-      expect(email.map(d => [d.format, d.width, d.height])).toEqual([
-        ['email-hero', 1200, 600], ['email-header', 1200, 300], ['email-signature', 1200, 200],
-      ]);
+      expect(email.map(d => [d.format, d.width, d.height])).toEqual(
+        style === 'light-action'
+          ? [['email-hero', 600, 200], ['email-header', 600, 200], ['email-signature', 400, 200]]
+          : [['email-hero', 1200, 600], ['email-header', 1200, 300], ['email-signature', 1200, 200]],
+      );
       expect(email.every(d => d.status === 'saved' && !d.draftTransactionId)).toBe(true);
     }
   });
-  it('covers all five social formats in every one of the four design sets', () => {
-    expect(SJB_CANVA_COLLECTIONS).toHaveLength(4);
+  it('covers all five social formats in every one of the five design sets', () => {
+    expect(SJB_CANVA_COLLECTIONS).toHaveLength(5);
     for (const { id } of SJB_CANVA_COLLECTIONS) {
       const social = filterSjbCanvaDesigns(id, 'all', 'all').filter(d => ['Instagram post', 'Portrait post', 'Instagram Story', 'Wide post', 'Facebook ad'].includes(d.name));
       expect(social).toHaveLength(5);

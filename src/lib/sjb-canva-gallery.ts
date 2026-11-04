@@ -57,12 +57,26 @@ import emailStadiumSignature from '@/assets/sjb-canva/stadium-accent-email-signa
 import emailActionHero from '@/assets/sjb-canva/canopy-email-action-hero.png.asset.json';
 import emailActionHeader from '@/assets/sjb-canva/canopy-email-action-header.png.asset.json';
 import emailActionSignature from '@/assets/sjb-canva/canopy-email-action-signature.png.asset.json';
+import lightSocialIg from '@/assets/sjb-canva/light-social-ig.png.asset.json';
+import lightSocialPortrait from '@/assets/sjb-canva/light-social-portrait.png.asset.json';
+import lightSocialStory from '@/assets/sjb-canva/light-social-story.png.asset.json';
+import lightSocialWide from '@/assets/sjb-canva/light-social-wide.png.asset.json';
+import lightSocialFacebook from '@/assets/sjb-canva/light-social-facebook.png.asset.json';
+import lightTicketsPortrait from '@/assets/sjb-canva/light-tickets-portrait.png.asset.json';
+import lightTicketsIg from '@/assets/sjb-canva/light-tickets-ig.png.asset.json';
+import lightTicketsStory from '@/assets/sjb-canva/light-tickets-story.png.asset.json';
+import lightTicketsWide from '@/assets/sjb-canva/light-tickets-wide.png.asset.json';
+import lightTicketsFacebook from '@/assets/sjb-canva/light-tickets-facebook.png.asset.json';
+import lightEmailHero from '@/assets/sjb-canva/light-email-hero.png.asset.json';
+import lightEmailHeader from '@/assets/sjb-canva/light-email-header.png.asset.json';
+import lightEmailSignature from '@/assets/sjb-canva/light-email-signature.png.asset.json';
 
 export const SJB_CANVA_COLLECTIONS = [
   { id: 'bold-graphic', name: 'Design Set 1', folderId: 'FAHZ9_NN2FQ' },
   { id: 'stadium-night', name: 'Design Set 2', folderId: 'FAHZ93d8ki8' },
   { id: 'action-spotlight', name: 'Design Set 3', folderId: 'FAHZ90BI6Mo' },
   { id: 'launch', name: 'Design Set 4', folderId: 'FAHZ99Po6eg' },
+  { id: 'light-action', name: 'Design Set 5', folderId: 'FAHZ_aTVaIg' },
 ] as const;
 export type SjbCanvaCollectionId = typeof SJB_CANVA_COLLECTIONS[number]['id'];
 export interface SjbCanvaGalleryDesign {
@@ -144,6 +158,19 @@ export const SJB_CANVA_GALLERY: readonly SjbCanvaGalleryDesign[] = [
   { ...design('DAHZ-YjfF04', 'launch', 'Tickets on sale', 1080, 1440, set4TicketTall, 'saved', 'illustration'), campaign: 'tickets' },
   { ...design('DAHZ-ThB-v8', 'launch', 'Tickets on sale', 1080, 1920, set4TicketStory, 'saved', 'illustration'), campaign: 'tickets' },
   { ...design('DAHZ-U-Ytrw', 'launch', 'Tickets on sale', 1200, 628, set4TicketLink, 'saved', 'illustration'), campaign: 'tickets' },
+  design('DAHZ_Qd7NbQ', 'light-action', 'Instagram post', 1080, 1350, lightSocialIg, 'saved', 'artistic-render'),
+  design('DAHZ_Y0_hsA', 'light-action', 'Portrait post', 1080, 1440, lightSocialPortrait, 'saved', 'artistic-render'),
+  design('DAHZ_W5bEMo', 'light-action', 'Instagram Story', 1080, 1920, lightSocialStory, 'saved', 'artistic-render'),
+  design('DAHZ_VNPExA', 'light-action', 'Wide post', 1600, 900, lightSocialWide, 'saved', 'artistic-render'),
+  design('DAHZ_a2Gej0', 'light-action', 'Facebook ad', 1200, 628, lightSocialFacebook, 'saved', 'artistic-render'),
+  { ...design('DAHZ_UK3UG4', 'light-action', 'Tickets on sale', 1080, 1440, lightTicketsPortrait, 'saved', 'artistic-render'), campaign: 'tickets' },
+  { ...design('DAHZ_X91LAc', 'light-action', 'Tickets on sale', 1080, 1350, lightTicketsIg, 'saved', 'artistic-render'), campaign: 'tickets' },
+  { ...design('DAHZ_VTZflI', 'light-action', 'Tickets on sale', 1080, 1920, lightTicketsStory, 'saved', 'artistic-render'), campaign: 'tickets' },
+  { ...design('DAHZ_dN1SXw', 'light-action', 'Tickets on sale', 1600, 900, lightTicketsWide, 'saved', 'artistic-render'), campaign: 'tickets' },
+  { ...design('DAHZ_ZZxQM0', 'light-action', 'Tickets on sale', 1200, 628, lightTicketsFacebook, 'saved', 'artistic-render'), campaign: 'tickets' },
+  { ...design('DAHZ_UGKVpo', 'light-action', 'Email hero', 600, 200, lightEmailHero, 'saved', 'artistic-render'), format: 'email-hero' },
+  { ...design('DAHZ_RFCog4', 'light-action', 'Email header', 600, 200, lightEmailHeader, 'saved', 'artistic-render'), format: 'email-header' },
+  { ...design('DAHZ_dXoWZg', 'light-action', 'Signature banner', 400, 200, lightEmailSignature, 'saved', 'artistic-render'), format: 'email-signature' },
 ];
 export function sjbCanvaSize(d: Pick<SjbCanvaGalleryDesign, 'width' | 'height'>) { return `${d.width}×${d.height}`; }
 export function filterSjbCanvaDesigns(collectionId: string, size: string, name: string) {
