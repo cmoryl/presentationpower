@@ -46,3 +46,5 @@
 - Brand-kit PDF usage comparisons keep Do on the left and Don't on the right, reserve each visual pair together, and place clear-space guidance before rules/examples and logo downloads after them — why: readers must compare the same logo topic without hunting between pages.
 
 - Brand-kit section navigation uses the shared BrandKitSectionNav with existing section anchors; conditional guide sections supply only rendered destinations — why: visual navigation must stay consistent without duplicating guide content.
+
+- Bowl social pages share the Canva snapshot gallery registry; preserve actual artboard sizes and distinguish unsaved drafts from saved originals — why: a parallel native renderer and assumed sizes misrepresent the Canva artwork.

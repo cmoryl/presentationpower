@@ -6,16 +6,16 @@ import { SjbSocialStudio } from "@/components/events/sjb-pages/SocialStudioPage"
 export const Route = createFileRoute("/events/san-juan-bowl_/social")({
   head: () => ({
     meta: [
-      { title: "San Juan Bowl social templates · TransPerfect Element" },
+      { title: "San Juan Bowl social designs · TransPerfect Element" },
       {
         name: "description",
         content:
-          "Live social media templates for the TransPerfect San Juan Bowl — pick a design, edit the words, download PNGs at exact native sizes for every channel.",
+          "Browse the TransPerfect San Juan Bowl Canva social collection, with design previews by style, ad type and actual artboard size.",
       },
       { property: "og:title", content: "San Juan Bowl social templates" },
       {
         property: "og:description",
-        content: "On-brand Bowl social designs, editable and downloadable at native sizes for every channel.",
+        content: "Canva Bowl social design previews by collection and size, with clearly labelled draft revisions.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
