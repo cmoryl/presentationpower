@@ -9,7 +9,7 @@ describe('Bowl Canva gallery', () => {
     const originals = SJB_CANVA_GALLERY.filter(d => d.collectionId === 'bold-graphic' && !d.format && d.campaign !== 'tickets');
     expect(originals).toHaveLength(5);
     expect(originals.filter(d => d.status === 'saved')).toHaveLength(5);
-    expect(originals.every(d => d.provenance === 'illustration')).toBe(true);
+    expect(originals.every(d => d.provenance === 'artistic-render')).toBe(true);
   });
   it('tracks the fourteen Stadium Night render revisions, all saved', () => {
     const stadium = filterSjbCanvaDesigns('stadium-night', 'all', 'all');
