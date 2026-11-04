@@ -40,8 +40,8 @@ export function SjbSocialStudio() {
         if (!designs.length) return null;
         return <section key={collection.id} aria-labelledby={`collection-${collection.id}`} className="mt-10">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3"><h2 id={`collection-${collection.id}`} className="text-xl font-bold">{collection.name}</h2><Button asChild variant="link" size="sm"><a href={`https://www.canva.com/folder/${collection.folderId}`} target="_blank" rel="noreferrer">Open collection<ExternalLink /></a></Button></div>
-          {collection.id === 'stadium-night' && <p className="mb-5 text-sm text-muted-foreground">Original Element stadium renders · Artistic football visualisations based on venue references, not photography or a verified field-conversion plan.</p>}
-          {collection.id === 'email' && <p className="mb-5 text-sm text-muted-foreground">Heroes 1200×600 · Headers 1200×300 · Signature banners 1200×200. Intended display width: 600 px. Ticket header and signature refinements are unsaved drafts; email sending and ticket links are not configured.</p>}
+          {collection.id === 'stadium-night' && <p className="mb-5 text-sm text-muted-foreground">Original Element canopy and football-action artwork · Artistic visualisations, not verified venue photography or a field-conversion plan.</p>}
+          {designs.some(d => d.format) && <p className="mb-5 text-sm text-muted-foreground">Heroes 1200×600 · Headers 1200×300 · Signature banners 1200×200. Intended display width: 600 px. Email artwork is an unsaved Canva draft; email sending and ticket links are not configured.</p>}
           <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {designs.map(d => <article key={d.id} className="min-w-0 overflow-hidden rounded-lg border border-border bg-background" data-canva-design={d.id}>
               <Button variant="ghost" className="relative block h-[360px] w-full rounded-none bg-muted p-3" aria-label={`Enlarge ${collection.name} ${d.name} ${sjbCanvaSize(d)}`} onClick={() => setSelected(d)}>
