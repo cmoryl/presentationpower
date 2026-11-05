@@ -1326,6 +1326,8 @@ export type Database = {
           id: string
           industry: string | null
           is_active: boolean
+          last_web_checked_at: string | null
+          last_web_logo_url: string | null
           light_path: string | null
           mime_type: string | null
           mono_path: string | null
@@ -1348,6 +1350,8 @@ export type Database = {
           id?: string
           industry?: string | null
           is_active?: boolean
+          last_web_checked_at?: string | null
+          last_web_logo_url?: string | null
           light_path?: string | null
           mime_type?: string | null
           mono_path?: string | null
@@ -1370,6 +1374,8 @@ export type Database = {
           id?: string
           industry?: string | null
           is_active?: boolean
+          last_web_checked_at?: string | null
+          last_web_logo_url?: string | null
           light_path?: string | null
           mime_type?: string | null
           mono_path?: string | null
@@ -3636,6 +3642,50 @@ export type Database = {
             columns: ["imported_deck_id"]
             isOneToOne: false
             referencedRelation: "imported_decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      logo_update_checks: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          found_logo_url: string
+          id: string
+          logo_id: string
+          previous_logo_url: string | null
+          status: string
+          website: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          found_logo_url: string
+          id?: string
+          logo_id: string
+          previous_logo_url?: string | null
+          status?: string
+          website: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          found_logo_url?: string
+          id?: string
+          logo_id?: string
+          previous_logo_url?: string | null
+          status?: string
+          website?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logo_update_checks_logo_id_fkey"
+            columns: ["logo_id"]
+            isOneToOne: false
+            referencedRelation: "client_logos"
             referencedColumns: ["id"]
           },
         ]
