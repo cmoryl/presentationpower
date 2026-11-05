@@ -32,8 +32,6 @@ import actionStory from '@/assets/sjb-canva/action-story.png.asset.json';
 import launchDate from '@/assets/sjb-canva/launch-date.png.asset.json';
 import launchQuote from '@/assets/sjb-canva/launch-quote.png.asset.json';
 import launchScore from '@/assets/sjb-canva/launch-score.png.asset.json';
-import launchCountdown from '@/assets/sjb-canva/launch-countdown.png.asset.json';
-import launchMatchup from '@/assets/sjb-canva/launch-matchup.png.asset.json';
 import launchGameDay from '@/assets/sjb-canva/launch-game-day.png.asset.json';
 import ticketBoldPortrait from '@/assets/sjb-canva/bold-ticket-portrait-review.png.asset.json';
 import ticketBoldTall from '@/assets/sjb-canva/bold-ticket-tall-review.png.asset.json';
