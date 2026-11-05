@@ -77,7 +77,7 @@ export function BillboardsPage() {
                     <figcaption className="text-xs text-muted-foreground">{way.label} · generated mockup · click to enlarge</figcaption>
                   </figure>
                 ))}
-                {w === 840 && SJB_BILLBOARD_TEAM_EXAMPLES.map((d) => (
+                {[...SJB_BILLBOARD_VECTOR_CANVA.filter((d) => d.w === w && d.lang === lang).map((d) => ({ id: d.id, label: `Vector Tickets On Sale · ${d.label}`, tag: "Vector master" })), ...(w === 840 ? SJB_BILLBOARD_TEAM_EXAMPLES.map((d) => ({ id: d.id, label: d.label, tag: "Team version · English only" })) : [])].map((d) => (
                   <figure key={d.id} className="space-y-1.5">
                     <Dialog>
                       <DialogTrigger asChild>
@@ -90,7 +90,7 @@ export function BillboardsPage() {
                         <img src={`/sjb-billboards/scenes/team-${d.id}-${tod}.jpg`} alt={`${d.label} billboard mockup, enlarged`} className="h-auto max-h-[85vh] w-full rounded-md object-contain" />
                       </DialogContent>
                     </Dialog>
-                    <figcaption className="text-xs text-muted-foreground">Team version · {d.label.split(" · ")[0]} · English only · click to enlarge</figcaption>
+                    <figcaption className="text-xs text-muted-foreground">{d.tag} · click to enlarge</figcaption>
                   </figure>
                 ))}
               </div>
