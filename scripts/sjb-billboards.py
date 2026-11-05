@@ -5,6 +5,7 @@ Output: public/sjb-billboards/<size>-<colorway>-<lang>.png at exact pixel size.
 Colours are the Bowl palette read from the supplied logo (SJB_COLORS).
 Usage: python3 scripts/sjb-billboards.py /path/to/sjb-logo-color.png
 """
+import json
 import sys
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
@@ -12,6 +13,8 @@ from PIL import Image, ImageDraw, ImageFont
 NAVY, SKY, GOLD, WHITE = "#0D0E21", "#00AAE7", "#FFD600", "#FFFFFF"
 FONT = "public/fonts/Geist-Bold.ttf"
 OUT = Path("public/sjb-billboards")
+GROUNDS = Path("/tmp/sjb-billboard-grounds")
+LAYOUT = {}
 SIZES = [(840, 400), (1728, 512)]
 COPY = {
     "en": ("COLLEGE FOOTBALL", "SAN JUAN · DEC 16"),
@@ -37,7 +40,7 @@ def fit(draw, text, max_w, max_h):
     return f, b
 
 
-def render(logo, w, h, way, lang):
+def render(logo, w, h, way, lang, text=True, layout=None):
     ground, slab, head, sub, url_fg, url_bg = WAYS[way]
     compact = w / h < 3
     im = Image.new("RGB", (w, h), ground)
@@ -54,7 +57,11 @@ def render(logo, w, h, way, lang):
         d.polygon([(sw + cut + o, 0), (sw + cut + o + t, 0), (sw + o + t, h), (sw + o, h)], fill=col)
     ls = int(h * 0.82)
     lg = logo.resize((ls, ls), Image.LANCZOS)
-    im.paste(lg, ((sw + cut // 2 - ls) // 2, (h - ls) // 2), lg)
+    lx, ly = (sw + cut // 2 - ls) // 2, (h - ls) // 2
+    if layout is not None:
+        layout['logo'] = dict(left=lx, top=ly, size=ls)
+    else:
+        im.paste(lg, (lx, ly), lg)
     # copy block
     x0 = sw + cut + int(h * (0.16 if compact else 0.14))
     cw = w - x0 - int(h * (0.08 if compact else 0.16))
@@ -73,22 +80,36 @@ def render(logo, w, h, way, lang):
     gap = int(h * 0.035)
     total = sum(b[3] - b[1] for *_, b in fitted) + gap * (len(fitted) - 1) + int(h * 0.07) + uh
     y = (h - total) // 2
+    rows_out = []
     for txt, col, f, b in fitted:
-        d.text((x0 - b[0], y - b[1]), txt, font=f, fill=col)
+        if text:
+            d.text((x0 - b[0], y - b[1]), txt, font=f, fill=col)
+        rows_out.append(dict(text=txt, color=col, size=f.size, top=y - b[1], left=x0 - b[0]))
         y += (b[3] - b[1]) + gap
     y += int(h * 0.07) - gap
     d.rectangle([x0 - pad, y, x0 + (bu[2] - bu[0]) + pad, y + uh], fill=url_bg)
-    d.text((x0 - bu[0], y + pad - bu[1]), URL, font=fu, fill=url_fg)
+    if text:
+        d.text((x0 - bu[0], y + pad - bu[1]), URL, font=fu, fill=url_fg)
+    if layout is not None:
+        layout['rows'] = rows_out
+        layout['url'] = dict(text=URL, color=url_fg, size=fu.size, top=y + pad - bu[1], left=x0 - bu[0])
     return im
 
 
 def main():
     logo = Image.open(sys.argv[1]).convert("RGBA")
     OUT.mkdir(parents=True, exist_ok=True)
+    GROUNDS.mkdir(parents=True, exist_ok=True)
     for w, h in SIZES:
         for way in WAYS:
             for lang in COPY:
                 render(logo, w, h, way, lang).save(OUT / f"{w}x{h}-{way}-{lang}.png", optimize=True)
+                # Canva-editable kit: ground without shield/copy + where each live layer sits
+                lay = {}
+                g = render(logo, w, h, way, lang, text=False, layout=lay)
+                g.save(GROUNDS / f"{w}x{h}-{way}.png", optimize=True)
+                LAYOUT[f"{w}x{h}-{way}-{lang}"] = lay
+    (GROUNDS / "layout.json").write_text(json.dumps(LAYOUT, indent=1, ensure_ascii=False))
 
 
 if __name__ == "__main__":
