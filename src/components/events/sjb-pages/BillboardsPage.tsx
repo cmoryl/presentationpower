@@ -77,7 +77,7 @@ export function BillboardsPage() {
                     <figcaption className="text-xs text-muted-foreground">{way.label} · generated mockup · click to enlarge</figcaption>
                   </figure>
                 ))}
-                {[...SJB_BILLBOARD_VECTOR_CANVA.filter((d) => d.w === w && d.lang === lang).map((d) => ({ id: d.id, label: `Vector Tickets On Sale · ${d.label}`, tag: "Vector master" })), ...(w === 840 ? SJB_BILLBOARD_TEAM_EXAMPLES.map((d) => ({ id: d.id, label: d.label, tag: "Team version · English only" })) : [])].map((d) => (
+                {[...SJB_BILLBOARD_VECTOR_CANVA.filter((d) => d.w === w && d.lang === lang).map((d) => ({ id: d.id, label: `Vector Tickets On Sale · ${d.label}`, tag: "Vector master" })), ...SJB_BILLBOARD_TEAM_EXAMPLES.filter((d) => d.w === w).map((d) => ({ id: d.id, label: d.label, tag: "Team version · English only" }))].map((d) => (
                   <figure key={d.id} className="space-y-1.5">
                     <Dialog>
                       <DialogTrigger asChild>
@@ -110,20 +110,6 @@ export function BillboardsPage() {
               </li>
             ))}
           </ul>
-          <h3 className="pt-2 text-sm font-semibold">More team versions</h3>
-          <div className="grid gap-4 lg:grid-cols-2">
-            {SJB_BILLBOARD_TEAM_EXAMPLES.map((d) => (
-              <figure key={d.id} className="space-y-1.5">
-                <img src={d.preview} width={840} height={400} alt={`Billboard example: ${d.label}`} className="w-full rounded border" loading="lazy" />
-                <figcaption className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                  <span>{d.label}</span>
-                  <Button asChild variant="outline" size="sm">
-                    <a href={d.edit} target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /> Edit in Canva</a>
-                  </Button>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
         </section>
 
         <section aria-labelledby="bb-update" className="space-y-4">
@@ -180,6 +166,30 @@ export function BillboardsPage() {
               </div>
             )),
           )}
+          {(["Light action", "Gold night catch"] as const).map((name) => (
+            <div key={name} className="space-y-2">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="text-sm font-semibold">Team version · {name}</h3>
+                <p className="text-xs text-muted-foreground">Tickets On Sale · English only · both sizes</p>
+              </div>
+              <div className="grid gap-4 lg:grid-cols-2">
+                {SJB_BILLBOARD_TEAM_EXAMPLES.filter((d) => d.label.startsWith(name)).map((d) => (
+                  <figure key={d.id} className="space-y-1.5">
+                    <img src={d.preview} width={d.w} height={d.h} loading="lazy" alt={`Team billboard ${d.label}: Tickets on sale, December 16, 2026, sanjuanbowl.com`} className="h-auto w-full rounded-sm border border-border" />
+                    <figcaption className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+                      <span className="mr-auto">{d.w.toLocaleString()} × {d.h}</span>
+                      <Button asChild size="sm" variant="ghost">
+                        <a href={d.preview} download><Download className="h-3.5 w-3.5" /> PNG</a>
+                      </Button>
+                      <Button asChild size="sm" variant="ghost">
+                        <a href={d.edit} target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /> Edit in Canva</a>
+                      </Button>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+          ))}
         </section>
 
         <section aria-labelledby="bb-highway" className="space-y-3">

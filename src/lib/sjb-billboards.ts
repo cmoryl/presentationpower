@@ -109,8 +109,10 @@ export const SJB_BILLBOARD_VECTOR_CANVA = [
   { id: "DAHaD3Csysc", w: 1728, lang: "es", label: "1,728 × 512 · Español", edit: "https://www.canva.com/d/Cxq7LCI1tMDk70Q" },
 ] as const;
 
-/** Additional team-built 840×400 example versions (previews exported from Canva). */
+/** Team-built Tickets On Sale versions (English), each in both sizes; previews exported from Canva. */
 export const SJB_BILLBOARD_TEAM_EXAMPLES = [
-  { id: "DAHaD4uCFFg", label: "Light action · 840 × 400 · English", edit: "https://www.canva.com/d/tZH3YI20MtWLLbK", preview: "/sjb-billboards/vector/DAHaD4uCFFg.png" },
-  { id: "DAHaD3KaDEU", label: "Gold night catch · 840 × 400 · English", edit: "https://www.canva.com/d/blrKOs4d7agllLX", preview: "/sjb-billboards/vector/DAHaD3KaDEU.png" },
+  { id: "DAHaD4uCFFg", w: 840, h: 400, label: "Light action · 840 × 400", edit: "https://www.canva.com/d/tZH3YI20MtWLLbK", preview: "/sjb-billboards/vector/DAHaD4uCFFg.png" },
+  { id: "DAHaECnriyo", w: 1728, h: 512, label: "Light action · 1,728 × 512", edit: "https://www.canva.com/d/sMS0f1nxUYkm53N", preview: "/sjb-billboards/vector/DAHaECnriyo.png" },
+  { id: "DAHaD3KaDEU", w: 840, h: 400, label: "Gold night catch · 840 × 400", edit: "https://www.canva.com/d/blrKOs4d7agllLX", preview: "/sjb-billboards/vector/DAHaD3KaDEU.png" },
+  { id: "DAHaEObQVkg", w: 1728, h: 512, label: "Gold night catch · 1,728 × 512", edit: "https://www.canva.com/d/TDoCnoiSvIL7HP5", preview: "/sjb-billboards/vector/DAHaEObQVkg.png" },
 ] as const;
