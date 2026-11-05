@@ -42,10 +42,19 @@ export function SjbSocialStudio() {
   const [adType, setAdType] = useState('all');
   const [selected, setSelected] = useState<SjbCanvaGalleryDesign | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
+  const results = useRef<HTMLDivElement>(null);
+  const pendingScroll = useRef(false);
+  const [selectionCount, setSelectionCount] = useState(0);
   const sizes = [...new Set(SJB_CANVA_GALLERY.map(sjbCanvaSize))];
   const types = [...new Set(SJB_CANVA_GALLERY.map(d => d.name))];
   const visible = filterSjbCanvaDesigns(collectionId, size, adType);
   useEffect(() => { if (selected) dialog.current?.showModal(); else dialog.current?.close(); }, [selected]);
+  useEffect(() => {
+    if (!pendingScroll.current) return;
+    pendingScroll.current = false;
+    const target = document.getElementById(`collection-${collectionId}`) ?? results.current;
+    target?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  }, [collectionId, selectionCount]);
 
   return <SjbShell>
     <main className="mx-auto max-w-7xl px-5 pb-24 pt-8 text-foreground sm:px-8">
@@ -57,7 +66,7 @@ export function SjbSocialStudio() {
       <nav aria-label="Design campaigns" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {[{ id: 'all', name: 'All campaigns', blurb: 'Every design set', accent: '#03002C' } as const, ...SJB_CANVA_COLLECTIONS].map(c => {
           const active = collectionId === c.id;
-          return <button key={c.id} type="button" aria-pressed={active} onClick={() => setCollectionId(c.id)} className={`group overflow-hidden rounded-lg border bg-background text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active ? 'border-primary ring-2 ring-primary' : 'border-border hover:border-foreground/40'}`}>
+          return <button key={c.id} type="button" aria-pressed={active} onClick={() => { pendingScroll.current = true; setCollectionId(c.id); setSelectionCount(count => count + 1); }} className={`group overflow-hidden rounded-lg border bg-background text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active ? 'border-primary ring-2 ring-primary' : 'border-border hover:border-foreground/40'}`}>
             <span className="relative block h-28 overflow-hidden bg-muted">
               <img src={SET_COVERS[c.id]} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
               <span aria-hidden className="absolute inset-x-0 bottom-0 h-1" style={{ backgroundColor: c.accent }} />
@@ -66,7 +75,7 @@ export function SjbSocialStudio() {
           </button>;
         })}
       </nav>
-      <div className="mt-5 flex flex-wrap items-end gap-4">
+      <div ref={results} className="mt-5 flex scroll-mt-24 flex-wrap items-end gap-4">
         <label className="grid gap-1.5 text-sm font-medium" htmlFor="sjb-size">Size<select id="sjb-size" value={size} onChange={e => setSize(e.target.value)} className="h-10 rounded-md border border-input bg-background px-3 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option value="all">All sizes</option>{sizes.map(s => <option key={s}>{s}</option>)}</select></label>
         <label className="grid gap-1.5 text-sm font-medium" htmlFor="sjb-type">Ad type<select id="sjb-type" value={adType} onChange={e => setAdType(e.target.value)} className="h-10 max-w-full rounded-md border border-input bg-background px-3 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option value="all">All ad types</option>{types.map(t => <option key={t}>{t}</option>)}</select></label>
       </div>
@@ -76,7 +85,7 @@ export function SjbSocialStudio() {
         const designs = visible.filter(d => d.collectionId === collection.id);
         if (!designs.length) return null;
         return <section key={collection.id} aria-labelledby={`collection-${collection.id}`} className="mt-10">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3"><h2 id={`collection-${collection.id}`} className="text-xl font-bold">{collection.name}</h2><Button asChild variant="link" size="sm"><a href={`https://www.canva.com/folder/${collection.folderId}`} target="_blank" rel="noreferrer">Open campaign folder<ExternalLink /></a></Button></div>
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3"><h2 id={`collection-${collection.id}`} className="scroll-mt-24 text-xl font-bold">{collection.name}</h2><Button asChild variant="link" size="sm"><a href={`https://www.canva.com/folder/${collection.folderId}`} target="_blank" rel="noreferrer">Open campaign folder<ExternalLink /></a></Button></div>
           {collection.id === 'stadium-night' && <p className="mb-5 text-sm text-muted-foreground">Original Element canopy and football-action artwork · Artistic visualisations, not verified venue photography or a field-conversion plan.</p>}
           {designs.some(d => d.format) && <p className="mb-5 text-sm text-muted-foreground">Heroes 1200×600 · Headers 1200×300 · Signature banners 1200×200. Intended display width: 600 px. Email artwork is saved in Canva; email sending and ticket links are not configured.</p>}
           <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
