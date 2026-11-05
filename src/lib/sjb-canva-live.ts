@@ -1,6 +1,20 @@
 // Designs whose gallery preview was re-pulled from the live Canva file (public/sjb-canva/live/<id>.png).
 // The live file wins over any older snapshot path in the gallery registry.
 export const SJB_CANVA_LIVE_PREVIEW_IDS: ReadonlySet<string> = new Set([
+  'DAHZ-X6Y3aQ',
+  'DAHZ-XiK_cw',
+  'DAHZ-fzb_kE',
+  'DAHZ-Pk8fbQ',
+  'DAHZ-SRV5eo',
+  'DAHZ-JE36VU',
+  'DAHZ-KzmDcI',
+  'DAHZ-GDY4eA',
+  'DAHZ-KEtDD4',
+  'DAHZ-VDklRg',
+  'DAHZ-YcI5iE',
+  'DAHZ-f35Lqw',
+  'DAHZ-Qz7ysE',
+  'DAHZ-aWPdWY',
   'DAHZ-dNZnAQ',
   'DAHZ-Soacj8',
   'DAHZ-U87YZ4',
