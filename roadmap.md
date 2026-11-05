@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Audit all live Bowl socials and billboards for dark grounds behind the shield; replace with the approved white-outline master, review drafts before saving, refresh downloads and roadside mockups, and verify public previews. Approved master uploaded as Canva asset `MAHaEoTb0CA`. Two example drafts shown: Set 2 Instagram `DAHZ9shQ9M8` transaction `7169125954605617969`; Gold 840 EN `DAHaDp-Fwv0` transaction `2262454162674992928`. No drafts saved or downloadable previews changed; awaiting required approval to save shown replacements and apply the same substitution throughout the remaining dark-ground designs. Light-ground logos remain unchanged.
+
 - [x] Audited all 59 live Bowl previews at 1950, 1280, 768, 390 and 320px widths, including 295 enlarged-preview checks: no stretching, preview cropping, page overflow or browser errors. Visual review found no definite text/logo clipping; Set 3 Story has tight lower copy margins, so platform-overlay safety is not certified. Saved Canva originals unchanged; arbitrary Canva auto-resizes are not verified by snapshot checks.
 
 - [x] Refresh fourteen Stadium Night / Design Set 2 social, ticket and email examples with shared gold separators, upright white headlines/dates and clearer logo/content separation. Reviewed all fourteen previews; seven gallery tests and public/member gallery, Story enlargement and mobile width checks pass. Canva revisions remain unsaved pending approval.
