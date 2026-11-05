@@ -209,6 +209,24 @@ export function BillboardsPage() {
                 />
               )),
             )}
+            {SJB_BILLBOARD_VECTOR_CANVA.filter((v) => v.lang === lang).map((v) => (
+              <img
+                key={v.id}
+                src={`/sjb-billboards/vector/${v.id}.png`}
+                alt={`Tickets On Sale ${v.label} at distance`}
+                loading="lazy"
+                className="mx-auto w-full max-w-[220px] blur-[0.6px] motion-safe:transition-[filter] hover:blur-0"
+              />
+            ))}
+            {SJB_BILLBOARD_TEAM_EXAMPLES.map((t) => (
+              <img
+                key={t.id}
+                src={t.preview}
+                alt={`${t.label} at distance`}
+                loading="lazy"
+                className="mx-auto w-full max-w-[220px] blur-[0.6px] motion-safe:transition-[filter] hover:blur-0"
+              />
+            ))}
           </div>
         </section>
 
