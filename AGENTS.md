@@ -17,6 +17,8 @@
 - Master modules is a projection of the existing registries, not a new renderer: social choices inherit print master overrides; registered slide renderers own every shipped variant; retirement checks explicit saved references, while database snapshots restore content without bypassing review — why: one governance view must not duplicate authorities or silently overwrite saved work.
 - The Knowledge screens share the `KnowledgeTabs` strip (Entries / Ask Oracle / Oracle KB / Sources); `/admin/knowledge-hub` redirects to `/knowledge`. Why: seven overlapping menu items.
 - Event, kiosk, signage, venue-map and logo extraction/viewer rules live in `src/lib/AGENTS.md`.
+- San Juan Bowl lettering, logo, guide and brand-kit rules live in `src/components/events/AGENTS.md`.
+- Rules for the supplied-file splitter scripts live in `scripts/AGENTS.md`.
 - Bowl announced event facts live in `SJB_EVENT`; event registry readiness carries source links rendered by the shared event home — why: directory and overview must agree without duplicating dates or losing provenance.
 - Bowl event brand navigation lives in the existing event registry and links to the shared kit/guide bodies; event-home logo guidance reads `SJB_LOGO_RULES` — why: discoverability must not create a second brand authority.
 
