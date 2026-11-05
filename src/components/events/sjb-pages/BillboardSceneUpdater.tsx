@@ -87,7 +87,16 @@ export function BillboardSceneUpdater() {
       setWarn(Math.abs(ratio - want) / want > 0.02 ? `This file is ${rw}×${rh}, not ${size.w}×${size.h} — check you exported the right size.` : null);
       const cx = info.quad.reduce((t, p) => t + p[0], 0) / 4, cy = info.quad.reduce((t, p) => t + p[1], 0) / 4;
       // grow the screen slightly so no magenta edge from the blank scene shows
-      const map = squareToQuad(info.quad.map(([x, y]) => [x + Math.sign(x - cx) * 7, y + Math.sign(y - cy) * 7] as Pt));
+      const grown = info.quad.map(([x, y]) => [x + Math.sign(x - cx) * 7, y + Math.sign(y - cy) * 7] as Pt);
+      // Whole screen opening becomes the dark LED panel; the board keeps its true shape inside it (never stretched).
+      ctx.fillStyle = "#0e0f12";
+      ctx.beginPath();
+      grown.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+      ctx.closePath();
+      ctx.fill();
+      const full = squareToQuad(info.quad);
+      const inset = Math.max(0, (1 - want / info.ratio) / 2);
+      const map = (u: number, v: number) => full(inset + u * (1 - 2 * inset), v);
       const N = 16, bw = board.width, bh = board.height;
       for (let i = 0; i < N; i++)
         for (let j = 0; j < N; j++) {
