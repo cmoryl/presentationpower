@@ -1,6 +1,7 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Create a separate Design Set 5 reusable asset folder: inventory original backgrounds, rebuild matching independent layers, transparent overlays where needed, scalable graphic elements and portable layered artwork; verify resolutions and disclose raster/production limits. No fixed signage dimensions supplied; matching rebuilds approved.
+- [x] Deliver Design Set 5 portable reusable pack: 3 transparent native 1920px objects, 7 scalable graphic SVGs, unchanged official logo SVGs, 4 self-contained 12-layer SVG/OpenRaster compositions and 6000px composite PNGs. All visuals inspected; alpha, embedded images, layer count and archive verified. Rebuilt artwork, not original-layer extraction; composite enlargement does not add raster detail. Saved campaign designs unchanged.
+- [ ] Finish filing new Set 5 uploads into Canva subfolders — blocked by Canva access/item-not-found refusals. Root folder and original-reference assets are filed; new object/SVG uploads accepted but not confirmed in subfolders or as Canva-editable layers. Portable pack is complete.
 
 - [x] Keep Canva PNG refreshes manual per user decision; automatic connection setup deferred unless requested.
 
