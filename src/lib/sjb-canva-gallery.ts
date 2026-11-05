@@ -32,8 +32,6 @@ import actionStory from '@/assets/sjb-canva/action-story.png.asset.json';
 import launchDate from '@/assets/sjb-canva/launch-date.png.asset.json';
 import launchQuote from '@/assets/sjb-canva/launch-quote.png.asset.json';
 import launchScore from '@/assets/sjb-canva/launch-score.png.asset.json';
-import launchCountdown from '@/assets/sjb-canva/launch-countdown.png.asset.json';
-import launchMatchup from '@/assets/sjb-canva/launch-matchup.png.asset.json';
 import launchGameDay from '@/assets/sjb-canva/launch-game-day.png.asset.json';
 import ticketBoldPortrait from '@/assets/sjb-canva/bold-ticket-portrait-review.png.asset.json';
 import ticketBoldTall from '@/assets/sjb-canva/bold-ticket-tall-review.png.asset.json';
@@ -139,8 +137,8 @@ export const SJB_CANVA_GALLERY: readonly SjbCanvaGalleryDesign[] = [
   { ...design('DAHZ-c_lW7M', 'launch', 'Wide post', 1600, 900, set4SocialWide, 'saved', 'illustration') },
   { ...design('DAHZ-eY_-Lg', 'launch', 'Facebook ad', 1200, 628, set4SocialLink, 'saved', 'illustration') },
   design('DAHZ9mUpIQY', 'launch', 'Game day', 1080, 1350, launchGameDay, 'saved', 'supplied-artwork', 'https://www.canva.com/d/J7Tgz72gRGAYu0k'),
-  design('DAHZ9pe47-Q', 'launch', 'Matchup', 1080, 1350, launchMatchup, 'saved', 'illustration', 'https://www.canva.com/d/W37aGaxcMLi4972'),
-  design('DAHZ9vTP7Xw', 'launch', 'Countdown', 1080, 1350, launchCountdown, 'saved', 'illustration', 'https://www.canva.com/d/yQ6sSYAdlE7n-WT'),
+  design('DAHZ9pe47-Q', 'launch', 'Matchup', 1080, 1350, { url: '/sjb-canva/s4-matchup.png' }, 'saved', 'illustration', 'https://www.canva.com/d/W37aGaxcMLi4972'),
+  design('DAHZ9vTP7Xw', 'launch', 'Countdown', 1080, 1350, { url: '/sjb-canva/s4-countdown.png' }, 'saved', 'illustration', 'https://www.canva.com/d/yQ6sSYAdlE7n-WT'),
   design('DAHZ9ll6m0A', 'launch', 'Final score', 1080, 1350, launchScore, 'saved', 'illustration', 'https://www.canva.com/d/fsDIjvMGkEy7ti3'),
   design('DAHZ9hR5aI4', 'launch', 'Quote card', 1080, 1350, launchQuote, 'saved', 'illustration', 'https://www.canva.com/d/OM2Zo5qnCSfn8fH'),
   design('DAHZ9lAkSN4', 'launch', 'Save the date', 1080, 1350, launchDate, 'saved', 'illustration', 'https://www.canva.com/d/hq22hG4ig3mw66E'),
