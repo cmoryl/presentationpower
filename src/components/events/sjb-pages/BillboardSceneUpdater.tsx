@@ -67,7 +67,7 @@ export function BillboardSceneUpdater() {
     (async () => {
       const cv = canvas.current;
       if (!cv) return;
-      const info = (quads as Record<string, { w: number; h: number; quad: Pt[] }>)[`${w}-${tod}`];
+      const info = (quads as unknown as Record<string, { w: number; h: number; quad: Pt[] }>)[`${w}-${tod}`];
       const scene = await loadImage(billboardBlankScene(w, tod));
       if (!live) return;
       cv.width = info.w;
@@ -80,7 +80,9 @@ export function BillboardSceneUpdater() {
       const size = SJB_BILLBOARD_SIZES.find((s) => s.w === w)!;
       const ratio = board.width / board.height, want = size.w / size.h;
       setWarn(Math.abs(ratio - want) / want > 0.02 ? `This file is ${board.width}×${board.height}; the ${size.w}×${size.h} board will stretch it.` : null);
-      const map = squareToQuad(info.quad);
+      const cx = info.quad.reduce((t, p) => t + p[0], 0) / 4, cy = info.quad.reduce((t, p) => t + p[1], 0) / 4;
+      // grow the screen slightly so no magenta edge from the blank scene shows
+      const map = squareToQuad(info.quad.map(([x, y]) => [x + Math.sign(x - cx) * 3, y + Math.sign(y - cy) * 3] as Pt));
       const N = 16, bw = board.width, bh = board.height;
       for (let i = 0; i < N; i++)
         for (let j = 0; j < N; j++) {
