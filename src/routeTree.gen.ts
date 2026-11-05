@@ -224,6 +224,7 @@ import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
 import { Route as ApiPublicBoothsEventRouteImport } from './routes/api/public/booths.$event'
 import { Route as ApiPublicCanvaCallbackRouteImport } from './routes/api/public/canva.callback'
+import { Route as ApiPublicHooksLogoScrubRouteImport } from './routes/api/public/hooks/logo-scrub'
 import { Route as ApiPublicVenueEventRouteImport } from './routes/api/public/venue.$event'
 import { Route as EventsKitsHackathonGuideRouteImport } from './routes/events.kits.hackathon.guide'
 import { Route as EventsKitsLegalweekGuideRouteImport } from './routes/events.kits.legalweek.guide'
@@ -1349,6 +1350,11 @@ const ApiPublicCanvaCallbackRoute = ApiPublicCanvaCallbackRouteImport.update({
   path: '/api/public/canva/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksLogoScrubRoute = ApiPublicHooksLogoScrubRouteImport.update({
+  id: '/api/public/hooks/logo-scrub',
+  path: '/api/public/hooks/logo-scrub',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicVenueEventRoute = ApiPublicVenueEventRouteImport.update({
   id: '/api/public/venue/$event',
   path: '/api/public/venue/$event',
@@ -1721,6 +1727,7 @@ export interface FileRoutesByFullPath {
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
+  '/api/public/hooks/logo-scrub': typeof ApiPublicHooksLogoScrubRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
   '/events/kits/hackathon/guide': typeof EventsKitsHackathonGuideRoute
   '/events/kits/legalweek/guide': typeof EventsKitsLegalweekGuideRoute
@@ -1962,6 +1969,7 @@ export interface FileRoutesByTo {
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
+  '/api/public/hooks/logo-scrub': typeof ApiPublicHooksLogoScrubRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
   '/events/kits/hackathon/guide': typeof EventsKitsHackathonGuideRoute
   '/events/kits/legalweek/guide': typeof EventsKitsLegalweekGuideRoute
@@ -2208,6 +2216,7 @@ export interface FileRoutesById {
   '/admin/modules_/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
+  '/api/public/hooks/logo-scrub': typeof ApiPublicHooksLogoScrubRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
   '/events/kits/hackathon/guide': typeof EventsKitsHackathonGuideRoute
   '/events/kits/legalweek/guide': typeof EventsKitsLegalweekGuideRoute
@@ -2455,6 +2464,7 @@ export interface FileRouteTypes {
     | '/admin/modules/print/$moduleId'
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
+    | '/api/public/hooks/logo-scrub'
     | '/api/public/venue/$event'
     | '/events/kits/hackathon/guide'
     | '/events/kits/legalweek/guide'
@@ -2696,6 +2706,7 @@ export interface FileRouteTypes {
     | '/admin/modules/print/$moduleId'
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
+    | '/api/public/hooks/logo-scrub'
     | '/api/public/venue/$event'
     | '/events/kits/hackathon/guide'
     | '/events/kits/legalweek/guide'
@@ -2941,6 +2952,7 @@ export interface FileRouteTypes {
     | '/admin/modules_/print/$moduleId'
     | '/api/public/booths/$event'
     | '/api/public/canva/callback'
+    | '/api/public/hooks/logo-scrub'
     | '/api/public/venue/$event'
     | '/events/kits/hackathon/guide'
     | '/events/kits/legalweek/guide'
@@ -3090,6 +3102,7 @@ export interface RootRouteChildren {
   ShareSanJuanBowlIndexRoute: typeof ShareSanJuanBowlIndexRoute
   ApiPublicBoothsEventRoute: typeof ApiPublicBoothsEventRoute
   ApiPublicCanvaCallbackRoute: typeof ApiPublicCanvaCallbackRoute
+  ApiPublicHooksLogoScrubRoute: typeof ApiPublicHooksLogoScrubRoute
   ApiPublicVenueEventRoute: typeof ApiPublicVenueEventRoute
 }
 
@@ -4600,6 +4613,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCanvaCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/logo-scrub': {
+      id: '/api/public/hooks/logo-scrub'
+      path: '/api/public/hooks/logo-scrub'
+      fullPath: '/api/public/hooks/logo-scrub'
+      preLoaderRoute: typeof ApiPublicHooksLogoScrubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/venue/$event': {
       id: '/api/public/venue/$event'
       path: '/api/public/venue/$event'
@@ -5207,6 +5227,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShareSanJuanBowlIndexRoute: ShareSanJuanBowlIndexRoute,
   ApiPublicBoothsEventRoute: ApiPublicBoothsEventRoute,
   ApiPublicCanvaCallbackRoute: ApiPublicCanvaCallbackRoute,
+  ApiPublicHooksLogoScrubRoute: ApiPublicHooksLogoScrubRoute,
   ApiPublicVenueEventRoute: ApiPublicVenueEventRoute,
 }
 export const routeTree = rootRouteImport

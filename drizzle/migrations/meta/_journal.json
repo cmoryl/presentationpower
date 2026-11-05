@@ -127,6 +127,20 @@
       "when": 1792689781795,
       "tag": "0017_fix_module_history_identity",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1793894715999,
+      "tag": "0018_migration",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1793894793470,
+      "tag": "0019_migration",
+      "breakpoints": true
     }
   ]
 }

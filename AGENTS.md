@@ -50,3 +50,4 @@
 - Brand-kit section navigation uses the shared BrandKitSectionNav with existing section anchors; conditional guide sections supply only rendered destinations — why: visual navigation must stay consistent without duplicating guide content.
 
 - Bowl social pages share the Canva snapshot gallery registry; preserve actual artboard sizes and distinguish unsaved drafts from saved originals — why: a parallel native renderer and assumed sizes misrepresent the Canva artwork.
+- LogoHub web checks: a daily cron calls `/api/public/hooks/logo-scrub` (token in service-role-only `internal_job_tokens`), which re-checks logos unchecked for 30 days via Firecrawl and only flags changes into `logo_update_checks`, reviewed on `/approvals?tab=logos` — why: logos are never replaced without an admin.
