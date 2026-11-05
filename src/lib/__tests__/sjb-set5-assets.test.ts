@@ -3,12 +3,24 @@ import { SJB_SET5_ASSETS, SJB_SET5_PACKS } from '../sjb-set5-assets';
 import { isPublicNoLoginPath } from '../sign-out';
 
 describe('Design Set 5 reusable asset delivery', () => {
-  it('includes all three completed asset packs', () => {
+  it('includes all four completed asset packs', () => {
     expect(SJB_SET5_PACKS.map(p => p.filename)).toEqual([
-      'sjb-set5-reusable-assets.zip', 'sjb-set5-motion-v2.zip', 'sjb-set5-motion-v3.zip',
+      'sjb-set5-reusable-assets.zip', 'sjb-set5-motion-v2.zip', 'sjb-set5-motion-v3.zip', 'sjb-set5-hires-backgrounds.zip',
     ]);
-    expect(SJB_SET5_ASSETS).toHaveLength(58);
-    expect(new Set(SJB_SET5_ASSETS.map(a => a.id)).size).toBe(58);
+    expect(SJB_SET5_ASSETS).toHaveLength(66);
+    expect(new Set(SJB_SET5_ASSETS.map(a => a.id)).size).toBe(66);
+  });
+  it('delivers both original and rebuilt backgrounds for all four source formats', () => {
+    for (const format of ['wide', 'portrait', 'story', 'email']) {
+      const original = SJB_SET5_ASSETS.find(a => a.id === `hires-${format}-original`);
+      const rebuild = SJB_SET5_ASSETS.find(a => a.id === `hires-${format}-rebuild`);
+      expect(original?.filename).toBe(`${format}-original-12000px.jpg`);
+      expect(rebuild?.filename).toBe(`${format}-rebuild-12000px.jpg`);
+      expect(original?.downloadUrl).not.toBe(original?.previewUrl);
+      expect(rebuild?.downloadUrl).not.toBe(rebuild?.previewUrl);
+    }
+    expect(SJB_SET5_ASSETS.find(a => a.id === 'hires-portrait-original')?.dimensions).toBe('9600 × 12000');
+    expect(SJB_SET5_ASSETS.find(a => a.id === 'hires-wide-original')?.dimensions).toBe('12000 × 6840');
   });
   it('keeps cinematic original PNG downloads separate from lightweight previews', () => {
     const asset = SJB_SET5_ASSETS.find(a => a.filename === 'leather-cinematic-transparent.png');
