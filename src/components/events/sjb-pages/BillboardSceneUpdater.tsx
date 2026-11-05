@@ -77,22 +77,11 @@ export function BillboardSceneUpdater() {
       if (!art) return;
       const raw = await loadImage(art);
       if (!live) return;
-      // Pad with the board's own edge colours to the screen's shape — never stretch the artwork.
+      // Warp the whole board straight onto the screen corners — no edge-colour padding (it smeared the sides).
       const board = document.createElement("canvas");
       const rw = raw.width, rh = raw.height;
-      if (rw / rh < info.ratio) {
-        board.width = Math.round(rh * info.ratio); board.height = rh;
-        const pad = Math.floor((board.width - rw) / 2), bx = board.getContext("2d")!;
-        bx.drawImage(raw, 0, 0, 1, rh, 0, 0, pad + 1, rh);
-        bx.drawImage(raw, rw - 1, 0, 1, rh, pad + rw - 1, 0, board.width - pad - rw + 1, rh);
-        bx.drawImage(raw, pad, 0);
-      } else {
-        board.width = rw; board.height = Math.round(rw / info.ratio);
-        const pad = Math.floor((board.height - rh) / 2), bx = board.getContext("2d")!;
-        bx.drawImage(raw, 0, 0, rw, 1, 0, 0, rw, pad + 1);
-        bx.drawImage(raw, 0, rh - 1, rw, 1, 0, pad + rh - 1, rw, board.height - pad - rh + 1);
-        bx.drawImage(raw, 0, pad);
-      }
+      board.width = rw; board.height = rh;
+      board.getContext("2d")!.drawImage(raw, 0, 0);
       const size = SJB_BILLBOARD_SIZES.find((s) => s.w === w)!;
       const ratio = rw / rh, want = size.w / size.h;
       setWarn(Math.abs(ratio - want) / want > 0.02 ? `This file is ${rw}×${rh}, not ${size.w}×${size.h} — check you exported the right size.` : null);
