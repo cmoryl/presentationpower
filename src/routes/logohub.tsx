@@ -296,6 +296,26 @@ function LogoCard({ row }: { row: ClientLogoRow }) {
           Open {active} file ↗
         </a>
       )}
+      {activeUrl && (
+        <button
+          type="button"
+          onClick={async () => {
+            const res = await fetch(activeUrl);
+            const blob = await res.blob();
+            const ext = (blob.type.split("/")[1] ?? "png").replace("svg+xml", "svg").replace("jpeg", "jpg");
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `${row.slug}-${active}.${ext}`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 30_000);
+          }}
+          className="ml-3 mt-2 inline-block text-[11px] font-medium text-primary hover:underline"
+        >
+          Download
+        </button>
+      )}
       {row.tags?.length ? (
         <div className="mt-2 line-clamp-2 text-[11px] text-black/50">{row.tags.join(" · ")}</div>
       ) : null}

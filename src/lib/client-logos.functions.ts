@@ -109,9 +109,14 @@ export type ClientLogoRow = {
 // ── LIST ────────────────────────────────────────────────────────────────
 export const listClientLogos = createServerFn({ method: "GET" }).handler(
   async (): Promise<ClientLogoRow[]> => {
-    const s = readerClient();
-    // Signed out (or session not yet hydrated) — render with no LogoHub marks.
-    if (!s) return [];
+    // Signed out: LogoHub is public by request, so read active logos with the
+    // server client and strip author/notes fields before returning.
+    let s = readerClient();
+    const isPublic = !s;
+    if (!s) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      s = supabaseAdmin as unknown as SbClient;
+    }
     const { data, error } = await s
       .from("client_logos")
       .select(
@@ -169,7 +174,7 @@ export const listClientLogos = createServerFn({ method: "GET" }).handler(
         slug: r.slug,
         industry: r.industry ?? null,
         division_id: r.division_id ?? null,
-        notes: r.notes ?? null,
+        notes: isPublic ? null : (r.notes ?? null),
         primary_path: r.primary_path,
         dark_path: r.dark_path ?? null,
         light_path: r.light_path ?? null,
@@ -181,7 +186,7 @@ export const listClientLogos = createServerFn({ method: "GET" }).handler(
         website: r.website ?? null,
         tags: r.tags ?? [],
         is_active: r.is_active ?? true,
-        created_by: r.created_by ?? null,
+        created_by: isPublic ? null : (r.created_by ?? null),
         created_at: r.created_at,
         updated_at: r.updated_at,
         primaryUrl: urlMap.get(r.primary_path) ?? null,
