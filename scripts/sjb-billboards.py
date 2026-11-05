@@ -57,7 +57,7 @@ def render(logo, w, h, way, lang):
     im.paste(lg, ((sw + cut // 2 - ls) // 2, (h - ls) // 2), lg)
     # copy block
     x0 = sw + cut + int(h * (0.16 if compact else 0.14))
-    cw = w - x0 - int(h * 0.08)
+    cw = w - x0 - int(h * (0.08 if compact else 0.16))
     l1, l2 = COPY[lang]
     heads = l1.split(" ") if compact else [l1]
     rows = [(x, head, h * (0.2 if compact else 0.21)) for x in heads] + [(l2, sub, h * 0.13)]
