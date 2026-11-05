@@ -103,10 +103,10 @@ export function billboardBlankScene(w: number, tod: "day" | "dusk") {
 
 /** Vector-shape Canva masters (Tickets On Sale), derived from the team's 840×400 version. */
 export const SJB_BILLBOARD_VECTOR_CANVA = [
-  { id: "DAHaDpOPHhU", label: "840 × 400 · English", edit: "https://www.canva.com/d/sa-KmPo0LaJuGoh" },
-  { id: "DAHaDy67sTs", label: "840 × 400 · Español", edit: "https://www.canva.com/d/rn47NK95YVX4UD6" },
-  { id: "DAHaDyiqbIE", label: "1,728 × 512 · English", edit: "https://www.canva.com/d/C31gUDFuSDFGpQw" },
-  { id: "DAHaD3Csysc", label: "1,728 × 512 · Español", edit: "https://www.canva.com/d/Cxq7LCI1tMDk70Q" },
+  { id: "DAHaDpOPHhU", w: 840, lang: "en", label: "840 × 400 · English", edit: "https://www.canva.com/d/sa-KmPo0LaJuGoh" },
+  { id: "DAHaDy67sTs", w: 840, lang: "es", label: "840 × 400 · Español", edit: "https://www.canva.com/d/rn47NK95YVX4UD6" },
+  { id: "DAHaDyiqbIE", w: 1728, lang: "en", label: "1,728 × 512 · English", edit: "https://www.canva.com/d/C31gUDFuSDFGpQw" },
+  { id: "DAHaD3Csysc", w: 1728, lang: "es", label: "1,728 × 512 · Español", edit: "https://www.canva.com/d/Cxq7LCI1tMDk70Q" },
 ] as const;
 
 /** Additional team-built 840×400 example versions (previews exported from Canva). */
