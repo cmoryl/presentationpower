@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Add a public Design Set 5 asset gallery linked from the social collection, covering reusable backgrounds, transparent pieces, motion effects and layered-pack downloads; verify viewing and downloads on desktop/mobile.
+- [x] Add a public Design Set 5 asset gallery linked from the social collection: 58 assets, three complete packs, light/dark previews and original downloads. Both URLs open; desktop/mobile checked, all images loaded and downloaded cinematic PNG matches the source checksum. Saved Canva originals unchanged.
 
 - [x] Create richer Set 5 cinematic light effects from the original references: two AI-edited navy/leather versions, transparent composites and independent partial wake overlays at native 1920×1280. All four checked on light/dark grounds, transparency seams softened and borders verified clear. Canva originals unchanged.
 
