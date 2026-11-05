@@ -67,7 +67,7 @@ export function BillboardSceneUpdater() {
     (async () => {
       const cv = canvas.current;
       if (!cv) return;
-      const info = (quads as unknown as Record<string, { w: number; h: number; quad: Pt[] }>)[`${w}-${tod}`];
+      const info = (quads as unknown as Record<string, { w: number; h: number; quad: Pt[]; ratio: number }>)[`${w}-${tod}`];
       const scene = await loadImage(billboardBlankScene(w, tod));
       if (!live) return;
       cv.width = info.w;
@@ -75,11 +75,27 @@ export function BillboardSceneUpdater() {
       const ctx = cv.getContext("2d")!;
       ctx.drawImage(scene, 0, 0);
       if (!art) return;
-      const board = await loadImage(art);
+      const raw = await loadImage(art);
       if (!live) return;
+      // Pad with the board's own edge colours to the screen's shape — never stretch the artwork.
+      const board = document.createElement("canvas");
+      const rw = raw.width, rh = raw.height;
+      if (rw / rh < info.ratio) {
+        board.width = Math.round(rh * info.ratio); board.height = rh;
+        const pad = Math.floor((board.width - rw) / 2), bx = board.getContext("2d")!;
+        bx.drawImage(raw, 0, 0, 1, rh, 0, 0, pad + 1, rh);
+        bx.drawImage(raw, rw - 1, 0, 1, rh, pad + rw - 1, 0, board.width - pad - rw + 1, rh);
+        bx.drawImage(raw, pad, 0);
+      } else {
+        board.width = rw; board.height = Math.round(rw / info.ratio);
+        const pad = Math.floor((board.height - rh) / 2), bx = board.getContext("2d")!;
+        bx.drawImage(raw, 0, 0, rw, 1, 0, 0, rw, pad + 1);
+        bx.drawImage(raw, 0, rh - 1, rw, 1, 0, pad + rh - 1, rw, board.height - pad - rh + 1);
+        bx.drawImage(raw, 0, pad);
+      }
       const size = SJB_BILLBOARD_SIZES.find((s) => s.w === w)!;
-      const ratio = board.width / board.height, want = size.w / size.h;
-      setWarn(Math.abs(ratio - want) / want > 0.02 ? `This file is ${board.width}×${board.height}; the ${size.w}×${size.h} board will stretch it.` : null);
+      const ratio = rw / rh, want = size.w / size.h;
+      setWarn(Math.abs(ratio - want) / want > 0.02 ? `This file is ${rw}×${rh}, not ${size.w}×${size.h} — check you exported the right size.` : null);
       const cx = info.quad.reduce((t, p) => t + p[0], 0) / 4, cy = info.quad.reduce((t, p) => t + p[1], 0) / 4;
       // grow the screen slightly so no magenta edge from the blank scene shows
       const map = squareToQuad(info.quad.map(([x, y]) => [x + Math.sign(x - cx) * 7, y + Math.sign(y - cy) * 7] as Pt));
