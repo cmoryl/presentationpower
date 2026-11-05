@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ExternalLink, Maximize2, X } from 'lucide-react';
+import { ArrowLeft, Download, ExternalLink, Maximize2, X } from 'lucide-react';
 import { Button } from '@/design-system/element';
 import { SjbLink, SjbShell } from '@/components/events/SjbShare';
 import { SJB_EVENT } from '@/lib/san-juan-bowl';
@@ -12,6 +12,19 @@ import coverSet4 from '@/assets/sjb-card-covers/set-4.jpg';
 import coverSet5 from '@/assets/sjb-card-covers/set-5.jpg';
 import coverSet6 from '@/assets/sjb-card-covers/set-6.jpg';
 import coverAll from '@/assets/sjb-card-covers/all.jpg';
+
+async function saveSocialImage(d: SjbCanvaGalleryDesign) {
+  const name = `san-juan-bowl-${d.collectionId}-${d.name}-${sjbCanvaSize(d)}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
+  try {
+    const blob = await (await fetch(d.previewUrl)).blob();
+    const ext = blob.type.includes('jpeg') ? 'jpg' : blob.type.includes('webp') ? 'webp' : 'png';
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `${name}.${ext}`; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  } catch {
+    window.open(d.previewUrl, '_blank', 'noopener');
+  }
+}
 
 const SET_COVERS: Record<string, string> = {
   all: coverAll,
@@ -71,13 +84,13 @@ export function SjbSocialStudio() {
               <Button variant="ghost" className="relative block h-[360px] w-full rounded-none bg-muted p-3" aria-label={`Enlarge ${collection.name} ${d.name} ${sjbCanvaSize(d)}`} onClick={() => setSelected(d)}>
                 <img src={d.previewUrl} alt={`${collection.name} — ${d.name}, ${sjbCanvaSize(d)}`} loading="lazy" className="h-full w-full object-contain" /><Maximize2 className="absolute bottom-3 right-3 rounded bg-background text-foreground" aria-hidden />
               </Button>
-              <div className="p-4"><div className="flex flex-wrap items-start justify-between gap-2"><h3 className="font-semibold">{d.name}</h3><span className="text-xs text-muted-foreground">{d.status === 'draft' ? 'Draft · unsaved' : 'Saved in Canva'}</span></div><p className="mt-1 text-sm text-muted-foreground">{sjbCanvaSize(d)} px</p><Button asChild variant="outline" size="sm" className="mt-4"><a href={d.canvaUrl} target="_blank" rel="noreferrer"><ExternalLink />{d.status === 'draft' ? 'Open Canva original' : 'Edit in Canva'}</a></Button></div>
+              <div className="p-4"><div className="flex flex-wrap items-start justify-between gap-2"><h3 className="font-semibold">{d.name}</h3><span className="text-xs text-muted-foreground">{d.status === 'draft' ? 'Draft · unsaved' : 'Saved in Canva'}</span></div><p className="mt-1 text-sm text-muted-foreground">{sjbCanvaSize(d)} px</p><div className="mt-4 flex flex-wrap gap-2"><Button variant="outline" size="sm" onClick={() => saveSocialImage(d)} aria-label={`Save image: ${collection.name} ${d.name} ${sjbCanvaSize(d)}`}><Download />Save image</Button><Button asChild variant="outline" size="sm"><a href={d.canvaUrl} target="_blank" rel="noreferrer"><ExternalLink />{d.status === 'draft' ? 'Open Canva original' : 'Edit in Canva'}</a></Button></div></div>
             </article>)}
           </div>
         </section>;
       })}
       <dialog ref={dialog} onClose={() => setSelected(null)} onCancel={() => setSelected(null)} aria-labelledby="sjb-preview-title" className="fixed inset-0 m-auto max-h-[92dvh] w-[min(1100px,94vw)] overflow-auto rounded-lg border border-border bg-background p-5 text-foreground shadow-xl backdrop:bg-foreground/60">
-        {selected && <><div className="mb-4 flex items-start justify-between gap-3"><div><h2 id="sjb-preview-title" className="text-lg font-semibold">{SJB_CANVA_COLLECTIONS.find(c => c.id === selected.collectionId)?.name} · {selected.name}</h2><p className="text-sm text-muted-foreground">{sjbCanvaSize(selected)} px · {selected.status === 'draft' ? 'Unsaved draft' : 'Saved Canva snapshot'}</p></div><Button variant="ghost" size="icon" aria-label="Close preview" onClick={() => setSelected(null)}><X /></Button></div><img src={selected.previewUrl} alt={selected.name} className="mx-auto max-h-[68dvh] max-w-full object-contain" /><Button asChild variant="outline" className="mt-4"><a href={selected.canvaUrl} target="_blank" rel="noreferrer"><ExternalLink />Open in Canva</a></Button></>}
+        {selected && <><div className="mb-4 flex items-start justify-between gap-3"><div><h2 id="sjb-preview-title" className="text-lg font-semibold">{SJB_CANVA_COLLECTIONS.find(c => c.id === selected.collectionId)?.name} · {selected.name}</h2><p className="text-sm text-muted-foreground">{sjbCanvaSize(selected)} px · {selected.status === 'draft' ? 'Unsaved draft' : 'Saved Canva snapshot'}</p></div><Button variant="ghost" size="icon" aria-label="Close preview" onClick={() => setSelected(null)}><X /></Button></div><img src={selected.previewUrl} alt={selected.name} className="mx-auto max-h-[68dvh] max-w-full object-contain" /><Button variant="outline" className="mr-2 mt-4" onClick={() => saveSocialImage(selected)}><Download />Save image</Button><Button asChild variant="outline" className="mt-4"><a href={selected.canvaUrl} target="_blank" rel="noreferrer"><ExternalLink />Open in Canva</a></Button></>}
       </dialog>
     </main>
   </SjbShell>;
