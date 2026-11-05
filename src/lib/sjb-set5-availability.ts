@@ -15,6 +15,6 @@ export function availableSet5Assets(removed: readonly string[]) {
 }
 
 export function availableSet5Packs(removed: readonly string[]) {
-  const prefixes = ['base-', 'motion-', 'cinematic-'];
+  const prefixes = ['base-', 'motion-', 'cinematic-', 'hires-'];
   return SJB_SET5_PACKS.filter((_, index) => !removed.some(id => id.startsWith(prefixes[index] ?? '')));
 }

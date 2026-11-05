@@ -120,9 +120,11 @@ import asset118 from '@/assets/sjb-set5-gallery/cinematic-navy-wake-overlay.png.
 import asset119 from '@/assets/sjb-set5-gallery/reusable-pack.zip.asset.json';
 import asset120 from '@/assets/sjb-set5-gallery/motion-pack.zip.asset.json';
 import asset121 from '@/assets/sjb-set5-gallery/cinematic-pack.zip.asset.json';
+import { SJB_SET5_HIRES_ASSETS, SJB_SET5_HIRES_PACK } from './sjb-set5-hires';
 
 export interface SjbSet5Asset { id: string; title: string; category: string; dimensions: string; note: string; previewUrl: string; downloadUrl: string; filename: string; vectorUrl?: string; }
 export const SJB_SET5_ASSETS: readonly SjbSet5Asset[] = [
+...SJB_SET5_HIRES_ASSETS,
 {"id": "base-layered-compositions-email-layered.svg", "title": "Email Layered", "category": "Layered artwork", "dimensions": "Mixed vector / raster SVG", "note": "Movable layers \u00b7 embedded raster pieces", "filename": "email-layered.svg", previewUrl: asset1.url, downloadUrl: asset0.url },
 {"id": "base-layered-compositions-portrait-layered.svg", "title": "Portrait Layered", "category": "Layered artwork", "dimensions": "Mixed vector / raster SVG", "note": "Movable layers \u00b7 embedded raster pieces", "filename": "portrait-layered.svg", previewUrl: asset3.url, downloadUrl: asset2.url },
 {"id": "base-layered-compositions-tall-layered.svg", "title": "Tall Layered", "category": "Layered artwork", "dimensions": "Mixed vector / raster SVG", "note": "Movable layers \u00b7 embedded raster pieces", "filename": "tall-layered.svg", previewUrl: asset5.url, downloadUrl: asset4.url },
@@ -186,4 +188,5 @@ export const SJB_SET5_PACKS = [
 { title: "Backgrounds & layered artwork", url: asset119.url, filename: "sjb-set5-reusable-assets.zip", size: "115 MB" },
 { title: "Motion footballs & separate effects", url: asset120.url, filename: "sjb-set5-motion-v2.zip", size: "35 MB" },
 { title: "Cinematic ribbons & glow", url: asset121.url, filename: "sjb-set5-motion-v3.zip", size: "12 MB" },
+SJB_SET5_HIRES_PACK,
 ];

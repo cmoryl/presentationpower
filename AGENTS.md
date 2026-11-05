@@ -51,5 +51,6 @@
 
 - Bowl social pages share the Canva snapshot gallery registry; preserve actual artboard sizes and distinguish unsaved drafts from saved originals — why: a parallel native renderer and assumed sizes misrepresent the Canva artwork.
 - Set 5 reusable artwork uses the shared `sjb-set5-assets` registry and asset page under both app/share URLs; CDN originals and lightweight previews stay separate — why: public viewing must not resize downloads or alter saved Canva designs.
+- Set 5 high-resolution backgrounds enter that registry through `sjb-set5-hires`; preserve recovered Canva media separately from AI-edited rebuilds and record actual source/export dimensions — why: a larger download must never be represented as recovered native detail.
 - Set 5 gallery deletions persist as admin-only RLS-protected removal records; both pages filter them and omit affected static ZIP packs, preserving source/Canva files — why: registry media is shared immutable artwork, not disposable storage.
 - LogoHub web checks: a daily cron calls `/api/public/hooks/logo-scrub` (token in service-role-only `internal_job_tokens`), which re-checks logos unchecked for 30 days via Firecrawl and only flags changes into `logo_update_checks`, reviewed on `/approvals?tab=logos` — why: logos are never replaced without an admin.
