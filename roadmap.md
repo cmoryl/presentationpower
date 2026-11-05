@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [x] Improve Set 5 motion-ball assets: enlarged original Story/display crops compared; navy/leather native 1920px transparent balls, six 3000px composites and layered SVGs with independent cyan/gold trails, contour glow and front ribbons delivered. All six light/dark comparisons and native leather/lace details inspected; measured magenta contamination removed. Matching rebuild, not exact pixel extraction; existing pack and campaigns unchanged.
+
 - [x] Deliver Design Set 5 portable reusable pack: 3 transparent native 1920px objects, 7 scalable graphic SVGs, unchanged official logo SVGs, 4 self-contained 12-layer SVG/OpenRaster compositions and 6000px composite PNGs. All visuals inspected; alpha, embedded images, layer count and archive verified. Rebuilt artwork, not original-layer extraction; composite enlargement does not add raster detail. Saved campaign designs unchanged.
 - [ ] Finish filing new Set 5 uploads into Canva subfolders — blocked by Canva access/item-not-found refusals. Root folder and original-reference assets are filed; new object/SVG uploads accepted but not confirmed in subfolders or as Canva-editable layers. Portable pack is complete.
 
