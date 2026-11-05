@@ -7,16 +7,16 @@ describe('Bowl Canva gallery', () => {
     expect(drafts.filter(d => d.collectionId === 'stadium-night')).toHaveLength(0);
     expect(drafts.filter(d => d.collectionId === 'bold-graphic')).toHaveLength(0);
     const originals = SJB_CANVA_GALLERY.filter(d => d.collectionId === 'bold-graphic' && !d.format && d.campaign !== 'tickets');
-    expect(originals).toHaveLength(11);
-    expect(originals.filter(d => d.status === 'saved')).toHaveLength(11);
+    expect(originals).toHaveLength(17);
+    expect(originals.filter(d => d.status === 'saved')).toHaveLength(17);
     expect(originals.every(d => d.provenance === 'artistic-render')).toBe(true);
   });
-  it('tracks the twenty Stadium Night render revisions, all saved', () => {
+  it('tracks the twenty-six Stadium Night render revisions, all saved', () => {
     const stadium = filterSjbCanvaDesigns('stadium-night', 'all', 'all');
-    expect(stadium).toHaveLength(20);
+    expect(stadium).toHaveLength(26);
     expect(stadium.every(d => d.provenance === 'artistic-render')).toBe(true);
     const saved = stadium.filter(d => d.status === 'saved');
-    expect(saved).toHaveLength(20);
+    expect(saved).toHaveLength(26);
     expect(saved.every(d => !d.draftTransactionId)).toBe(true);
   });
   it('uses actual Canva sizes, not the old square label', () => {
@@ -61,6 +61,15 @@ describe('Bowl Canva gallery', () => {
       expect(social).toHaveLength(5);
       expect(social.map(d => [d.width, d.height])).toEqual([[1080,1350],[1080,1440],[1080,1920],[1600,900],[1200,id === 'bold-graphic' ? 630 : 628]]);
       expect(new Set(social.map(d => d.id)).size).toBe(5);
+    }
+  });
+  it('every design set carries all six campaign post types', () => {
+    for (const { id } of SJB_CANVA_COLLECTIONS) {
+      for (const name of ['Countdown', 'Matchup', 'Game day', 'Final score', 'Quote card', 'Save the date']) {
+        const posts = filterSjbCanvaDesigns(id, 'all', name);
+        expect(posts).toHaveLength(1);
+        expect(posts[0]).toMatchObject({ width: 1080, height: 1350, status: 'saved' });
+      }
     }
   });
 });

@@ -239,7 +239,18 @@ export const SJB_CANVA_GALLERY: readonly SjbCanvaGalleryDesign[] = [
   design('DAHZ_58yIR0', 'light-cinematic', 'Medium rectangle 300×250', 300, 250, { url: '/sjb-canva/display-s6-300x250.png' }, 'saved', 'artistic-render'),
   design('DAHZ_2cEveU', 'light-cinematic', 'Half page 300×600', 300, 600, { url: '/sjb-canva/display-s6-300x600.png' }, 'saved', 'artistic-render'),
   design('DAHZ_yvIMyM', 'light-cinematic', 'Wide skyscraper 160×600', 160, 600, { url: '/sjb-canva/display-s6-160x600.png' }, 'saved', 'artistic-render'),
+  // Campaign posts (countdown, matchup, game day, final score, quote, save the date)
+  // for every set, built from each set's own Instagram master. Set 4 has its own above.
+  ...campaignPosts('bold-graphic', 's1', 'artistic-render', ['DAHaATr2HHM', 'DAHaASP78J0', 'DAHaAfb57UU', 'DAHaAUUnSJA', 'DAHaAY_hXTo', 'DAHaATlAbzw']),
+  ...campaignPosts('stadium-night', 's2', 'artistic-render', ['DAHaAd7xMwY', 'DAHaAbgHrjE', 'DAHaAadGlXs', 'DAHaAaAvl6o', 'DAHaAYvBML0', 'DAHaAcCOWrY']),
+  ...campaignPosts('action-spotlight', 's3', 'illustration', ['DAHaAfcGqx8', 'DAHaATo5ENI', 'DAHaAQYgjEI', 'DAHaAbm6dlE', 'DAHaAXCumVs', 'DAHaAfCgcSQ']),
+  ...campaignPosts('light-action', 's5', 'artistic-render', ['DAHaAe_aPQA', 'DAHaAaccCco', 'DAHaAbJSjIo', 'DAHaAe7f-dw', 'DAHaAcSZssU', 'DAHaAfijFUE']),
+  ...campaignPosts('light-cinematic', 's6', 'artistic-render', ['DAHaAROqkFQ', 'DAHaAY5jVEU', 'DAHaAQxhkMM', 'DAHaAeOCr8A', 'DAHaAcQDuto', 'DAHaAc4VgKY']),
 ];
+function campaignPosts(collectionId: SjbCanvaCollectionId, prefix: string, provenance: SjbCanvaGalleryDesign['provenance'], ids: readonly [string, string, string, string, string, string]): SjbCanvaGalleryDesign[] {
+  const types = [['Countdown', 'countdown'], ['Matchup', 'matchup'], ['Game day', 'game-day'], ['Final score', 'final-score'], ['Quote card', 'quote'], ['Save the date', 'save-date']] as const;
+  return types.map(([name, slug], i) => design(ids[i], collectionId, name, 1080, 1350, { url: `/sjb-canva/${prefix}-${slug}.png` }, 'saved', provenance));
+}
 export function sjbCanvaSize(d: Pick<SjbCanvaGalleryDesign, 'width' | 'height'>) { return `${d.width}×${d.height}`; }
 export function filterSjbCanvaDesigns(collectionId: string, size: string, name: string) {
   return SJB_CANVA_GALLERY.filter(d => (collectionId === 'all' || d.collectionId === collectionId) && (size === 'all' || sjbCanvaSize(d) === size) && (name === 'all' || d.name === name));
