@@ -1,3 +1,4 @@
+import { SJB_CANVA_LIVE_PREVIEW_IDS } from './sjb-canva-live';
 import set4SocialPortrait from '@/assets/sjb-canva/set4-social-portrait.png.asset.json';
 import set4SocialTall from '@/assets/sjb-canva/set4-social-tall.png.asset.json';
 import set4SocialStory from '@/assets/sjb-canva/set4-social-story.png.asset.json';
@@ -110,7 +111,7 @@ export interface SjbCanvaGalleryDesign {
   provenance: 'historical-photo' | 'artistic-render' | 'supplied-artwork' | 'illustration';
 }
 function design(id: string, collectionId: SjbCanvaCollectionId, name: string, width: number, height: number, asset: { url: string }, status: SjbCanvaGalleryDesign['status'], provenance: SjbCanvaGalleryDesign['provenance'], canvaUrl?: string): SjbCanvaGalleryDesign {
-  return { id, collectionId, name, width, height, previewUrl: asset.url, status, provenance, canvaUrl: canvaUrl ?? `https://www.canva.com/design/${id}/edit` };
+  return { id, collectionId, name, width, height, previewUrl: SJB_CANVA_LIVE_PREVIEW_IDS.has(id) ? `/sjb-canva/live/${id}.png` : asset.url, status, provenance, canvaUrl: canvaUrl ?? `https://www.canva.com/design/${id}/edit` };
 }
 // Canva artwork snapshots, not a second renderer. Actual artboard sizes are
 // independent of the legacy native editor's format labels. Drafts are NOT saved.
