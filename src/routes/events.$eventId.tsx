@@ -174,6 +174,11 @@ function EventHome() {
                 </Link>
               </Button>
               <Button asChild variant="outline">
+                <Link to="/events/san-juan-bowl/billboards">
+                  Digital billboards <ArrowRight aria-hidden />
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
                 <Link to="/events/next/sign-editor/$signId" params={{ signId: "sjb-first-flyer" }}>
                   Game flyer <ArrowRight aria-hidden />
                 </Link>
