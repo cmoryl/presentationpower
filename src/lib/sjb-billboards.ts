@@ -82,17 +82,17 @@ export const SJB_BILLBOARD_RESEARCH = [
 /** Editable Canva masters (TransPerfect team account): ground image + separate Bowl shield, headline, date and web-address layers. */
 export const SJB_BILLBOARD_CANVA: Record<string, { id: string; edit: string }> = {
   "840-navy-en": { id: "DAHaDpOPHhU", edit: "https://www.canva.com/d/sa-KmPo0LaJuGoh" },
-  "840-navy-es": { id: "DAHaDl2QXZk", edit: "https://www.canva.com/d/TBMfVA8tsNU6X5Z" },
+  "840-navy-es": { id: "DAHaEcNTGak", edit: "https://www.canva.com/d/PzQ2VktpnX3wv8k" },
   "840-gold-en": { id: "DAHaDp-Fwv0", edit: "https://www.canva.com/d/XDLAu1POsDD2qdP" },
-  "840-gold-es": { id: "DAHaDoz-BVo", edit: "https://www.canva.com/d/K1Qesc4UkKnahZ6" },
+  "840-gold-es": { id: "DAHaEYiz_60", edit: "https://www.canva.com/d/aVKzzx3mJl1t50Y" },
   "840-cyan-en": { id: "DAHaDstyS7c", edit: "https://www.canva.com/d/q8ZVqhUo_OBzbw8" },
-  "840-cyan-es": { id: "DAHaDmgsUpY", edit: "https://www.canva.com/d/d4n5NhK9UoCkm9b" },
-  "1728-navy-en": { id: "DAHaDk41rz4", edit: "https://www.canva.com/d/3jn0V_FsT6Oaa1E" },
-  "1728-navy-es": { id: "DAHaDm5duUw", edit: "https://www.canva.com/d/hSWXswWJOQJ2L0b" },
-  "1728-gold-en": { id: "DAHaDgfwaYg", edit: "https://www.canva.com/d/0gbuVnYIJxE-Dlj" },
-  "1728-gold-es": { id: "DAHaDn7--lA", edit: "https://www.canva.com/d/ux4Ud6ACNuQi4GF" },
-  "1728-cyan-en": { id: "DAHaDghDJJw", edit: "https://www.canva.com/d/zpqjejkpliueJOs" },
-  "1728-cyan-es": { id: "DAHaDlRy6ao", edit: "https://www.canva.com/d/QZN8Ah3R3J4i7rz" },
+  "840-cyan-es": { id: "DAHaEdOIqjs", edit: "https://www.canva.com/d/iWQUbPHgnkV4N8w" },
+  "1728-navy-en": { id: "DAHaESy7GNA", edit: "https://www.canva.com/d/bhxU7rnsrDLlT05" },
+  "1728-navy-es": { id: "DAHaEToE578", edit: "https://www.canva.com/d/OJ6l957ki1qpvCc" },
+  "1728-gold-en": { id: "DAHaEdR5C0I", edit: "https://www.canva.com/d/jMY1FHDY2Ck5uPb" },
+  "1728-gold-es": { id: "DAHaEa7pev4", edit: "https://www.canva.com/d/Gi32rFPHfJsxuov" },
+  "1728-cyan-en": { id: "DAHaEd9ZBy0", edit: "https://www.canva.com/d/r1bf3WkoX_1T3UI" },
+  "1728-cyan-es": { id: "DAHaEewIoMA", edit: "https://www.canva.com/d/HphNxfTFwMiQPss" },
 };
 export function billboardCanva(w: number, way: string, lang: BillboardLang) {
   return SJB_BILLBOARD_CANVA[`${w}-${way}-${lang}`];
