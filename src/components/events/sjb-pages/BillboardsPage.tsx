@@ -77,6 +77,22 @@ export function BillboardsPage() {
                     <figcaption className="text-xs text-muted-foreground">{way.label} · generated mockup · click to enlarge</figcaption>
                   </figure>
                 ))}
+                {w === 840 && SJB_BILLBOARD_TEAM_EXAMPLES.map((d) => (
+                  <figure key={d.id} className="space-y-1.5">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button type="button" className="block w-full cursor-zoom-in rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={`View ${d.label} mockup larger`}>
+                          <img src={`/sjb-billboards/scenes/team-${d.id}-${tod}.jpg`} alt={`${d.label} billboard shown beside a San Juan road (illustrative mockup)`} loading="lazy" className="aspect-[16/10] w-full rounded-md object-cover" />
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-[min(96vw,1600px)] p-3">
+                        <DialogTitle className="text-sm">{d.label} · generated mockup, not an actual location</DialogTitle>
+                        <img src={`/sjb-billboards/scenes/team-${d.id}-${tod}.jpg`} alt={`${d.label} billboard mockup, enlarged`} className="h-auto max-h-[85vh] w-full rounded-md object-contain" />
+                      </DialogContent>
+                    </Dialog>
+                    <figcaption className="text-xs text-muted-foreground">Team version · {d.label.split(" · ")[0]} · English only · click to enlarge</figcaption>
+                  </figure>
+                ))}
               </div>
             </div>
           ))}
