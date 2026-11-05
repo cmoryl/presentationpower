@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Download, ExternalLink, Maximize2, X } from 'lucide-react';
+import { ArrowLeft, Download, ExternalLink, FolderOpen, Maximize2, X } from 'lucide-react';
 import { Button } from '@/design-system/element';
 import { SjbLink, SjbShell } from '@/components/events/SjbShare';
 import { SJB_EVENT } from '@/lib/san-juan-bowl';
@@ -85,7 +85,7 @@ export function SjbSocialStudio() {
         const designs = visible.filter(d => d.collectionId === collection.id);
         if (!designs.length) return null;
         return <section key={collection.id} aria-labelledby={`collection-${collection.id}`} className="mt-10">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3"><h2 id={`collection-${collection.id}`} className="scroll-mt-24 text-xl font-bold">{collection.name}</h2><Button asChild variant="link" size="sm"><a href={`https://www.canva.com/folder/${collection.folderId}`} target="_blank" rel="noreferrer">Open campaign folder<ExternalLink /></a></Button></div>
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3"><h2 id={`collection-${collection.id}`} className="scroll-mt-24 text-xl font-bold">{collection.name}</h2><div className="flex flex-wrap items-center gap-2">{collection.id === 'light-action' && <Button asChild variant="outline" size="sm"><SjbLink page="set5assets"><FolderOpen />View design assets</SjbLink></Button>}<Button asChild variant="link" size="sm"><a href={`https://www.canva.com/folder/${collection.folderId}`} target="_blank" rel="noreferrer">Open campaign folder<ExternalLink /></a></Button></div></div>
           {collection.id === 'stadium-night' && <p className="mb-5 text-sm text-muted-foreground">Original Element canopy and football-action artwork · Artistic visualisations, not verified venue photography or a field-conversion plan.</p>}
           {designs.some(d => d.format) && <p className="mb-5 text-sm text-muted-foreground">Heroes 1200×600 · Headers 1200×300 · Signature banners 1200×200. Intended display width: 600 px. Email artwork is saved in Canva; email sending and ticket links are not configured.</p>}
           <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
