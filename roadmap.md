@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [x] Add confirmed admin-only removal from the Set 5 asset gallery, persisted across app/share pages; preserve Canva originals and omit affected ZIP packs. Admin cancel/delete/reload and signed-out removal verified; test asset restored, seven targeted tests pass, build OK. Full suite: 2,628 pass with the existing unrelated London map-export failure.
+
 - [x] Add a public Design Set 5 asset gallery linked from the social collection: 58 assets, three complete packs, light/dark previews and original downloads. Both URLs open; desktop/mobile checked, all images loaded and downloaded cinematic PNG matches the source checksum. Saved Canva originals unchanged.
 
 - [x] Create richer Set 5 cinematic light effects from the original references: two AI-edited navy/leather versions, transparent composites and independent partial wake overlays at native 1920×1280. All four checked on light/dark grounds, transparency seams softened and borders verified clear. Canva originals unchanged.
