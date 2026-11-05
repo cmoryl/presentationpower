@@ -52,7 +52,7 @@ def screen_ratio(q):
 
 def place(scene, board, dusk):
     quad, mask = corners(scene)
-    board = fit(board, screen_ratio(quad))
+    # Warp the whole board straight onto the screen corners: no edge-colour padding (it smeared the sides).
     w, h = board.size
     big = board.resize((w * 2, h * 2), Image.LANCZOS)
     c = coeffs(quad, [(0, 0), (w * 2, 0), (w * 2, h * 2), (0, h * 2)])
