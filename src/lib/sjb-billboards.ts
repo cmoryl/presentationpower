@@ -108,3 +108,9 @@ export const SJB_BILLBOARD_VECTOR_CANVA = [
   { id: "DAHaDyiqbIE", label: "1,728 × 512 · English", edit: "https://www.canva.com/d/C31gUDFuSDFGpQw" },
   { id: "DAHaD3Csysc", label: "1,728 × 512 · Español", edit: "https://www.canva.com/d/Cxq7LCI1tMDk70Q" },
 ] as const;
+
+/** Additional team-built 840×400 example versions (previews exported from Canva). */
+export const SJB_BILLBOARD_TEAM_EXAMPLES = [
+  { id: "DAHaD4uCFFg", label: "Light action · 840 × 400 · English", edit: "https://www.canva.com/d/tZH3YI20MtWLLbK", preview: "/sjb-billboards/vector/DAHaD4uCFFg.png" },
+  { id: "DAHaD3KaDEU", label: "Gold night catch · 840 × 400 · English", edit: "https://www.canva.com/d/blrKOs4d7agllLX", preview: "/sjb-billboards/vector/DAHaD3KaDEU.png" },
+] as const;
