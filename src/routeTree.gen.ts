@@ -194,6 +194,7 @@ import { Route as EventsNextStartRouteImport } from './routes/events.next_.start
 import { Route as EventsNextVendorHandoffsRouteImport } from './routes/events.next_.vendor-handoffs'
 import { Route as EventsNextVenueRouteImport } from './routes/events.next_.venue'
 import { Route as EventsNextVenuesRouteImport } from './routes/events.next_.venues'
+import { Route as EventsSanJuanBowlBillboardsRouteImport } from './routes/events.san-juan-bowl_.billboards'
 import { Route as EventsSanJuanBowlBrandKitRouteImport } from './routes/events.san-juan-bowl_.brand-kit'
 import { Route as EventsSanJuanBowlSocialRouteImport } from './routes/events.san-juan-bowl_.social'
 import { Route as EventsSanJuanBowlStadiumRouteImport } from './routes/events.san-juan-bowl_.stadium'
@@ -213,6 +214,7 @@ import { Route as LibraryPrintModulesRouteImport } from './routes/library.print_
 import { Route as MastersGeneralSlidesLooksRouteImport } from './routes/masters.general-slides_.looks'
 import { Route as ShareNextBrandKitTokenRouteImport } from './routes/share.next-brand-kit.$token'
 import { Route as ShareSanJuanBowlIndexRouteImport } from './routes/share.san-juan-bowl.index'
+import { Route as ShareSanJuanBowlBillboardsRouteImport } from './routes/share.san-juan-bowl.billboards'
 import { Route as ShareSanJuanBowlDesignersRouteImport } from './routes/share.san-juan-bowl.designers'
 import { Route as ShareSanJuanBowlLetteringRouteImport } from './routes/share.san-juan-bowl.lettering'
 import { Route as ShareSanJuanBowlSingleColourRouteImport } from './routes/share.san-juan-bowl.single-colour'
@@ -1183,6 +1185,12 @@ const EventsNextVenuesRoute = EventsNextVenuesRouteImport.update({
   path: '/next/venues',
   getParentRoute: () => EventsRoute,
 } as any)
+const EventsSanJuanBowlBillboardsRoute =
+  EventsSanJuanBowlBillboardsRouteImport.update({
+    id: '/san-juan-bowl_/billboards',
+    path: '/san-juan-bowl/billboards',
+    getParentRoute: () => EventsRoute,
+  } as any)
 const EventsSanJuanBowlBrandKitRoute =
   EventsSanJuanBowlBrandKitRouteImport.update({
     id: '/san-juan-bowl_/brand-kit',
@@ -1286,6 +1294,12 @@ const ShareSanJuanBowlIndexRoute = ShareSanJuanBowlIndexRouteImport.update({
   path: '/share/san-juan-bowl/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShareSanJuanBowlBillboardsRoute =
+  ShareSanJuanBowlBillboardsRouteImport.update({
+    id: '/share/san-juan-bowl/billboards',
+    path: '/share/san-juan-bowl/billboards',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ShareSanJuanBowlDesignersRoute =
   ShareSanJuanBowlDesignersRouteImport.update({
     id: '/share/san-juan-bowl/designers',
@@ -1676,6 +1690,7 @@ export interface FileRoutesByFullPath {
   '/events/next/vendor-handoffs': typeof EventsNextVendorHandoffsRoute
   '/events/next/venue': typeof EventsNextVenueRoute
   '/events/next/venues': typeof EventsNextVenuesRoute
+  '/events/san-juan-bowl/billboards': typeof EventsSanJuanBowlBillboardsRoute
   '/events/san-juan-bowl/brand-kit': typeof EventsSanJuanBowlBrandKitRoute
   '/events/san-juan-bowl/social': typeof EventsSanJuanBowlSocialRoute
   '/events/san-juan-bowl/stadium': typeof EventsSanJuanBowlStadiumRoute
@@ -1692,6 +1707,7 @@ export interface FileRoutesByFullPath {
   '/library/print/modules': typeof LibraryPrintModulesRoute
   '/masters/general-slides/looks': typeof MastersGeneralSlidesLooksRoute
   '/share/next-brand-kit/$token': typeof ShareNextBrandKitTokenRoute
+  '/share/san-juan-bowl/billboards': typeof ShareSanJuanBowlBillboardsRoute
   '/share/san-juan-bowl/designers': typeof ShareSanJuanBowlDesignersRoute
   '/share/san-juan-bowl/lettering': typeof ShareSanJuanBowlLetteringRoute
   '/share/san-juan-bowl/single-colour': typeof ShareSanJuanBowlSingleColourRoute
@@ -1915,6 +1931,7 @@ export interface FileRoutesByTo {
   '/events/next/vendor-handoffs': typeof EventsNextVendorHandoffsRoute
   '/events/next/venue': typeof EventsNextVenueRoute
   '/events/next/venues': typeof EventsNextVenuesRoute
+  '/events/san-juan-bowl/billboards': typeof EventsSanJuanBowlBillboardsRoute
   '/events/san-juan-bowl/brand-kit': typeof EventsSanJuanBowlBrandKitRoute
   '/events/san-juan-bowl/social': typeof EventsSanJuanBowlSocialRoute
   '/events/san-juan-bowl/stadium': typeof EventsSanJuanBowlStadiumRoute
@@ -1931,6 +1948,7 @@ export interface FileRoutesByTo {
   '/library/print/modules': typeof LibraryPrintModulesRoute
   '/masters/general-slides/looks': typeof MastersGeneralSlidesLooksRoute
   '/share/next-brand-kit/$token': typeof ShareNextBrandKitTokenRoute
+  '/share/san-juan-bowl/billboards': typeof ShareSanJuanBowlBillboardsRoute
   '/share/san-juan-bowl/designers': typeof ShareSanJuanBowlDesignersRoute
   '/share/san-juan-bowl/lettering': typeof ShareSanJuanBowlLetteringRoute
   '/share/san-juan-bowl/single-colour': typeof ShareSanJuanBowlSingleColourRoute
@@ -2159,6 +2177,7 @@ export interface FileRoutesById {
   '/events/next_/vendor-handoffs': typeof EventsNextVendorHandoffsRoute
   '/events/next_/venue': typeof EventsNextVenueRoute
   '/events/next_/venues': typeof EventsNextVenuesRoute
+  '/events/san-juan-bowl_/billboards': typeof EventsSanJuanBowlBillboardsRoute
   '/events/san-juan-bowl_/brand-kit': typeof EventsSanJuanBowlBrandKitRoute
   '/events/san-juan-bowl_/social': typeof EventsSanJuanBowlSocialRoute
   '/events/san-juan-bowl_/stadium': typeof EventsSanJuanBowlStadiumRoute
@@ -2175,6 +2194,7 @@ export interface FileRoutesById {
   '/library/print_/modules': typeof LibraryPrintModulesRoute
   '/masters/general-slides_/looks': typeof MastersGeneralSlidesLooksRoute
   '/share/next-brand-kit/$token': typeof ShareNextBrandKitTokenRoute
+  '/share/san-juan-bowl/billboards': typeof ShareSanJuanBowlBillboardsRoute
   '/share/san-juan-bowl/designers': typeof ShareSanJuanBowlDesignersRoute
   '/share/san-juan-bowl/lettering': typeof ShareSanJuanBowlLetteringRoute
   '/share/san-juan-bowl/single-colour': typeof ShareSanJuanBowlSingleColourRoute
@@ -2404,6 +2424,7 @@ export interface FileRouteTypes {
     | '/events/next/vendor-handoffs'
     | '/events/next/venue'
     | '/events/next/venues'
+    | '/events/san-juan-bowl/billboards'
     | '/events/san-juan-bowl/brand-kit'
     | '/events/san-juan-bowl/social'
     | '/events/san-juan-bowl/stadium'
@@ -2420,6 +2441,7 @@ export interface FileRouteTypes {
     | '/library/print/modules'
     | '/masters/general-slides/looks'
     | '/share/next-brand-kit/$token'
+    | '/share/san-juan-bowl/billboards'
     | '/share/san-juan-bowl/designers'
     | '/share/san-juan-bowl/lettering'
     | '/share/san-juan-bowl/single-colour'
@@ -2643,6 +2665,7 @@ export interface FileRouteTypes {
     | '/events/next/vendor-handoffs'
     | '/events/next/venue'
     | '/events/next/venues'
+    | '/events/san-juan-bowl/billboards'
     | '/events/san-juan-bowl/brand-kit'
     | '/events/san-juan-bowl/social'
     | '/events/san-juan-bowl/stadium'
@@ -2659,6 +2682,7 @@ export interface FileRouteTypes {
     | '/library/print/modules'
     | '/masters/general-slides/looks'
     | '/share/next-brand-kit/$token'
+    | '/share/san-juan-bowl/billboards'
     | '/share/san-juan-bowl/designers'
     | '/share/san-juan-bowl/lettering'
     | '/share/san-juan-bowl/single-colour'
@@ -2886,6 +2910,7 @@ export interface FileRouteTypes {
     | '/events/next_/vendor-handoffs'
     | '/events/next_/venue'
     | '/events/next_/venues'
+    | '/events/san-juan-bowl_/billboards'
     | '/events/san-juan-bowl_/brand-kit'
     | '/events/san-juan-bowl_/social'
     | '/events/san-juan-bowl_/stadium'
@@ -2902,6 +2927,7 @@ export interface FileRouteTypes {
     | '/library/print_/modules'
     | '/masters/general-slides_/looks'
     | '/share/next-brand-kit/$token'
+    | '/share/san-juan-bowl/billboards'
     | '/share/san-juan-bowl/designers'
     | '/share/san-juan-bowl/lettering'
     | '/share/san-juan-bowl/single-colour'
@@ -3054,6 +3080,7 @@ export interface RootRouteChildren {
   LibraryPrintModulesRoute: typeof LibraryPrintModulesRoute
   MastersGeneralSlidesLooksRoute: typeof MastersGeneralSlidesLooksRoute
   ShareNextBrandKitTokenRoute: typeof ShareNextBrandKitTokenRoute
+  ShareSanJuanBowlBillboardsRoute: typeof ShareSanJuanBowlBillboardsRoute
   ShareSanJuanBowlDesignersRoute: typeof ShareSanJuanBowlDesignersRoute
   ShareSanJuanBowlLetteringRoute: typeof ShareSanJuanBowlLetteringRoute
   ShareSanJuanBowlSingleColourRoute: typeof ShareSanJuanBowlSingleColourRoute
@@ -4363,6 +4390,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsNextVenuesRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/san-juan-bowl_/billboards': {
+      id: '/events/san-juan-bowl_/billboards'
+      path: '/san-juan-bowl/billboards'
+      fullPath: '/events/san-juan-bowl/billboards'
+      preLoaderRoute: typeof EventsSanJuanBowlBillboardsRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/san-juan-bowl_/brand-kit': {
       id: '/events/san-juan-bowl_/brand-kit'
       path: '/san-juan-bowl/brand-kit'
@@ -4494,6 +4528,13 @@ declare module '@tanstack/react-router' {
       path: '/share/san-juan-bowl'
       fullPath: '/share/san-juan-bowl/'
       preLoaderRoute: typeof ShareSanJuanBowlIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/san-juan-bowl/billboards': {
+      id: '/share/san-juan-bowl/billboards'
+      path: '/share/san-juan-bowl/billboards'
+      fullPath: '/share/san-juan-bowl/billboards'
+      preLoaderRoute: typeof ShareSanJuanBowlBillboardsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/share/san-juan-bowl/designers': {
@@ -4877,6 +4918,7 @@ interface EventsRouteChildren {
   EventsNextVendorHandoffsRoute: typeof EventsNextVendorHandoffsRoute
   EventsNextVenueRoute: typeof EventsNextVenueRoute
   EventsNextVenuesRoute: typeof EventsNextVenuesRoute
+  EventsSanJuanBowlBillboardsRoute: typeof EventsSanJuanBowlBillboardsRoute
   EventsSanJuanBowlBrandKitRoute: typeof EventsSanJuanBowlBrandKitRoute
   EventsSanJuanBowlSocialRoute: typeof EventsSanJuanBowlSocialRoute
   EventsSanJuanBowlStadiumRoute: typeof EventsSanJuanBowlStadiumRoute
@@ -4941,6 +4983,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextVendorHandoffsRoute: EventsNextVendorHandoffsRoute,
   EventsNextVenueRoute: EventsNextVenueRoute,
   EventsNextVenuesRoute: EventsNextVenuesRoute,
+  EventsSanJuanBowlBillboardsRoute: EventsSanJuanBowlBillboardsRoute,
   EventsSanJuanBowlBrandKitRoute: EventsSanJuanBowlBrandKitRoute,
   EventsSanJuanBowlSocialRoute: EventsSanJuanBowlSocialRoute,
   EventsSanJuanBowlStadiumRoute: EventsSanJuanBowlStadiumRoute,
@@ -5154,6 +5197,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryPrintModulesRoute: LibraryPrintModulesRoute,
   MastersGeneralSlidesLooksRoute: MastersGeneralSlidesLooksRoute,
   ShareNextBrandKitTokenRoute: ShareNextBrandKitTokenRoute,
+  ShareSanJuanBowlBillboardsRoute: ShareSanJuanBowlBillboardsRoute,
   ShareSanJuanBowlDesignersRoute: ShareSanJuanBowlDesignersRoute,
   ShareSanJuanBowlLetteringRoute: ShareSanJuanBowlLetteringRoute,
   ShareSanJuanBowlSingleColourRoute: ShareSanJuanBowlSingleColourRoute,
