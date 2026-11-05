@@ -32,9 +32,13 @@ describe('Set 5 admin deletions', () => {
   });
   it('removes the asset and its containing ZIP from available downloads only', () => {
     expect(availableSet5Assets([id]).some(a => a.id === id)).toBe(false);
-    expect(availableSet5Assets([id])).toHaveLength(65);
+    expect(availableSet5Assets([id])).toHaveLength(85);
     expect(availableSet5Packs([id]).map(p => p.filename)).toEqual(['sjb-set5-reusable-assets.zip', 'sjb-set5-motion-v2.zip', 'sjb-set5-hires-backgrounds.zip']);
-    expect(availableSet5Assets([])).toHaveLength(66);
+    expect(availableSet5Assets([])).toHaveLength(86);
+  });
+  it('removes a standalone variety render without hiding unrelated packs', () => {
+    expect(availableSet5Assets(['variety-left-flight']).some(a => a.id === 'variety-left-flight')).toBe(false);
+    expect(availableSet5Packs(['variety-left-flight'])).toHaveLength(4);
   });
   it('omits only the high-resolution pack when one of its backgrounds is removed', () => {
     expect(availableSet5Packs(['hires-wide-original']).map(p => p.filename)).toEqual(['sjb-set5-reusable-assets.zip', 'sjb-set5-motion-v2.zip', 'sjb-set5-motion-v3.zip']);
