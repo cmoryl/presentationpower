@@ -166,6 +166,30 @@ export function BillboardsPage() {
               </div>
             )),
           )}
+          {(["Light action", "Gold night catch"] as const).map((name) => (
+            <div key={name} className="space-y-2">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="text-sm font-semibold">Team version · {name}</h3>
+                <p className="text-xs text-muted-foreground">Tickets On Sale · English only · both sizes</p>
+              </div>
+              <div className="grid gap-4 lg:grid-cols-2">
+                {SJB_BILLBOARD_TEAM_EXAMPLES.filter((d) => d.label.startsWith(name)).map((d) => (
+                  <figure key={d.id} className="space-y-1.5">
+                    <img src={d.preview} width={d.w} height={d.h} loading="lazy" alt={`Team billboard ${d.label}: Tickets on sale, December 16, 2026, sanjuanbowl.com`} className="h-auto w-full rounded-sm border border-border" />
+                    <figcaption className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+                      <span className="mr-auto">{d.w.toLocaleString()} × {d.h}</span>
+                      <Button asChild size="sm" variant="ghost">
+                        <a href={d.preview} download><Download className="h-3.5 w-3.5" /> PNG</a>
+                      </Button>
+                      <Button asChild size="sm" variant="ghost">
+                        <a href={d.edit} target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /> Edit in Canva</a>
+                      </Button>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+          ))}
         </section>
 
         <section aria-labelledby="bb-highway" className="space-y-3">
