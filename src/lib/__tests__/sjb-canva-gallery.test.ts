@@ -1,6 +1,16 @@
 import { describe, it, expect } from 'vitest';
+import { existsSync } from 'node:fs';
 import { SJB_CANVA_COLLECTIONS, SJB_CANVA_GALLERY, filterSjbCanvaDesigns } from '../sjb-canva-gallery';
 describe('Bowl Canva gallery', () => {
+  it('delivers refreshed Canva downloads across all four dark campaign sets', () => {
+    const darkSets = ['bold-graphic', 'stadium-night', 'action-spotlight', 'launch'];
+    const designs = SJB_CANVA_GALLERY.filter(d => darkSets.includes(d.collectionId));
+    expect(designs).toHaveLength(101);
+    for (const d of designs) {
+      expect(d.previewUrl).toBe(`/sjb-canva/live/${d.id}.png`);
+      expect(existsSync(`public${d.previewUrl}`)).toBe(true);
+    }
+  });
   it('keeps only un-reviewed campaign adaptations unsaved', () => {
     const drafts = SJB_CANVA_GALLERY.filter(d => d.status === 'draft' && !d.format && d.campaign !== 'tickets');
     expect(drafts).toHaveLength(0);
