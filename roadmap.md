@@ -120,5 +120,5 @@
 - [x] Send to vendor: expiring, revocable vendor links to supplied live files + brief PDF; /events/next/vendor-handoffs list
 - [ ] Decide: photography for outside designers; move Dropbox masters into the pack — waiting on owner
 
-- [ ] LogoHub: last-updated date + monthly online logo check flagged for admin review
-- [ ] Billboards: fold team versions into main boards with roadside mockups + lightbox
+- [x] LogoHub: last-updated date + monthly online logo check flagged for admin review
+- [x] Billboards: fold team versions into main boards with roadside mockups + lightbox
