@@ -107,7 +107,7 @@ def main():
                 # Canva-editable kit: ground without shield/copy + where each live layer sits
                 lay = {}
                 g = render(logo, w, h, way, lang, text=False, layout=lay)
-                g.save(GROUNDS / f"{w}x{h}-{way}.png", optimize=True)
+                g.save(GROUNDS / f"{w}x{h}-{way}-{lang}.png", optimize=True)
                 LAYOUT[f"{w}x{h}-{way}-{lang}"] = lay
     (GROUNDS / "layout.json").write_text(json.dumps(LAYOUT, indent=1, ensure_ascii=False))
 
