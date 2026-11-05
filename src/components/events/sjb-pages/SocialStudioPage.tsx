@@ -5,6 +5,22 @@ import { SjbLink, SjbShell } from '@/components/events/SjbShare';
 import { SJB_EVENT } from '@/lib/san-juan-bowl';
 import { SJB_CANVA_FOLDER_URL } from '@/lib/sjb-social-templates';
 import { SJB_CANVA_COLLECTIONS, SJB_CANVA_GALLERY, filterSjbCanvaDesigns, sjbCanvaSize, type SjbCanvaGalleryDesign } from '@/lib/sjb-canva-gallery';
+import coverSet1 from '@/assets/sjb-card-covers/set-1.jpg';
+import coverSet2 from '@/assets/sjb-card-covers/set-2.jpg';
+import coverSet3 from '@/assets/sjb-card-covers/set-3.jpg';
+import coverSet4 from '@/assets/sjb-card-covers/set-4.jpg';
+import coverSet5 from '@/assets/sjb-card-covers/set-5.jpg';
+import coverSet6 from '@/assets/sjb-card-covers/set-6.jpg';
+
+const SET_COVERS: Record<string, string> = {
+  all: coverSet2,
+  'bold-graphic': coverSet1,
+  'stadium-night': coverSet2,
+  'action-spotlight': coverSet3,
+  launch: coverSet4,
+  'light-action': coverSet5,
+  'light-cinematic': coverSet6,
+};
 
 export function SjbSocialStudio() {
   const [collectionId, setCollectionId] = useState('all');
@@ -26,14 +42,12 @@ export function SjbSocialStudio() {
       </header>
       <nav aria-label="Design campaigns" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {[{ id: 'all', name: 'All campaigns', blurb: 'Every design set', accent: '#03002C' } as const, ...SJB_CANVA_COLLECTIONS].map(c => {
-          const inSet = SJB_CANVA_GALLERY.filter(d => (c.id === 'all' || d.collectionId === c.id) && !d.campaign && !d.format);
-          const hero = inSet.find(d => d.name === 'Wide post') ?? inSet[0];
           const active = collectionId === c.id;
           return <button key={c.id} type="button" aria-pressed={active} onClick={() => setCollectionId(c.id)} className={`group overflow-hidden rounded-lg border bg-background text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active ? 'border-primary ring-2 ring-primary' : 'border-border hover:border-foreground/40'}`}>
-            {hero && <span className="relative block h-28 overflow-hidden bg-muted">
-              <img src={hero.previewUrl} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+            <span className="relative block h-28 overflow-hidden bg-muted">
+              <img src={SET_COVERS[c.id]} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
               <span aria-hidden className="absolute inset-x-0 bottom-0 h-1" style={{ backgroundColor: c.accent }} />
-            </span>}
+            </span>
             <span className="block p-3"><span className="block text-sm font-semibold">{c.name}</span><span className="mt-0.5 block text-xs text-muted-foreground">{c.blurb}</span></span>
           </button>;
         })}
