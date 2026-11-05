@@ -28,13 +28,14 @@ export function SjbSocialStudio() {
         {[{ id: 'all', name: 'All campaigns', blurb: 'Every design set', accent: '#03002C' } as const, ...SJB_CANVA_COLLECTIONS].map(c => {
           const inSet = SJB_CANVA_GALLERY.filter(d => (c.id === 'all' || d.collectionId === c.id) && !d.campaign && !d.format);
           const hero = inSet.find(d => d.name === 'Wide post') ?? inSet[0];
+          const count = c.id === 'all' ? SJB_CANVA_GALLERY.length : SJB_CANVA_GALLERY.filter(d => d.collectionId === c.id).length;
           const active = collectionId === c.id;
           return <button key={c.id} type="button" aria-pressed={active} onClick={() => setCollectionId(c.id)} className={`group overflow-hidden rounded-lg border bg-background text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active ? 'border-primary ring-2 ring-primary' : 'border-border hover:border-foreground/40'}`}>
             {hero && <span className="relative block h-28 overflow-hidden bg-muted">
               <img src={hero.previewUrl} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
               <span aria-hidden className="absolute inset-x-0 bottom-0 h-1" style={{ backgroundColor: c.accent }} />
             </span>}
-            <span className="block p-3"><span className="block text-sm font-semibold">{c.name}</span><span className="mt-0.5 block text-xs text-muted-foreground">{'blurb' in c ? c.blurb : ''} · {inSet.length || SJB_CANVA_GALLERY.length} designs</span></span>
+            <span className="block p-3"><span className="block text-sm font-semibold">{c.name}</span><span className="mt-0.5 block text-xs text-muted-foreground">{c.blurb} · {count} designs</span></span>
           </button>;
         })}
       </nav>
