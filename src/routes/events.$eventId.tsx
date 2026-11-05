@@ -178,11 +178,6 @@ function EventHome() {
                   Digital billboards <ArrowRight aria-hidden />
                 </Link>
               </Button>
-              <Button asChild variant="outline">
-                <Link to="/events/next/sign-editor/$signId" params={{ signId: "sjb-first-flyer" }}>
-                  Game flyer <ArrowRight aria-hidden />
-                </Link>
-              </Button>
             </div>
           )}
           <div className="mt-3 flex items-center gap-3">
