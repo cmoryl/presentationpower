@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Add high-resolution Set 5 original backgrounds and separately labelled sharper matching rebuilds to the existing public asset gallery; preserve Canva designs and disclose actual native detail.
+- [x] Add eight 12,000px Set 5 backgrounds (four cleaned enlarged originals and four separately labelled AI-edited matching rebuilds) plus a 136 MB ZIP to the existing public asset gallery. Recovered embedded Canva backgrounds; saved designs untouched. Actual source detail disclosed (email recovered at 840×426); all eight visuals and rebuilt football details inspected. Both public pages, categories, enlarged preview, exact-byte 12000×6840 download and phone width verified; nine targeted tests pass, build OK. Full suite: 2,630 pass with the pre-existing unrelated London map-export failure.
 
 - [x] Add confirmed admin-only removal from the Set 5 asset gallery, persisted across app/share pages; preserve Canva originals and omit affected ZIP packs. Admin cancel/delete/reload and signed-out removal verified; test asset restored, seven targeted tests pass, build OK. Full suite: 2,628 pass with the existing unrelated London map-export failure.
 
