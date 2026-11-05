@@ -11,9 +11,10 @@ import coverSet3 from '@/assets/sjb-card-covers/set-3.jpg';
 import coverSet4 from '@/assets/sjb-card-covers/set-4.jpg';
 import coverSet5 from '@/assets/sjb-card-covers/set-5.jpg';
 import coverSet6 from '@/assets/sjb-card-covers/set-6.jpg';
+import coverAll from '@/assets/sjb-card-covers/all.jpg';
 
 const SET_COVERS: Record<string, string> = {
-  all: coverSet2,
+  all: coverAll,
   'bold-graphic': coverSet1,
   'stadium-night': coverSet2,
   'action-spotlight': coverSet3,
