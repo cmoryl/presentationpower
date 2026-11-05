@@ -3344,6 +3344,21 @@ export type Database = {
         }
         Relationships: []
       }
+      internal_job_tokens: {
+        Row: {
+          name: string
+          token: string
+        }
+        Insert: {
+          name: string
+          token?: string
+        }
+        Update: {
+          name?: string
+          token?: string
+        }
+        Relationships: []
+      }
       kiosk_layer_edits: {
         Row: {
           booth_id: string
