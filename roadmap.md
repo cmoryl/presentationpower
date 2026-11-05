@@ -1,5 +1,7 @@
 # Roadmap — build review (Week 1)
 
+- [ ] Add a public Design Set 5 asset gallery linked from the social collection, covering reusable backgrounds, transparent pieces, motion effects and layered-pack downloads; verify viewing and downloads on desktop/mobile.
+
 - [x] Create richer Set 5 cinematic light effects from the original references: two AI-edited navy/leather versions, transparent composites and independent partial wake overlays at native 1920×1280. All four checked on light/dark grounds, transparency seams softened and borders verified clear. Canva originals unchanged.
 
 - [x] Improve Set 5 motion-ball assets: enlarged original Story/display crops compared; navy/leather native 1920px transparent balls, six 3000px composites and layered SVGs with independent cyan/gold trails, contour glow and front ribbons delivered. All six light/dark comparisons and native leather/lace details inspected; measured magenta contamination removed. Matching rebuild, not exact pixel extraction; existing pack and campaigns unchanged.
