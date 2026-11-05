@@ -82,7 +82,7 @@ export function BillboardSceneUpdater() {
       setWarn(Math.abs(ratio - want) / want > 0.02 ? `This file is ${board.width}×${board.height}; the ${size.w}×${size.h} board will stretch it.` : null);
       const cx = info.quad.reduce((t, p) => t + p[0], 0) / 4, cy = info.quad.reduce((t, p) => t + p[1], 0) / 4;
       // grow the screen slightly so no magenta edge from the blank scene shows
-      const map = squareToQuad(info.quad.map(([x, y]) => [x + Math.sign(x - cx) * 3, y + Math.sign(y - cy) * 3] as Pt));
+      const map = squareToQuad(info.quad.map(([x, y]) => [x + Math.sign(x - cx) * 7, y + Math.sign(y - cy) * 7] as Pt));
       const N = 16, bw = board.width, bh = board.height;
       for (let i = 0; i < N; i++)
         for (let j = 0; j < N; j++) {
