@@ -7,16 +7,16 @@ describe('Bowl Canva gallery', () => {
     expect(drafts.filter(d => d.collectionId === 'stadium-night')).toHaveLength(0);
     expect(drafts.filter(d => d.collectionId === 'bold-graphic')).toHaveLength(0);
     const originals = SJB_CANVA_GALLERY.filter(d => d.collectionId === 'bold-graphic' && !d.format && d.campaign !== 'tickets');
-    expect(originals).toHaveLength(5);
-    expect(originals.filter(d => d.status === 'saved')).toHaveLength(5);
+    expect(originals).toHaveLength(11);
+    expect(originals.filter(d => d.status === 'saved')).toHaveLength(11);
     expect(originals.every(d => d.provenance === 'artistic-render')).toBe(true);
   });
-  it('tracks the fourteen Stadium Night render revisions, all saved', () => {
+  it('tracks the twenty Stadium Night render revisions, all saved', () => {
     const stadium = filterSjbCanvaDesigns('stadium-night', 'all', 'all');
-    expect(stadium).toHaveLength(14);
+    expect(stadium).toHaveLength(20);
     expect(stadium.every(d => d.provenance === 'artistic-render')).toBe(true);
     const saved = stadium.filter(d => d.status === 'saved');
-    expect(saved).toHaveLength(14);
+    expect(saved).toHaveLength(20);
     expect(saved.every(d => !d.draftTransactionId)).toBe(true);
   });
   it('uses actual Canva sizes, not the old square label', () => {
