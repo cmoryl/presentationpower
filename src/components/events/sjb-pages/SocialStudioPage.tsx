@@ -24,9 +24,16 @@ export function SjbSocialStudio() {
         <div><p className="text-sm text-muted-foreground">{SJB_EVENT.name}</p><h1 className="mt-1 text-3xl font-bold">Social designs</h1><p className="mt-2 text-sm text-muted-foreground">Canva collection · {SJB_CANVA_GALLERY.length} designs · Preview edition</p></div>
         <Button asChild variant="outline"><a href={SJB_CANVA_FOLDER_URL} target="_blank" rel="noreferrer"><ExternalLink />Canva folder</a></Button>
       </header>
-      <nav aria-label="Design campaigns" className="mt-6 flex flex-wrap gap-2">
-        <Button variant={collectionId === 'all' ? 'default' : 'outline'} onClick={() => setCollectionId('all')} aria-pressed={collectionId === 'all'}>All campaigns</Button>
-        {SJB_CANVA_COLLECTIONS.map(c => <Button key={c.id} variant={collectionId === c.id ? 'default' : 'outline'} aria-pressed={collectionId === c.id} onClick={() => setCollectionId(c.id)}>{c.name}</Button>)}
+      <nav aria-label="Design campaigns" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {[{ id: 'all', name: 'All campaigns' } as const, ...SJB_CANVA_COLLECTIONS].map(c => {
+          const hero = SJB_CANVA_GALLERY.find(d => (c.id === 'all' || d.collectionId === c.id) && !d.campaign && !d.format);
+          const count = c.id === 'all' ? SJB_CANVA_GALLERY.length : SJB_CANVA_GALLERY.filter(d => d.collectionId === c.id).length;
+          const active = collectionId === c.id;
+          return <button key={c.id} type="button" aria-pressed={active} onClick={() => setCollectionId(c.id)} className={`group overflow-hidden rounded-lg border bg-background text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active ? 'border-primary ring-2 ring-primary' : 'border-border hover:border-foreground/40'}`}>
+            {hero && <span className="block h-28 overflow-hidden bg-muted"><img src={hero.previewUrl} alt="" loading="lazy" className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-105" /></span>}
+            <span className="block p-3"><span className="block text-sm font-semibold">{c.name}</span><span className="mt-0.5 block text-xs text-muted-foreground">{count} designs</span></span>
+          </button>;
+        })}
       </nav>
       <div className="mt-5 flex flex-wrap items-end gap-4">
         <label className="grid gap-1.5 text-sm font-medium" htmlFor="sjb-size">Size<select id="sjb-size" value={size} onChange={e => setSize(e.target.value)} className="h-10 rounded-md border border-input bg-background px-3 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option value="all">All sizes</option>{sizes.map(s => <option key={s}>{s}</option>)}</select></label>
