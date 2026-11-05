@@ -4,7 +4,6 @@ import { ArrowLeft, Download, ExternalLink } from "lucide-react";
 import { SjbLink, SjbShareLinkButton, SjbShell } from "@/components/events/SjbShare";
 import { Button } from "@/design-system/element";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { BillboardSceneUpdater } from "./BillboardSceneUpdater";
 import {
   billboardFile,
   billboardScene,
@@ -110,16 +109,6 @@ export function BillboardsPage() {
               </li>
             ))}
           </ul>
-        </section>
-
-        <section aria-labelledby="bb-update" className="space-y-4">
-          <div>
-            <h2 id="bb-update" className="text-xl font-semibold">Update the in-place examples</h2>
-            <p className="text-sm text-muted-foreground">
-              Edited a board in Canva? Download it as PNG, drop it here and get a new roadside mockup in the same scene.
-            </p>
-          </div>
-          <BillboardSceneUpdater />
         </section>
 
         <section aria-labelledby="bb-boards" className="space-y-6">
