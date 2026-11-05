@@ -25,7 +25,7 @@ async function findWebLogo(site: string): Promise<string | null> {
   const j = JSON.parse(text) as { data?: { branding?: { logo?: string; images?: { logo?: string } } }; branding?: { logo?: string; images?: { logo?: string } } };
   const b = j.data?.branding ?? j.branding;
   const url = b?.images?.logo || b?.logo || null;
-  return url && /^https?:\/\//.test(url) ? url : null;
+  return url && (/^https?:\/\//.test(url) || url.startsWith("data:image/")) ? url : null;
 }
 
 /** Check the logos whose last web check is older than 30 days (oldest first). */

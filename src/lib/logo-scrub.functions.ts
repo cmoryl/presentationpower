@@ -44,12 +44,19 @@ export const decideLogoUpdate = createServerFn({ method: "POST" })
     if (error || !row) throw new Error("Check not found.");
     if (row.status !== "pending") throw new Error("Already decided.");
     if (data.approve) {
-      const res = await fetch(row.found_logo_url);
-      if (!res.ok) throw new Error(`Couldn't download the new logo [${res.status}].`);
-      const type = res.headers.get("content-type") ?? "image/png";
+      let type: string; let bytes: Uint8Array;
+      const m = /^data:([^;,]+)(;base64)?,(.*)$/s.exec(row.found_logo_url);
+      if (m) {
+        type = m[1];
+        bytes = m[2] ? Uint8Array.from(atob(m[3]), (ch) => ch.charCodeAt(0)) : new TextEncoder().encode(decodeURIComponent(m[3]));
+      } else {
+        const res = await fetch(row.found_logo_url);
+        if (!res.ok) throw new Error(`Couldn't download the new logo [${res.status}].`);
+        type = res.headers.get("content-type") ?? "image/png";
+        bytes = new Uint8Array(await res.arrayBuffer());
+      }
       if (!type.startsWith("image/")) throw new Error("The website link isn't an image file.");
       const ext = type.includes("svg") ? "svg" : type.includes("jpeg") ? "jpg" : type.includes("webp") ? "webp" : "png";
-      const bytes = new Uint8Array(await res.arrayBuffer());
       const path = `web-updates/${row.logo_id}/${Date.now()}.${ext}`;
       const up = await supabaseAdmin.storage.from("client-logos").upload(path, bytes, { contentType: type });
       if (up.error) throw new Error(up.error.message);
