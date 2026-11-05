@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Check, Download, Link2, Maximize2, X } from 'lucide-react';
+import { ArrowLeft, Check, Download, Link2, Maximize2, Trash2, X } from 'lucide-react';
+import { useServerFn } from '@tanstack/react-start';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useIsAdmin } from '@/hooks/use-is-admin';
+import { deleteSet5Asset } from '@/lib/sjb-set5-removals.functions';
+import { availableSet5Assets, availableSet5Packs, set5RemovalsOptions } from '@/lib/sjb-set5-availability';
 import { Button } from '@/design-system/element';
 import { SjbLink, SjbShell } from '@/components/events/SjbShare';
-import { SJB_SET5_ASSETS, SJB_SET5_PACKS, type SjbSet5Asset } from '@/lib/sjb-set5-assets';
+import { type SjbSet5Asset } from '@/lib/sjb-set5-assets';
 
 async function saveAsset(url: string, filename: string) {
   const response = await fetch(url);
@@ -14,6 +19,15 @@ async function saveAsset(url: string, filename: string) {
 }
 
 export function SjbSet5Assets() {
+  const isAdmin = useIsAdmin();
+  const removeAsset = useServerFn(deleteSet5Asset);
+  const queryClient = useQueryClient();
+  const { data: removed } = useSuspenseQuery(set5RemovalsOptions);
+  const assets = availableSet5Assets(removed);
+  const packs = availableSet5Packs(removed);
+  const [pendingDelete, setPendingDelete] = useState<SjbSet5Asset | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const deleteDialog = useRef<HTMLDialogElement>(null);
   const [category, setCategory] = useState('All assets');
   const [ground, setGround] = useState('Light');
   const [selected, setSelected] = useState<SjbSet5Asset | null>(null);
@@ -21,10 +35,23 @@ export function SjbSet5Assets() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState('');
   const dialog = useRef<HTMLDialogElement>(null);
-  const categories = ['All assets', ...new Set(SJB_SET5_ASSETS.map(a => a.category))];
-  const visible = SJB_SET5_ASSETS.filter(a => category === 'All assets' || a.category === category);
+  const categories = ['All assets', ...new Set(assets.map(a => a.category)), ...(assets.some(a => a.category === category) || category === 'All assets' ? [] : [category])];
+  const visible = assets.filter(a => category === 'All assets' || a.category === category);
   const previewGround = ground === 'Dark' ? 'bg-foreground' : 'bg-muted';
   useEffect(() => { if (selected) dialog.current?.showModal(); else dialog.current?.close(); }, [selected]);
+  useEffect(() => { if (pendingDelete) deleteDialog.current?.showModal(); else deleteDialog.current?.close(); }, [pendingDelete]);
+  useEffect(() => { if (selected && removed.includes(selected.id)) setSelected(null); }, [removed, selected]);
+  async function confirmDelete() {
+    if (!pendingDelete || deleting) return;
+    setDeleting(true); setError('');
+    try {
+      const { assetId } = await removeAsset({ data: { assetId: pendingDelete.id } });
+      queryClient.setQueryData<string[]>(set5RemovalsOptions.queryKey, current => [...new Set([...(current ?? []), assetId])]);
+      setPendingDelete(null);
+      await queryClient.invalidateQueries({ queryKey: set5RemovalsOptions.queryKey });
+    } catch { setError('Asset could not be deleted. Please try again.'); }
+    finally { setDeleting(false); }
+  }
   async function download(url: string, filename: string) {
     setBusy(filename); setError('');
     try { await saveAsset(url, filename); }
@@ -43,7 +70,7 @@ export function SjbSet5Assets() {
         }}>{copied ? <Check /> : <Link2 />}{copied ? 'Link copied' : 'Copy viewing link'}</Button>
       </header>
       <section aria-label="Complete download packs" className="grid gap-4 border-b border-border py-6 md:grid-cols-3">
-        {SJB_SET5_PACKS.map(pack => <div key={pack.filename} className="min-w-0"><h2 className="font-semibold">{pack.title}</h2><Button className="mt-3" variant="outline" size="sm" disabled={busy === pack.filename} onClick={() => download(pack.url, pack.filename)}><Download />{busy === pack.filename ? 'Preparing…' : `Download ZIP · ${pack.size}`}</Button></div>)}
+        {packs.map(pack => <div key={pack.filename} className="min-w-0"><h2 className="font-semibold">{pack.title}</h2><Button className="mt-3" variant="outline" size="sm" disabled={busy === pack.filename} onClick={() => download(pack.url, pack.filename)}><Download />{busy === pack.filename ? 'Preparing…' : `Download ZIP · ${pack.size}`}</Button></div>)}
       </section>
       <p className="mt-5 border-l-2 border-border pl-3 text-sm leading-relaxed text-muted-foreground">Matching rebuilt artwork, not recovered original layers. Raster objects and cinematic effects have native detail up to 1,920px; 3,000px and 6,000px composites do not add raster detail. Vector effects scale independently. Layered SVGs contain raster pieces. RGB assets; final billboard suitability depends on size, viewing distance and printer requirements. Saved Canva designs are unchanged.</p>
       {error && <p role="alert" className="mt-4 text-destructive">{error}</p>}
@@ -54,12 +81,16 @@ export function SjbSet5Assets() {
       <p className="mt-5 text-sm text-muted-foreground">{visible.length} assets</p>
       <div className="mt-4 grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map(asset => <article key={asset.id} className="min-w-0 overflow-hidden rounded-lg border border-border bg-background">
+          {isAdmin && <div className="flex justify-end px-2 pt-2"><Button variant="ghost" size="icon" aria-label={`Delete ${asset.title}`} title={`Delete ${asset.title}`} onClick={() => { setError(''); setPendingDelete(asset); }}><Trash2 className="size-4 text-destructive" /></Button></div>}
           <Button variant="ghost" aria-label={`Enlarge ${asset.title}`} onClick={() => setSelected(asset)} className={`relative block h-64 w-full rounded-none p-3 hover:bg-transparent ${previewGround}`}><img src={asset.previewUrl} alt={asset.title} loading="lazy" className="h-full w-full object-contain" /><Maximize2 className="absolute bottom-3 right-3 rounded bg-background text-foreground" aria-hidden /></Button>
           <div className="p-4"><p className="text-xs text-muted-foreground">{asset.category}</p><h2 className="mt-1 font-semibold">{asset.title}</h2><p className="mt-1 text-sm text-muted-foreground">{asset.dimensions}</p><p className="mt-2 text-xs leading-relaxed text-muted-foreground">{asset.note}</p><div className="mt-4 flex flex-wrap gap-2"><Button variant="outline" size="sm" disabled={busy === asset.filename} onClick={() => download(asset.downloadUrl, asset.filename)}><Download />{busy === asset.filename ? 'Preparing…' : `Save ${asset.filename.split('.').pop()?.toUpperCase()}`}</Button>{asset.vectorUrl && <Button variant="outline" size="sm" onClick={() => download(asset.vectorUrl ?? '', asset.filename.replace(/\.png$/, '.svg'))}><Download />Save SVG</Button>}</div></div>
         </article>)}
       </div>
       <dialog ref={dialog} onClose={() => setSelected(null)} onCancel={() => setSelected(null)} aria-labelledby="set5-preview-title" className="fixed inset-0 m-auto max-h-[92dvh] w-[min(1100px,94vw)] overflow-auto rounded-lg border border-border bg-background p-5 text-foreground shadow-xl backdrop:bg-foreground/60">
         {selected && <><div className="mb-4 flex items-start justify-between gap-3"><div><h2 id="set5-preview-title" className="text-lg font-semibold">{selected.title}</h2><p className="text-sm text-muted-foreground">{selected.dimensions} · {selected.note}</p></div><Button variant="ghost" size="icon" aria-label="Close preview" onClick={() => setSelected(null)}><X /></Button></div><div className={`flex min-h-64 items-center justify-center p-4 ${previewGround}`}><img src={selected.previewUrl} alt={selected.title} className="max-h-[65dvh] max-w-full object-contain" /></div><Button className="mt-4" variant="outline" disabled={busy === selected.filename} onClick={() => download(selected.downloadUrl, selected.filename)}><Download />Save original</Button>{error && <p role="alert" className="mt-3 text-destructive">{error}</p>}</>}
+      </dialog>
+      <dialog ref={deleteDialog} onCancel={e => { if (deleting) e.preventDefault(); else setPendingDelete(null); }} onClose={() => setPendingDelete(null)} aria-labelledby="set5-delete-title" className="fixed inset-0 m-auto w-[min(440px,94vw)] rounded-lg border border-border bg-background p-6 text-foreground shadow-xl backdrop:bg-foreground/60">
+        {pendingDelete && <><h2 id="set5-delete-title" className="text-lg font-semibold">Delete {pendingDelete.title}?</h2><p className="mt-3 text-sm text-muted-foreground">Remove this asset from both Set 5 viewing pages. Its download and the ZIP pack containing it will no longer appear. Canva designs, source files and previously downloaded copies remain unchanged.</p><div className="mt-6 flex justify-end gap-2"><Button variant="outline" disabled={deleting} onClick={() => setPendingDelete(null)}>Cancel</Button><Button variant="destructive" disabled={deleting} onClick={confirmDelete}><Trash2 />{deleting ? 'Deleting…' : 'Delete asset'}</Button></div>{error && <p role="alert" className="mt-3 text-destructive">{error}</p>}</>}
       </dialog>
     </div>
   </SjbShell>;
