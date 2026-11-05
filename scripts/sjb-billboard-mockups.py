@@ -56,7 +56,7 @@ def place(scene, board, dusk):
     quad, mask = corners(scene)
     w, h = board.size
     R = screen_ratio(quad); r = w / h
-    f = min(1.0, r / R)  # share of screen width the true-shape board occupies
+    f = 1.0  # screens are generated at the board shape: fill edge to edge, no bands
     u0 = (1 - f) / 2
     H = coeffs([(0, 0), (1, 0), (1, 1), (0, 1)], quad)  # unit square -> scene
 
