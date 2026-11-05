@@ -47,6 +47,11 @@ function LogoHubBrowse() {
     return Array.from(set).sort();
   }, [q.data]);
   const [industry, setIndustry] = useState<string>("all");
+  const lastUpdated = useMemo(() => {
+    let max = "";
+    for (const r of q.data ?? []) if (r.updated_at > max) max = r.updated_at;
+    return max || null;
+  }, [q.data]);
 
   const filtered = useMemo(() => {
     const rows = q.data ?? [];
@@ -73,6 +78,14 @@ function LogoHubBrowse() {
           Every client logo we use — primary, on-dark, on-light and mono variants — searchable by
           industry, division and tag.
         </p>
+        {lastUpdated && (
+          <p className="mt-3 text-xs font-medium text-black/60">
+            Last updated{" "}
+            <time dateTime={lastUpdated}>
+              {new Date(lastUpdated).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+            </time>
+          </p>
+        )}
       </div>
 
       <div className="grid gap-3 md:grid-cols-4">
