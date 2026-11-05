@@ -5,6 +5,7 @@ import { ModuleReviewQueue } from "@/components/approvals/ModuleReviewQueue";
 import { SignTemplateQueue } from "@/components/approvals/SignTemplateQueue";
 import { Booth3dCheckQueue } from "@/components/approvals/Booth3dCheckQueue";
 import { LearningQueue } from "@/components/approvals/LearningQueue";
+import { LogoUpdateQueue } from "@/components/approvals/LogoUpdateQueue";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -43,14 +44,14 @@ export const Route = createFileRoute("/approvals")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>): { tab?: "brand" | "modules" | "signs" | "booths" | "learning" | "partners" } =>
-    s.tab === "partners" ? { tab: "partners" } : s.tab === "learning" ? { tab: "learning" } : s.tab === "booths" ? { tab: "booths" } : s.tab === "modules" ? { tab: "modules" } : s.tab === "signs" ? { tab: "signs" } : {},
+  validateSearch: (s: Record<string, unknown>): { tab?: "brand" | "modules" | "signs" | "booths" | "learning" | "partners" | "logos" } =>
+    s.tab === "logos" ? { tab: "logos" } : s.tab === "partners" ? { tab: "partners" } : s.tab === "learning" ? { tab: "learning" } : s.tab === "booths" ? { tab: "booths" } : s.tab === "modules" ? { tab: "modules" } : s.tab === "signs" ? { tab: "signs" } : {},
   component: ApprovalsPage,
 });
 
 function ApprovalsPage() {
   const { tab } = Route.useSearch();
-  const active = tab === "partners" ? "partners" : tab === "learning" ? "learning" : tab === "modules" ? "modules" : tab === "signs" ? "signs" : tab === "booths" ? "booths" : "brand";
+  const active = tab === "logos" ? "logos" : tab === "partners" ? "partners" : tab === "learning" ? "learning" : tab === "modules" ? "modules" : tab === "signs" ? "signs" : tab === "booths" ? "booths" : "brand";
   const tabCls = (on: boolean) =>
     `-mb-px border-b-2 px-4 py-2.5 text-sm ${on ? "border-primary font-medium text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`;
   return (
@@ -74,8 +75,18 @@ function ApprovalsPage() {
         <Link to="/approvals" search={{ tab: "learning" }} className={tabCls(active === "learning")} aria-current={active === "learning" ? "page" : undefined}>
           Learning
         </Link>
+        <Link to="/approvals" search={{ tab: "logos" }} className={tabCls(active === "logos")} aria-current={active === "logos" ? "page" : undefined}>
+          Logo updates
+        </Link>
       </nav>
-      {active === "partners" ? (
+      {active === "logos" ? (
+        <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-10 sm:px-6">
+          <header>
+            <h1 className="text-3xl font-semibold">LogoHub logo updates</h1>
+          </header>
+          <LogoUpdateQueue />
+        </div>
+      ) : active === "partners" ? (
         <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-10 sm:px-6">
           <header>
             <h1 className="text-3xl font-semibold">Partner designs</h1>
