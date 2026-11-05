@@ -35,6 +35,7 @@ Proposed copy (7 words or fewer, for your approval):
   4. A "highway view": each board shown small and slightly blurred to mimic distance, so the team can judge how it reads.
   5. A side-by-side of English and Spanish.
   6. A download button for each board.
+  7. An "in place" photo for each board: a photo-realistic scene of a digital billboard beside a San Juan road near Hiram Bithorn Stadium, with the actual board artwork placed exactly on the screen. I'll make day and dusk versions. Scenes are built from real reference photos of the area, such as the Expreso Las Américas / Roosevelt Ave approaches and the stadium's sawtooth roof and floodlight pylons in the distance. Each one is captioned "Illustrative mockup, not an actual billboard location," because the real placements aren't known.
 - The page is linked from the existing Bowl event home and navigation.
 
 ## Where the boards are made
@@ -45,4 +46,5 @@ Proposed copy (7 words or fewer, for your approval):
 - New route files follow the existing `events.san-juan-bowl_.*` and `share.san-juan-bowl.*` patterns, each with its own `head()`.
 - Billboard facts (date, venue, URL) come from `SJB_EVENT` in `src/lib/san-juan-bowl.ts`. The web address is added there once if it's missing.
 - Board artwork is SVG, built from shared tokens in `brand-colors.ts`. PNGs are exported at 840×400 and 1728×512. Downloads are labelled as digital-display files, not print masters.
+- Mockup scenes are AI-generated with an empty screen. The board artwork is then laid onto the screen with a perspective warp, so the logo and text are never redrawn by AI. Each image is stored with a "generated mockup" label.
 - A small test checks that each board has 7 words or fewer and includes SANJUANBOWL.COM.
