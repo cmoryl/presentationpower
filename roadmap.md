@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Expand Set 5 with eight coordinated background compositions and four transparent football/object renders; publish native downloads and 12,000px enlarged backgrounds in the existing gallery, preserve Canva originals, verify viewing/downloads.
+- [x] Expand Set 5 with eight coordinated backgrounds, eight separately labelled 12,000px enlargements and four transparent objects (20 new individual downloads; existing ZIPs unchanged). All artwork inspected, both public galleries and mobile checked; enlarged JPG exact bytes/dimensions and PNG alpha verified. Canva originals unchanged. Eleven targeted tests pass; full suite 2,632 pass with the pre-existing unrelated London map-export failure; build OK.
 
 - [x] Add eight 12,000px Set 5 backgrounds (four cleaned enlarged originals and four separately labelled AI-edited matching rebuilds) plus a 136 MB ZIP to the existing public asset gallery. Recovered embedded Canva backgrounds; saved designs untouched. Actual source detail disclosed (email recovered at 840×426); all eight visuals and rebuilt football details inspected. Both public pages, categories, enlarged preview, exact-byte 12000×6840 download and phone width verified; nine targeted tests pass, build OK. Full suite: 2,630 pass with the pre-existing unrelated London map-export failure.
 
