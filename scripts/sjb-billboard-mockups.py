@@ -34,8 +34,25 @@ def coeffs(dst, src):
     return np.linalg.solve(np.array(A, float), np.array(B, float)).tolist()
 
 
+def fit(board, ratio):
+    """Pad with the board's own edge colours to the screen's shape — never stretch the artwork."""
+    a = np.asarray(board.convert("RGB")); h, w = a.shape[:2]
+    if w / h < ratio:
+        extra = round(h * ratio) - w; a = np.pad(a, ((0, 0), (extra // 2, extra - extra // 2), (0, 0)), mode="edge")
+    else:
+        extra = round(w / ratio) - h; a = np.pad(a, ((extra // 2, extra - extra // 2), (0, 0), (0, 0)), mode="edge")
+    return Image.fromarray(a)
+
+
+def screen_ratio(q):
+    import math
+    tl, tr, br, bl = q
+    return (math.dist(tl, tr) + math.dist(bl, br)) / (math.dist(tl, bl) + math.dist(tr, br))
+
+
 def place(scene, board, dusk):
     quad, mask = corners(scene)
+    board = fit(board, screen_ratio(quad))
     w, h = board.size
     big = board.resize((w * 2, h * 2), Image.LANCZOS)
     c = coeffs(quad, [(0, 0), (w * 2, 0), (w * 2, h * 2), (0, h * 2)])
