@@ -1,6 +1,8 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Automatically refresh saved Canva PNGs for Bowl billboard/social previews and downloads — BLOCKED: the app's shared Canva connection is empty and Canva client credentials are absent; the offered runtime Canva connection was declined. Chat Canva access cannot run inside the app. Supported save-event notification not established; use bounded change detection and export completion rather than promise instant refresh.
+- [ ] Create a separate Design Set 5 reusable asset folder: inventory original backgrounds, rebuild matching independent layers, transparent overlays where needed, scalable graphic elements and portable layered artwork; verify resolutions and disclose raster/production limits. No fixed signage dimensions supplied; matching rebuilds approved.
+
+- [x] Keep Canva PNG refreshes manual per user decision; automatic connection setup deferred unless requested.
 
 - [x] Apply the approved white-outline Bowl shield to reviewed dark-ground Canva artwork and refresh downloadable snapshots and roadside mockups. Approved replacements committed, including campaign variations and display banners; all 101 designs in Sets 1–4 now use local refreshed downloads, with file coverage verified by a retained test. Light-ground billboard logos left unchanged. Twelve targeted tests pass; public social image download matches the refreshed file byte-for-byte and billboard page opens without page errors; preview build OK. Browser campaign-filter check did not establish filtering, and a complete independent Canva read-back of every previously edited design was not performed.
 
