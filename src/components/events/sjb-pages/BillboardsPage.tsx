@@ -16,6 +16,7 @@ import {
   SJB_BILLBOARD_SIZES,
   SJB_BILLBOARD_WAYS,
   SJB_BILLBOARD_VECTOR_CANVA,
+  SJB_BILLBOARD_TEAM_EXAMPLES,
 } from "@/lib/sjb-billboards";
 
 export function BillboardsPage() {
