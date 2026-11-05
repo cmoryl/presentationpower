@@ -89,12 +89,12 @@ const cineEmailHeader = { url: '/sjb-canva/cine-email-header.png' };
 const cineEmailSignature = { url: '/sjb-canva/cine-email-signature.png' };
 
 export const SJB_CANVA_COLLECTIONS = [
-  { id: 'bold-graphic', name: 'Design Set 1', folderId: 'FAHZ9_NN2FQ' },
-  { id: 'stadium-night', name: 'Design Set 2', folderId: 'FAHZ93d8ki8' },
-  { id: 'action-spotlight', name: 'Design Set 3', folderId: 'FAHZ90BI6Mo' },
-  { id: 'launch', name: 'Design Set 4', folderId: 'FAHZ99Po6eg' },
-  { id: 'light-action', name: 'Design Set 5', folderId: 'FAHZ_aTVaIg' },
-  { id: 'light-cinematic', name: 'Design Set 6', folderId: 'FAHZ_qwxXeQ' },
+  { id: 'bold-graphic', name: 'Design Set 1', folderId: 'FAHZ9_NN2FQ', blurb: 'Gritty action-sports broadcast', accent: '#FFEB66' },
+  { id: 'stadium-night', name: 'Design Set 2', folderId: 'FAHZ93d8ki8', blurb: 'Night grandstand + broadcast lines', accent: '#A1FBF9' },
+  { id: 'action-spotlight', name: 'Design Set 3', folderId: 'FAHZ90BI6Mo', blurb: 'Player spotlight under the lights', accent: '#C2A3FF' },
+  { id: 'launch', name: 'Design Set 4', folderId: 'FAHZ99Po6eg', blurb: 'Stadium line art + field strip', accent: '#FF9B70' },
+  { id: 'light-action', name: 'Design Set 5', folderId: 'FAHZ_aTVaIg', blurb: 'Bright high-energy action', accent: '#A6FA87' },
+  { id: 'light-cinematic', name: 'Design Set 6', folderId: 'FAHZ_qwxXeQ', blurb: 'Light cinematic stadium realism', accent: '#003FC7' },
 ] as const;
 export type SjbCanvaCollectionId = typeof SJB_CANVA_COLLECTIONS[number]['id'];
 export interface SjbCanvaGalleryDesign {
