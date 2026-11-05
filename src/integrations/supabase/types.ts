@@ -4827,6 +4827,21 @@ export type Database = {
         }
         Relationships: []
       }
+      sjb_set5_asset_removals: {
+        Row: {
+          asset_id: string
+          removed_at: string
+        }
+        Insert: {
+          asset_id: string
+          removed_at?: string
+        }
+        Update: {
+          asset_id?: string
+          removed_at?: string
+        }
+        Relationships: []
+      }
       skin_backdrops: {
         Row: {
           created_at: string
