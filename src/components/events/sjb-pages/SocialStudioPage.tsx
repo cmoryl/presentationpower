@@ -5,6 +5,22 @@ import { SjbLink, SjbShell } from '@/components/events/SjbShare';
 import { SJB_EVENT } from '@/lib/san-juan-bowl';
 import { SJB_CANVA_FOLDER_URL } from '@/lib/sjb-social-templates';
 import { SJB_CANVA_COLLECTIONS, SJB_CANVA_GALLERY, filterSjbCanvaDesigns, sjbCanvaSize, type SjbCanvaGalleryDesign } from '@/lib/sjb-canva-gallery';
+import coverSet1 from '@/assets/sjb-card-covers/set-1.jpg';
+import coverSet2 from '@/assets/sjb-card-covers/set-2.jpg';
+import coverSet3 from '@/assets/sjb-card-covers/set-3.jpg';
+import coverSet4 from '@/assets/sjb-card-covers/set-4.jpg';
+import coverSet5 from '@/assets/sjb-card-covers/set-5.jpg';
+import coverSet6 from '@/assets/sjb-card-covers/set-6.jpg';
+
+const SET_COVERS: Record<string, string> = {
+  all: coverSet2,
+  'bold-graphic': coverSet1,
+  'stadium-night': coverSet2,
+  'action-spotlight': coverSet3,
+  launch: coverSet4,
+  'light-action': coverSet5,
+  'light-cinematic': coverSet6,
+};
 
 export function SjbSocialStudio() {
   const [collectionId, setCollectionId] = useState('all');
