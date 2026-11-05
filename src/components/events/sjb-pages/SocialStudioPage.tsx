@@ -21,7 +21,7 @@ export function SjbSocialStudio() {
     <main className="mx-auto max-w-7xl px-5 pb-24 pt-8 text-foreground sm:px-8">
       <SjbLink page="kit" className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground"><ArrowLeft className="size-4" />Brand kit</SjbLink>
       <header className="mt-5 flex flex-wrap items-end justify-between gap-5 border-b border-border pb-6">
-        <div><p className="text-sm text-muted-foreground">{SJB_EVENT.name}</p><h1 className="mt-1 text-3xl font-bold">Social designs</h1><p className="mt-2 text-sm text-muted-foreground">Canva collection · {SJB_CANVA_GALLERY.length} designs · Preview edition</p></div>
+        <div><p className="text-sm text-muted-foreground">{SJB_EVENT.name}</p><h1 className="mt-1 text-3xl font-bold">Social designs</h1><p className="mt-2 text-sm text-muted-foreground">Canva collection · Preview edition</p></div>
         <Button asChild variant="outline"><a href={SJB_CANVA_FOLDER_URL} target="_blank" rel="noreferrer"><ExternalLink />Canva folder</a></Button>
       </header>
       <nav aria-label="Design campaigns" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -35,7 +35,7 @@ export function SjbSocialStudio() {
               <img src={hero.previewUrl} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
               <span aria-hidden className="absolute inset-x-0 bottom-0 h-1" style={{ backgroundColor: c.accent }} />
             </span>}
-            <span className="block p-3"><span className="block text-sm font-semibold">{c.name}</span><span className="mt-0.5 block text-xs text-muted-foreground">{c.blurb} · {count} designs</span></span>
+            <span className="block p-3"><span className="block text-sm font-semibold">{c.name}</span><span className="mt-0.5 block text-xs text-muted-foreground">{c.blurb}</span></span>
           </button>;
         })}
       </nav>
