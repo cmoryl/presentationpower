@@ -93,6 +93,20 @@ export function BillboardsPage() {
               </li>
             ))}
           </ul>
+          <h3 className="pt-2 text-sm font-semibold">More team versions</h3>
+          <div className="grid gap-4 lg:grid-cols-2">
+            {SJB_BILLBOARD_TEAM_EXAMPLES.map((d) => (
+              <figure key={d.id} className="space-y-1.5">
+                <img src={d.preview} width={840} height={400} alt={`Billboard example: ${d.label}`} className="w-full rounded border" loading="lazy" />
+                <figcaption className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                  <span>{d.label}</span>
+                  <Button asChild variant="outline" size="sm">
+                    <a href={d.edit} target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /> Edit in Canva</a>
+                  </Button>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
         </section>
 
         <section aria-labelledby="bb-update" className="space-y-4">
