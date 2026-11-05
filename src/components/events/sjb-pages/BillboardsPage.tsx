@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ArrowLeft, Download, ExternalLink } from "lucide-react";
 import { SjbLink, SjbShareLinkButton, SjbShell } from "@/components/events/SjbShare";
 import { Button } from "@/design-system/element";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { BillboardSceneUpdater } from "./BillboardSceneUpdater";
 import {
   billboardFile,
@@ -14,6 +15,7 @@ import {
   SJB_BILLBOARD_RESEARCH,
   SJB_BILLBOARD_SIZES,
   SJB_BILLBOARD_WAYS,
+  SJB_BILLBOARD_VECTOR_CANVA,
 } from "@/lib/sjb-billboards";
 
 export function BillboardsPage() {
@@ -55,18 +57,42 @@ export function BillboardsPage() {
               <div className="grid gap-4 md:grid-cols-3">
                 {SJB_BILLBOARD_WAYS.map((way) => (
                   <figure key={way.id} className="space-y-1.5">
-                    <img
-                      src={billboardScene(w, h, way.id, lang, tod)}
-                      alt={`${way.label} ${w}×${h} billboard shown beside a San Juan road (illustrative mockup)`}
-                      loading="lazy"
-                      className="aspect-[16/10] w-full rounded-md object-cover"
-                    />
-                    <figcaption className="text-xs text-muted-foreground">{way.label} · generated mockup</figcaption>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button type="button" className="block w-full cursor-zoom-in rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={`View ${way.label} ${w}×${h} mockup larger`}>
+                          <img
+                            src={billboardScene(w, h, way.id, lang, tod)}
+                            alt={`${way.label} ${w}×${h} billboard shown beside a San Juan road (illustrative mockup)`}
+                            loading="lazy"
+                            className="aspect-[16/10] w-full rounded-md object-cover"
+                          />
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-[min(96vw,1600px)] p-3">
+                        <DialogTitle className="text-sm">{way.label} · {w.toLocaleString()} × {h} · generated mockup, not an actual location</DialogTitle>
+                        <img src={billboardScene(w, h, way.id, lang, tod)} alt={`${way.label} ${w}×${h} billboard mockup, enlarged`} className="h-auto max-h-[85vh] w-full rounded-md object-contain" />
+                      </DialogContent>
+                    </Dialog>
+                    <figcaption className="text-xs text-muted-foreground">{way.label} · generated mockup · click to enlarge</figcaption>
                   </figure>
                 ))}
               </div>
             </div>
           ))}
+        </section>
+
+        <section aria-labelledby="bb-vector" className="space-y-3">
+          <h2 id="bb-vector" className="text-xl font-semibold">Vector Canva masters — Tickets On Sale</h2>
+          <p className="text-sm text-muted-foreground">Backgrounds built from editable Canva shapes, from the team's 840 × 400 version.</p>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {SJB_BILLBOARD_VECTOR_CANVA.map((d) => (
+              <li key={d.id}>
+                <Button asChild variant="outline" size="sm">
+                  <a href={d.edit} target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /> {d.label}</a>
+                </Button>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section aria-labelledby="bb-update" className="space-y-4">
