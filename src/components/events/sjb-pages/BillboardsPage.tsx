@@ -3,9 +3,11 @@ import { useState } from "react";
 import { ArrowLeft, Download, ExternalLink } from "lucide-react";
 import { SjbLink, SjbShareLinkButton, SjbShell } from "@/components/events/SjbShare";
 import { Button } from "@/design-system/element";
+import { BillboardSceneUpdater } from "./BillboardSceneUpdater";
 import {
   billboardFile,
   billboardScene,
+  billboardCanva,
   type BillboardLang,
   SJB_BILLBOARD_COPY,
   SJB_BILLBOARD_LINK,
@@ -67,6 +69,16 @@ export function BillboardsPage() {
           ))}
         </section>
 
+        <section aria-labelledby="bb-update" className="space-y-4">
+          <div>
+            <h2 id="bb-update" className="text-xl font-semibold">Update the in-place examples</h2>
+            <p className="text-sm text-muted-foreground">
+              Edited a board in Canva? Download it as PNG, drop it here and get a new roadside mockup in the same scene.
+            </p>
+          </div>
+          <BillboardSceneUpdater />
+        </section>
+
         <section aria-labelledby="bb-boards" className="space-y-6">
           <div>
             <h2 id="bb-boards" className="text-xl font-semibold">The boards</h2>
@@ -90,13 +102,20 @@ export function BillboardsPage() {
                         alt={`${way.label} billboard ${w}×${h}: ${SJB_BILLBOARD_COPY[l].join(" ")}`}
                         className="h-auto w-full rounded-sm border border-border"
                       />
-                      <figcaption className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{l === "en" ? "English" : "Español"} · {SJB_BILLBOARD_COPY[l].join(" / ")}</span>
+                      <figcaption className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+                        <span className="mr-auto">{l === "en" ? "English" : "Español"} · {SJB_BILLBOARD_COPY[l].join(" / ")}</span>
                         <Button asChild size="sm" variant="ghost">
                           <a href={billboardFile(w, h, way.id, l)} download>
                             <Download className="h-3.5 w-3.5" /> PNG
                           </a>
                         </Button>
+                        {billboardCanva(w, way.id, l) && (
+                          <Button asChild size="sm" variant="ghost">
+                            <a href={billboardCanva(w, way.id, l)!.edit} target="_blank" rel="noreferrer">
+                              <ExternalLink className="h-3.5 w-3.5" /> Edit in Canva
+                            </a>
+                          </Button>
+                        )}
                       </figcaption>
                     </figure>
                   ))}

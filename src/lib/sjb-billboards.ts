@@ -78,3 +78,25 @@ export const SJB_BILLBOARD_RESEARCH = [
     url: "https://oaaa.org/wp-content/uploads/2022/09/OAAA-Best-Practices-oct20-2021-spreads%5F2%5F.pdf",
   },
 ] as const;
+
+/** Editable Canva masters (TransPerfect team account): ground image + separate Bowl shield, headline, date and web-address layers. */
+export const SJB_BILLBOARD_CANVA: Record<string, { id: string; edit: string }> = {
+  "840-navy-en": { id: "DAHaDpOPHhU", edit: "https://www.canva.com/d/sa-KmPo0LaJuGoh" },
+  "840-navy-es": { id: "DAHaDl2QXZk", edit: "https://www.canva.com/d/TBMfVA8tsNU6X5Z" },
+  "840-gold-en": { id: "DAHaDp-Fwv0", edit: "https://www.canva.com/d/XDLAu1POsDD2qdP" },
+  "840-gold-es": { id: "DAHaDoz-BVo", edit: "https://www.canva.com/d/K1Qesc4UkKnahZ6" },
+  "840-cyan-en": { id: "DAHaDstyS7c", edit: "https://www.canva.com/d/q8ZVqhUo_OBzbw8" },
+  "840-cyan-es": { id: "DAHaDmgsUpY", edit: "https://www.canva.com/d/d4n5NhK9UoCkm9b" },
+  "1728-navy-en": { id: "DAHaDk41rz4", edit: "https://www.canva.com/d/3jn0V_FsT6Oaa1E" },
+  "1728-navy-es": { id: "DAHaDm5duUw", edit: "https://www.canva.com/d/hSWXswWJOQJ2L0b" },
+  "1728-gold-en": { id: "DAHaDgfwaYg", edit: "https://www.canva.com/d/0gbuVnYIJxE-Dlj" },
+  "1728-gold-es": { id: "DAHaDn7--lA", edit: "https://www.canva.com/d/ux4Ud6ACNuQi4GF" },
+  "1728-cyan-en": { id: "DAHaDghDJJw", edit: "https://www.canva.com/d/zpqjejkpliueJOs" },
+  "1728-cyan-es": { id: "DAHaDlRy6ao", edit: "https://www.canva.com/d/QZN8Ah3R3J4i7rz" },
+};
+export function billboardCanva(w: number, way: string, lang: BillboardLang) {
+  return SJB_BILLBOARD_CANVA[`${w}-${way}-${lang}`];
+}
+export function billboardBlankScene(w: number, tod: "day" | "dusk") {
+  return `/sjb-billboards/scenes/blank/scene-${w}-${tod}.jpg`;
+}

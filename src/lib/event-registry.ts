@@ -382,6 +382,16 @@ function sanJuanBowlEntry(): EventEntry {
             detail: "Build every sign on the venue's sign list from approved templates, review and download them.",
             link: { to: "/events/next/signs/$eventId", params: { eventId: SJB_EVENT.id } },
           },
+          {
+            label: "Digital billboards",
+            detail: "Roadside billboards in English and Spanish (840 × 400, 1,728 × 512): editable Canva files, downloads and in-scene examples.",
+            link: { to: "/events/san-juan-bowl/billboards" },
+          },
+          {
+            label: "Billboard share link",
+            detail: "The same billboard examples, no sign-in needed — send to the team.",
+            link: { to: "/share/san-juan-bowl/billboards" },
+          },
         ],
         waitingOn: "the venue's sign list and site survey",
       },
