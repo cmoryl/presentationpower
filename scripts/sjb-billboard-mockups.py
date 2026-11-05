@@ -51,18 +51,48 @@ def screen_ratio(q):
 
 
 def place(scene, board, dusk):
+    """True-shape placement: the board keeps its exact aspect ratio inside the screen;
+    any spare screen width becomes the dark LED cabinet, like a real display. Never stretched."""
     quad, mask = corners(scene)
-    # Warp the whole board straight onto the screen corners: no edge-colour padding (it smeared the sides).
     w, h = board.size
-    big = board.resize((w * 2, h * 2), Image.LANCZOS)
-    c = coeffs(quad, [(0, 0), (w * 2, 0), (w * 2, h * 2), (0, h * 2)])
+    R = screen_ratio(quad); r = w / h
+    f = min(1.0, r / R)  # share of screen width the true-shape board occupies
+    u0 = (1 - f) / 2
+    H = coeffs([(0, 0), (1, 0), (1, 1), (0, 1)], quad)  # unit square -> scene
+
+    def pt(u, v):
+        a, b, c, d, e, g, i, j = H
+        den = i * u + j * v + 1
+        return ((a * u + b * v + c) / den, (d * u + e * v + g) / den)
+
+    sub = [pt(u0, 0), pt(1 - u0, 0), pt(1 - u0, 1), pt(u0, 1)]
+    S = 3
+    big = board.resize((w * S, h * S), Image.LANCZOS)
+    a = np.asarray(big).astype(np.float32)
+    # LED realism: faint pixel grid + slight glass sheen; day screens lose a touch of contrast in sunlight
+    pitch = max(3, round(S * h / 220))
+    grid = np.ones(a.shape[:2], np.float32)
+    grid[::pitch, :] *= 0.9; grid[:, ::pitch] *= 0.9
+    a *= grid[..., None]
+    if not dusk:
+        a = a * 0.92 + 14
+    yy = np.linspace(1.05, 0.97, a.shape[0])[:, None, None]
+    a = np.clip(a * yy, 0, 255).astype("uint8")
+    big = Image.fromarray(a)
+    c = coeffs(sub, [(0, 0), (w * S, 0), (w * S, h * S), (0, h * S)])
     warped = big.transform(scene.size, Image.PERSPECTIVE, c, Image.BICUBIC)
+    art = Image.new("L", scene.size, 0)
+    from PIL import ImageDraw
+    ImageDraw.Draw(art).polygon([tuple(map(float, p)) for p in sub], fill=255)
     m = Image.fromarray((mask * 255).astype("uint8")).filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(0.8))
     out = scene.convert("RGB").copy()
+    cabinet = Image.new("RGB", scene.size, (14, 15, 18))
+    out.paste(cabinet, (0, 0), m)  # whole screen opening = dark display panel
     if dusk:  # LED screens read brighter than their surroundings at dusk
         glow = warped.filter(ImageFilter.GaussianBlur(18))
-        out = Image.blend(out, Image.composite(glow, out, m.filter(ImageFilter.MaxFilter(31))), 0.25)
-    out.paste(warped, (0, 0), m)
+        gm = art.filter(ImageFilter.MaxFilter(31))
+        out = Image.blend(out, Image.composite(glow, out, gm), 0.25)
+    out.paste(warped, (0, 0), Image.fromarray(np.minimum(np.asarray(art), np.asarray(m))).filter(ImageFilter.GaussianBlur(0.6)))
     return out
 
 
