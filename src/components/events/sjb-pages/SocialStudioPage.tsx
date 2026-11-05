@@ -21,28 +21,26 @@ export function SjbSocialStudio() {
     <main className="mx-auto max-w-7xl px-5 pb-24 pt-8 text-foreground sm:px-8">
       <SjbLink page="kit" className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground"><ArrowLeft className="size-4" />Brand kit</SjbLink>
       <header className="mt-5 flex flex-wrap items-end justify-between gap-5 border-b border-border pb-6">
-        <div><p className="text-sm text-muted-foreground">{SJB_EVENT.name}</p><h1 className="mt-1 text-3xl font-bold">Social designs</h1><p className="mt-2 text-sm text-muted-foreground">Canva collection · {SJB_CANVA_GALLERY.length} designs · Preview edition</p></div>
+        <div><p className="text-sm text-muted-foreground">{SJB_EVENT.name}</p><h1 className="mt-1 text-3xl font-bold">Social designs</h1><p className="mt-2 text-sm text-muted-foreground">Canva collection · Preview edition</p></div>
         <Button asChild variant="outline"><a href={SJB_CANVA_FOLDER_URL} target="_blank" rel="noreferrer"><ExternalLink />Canva folder</a></Button>
       </header>
       <nav aria-label="Design campaigns" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {[{ id: 'all', name: 'All campaigns', blurb: 'Every design set', accent: '#03002C' } as const, ...SJB_CANVA_COLLECTIONS].map(c => {
           const inSet = SJB_CANVA_GALLERY.filter(d => (c.id === 'all' || d.collectionId === c.id) && !d.campaign && !d.format);
           const hero = inSet.find(d => d.name === 'Wide post') ?? inSet[0];
-          const count = c.id === 'all' ? SJB_CANVA_GALLERY.length : SJB_CANVA_GALLERY.filter(d => d.collectionId === c.id).length;
           const active = collectionId === c.id;
           return <button key={c.id} type="button" aria-pressed={active} onClick={() => setCollectionId(c.id)} className={`group overflow-hidden rounded-lg border bg-background text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active ? 'border-primary ring-2 ring-primary' : 'border-border hover:border-foreground/40'}`}>
             {hero && <span className="relative block h-28 overflow-hidden bg-muted">
               <img src={hero.previewUrl} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
               <span aria-hidden className="absolute inset-x-0 bottom-0 h-1" style={{ backgroundColor: c.accent }} />
             </span>}
-            <span className="block p-3"><span className="block text-sm font-semibold">{c.name}</span><span className="mt-0.5 block text-xs text-muted-foreground">{c.blurb} · {count} designs</span></span>
+            <span className="block p-3"><span className="block text-sm font-semibold">{c.name}</span><span className="mt-0.5 block text-xs text-muted-foreground">{c.blurb}</span></span>
           </button>;
         })}
       </nav>
       <div className="mt-5 flex flex-wrap items-end gap-4">
         <label className="grid gap-1.5 text-sm font-medium" htmlFor="sjb-size">Size<select id="sjb-size" value={size} onChange={e => setSize(e.target.value)} className="h-10 rounded-md border border-input bg-background px-3 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option value="all">All sizes</option>{sizes.map(s => <option key={s}>{s}</option>)}</select></label>
         <label className="grid gap-1.5 text-sm font-medium" htmlFor="sjb-type">Ad type<select id="sjb-type" value={adType} onChange={e => setAdType(e.target.value)} className="h-10 max-w-full rounded-md border border-input bg-background px-3 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option value="all">All ad types</option>{types.map(t => <option key={t}>{t}</option>)}</select></label>
-        <p role="status" className="pb-2 text-sm text-muted-foreground">{visible.length} designs</p>
       </div>
       <p className="mt-5 border-l-2 border-border pl-3 text-sm text-muted-foreground">Draft labels identify unsaved Canva revisions. Saved labels identify Canva snapshots, not campaign approval. Preview images are not full-resolution downloads.</p>
       {visible.length === 0 && <div className="py-20 text-center"><p>No designs in this selection.</p><Button variant="link" onClick={() => { setSize('all'); setAdType('all'); setCollectionId('all'); }}>Reset filters</Button></div>}
