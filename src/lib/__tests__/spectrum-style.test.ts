@@ -135,3 +135,13 @@ describe("Spectrum adoption in the build", () => {
     }
   });
 });
+
+import { stylePackById as _spById } from "@/lib/style-packs";
+describe("Spectrum ground", () => {
+  it("never paints a photo behind Spectrum slides", () => {
+    const pack = _spById("skin-s06")!;
+    for (const seed of ["scene:cover x", "scene:content MV-BENTO-6", "scene:stats y take:2"]) {
+      expect(pack.ground(seed).join(" ")).not.toMatch(/url\(/);
+    }
+  });
+});
