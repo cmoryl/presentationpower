@@ -142,3 +142,4 @@
 - [x] LogoHub: last-updated date + monthly online logo check flagged for admin review
 - [x] Billboards: fold team versions into main boards with roadside mockups + lightbox
 - [x] Set 5 asset area: seven browsing sections (Finished designs, Backgrounds, Enlarged 12,000px, Movable objects, Motion & light effects, Layered artwork, Official logos) with headings + group filter; grouping lives in sjb-set5-availability.ts, categories unchanged
+- [x] Add a detailed, copy-ready image-creation prompt to every Set 5 asset card (137 assets): shared Bowl design DNA + per-asset art direction in `src/lib/sjb-set5-prompts.ts`; expandable "Creation prompt" + "Copy prompt" on every card and in the enlarge dialog (`Set5AssetsPage.tsx`). Verified on the public share page: expand, exact clipboard match, dialog prompt; 5 new tests in `sjb-set5-prompts.test.ts`; full suite 2,639 pass with the pre-existing unrelated London map-export failure; build OK.
