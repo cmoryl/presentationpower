@@ -1,0 +1,2703 @@
+{
+  "date": "2026-11-06",
+  "scope": "Browser preview checks only; PASS is not full guide certification. Checks: 12pt HTML text floor, 0.75in side padding, text bounds, text collisions, framed photos. SVG labels, all role-specific type ranges, pixel-perfect master parity, dense authored content, all divisions and PowerPoint/Office remain unverified.",
+  "rows": [
+    {
+      "id": "MV-OP-COVER",
+      "name": "Cover \u2014 classic",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-COVER-MEDIA",
+      "name": "Cover \u2014 full-bleed media",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "unframed/full-bleed photo",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-COVER-MINIMAL",
+      "name": "Cover \u2014 minimal",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-AGENDA",
+      "name": "Agenda \u2014 two column",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-AGENDA-VERTICAL",
+      "name": "Agenda \u2014 vertical",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-DIVIDER",
+      "name": "Section divider",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-DIVIDER-NUMBERED",
+      "name": "Section divider \u2014 numbered",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-INTRO-TEAM",
+      "name": "Who's presenting",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CTX-CARDS-2",
+      "name": "Two challenge cards",
+      "familyId": "MF-02",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CTX-CARDS-3",
+      "name": "Three challenge cards",
+      "familyId": "MF-02",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CTX-CARDS-4",
+      "name": "Four challenge tiles",
+      "familyId": "MF-02",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CTX-COST",
+      "name": "Cost of inaction",
+      "familyId": "MF-02",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CTX-STAT-GRID",
+      "name": "Market stat grid",
+      "familyId": "MF-02",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CTX-TREND",
+      "name": "Trend narrative",
+      "familyId": "MF-02",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CTX-CHALLENGE-STACK",
+      "name": "Challenge stack",
+      "familyId": "MF-02",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-INS-CALLOUT",
+      "name": "Insight callout",
+      "familyId": "MF-03",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-INS-BIG-IDEA",
+      "name": "Big idea",
+      "familyId": "MF-03",
+      "family": "Context",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-INS-SO-WHAT",
+      "name": "Insight \u2192 So what \u2192 Now what",
+      "familyId": "MF-03",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-INS-OPPORTUNITY-SIZE",
+      "name": "Opportunity size",
+      "familyId": "MF-03",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-INS-QUOTE",
+      "name": "Client quote",
+      "familyId": "MF-03",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-SOL-PILLARS-2",
+      "name": "Two solution pillars",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-SOL-PILLARS-3",
+      "name": "Three solution pillars",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-SOL-PILLARS-4",
+      "name": "Four solution tiles",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-SOL-PILLARS-5",
+      "name": "Hero + four tiles",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-SOL-ARCHITECTURE",
+      "name": "Layered architecture",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-SOL-FEATURE-LIST",
+      "name": "Feature list",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROC-TIMELINE",
+      "name": "Process timeline",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROC-PHASES",
+      "name": "Numbered phases",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROC-STEP-CHAIN",
+      "name": "Step chain (up to 9)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROC-STEP-SPOTLIGHT",
+      "name": "Numbered step spotlight",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-PROC-STAGE-ORBITS",
+      "name": "Stage orbits (numbered medallions)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-PROC-BEFORE-AFTER",
+      "name": "Before \u2192 After",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROC-BEFORE-AFTER-SPLIT",
+      "name": "Before \u2192 After split (centre hub)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-INFO-HUB-SATELLITES",
+      "name": "Hub & satellites (4-8)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-INFO-HUB-PILL-ORBIT",
+      "name": "Hub & pill orbit (4-12)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROC-ARC-FLOW",
+      "name": "Arc flow (2-6 steps)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROC-TIMELINE-RAIL",
+      "name": "Timeline rail (3-7 stops)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROC-JOURNEY-VERTICAL",
+      "name": "Journey timeline (vertical, 3-6)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text outside margins/stage"
+      ]
+    },
+    {
+      "id": "MV-PROC-SWIMLANE-FLOW",
+      "name": "Swimlane flow (lanes x phases)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROC-LAYER-STACK",
+      "name": "Layer stack (architecture lanes)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROC-PROOF-PAIRS",
+      "name": "Proof pairs (problem to outcome)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROC-PLATFORM-LOOP",
+      "name": "Platform loop (connected capabilities)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROOF-STATS-2",
+      "name": "Two proof stats",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROOF-STATS-3",
+      "name": "Three proof stats",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROOF-STATS-4",
+      "name": "Four proof stats",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROOF-GROWTH-ORBITS",
+      "name": "Growth proof split (logos + orbit stats)",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-SOL-CAP-CARDS",
+      "name": "Capability cards (photo \u00b7 label band \u00b7 bullets)",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-SHOW-DEVICE-QUAD",
+      "name": "Device screen + benefit quad",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROOF-CERT-ORBITS",
+      "name": "Credential proof split (card + certification orbits)",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROOF-LOGOS",
+      "name": "Client logo wall",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROOF-LOGOS-STRIP",
+      "name": "Client logo strip",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROOF-LOGOS-MARQUEE",
+      "name": "Client logo marquee",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROOF-LOGOS-FEATURED",
+      "name": "Featured client + supporting wall",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROOF-LOGOS-CATEGORIZED",
+      "name": "Client logos by category",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROOF-LOGOS-MOSAIC",
+      "name": "Client logo mosaic",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PROOF-TESTIMONIAL",
+      "name": "Testimonial card",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-DEC-MATRIX",
+      "name": "Decision matrix",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-DEC-COMPARE-TABLE",
+      "name": "Comparison table",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-DEC-CHECKLIST",
+      "name": "Decision checklist",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-COMM-PRICING",
+      "name": "Pricing tiers",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-COMM-INVESTMENT",
+      "name": "Investment summary",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-RISK-MITIGATION",
+      "name": "Risk & mitigation",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CASE-SPREAD",
+      "name": "Case study spread",
+      "familyId": "MF-06",
+      "family": "Case studies",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CASE-METRICS",
+      "name": "Case study \u2014 metrics forward",
+      "familyId": "MF-06",
+      "family": "Case studies",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CASE-STORY",
+      "name": "Case study \u2014 narrative",
+      "familyId": "MF-06",
+      "family": "Case studies",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CASE-LOGO-GRID",
+      "name": "Case study logo grid",
+      "familyId": "MF-06",
+      "family": "Case studies",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-TEAM-BIOS-3",
+      "name": "Team \u2014 three bios",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-TEAM-BIOS-4",
+      "name": "Team \u2014 four bios",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GOV-RACI",
+      "name": "Governance model",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-REC-NEXT",
+      "name": "Recommendation",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLOSE-CTA",
+      "name": "Close & CTA",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLOSE-THANKS",
+      "name": "Thank you",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLOSE-QNA",
+      "name": "Q & A",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLOSE-CONTACT",
+      "name": "Contact card",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLOSE-TIMELINE",
+      "name": "Next-step timeline",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLOSE-CHECKLIST",
+      "name": "What happens next",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLOSE-DECISION",
+      "name": "Decision ask",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLOSE-CALENDAR",
+      "name": "Book the kickoff",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLOSE-STATEMENT",
+      "name": "Statement close",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLOSE-SPLIT",
+      "name": "Split \u2014 image + CTA",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLOSE-DUAL-CTA",
+      "name": "Two-path CTA",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLOSE-METRIC-PROMISE",
+      "name": "Metric promise",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-COVER-EDITORIAL",
+      "name": "Cover \u2014 editorial",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-COVER-SPLIT",
+      "name": "Cover \u2014 split image",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-COVER-POSTER",
+      "name": "Cover \u2014 poster",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-COVER-GRID",
+      "name": "Cover \u2014 media grid",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-COVER-DOSSIER",
+      "name": "Cover \u2014 dossier",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-COVER-GRADIENT",
+      "name": "Cover \u2014 chromatic",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "unframed/full-bleed photo",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-COVER-MONOGRAM",
+      "name": "Cover \u2014 monogram",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-OP-COVER-STACKED",
+      "name": "Cover \u2014 stacked",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-IMG-FULL-BLEED",
+      "name": "Full-bleed image",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "unframed/full-bleed photo",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-IMG-SPLIT",
+      "name": "Split \u2014 media + copy",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-IMG-CAPTION",
+      "name": "Framed image + caption",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-SHOW-LAPTOP",
+      "name": "Laptop screen showcase",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-SHOW-MONITOR",
+      "name": "Desktop monitor showcase",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text outside margins/stage"
+      ]
+    },
+    {
+      "id": "MV-SHOW-PHONE",
+      "name": "Mobile screen showcase",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-IMG-GRID-3",
+      "name": "Media trio",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-IMG-GRID-6",
+      "name": "Media grid \u2014 six",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-IMG-PORTRAIT",
+      "name": "Portrait feature",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-IMG-QUOTE-BG",
+      "name": "Quote over image",
+      "familyId": "MF-03",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "unframed/full-bleed photo",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-IMG-BEFORE-AFTER",
+      "name": "Before / after \u2014 visual",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-IMG-STAT-CALLOUT",
+      "name": "Image + stat callout",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-IMG-STRIP",
+      "name": "Filmstrip",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-QUOTE-MULTI",
+      "name": "Quote wall \u2014 three voices",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-QUOTE-PORTRAIT",
+      "name": "Quote \u2014 portrait",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-QUOTE-CARD",
+      "name": "Quote \u2014 framed card",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-QUOTE-METRIC",
+      "name": "Quote + proof metric",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-QUOTE-POSTER",
+      "name": "Quote \u2014 poster",
+      "familyId": "MF-03",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-INFO-DONUT",
+      "name": "Donut infographic",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-INFO-FUNNEL",
+      "name": "Funnel infographic",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-INFO-BAR-COMPARE",
+      "name": "Bar comparison",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-INFO-CIRCULAR-FLOW",
+      "name": "Circular flow",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-INFO-PYRAMID",
+      "name": "Pyramid",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-INFO-VENN",
+      "name": "Venn \u2014 three sets",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLIENT-MATRIX",
+      "name": "Client outcome matrix",
+      "familyId": "MF-06",
+      "family": "Case studies",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-CLIENT-DETAIL-3",
+      "name": "Client detail cards",
+      "familyId": "MF-06",
+      "family": "Case studies",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-IMG-MATRIX-4",
+      "name": "Media matrix \u2014 four",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-IMG-MATRIX-6",
+      "name": "Media matrix \u2014 six",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CLIENT-COMPARE",
+      "name": "Client comparison strip",
+      "familyId": "MF-06",
+      "family": "Case studies",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-BENTO-5",
+      "name": "Bento \u2014 5 cell",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-BENTO-6",
+      "name": "Bento \u2014 6 cell",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-BENTO-7",
+      "name": "Bento \u2014 7 cell",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-BENTO-8",
+      "name": "Bento \u2014 8 cell",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text outside margins/stage"
+      ]
+    },
+    {
+      "id": "MV-BENTO-VALUE-CLOSE",
+      "name": "Bento \u2014 value grid + close",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-SANKEY",
+      "name": "Sankey flow",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-CHORD",
+      "name": "Chord \u2014 relationships",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-BEESWARM",
+      "name": "Beeswarm distribution",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-BUMP",
+      "name": "Bump chart \u2014 rank shifts",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-MARKET-MAP",
+      "name": "Market map (bubble matrix)",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-TREEMAP",
+      "name": "Treemap \u2014 proportional",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-CALENDAR-HEATMAP",
+      "name": "Calendar heatmap",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-WATERFALL",
+      "name": "Waterfall \u2014 value build",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-RADAR",
+      "name": "Radar \u2014 capability profile",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-STACKED-AREA",
+      "name": "Stacked area \u2014 composition over time",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-DUMBBELL",
+      "name": "Dumbbell \u2014 before vs. after",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-RADIAL-BAR",
+      "name": "Radial bars \u2014 progress rings",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-SUNBURST",
+      "name": "Sunburst \u2014 nested share",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-GANTT",
+      "name": "Gantt \u2014 rollout timeline",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-SLOPE",
+      "name": "Slope \u2014 two-point change",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-GAUGE-GRID",
+      "name": "Gauge grid \u2014 scorecard dials",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-VIZ-BOXPLOT",
+      "name": "Box plot \u2014 spread and outliers",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-KPI-DASHBOARD",
+      "name": "KPI dashboard",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-ROADMAP-QUARTERS",
+      "name": "Roadmap \u2014 quarters",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text outside margins/stage"
+      ]
+    },
+    {
+      "id": "MV-FUNNEL",
+      "name": "Funnel \u2014 vertical",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-FLYWHEEL",
+      "name": "Flywheel",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-MATURITY-CURVE",
+      "name": "Maturity curve",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-JOURNEY-MAP",
+      "name": "Journey map",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-LOGO-WALL",
+      "name": "Logo wall",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-MATRIX-2X2",
+      "name": "Strategy 2\u00d72 matrix",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text outside margins/stage",
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-ICEBERG",
+      "name": "Iceberg \u2014 above/below",
+      "familyId": "MF-03",
+      "family": "Context",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text outside margins/stage"
+      ]
+    },
+    {
+      "id": "MV-EDITORIAL-SPREAD",
+      "name": "Editorial spread",
+      "familyId": "MF-03",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-SPLIT-MANIFESTO",
+      "name": "Split manifesto",
+      "familyId": "MF-03",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-NUMBERS-TRIPTYCH",
+      "name": "Numbers triptych",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-TIMELINE-VERTICAL",
+      "name": "Timeline \u2014 vertical",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-COMPARE-VS-LISTS",
+      "name": "Compare \u2014 VS lists",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-COMPARE-SLIDER",
+      "name": "Compare \u2014 before/after slider",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PULL-QUOTE-STACK",
+      "name": "Pull-quote stack",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-DEFINITION",
+      "name": "Definition",
+      "familyId": "MF-03",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-PRINCIPLES",
+      "name": "Principles",
+      "familyId": "MF-03",
+      "family": "Context",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-COUNTDOWN",
+      "name": "Countdown \u2014 three to remember",
+      "familyId": "MF-07",
+      "family": "Closings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-HORIZON",
+      "name": "Horizon \u2014 Now / Next / Later",
+      "familyId": "MF-04",
+      "family": "Solution",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-DASH-SUMMARY",
+      "name": "Dashboard \u2014 weekly summary",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-DASH-DONUT-TRIO",
+      "name": "Dashboard \u2014 donut trio",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-DASH-SALES-CHART",
+      "name": "Dashboard \u2014 trend chart",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-DASH-GAUGE-ROW",
+      "name": "Dashboard \u2014 gauge row",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-DASH-PERFORMANCE",
+      "name": "Dashboard \u2014 performance bars",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-DASH-REPORT-CARDS",
+      "name": "Dashboard \u2014 report cards",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-DASH-GROWTH-COLUMNS",
+      "name": "Dashboard \u2014 growth columns",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-DASH-BREAKDOWN",
+      "name": "Dashboard \u2014 breakdown",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-DASH-REGION-STATS",
+      "name": "Dashboard \u2014 region stats",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-YEAR-SERIES",
+      "name": "Graph \u2014 year series",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-AXIS-BARS",
+      "name": "Graph \u2014 axis bars",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-CATEGORY-BARS",
+      "name": "Graph \u2014 category bars",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-DUAL-DONUT",
+      "name": "Graph \u2014 dual donut",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-RINGS",
+      "name": "Graph \u2014 concentric rings",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-TASK-CARDS",
+      "name": "Graph \u2014 task cards",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-TASK-DIALS",
+      "name": "Graph \u2014 task dials",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-DECADE-AREA",
+      "name": "Graph \u2014 decade area",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-PERCENT-COMPARE",
+      "name": "Graph \u2014 percent compare",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-LINE-MULTI",
+      "name": "Graph \u2014 multi-series line",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-STACKED-BAR",
+      "name": "Graph \u2014 stacked bars",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-AREA-STACK",
+      "name": "Graph \u2014 stacked area",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-WATERFALL",
+      "name": "Graph \u2014 waterfall",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-BUBBLE",
+      "name": "Graph \u2014 bubble scatter",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-HEATMAP",
+      "name": "Graph \u2014 heatmap grid",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-TREEMAP",
+      "name": "Graph \u2014 treemap",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-GRAPH-COMBO",
+      "name": "Graph \u2014 combo bar + line",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-ED-HERO-BLEED",
+      "name": "Editorial \u2014 full-bleed hero",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "unframed/full-bleed photo",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-ED-HERO-ORB",
+      "name": "Editorial \u2014 orb composition",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-ED-DIVIDER-XL",
+      "name": "Editorial \u2014 numbered divider",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-ED-KICKER-POSTER",
+      "name": "Editorial \u2014 kicker poster",
+      "familyId": "MF-01",
+      "family": "Openings",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-ED-STAT-PHOTO",
+      "name": "Editorial \u2014 stat over photo",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "text outside margins/stage",
+        "text collisions",
+        "unframed/full-bleed photo",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-ED-QUOTE-BLEED",
+      "name": "Editorial \u2014 full-bleed quote",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "unframed/full-bleed photo",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-LOC-WORLD-PINS",
+      "name": "Locations \u2014 world map with pins",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-LOC-WORLD-STATS",
+      "name": "Locations \u2014 world map + region stats",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-LOC-REGION-FOCUS",
+      "name": "Locations \u2014 regional focus",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-LOC-HUB-SPOKE",
+      "name": "Locations \u2014 hub & spoke network",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-STAT-HERO-NUMBER",
+      "name": "Stat \u2014 giant hero number",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-STAT-TYPE-WALL",
+      "name": "Stat \u2014 numeric typography wall",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-STAT-PROOF-BOARD",
+      "name": "Stat \u2014 proof board (headline results + scale rail)",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-LOC-CITY-DIRECTORY",
+      "name": "Locations \u2014 city directory",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-STAT-KPI-RAIL",
+      "name": "Stat \u2014 type-led KPI rail",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-STAT-TICKER-STRIP",
+      "name": "Stat \u2014 ticker strip",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-STAT-SPARK-HERO",
+      "name": "Stat \u2014 sparkline hero",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-STAT-GAUGE-STACK",
+      "name": "Stat \u2014 gauge stack",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-STAT-ORBIT",
+      "name": "Stat \u2014 orbiting distribution type",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text outside margins/stage",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-STAT-ACTUAL-TARGET",
+      "name": "Stat \u2014 actual \u2192 target \u2192 delta",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-STAT-EDITORIAL-DASH",
+      "name": "Stat \u2014 editorial dashboard",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-STAT-MOSAIC",
+      "name": "Stat \u2014 asymmetrical mosaic",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text outside margins/stage"
+      ]
+    },
+    {
+      "id": "MV-STAT-IMAGE-TYPE",
+      "name": "Stat \u2014 image + oversized type",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-STAT-PHOTO-TRIO",
+      "name": "Stat \u2014 photo trio with figures",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-STAT-PHOTO-BAND",
+      "name": "Stat \u2014 photo band KPI rail",
+      "familyId": "MF-05",
+      "family": "Data",
+      "status": "FAIL",
+      "before": [
+        "type below 12pt",
+        "text collisions",
+        "side padding not 0.75in"
+      ],
+      "failures": [
+        "text collisions"
+      ]
+    },
+    {
+      "id": "MV-STAT-PORTRAIT-PROOF",
+      "name": "Stat \u2014 portrait proof panel",
+      "familyId": "MF-05",
+      "family": "Proof",
+      "status": "PASS",
+      "before": [
+        "type below 12pt",
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    },
+    {
+      "id": "MV-CANVAS-BLANK",
+      "name": "Blank canvas",
+      "familyId": "MF-08",
+      "family": "Custom canvas",
+      "status": "PASS",
+      "before": [
+        "side padding not 0.75in"
+      ],
+      "failures": []
+    }
+  ]
+}

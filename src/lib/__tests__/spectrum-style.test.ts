@@ -91,6 +91,12 @@ describe("Spectrum corporate style (Nov 2026 guide)", () => {
 });
 
 describe("Spectrum adoption in the build", () => {
+  it("applies the guide's 0.75 inch margins to every Spectrum module", async () => {
+    const { moduleSpacing } = await import("@/lib/module-spacing");
+    const { MODULE_VARIANTS } = await import("@/lib/taxonomy");
+    const pack = skinPackById("skin-s06");
+    for (const variant of MODULE_VARIANTS) expect(moduleSpacing(pack, variant.id).padX).toBe(108);
+  });
   it("restyles S06 as the Enterprise Spectrum skin", () => {
     const skin = designSkinByCode("S06");
     expect(skin?.name).toBe("Enterprise Spectrum");

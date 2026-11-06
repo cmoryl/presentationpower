@@ -18,6 +18,7 @@
 
 import { lookCodeFromPackId } from "./look-brand";
 import type { StylePack } from "./style-packs";
+import { SPECTRUM_LAYOUT, STAGE_PX_PER_IN } from "./spectrum-style";
 
 export interface ModuleSpacing {
   /** Thickness (stage px) of the section rule above the content. 0 = no rule. */
@@ -55,6 +56,7 @@ export const DEFAULT_MODULE_SPACING: ModuleSpacing = {
 
 /** Per-look defaults, keyed by look code. */
 const LOOK_SPACING: Record<string, Partial<ModuleSpacing>> = {
+  S06: { padX: SPECTRUM_LAYOUT.marginIn * STAGE_PX_PER_IN, padTop: 108, padBottom: 96, gutter: 32 },
   // DataForce is art-directed: no full-width rule anywhere, tighter gutters,
   // and mass centred rather than dropped onto a plinth.
   R03: { ruleTop: 0, gutter: 28, padTop: 120, padBottom: 104, rhythm: 0.96 },

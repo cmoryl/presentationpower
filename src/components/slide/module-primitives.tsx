@@ -1534,7 +1534,7 @@ export function AuroraStatCell({
           : "relative flex items-center gap-6 pl-10 pr-8"
       }
       style={{
-        borderLeft: showLeftRule ? `1px solid ${ink.hairline}` : "none",
+        borderLeft: showLeftRule && !spectrum ? `1px solid ${ink.hairline}` : "none",
       }}
     >
       {/* Soft translucent icon circle — 1px hairline stroke, subtle fill,
@@ -1548,8 +1548,10 @@ export function AuroraStatCell({
           background: stage
             ? `color-mix(in oklab, ${stage.deep} 10%, transparent)`
             : "color-mix(in oklab, var(--slide-accent-text) 12%, transparent)",
-          border: `1px solid color-mix(in oklab, ${stage ? stage.deep : "var(--slide-accent-text)"} 32%, transparent)`,
-          color: stage ? stage.deep : "var(--slide-accent-text)",
+          border: spectrum ? "none" : `1px solid color-mix(in oklab, var(--slide-accent-text) 32%, transparent)`,
+          borderRadius: spectrum ? 16 : undefined,
+          backgroundImage: spectrum ? spectrumGradientCss(index) : undefined,
+          color: spectrum ? BRAND.white : "var(--slide-accent-text)",
           marginTop: centered ? 0 : 8,
         }}
       >
@@ -1562,7 +1564,7 @@ export function AuroraStatCell({
         <div
           className={`flex items-baseline gap-2 tabular-nums${centered ? " justify-center" : ""}`}
           style={{
-            fontSize: fillPx(84, "display"),
+            fontSize: spectrum ? 96 : fillPx(84, "display"),
             fontWeight: 600,
             lineHeight: 0.95,
             letterSpacing: "-0.035em",
@@ -1577,13 +1579,13 @@ export function AuroraStatCell({
           }}
         >
           <span>{value || "—"}</span>
-          {unit ? (
+          {unit && unit.trim().toLowerCase() !== label.trim().toLowerCase() ? (
             <span
               style={{
-                fontSize: fillPx(48, "figure"),
+                fontSize: spectrum ? 96 : fillPx(48, "figure"),
                 fontWeight: 500,
                 letterSpacing: "-0.02em",
-                color: stage ? stage.deep : ink.strong,
+                ...(spectrum ? { backgroundImage: spectrumGradientCss(index), backgroundClip: "text", WebkitBackgroundClip: "text", color: "transparent" } : { color: ink.strong }),
               }}
             >
               {unit}

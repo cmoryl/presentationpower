@@ -21,6 +21,7 @@ import { AccentRule } from "../Connectors";
 import { hexA } from "@/lib/accent-tokens";
 import { foregroundOn } from "@/lib/export-foreground";
 import { fillPx } from "@/lib/open-space-fill";
+import { SpectrumPhotoLayout } from "../SpectrumPhotoLayout";
 
 registerSlideModule({
   id: "family:opening",
@@ -41,7 +42,10 @@ registerSlideModule({
     "MV-OP-COVER-MONOGRAM",
     "MV-OP-COVER-STACKED",
   ],
-  render: ({ variant, brand, pageNumber, c, mode, ink, accentTone, isDark }) => {
+  render: ({ variant, brand, pageNumber, c, mode, ink, accentTone, isDark, spectrum }) => {
+    if (spectrum && ["MV-OP-COVER-MEDIA", "MV-OP-COVER-GRADIENT"].includes(variant.id)) {
+      return <SpectrumPhotoLayout brand={brand} pageNumber={pageNumber} content={c} />;
+    }
     switch (variant.id) {
       case "MV-OP-COVER":
         return (

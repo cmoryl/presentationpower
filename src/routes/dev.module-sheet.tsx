@@ -17,8 +17,9 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
+import { LibraryPackProvider, PackShell } from "@/components/slide/PackShell";
 
-type Search = { start: number; count: number; w: number; fix: number; ar: string; ids: string };
+type Search = { start: number; count: number; w: number; fix: number; ar: string; ids: string; pack: string; brand: string };
 
 export const Route = createFileRoute("/dev/module-sheet")({
   validateSearch: (raw: Record<string, unknown>): Search => ({
@@ -32,11 +33,17 @@ export const Route = createFileRoute("/dev/module-sheet")({
     ar: typeof raw.ar === "string" && /^\d+:\d+$/.test(raw.ar) ? raw.ar : "16:9",
     // ids=MV-A,MV-B renders an explicit variant set instead of a slice.
     ids: typeof raw.ids === "string" ? raw.ids : "",
+    pack: typeof raw.pack === "string" ? raw.pack : "",
+    brand: typeof raw.brand === "string" ? raw.brand : "bm-enterprise",
   }),
   head: () => ({
     meta: [
       { title: "Module contact sheet · TransPerfect Element" },
       { name: "description", content: "Internal contact sheet of every module variant." },
+      { property: "og:title", content: "Module contact sheet · TransPerfect Element" },
+      { property: "og:description", content: "Internal module layout and typography review." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ModuleSheet,
@@ -60,6 +67,7 @@ function SheetPage({
   index,
   fix,
   ar,
+  brandId,
 }: {
   variant: ModuleVariant;
   mode: "light" | "dark";
@@ -67,9 +75,14 @@ function SheetPage({
   index: number;
   fix: boolean;
   ar: string;
+  brandId: string;
 }) {
   const stage = stageForAspect(ar);
-  const brand = BRAND_MODES.find((b) => b.id === "bm-enterprise") ?? BRAND_MODES[0]!;
+  const brand = useMemo(() => {
+    const resolved = BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES.find((b) => b.id === "bm-enterprise");
+    if (!resolved) throw new Error("Enterprise brand is missing from the module inventory");
+    return resolved;
+  }, [brandId]);
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const slide = useMemo(
     () => ({
@@ -119,15 +132,17 @@ function SheetPage({
         style={{ background: mode === "dark" ? BRAND.ink : "#F2F2F2" }}
       >
         <ScaledSlide stageW={stage.w} stageH={stage.h}>
-          <SlideBackdropContext.Provider value={backdropForVariant(variant, brand.id, mode)}>
+          <PackShell>
+          <SlideBackdropContext.Provider value={backdropForVariant(variant, brand?.id ?? "bm-enterprise", mode)}>
             <VariantRenderer
               slide={slide as never}
               variant={variant}
-              brand={brand}
+              brand={brand as Parameters<typeof VariantRenderer>[0]["brand"]}
               pageNumber={index + 1}
               mode={mode}
             />
           </SlideBackdropContext.Provider>
+          </PackShell>
         </ScaledSlide>
       </div>
     </div>
@@ -135,7 +150,7 @@ function SheetPage({
 }
 
 function ModuleSheet() {
-  const { start, count, w, fix, ar, ids } = Route.useSearch();
+  const { start, count, w, fix, ar, ids, pack, brand } = Route.useSearch();
   const picked = ids
     .split(",")
     .map((s) => s.trim())
@@ -146,10 +161,11 @@ function ModuleSheet() {
         .filter((v): v is ModuleVariant => Boolean(v))
     : MODULE_VARIANTS.slice(start, start + count);
   return (
+    <LibraryPackProvider packId={pack || null}>
     <main className="bg-white p-0" data-sheet-root="" data-sheet-total={MODULE_VARIANTS.length}>
       <h1 className="sr-only">Module contact sheet</h1>
       {slice.map((v, i) =>
-        (["light", "dark"] as const).map((m) => (
+        (pack === "skin-s06" ? ["light"] as const : ["light", "dark"] as const).map((m) => (
           <SheetPage
             key={`${v.id}-${m}`}
             variant={v}
@@ -158,9 +174,11 @@ function ModuleSheet() {
             index={start + i}
             fix={fix === 1}
             ar={ar}
+            brandId={brand}
           />
         )),
       )}
     </main>
+    </LibraryPackProvider>
   );
 }

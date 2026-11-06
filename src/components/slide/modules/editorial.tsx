@@ -32,6 +32,7 @@ import { useSlideInk } from "../SlideChrome";
 import type { CSSProperties } from "react";
 import { Blend, Target, CupSoda, Sparkles, GlassWater, Droplets } from "lucide-react";
 import { LoopHalo } from "./process";
+import { SpectrumPhotoLayout } from "../SpectrumPhotoLayout";
 
 registerSlideModule({
   id: "family:editorial",
@@ -77,6 +78,9 @@ registerSlideModule({
     void bareSurfaces;
     void mode;
     void isDark;
+    if (args.spectrum && ["MV-ED-HERO-BLEED", "MV-ED-STAT-PHOTO", "MV-ED-QUOTE-BLEED"].includes(variant.id)) {
+      return <SpectrumPhotoLayout brand={brand} pageNumber={pageNumber} content={c} />;
+    }
     switch (variant.id) {
       case "MV-EDITORIAL-SPREAD": {
         return (
