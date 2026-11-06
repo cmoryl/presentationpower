@@ -92,7 +92,11 @@ export default defineTool({
         status: "draft",
         context: {
           clientName: input.client_name ?? null,
-          stylePackId: input.style_pack_id ?? null,
+          // Enterprise decks default to the Enterprise Spectrum pack (Nov 2026
+          // corporate style guide); other scopes keep the base brand system.
+          stylePackId:
+            input.style_pack_id ??
+            (plan.value.brandModeId === "bm-enterprise" ? "skin-s06" : null),
           designRecipeId: input.design_recipe_id ?? null,
         } as never,
       } as never)

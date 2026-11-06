@@ -38,7 +38,7 @@ export default defineTool({
     appearance: z
       .enum(["light", "dark", "mixed"])
       .describe(
-        "Light/dark treatment within the approved brand system. 'mixed' (DEFAULT) = dark cover and closing with light working slides (override per slide with each slide's mode), 'light' = Enterprise Light whole-deck, 'dark' = Enterprise Dark whole-deck. Ignored for the base look when style_pack_id is set.",
+        "Light/dark treatment within the approved brand system. 'light' (DEFAULT) = the whole deck on the light-first Enterprise Spectrum look — the corporate style has no dark pages. 'mixed' and 'dark' are legacy options, only used when the user explicitly asks (override per slide with each slide's mode). Ignored for the base look when style_pack_id is set.",
       )
       .optional(),
     design_recipe_id: z

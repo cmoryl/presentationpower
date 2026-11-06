@@ -13,6 +13,9 @@
 export const LOOK_BRAND_MODE: Record<string, string> = {
   // AI · Data Signature is DataForce's template (DataForce by TransPerfect).
   R03: "bm-product",
+  // Enterprise Spectrum is the corporate master brand's template (Nov 2026
+  // style guide): enterprise decks with no recorded pack render Spectrum.
+  S06: "bm-enterprise",
 };
 
 /** Normalises any pack id / code to the bare look code (e.g. "R03"). */

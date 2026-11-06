@@ -534,7 +534,7 @@ export const INDUSTRY_RECIPES: IndustryRecipe[] = [
     id: "R01",
     name: "Corporate / Enterprise",
     summary: "Executive summary \u00b7 capability architecture \u00b7 KPI story \u00b7 roadmap",
-    dna: ["Enterprise Grid", "Bento Modular", "Swiss Rational"],
+    dna: ["Enterprise Spectrum", "Bento Modular", "Swiss Rational"],
     presets: [
       { name: "Boardroom Modern", note: "Low-density executive storytelling" },
       { name: "Enterprise Intelligence", note: "Decision-ready data and proof" },
