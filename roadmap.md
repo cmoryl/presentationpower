@@ -1,8 +1,8 @@
 # Roadmap — Spectrum corporate style adoption (done)
 
 ## Living Spectrum spec
-- [ ] Publish searchable, clickable guide values and rules with source-page references and shareable selections.
-- [ ] Verify copy, selection links, desktop/mobile and specification tests.
+- [x] Publish searchable, clickable guide values and rules with source-page references and shareable selections.
+- [x] Verify copy, selection links, desktop/mobile and specification tests (6 passed).
 
 ## Canva billboard refresh — November 6
 - [x] Refresh all 19 saved billboard designs, preserving pixels and removing AI/XMP/EXIF/C2PA export metadata.
