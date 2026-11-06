@@ -17,6 +17,8 @@ export type ColorRamp = {
   stops: string[]; // hex list light → dark
 };
 
+import type { LogoRuleDemo } from "@/lib/logo-rule-demos";
+
 export type TypeStyle = {
   label: string;
   sample: string;
