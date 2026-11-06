@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Check, Download, Link2, Maximize2, Trash2, X } from 'lucide-react';
+import { ArrowLeft, Check, Copy, Download, Link2, Maximize2, Trash2, X } from 'lucide-react';
 import { useServerFn } from '@tanstack/react-start';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useIsAdmin } from '@/hooks/use-is-admin';
@@ -8,6 +8,24 @@ import { availableSet5Assets, availableSet5Packs, groupedSet5Assets, set5Removal
 import { Button } from '@/design-system/element';
 import { SjbLink, SjbShell } from '@/components/events/SjbShare';
 import { type SjbSet5Asset } from '@/lib/sjb-set5-assets';
+import { set5CreationPrompt } from '@/lib/sjb-set5-prompts';
+
+function PromptBlock({ asset }: { asset: SjbSet5Asset }) {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const prompt = set5CreationPrompt(asset);
+  async function copy() {
+    try { await navigator.clipboard.writeText(prompt); setCopied(true); setTimeout(() => setCopied(false), 2000); }
+    catch { window.prompt('Copy creation prompt', prompt); }
+  }
+  return <div className="mt-3 border-t border-border pt-3">
+    <div className="flex flex-wrap items-center gap-2">
+      <Button variant="ghost" size="sm" aria-expanded={open} onClick={() => setOpen(o => !o)}>{open ? 'Hide creation prompt' : 'Creation prompt'}</Button>
+      <Button variant="ghost" size="sm" onClick={copy}>{copied ? <Check /> : <Copy />}{copied ? 'Copied' : 'Copy prompt'}</Button>
+    </div>
+    {open && <p className="mt-2 max-h-48 overflow-auto rounded-md bg-muted p-3 font-mono text-xs leading-relaxed text-muted-foreground">{prompt}</p>}
+  </div>;
+}
 
 async function saveAsset(url: string, filename: string) {
   const response = await fetch(url);
