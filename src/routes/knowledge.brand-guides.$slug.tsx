@@ -410,9 +410,7 @@ function BrandGuideView() {
                 const demo = inferLegibilityDemo(n);
                 return (
                   <div key={n} className="flex flex-col gap-3 border-t border-border py-4">
-                    {demo && (
-                      <LegibilityNoteVisual demo={demo} note={n} ink={hero} alt={n} />
-                    )}
+                    {demo && <LegibilityNoteVisual demo={demo} note={n} alt={n} />}
                     <p className="text-sm text-foreground/85">{n}</p>
                   </div>
                 );
