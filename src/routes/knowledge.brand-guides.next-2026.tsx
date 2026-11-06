@@ -662,28 +662,44 @@ function NextBrandGuide() {
         {/* Misuse */}
         <Section id="misuse" eyebrow="07 · Governance" title="Rules & misuse">
           <div className="grid gap-4 md:grid-cols-2">
-            {NEXT_LOGO_RULES.map((r) => (
-              <div
-                key={r.title}
-                className={`rounded-2xl border p-5 ${
-                  r.do
-                    ? "border-emerald-500/30 bg-emerald-500/[0.06]"
-                    : "border-red-500/30 bg-red-500/[0.06]"
-                }`}
-              >
+            {NEXT_LOGO_RULES.map((r) => {
+              const demo = logoRuleDemo(r);
+              return (
                 <div
-                  className={`text-[11px] font-semibold uppercase tracking-[0.25em] ${
+                  key={r.title}
+                  className={`rounded-2xl border p-5 ${
                     r.do
-                      ? "text-emerald-700 dark:text-emerald-300"
-                      : "text-red-700 dark:text-red-300"
+                      ? "border-emerald-500/30 bg-emerald-500/[0.06]"
+                      : "border-red-500/30 bg-red-500/[0.06]"
                   }`}
                 >
-                  {r.do ? "Do" : "Don't"}
+                  {demo && (
+                    <div className="mb-4">
+                      <LogoRuleVisual
+                        demo={demo}
+                        src="/next-2026/logos/transperfect-side-by-side-color.svg"
+                        whiteSrc="/next-2026/logos/transperfect-side-by-side-white.svg"
+                        wordmark="TransPerfect NEXT"
+                        darkGround="#03002C"
+                        accent="#13B1F3"
+                        alt={`${r.do ? "Correct" : "Incorrect"}: ${r.title}`}
+                      />
+                    </div>
+                  )}
+                  <div
+                    className={`text-[11px] font-semibold uppercase tracking-[0.25em] ${
+                      r.do
+                        ? "text-emerald-700 dark:text-emerald-300"
+                        : "text-red-700 dark:text-red-300"
+                    }`}
+                  >
+                    {r.do ? "Do" : "Don't"}
+                  </div>
+                  <div className="mt-2 font-medium">{r.title}</div>
+                  <p className="mt-2 text-sm text-black/65 dark:text-white/65">{r.body}</p>
                 </div>
-                <div className="mt-2 font-medium">{r.title}</div>
-                <p className="mt-2 text-sm text-black/65 dark:text-white/65">{r.body}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Section>
 
