@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { SJB_SET5_ASSETS, SJB_SET5_PACKS } from '../sjb-set5-assets';
+import { SET5_ASSET_GROUPS, groupedSet5Assets, set5AssetGroup } from '../sjb-set5-availability';
 import { isPublicNoLoginPath } from '../sign-out';
 
 describe('Design Set 5 reusable asset delivery', () => {

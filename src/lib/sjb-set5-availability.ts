@@ -51,6 +51,7 @@ const SET5_GROUP_BY_CATEGORY: Record<string, Set5AssetGroup> = {
   'Objects': 'Movable objects (transparent)',
   'Motion footballs': 'Movable objects (transparent)',
   'Motion effects': 'Motion & light effects',
+  'Cinematic effects': 'Motion & light effects',
   'Vector effects': 'Motion & light effects',
   'Layered artwork': 'Layered artwork',
   'Official logos': 'Official logos',
