@@ -145,7 +145,7 @@ export const DESIGN_SKINS: DesignSkin[] = [
       "The corporate Spectrum style: a light white-to-lilac canvas, frosted glass cards, and color in position order \u2014 aqua first, blue second, violet third \u2014 with gradient hero numbers.",
     bestFit: "Enterprise \u00b7 consulting \u00b7 analytics \u00b7 operations",
     mode: "light",
-    palette: ["#FFFFFF", "#F0F3FB", "#03002C", "#003FC7", "#A1FBF9", "#8AB8FF", "#C2A3FF"],
+    palette: ["#F0F3FB", "#0FB5B2", "#3B7BF0", "#8F6BF0", "#003FC7", "#03002C"],
     typography: "Geist \u00b7 regular titles \u00b7 semibold gradient stats",
     surfaceNote: "Frosted glass cards \u00b7 one soft shadow",
     imagery: "Rounded photo frames \u00b7 no orbs or full-bleed",
