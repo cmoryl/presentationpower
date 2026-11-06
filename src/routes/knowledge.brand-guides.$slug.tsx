@@ -448,14 +448,23 @@ function BrandGuideView() {
                   <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
                     {label}
                   </div>
-                  <ul className="mt-3 space-y-2 text-sm text-foreground/85">
+                  <ul className="mt-3 space-y-3 text-sm text-foreground/85">
                     {items.map((r) => (
-                      <li key={r} className="flex gap-2">
-                        <span
-                          className="mt-2 h-1 w-1 shrink-0 rounded-full"
-                          style={{ background: label === "Do" ? hero : BRAND.red }}
+                      <li key={r}>
+                        <PhotoRuleVisual
+                          demo={inferPhotoRuleDemo(r)}
+                          isDo={label === "Do"}
+                          photoSrc={heroImagery?.photos?.[0] ?? heroImagery?.abstracts?.[0]}
+                          logoSrc={logos?.white ?? logos?.stackedWhite}
+                          accent={hero}
                         />
-                        <span>{r}</span>
+                        <p className="mt-1.5 flex gap-2">
+                          <span
+                            className="mt-2 h-1 w-1 shrink-0 rounded-full"
+                            style={{ background: label === "Do" ? hero : BRAND.red }}
+                          />
+                          <span>{r}</span>
+                        </p>
                       </li>
                     ))}
                   </ul>
