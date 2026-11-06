@@ -232,7 +232,7 @@ registerSlideModule({
                 {cardsMode ? (
                   <div className={`mt-5 flex flex-col ${spectrum ? "gap-2" : "gap-4"}`}>
                     {growth.map((g: Item, i) => (
-                      <div key={i} className={`flex items-center gap-7 rounded-2xl px-7 ${spectrum ? "py-2" : "py-5"}`} style={{ background: isDark ? "rgba(255,255,255,0.05)" : "rgba(10,15,28,0.03)", border: `1px solid ${ink.hairline}`, borderLeft: spectrum ? undefined : `4px solid ${accent}` }}>
+                      <div key={i} className={`flex items-center gap-7 rounded-2xl px-7 ${spectrum ? "py-0" : "py-5"}`} style={{ background: isDark ? "rgba(255,255,255,0.05)" : "rgba(10,15,28,0.03)", border: `1px solid ${ink.hairline}`, borderLeft: spectrum ? undefined : `4px solid ${accent}` }}>
                         <div className="shrink-0 tabular-nums" style={{ minWidth: 120, fontSize: fillPx(76, "display"), fontWeight: 800, lineHeight: 1, letterSpacing: "-0.04em", color: ink.strong }}>
                           {formatStatValue(g.value, g)}
                         </div>
