@@ -99,6 +99,16 @@ function LegalweekGuide() {
           The Legalweek package contains no don’ts list. None are shown here until the brand team supplies one.
         </p>
       </Section>
+      <Section n="07" title="Applications · supplied artwork">
+        <p className="text-sm text-muted-foreground">The original pieces show the branding in context. No separate logo or unsupplied application is recreated.</p>
+        <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {kit.pieces.filter((p) => p.preview).map((p) => <figure key={p.file} className="min-w-0 border-t border-border pt-4">
+            <a href={p.preview ?? p.file} target="_blank" rel="noreferrer" className="flex h-64 items-center justify-center bg-muted p-4 focus-visible:outline-2 focus-visible:outline-ring">
+              <img src={p.preview ?? ""} alt={p.title} loading="lazy" className="max-h-full max-w-full object-contain" />
+            </a><figcaption className="mt-3 text-sm font-semibold">{p.title}</figcaption>
+          </figure>)}
+        </div>
+      </Section>
     </main>
   );
 }

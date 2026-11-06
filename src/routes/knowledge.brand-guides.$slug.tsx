@@ -677,8 +677,10 @@ function BrandGuideView() {
         name: guide.title,
         color: logos?.color ?? logos?.stackedColor ?? logos?.black ?? "",
         white: logos?.white ?? logos?.stackedWhite,
-        stacked: logos?.stackedColor,
-        stackedWhite: logos?.stackedWhite,
+        stacked: guide.divisionId === "master" ? logos?.color : logos?.stackedColor,
+        stackedWhite: guide.divisionId === "master" ? logos?.white : logos?.stackedWhite,
+        socialPosition: guide.socialMedia?.some((p) => p.rules.some((r) => /bottom.right/i.test(r))) ? "right" : "left",
+        unbrandedStory: guide.socialMedia?.some((p) => /instagram/i.test(p.platform) && p.rules.some((r) => /do not watermark/i.test(r))),
         dark: hero,
         accent,
       }} />}

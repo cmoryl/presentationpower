@@ -13,6 +13,8 @@ export interface BrandApplicationArtwork {
   accent: string;
   cityLogo?: string;
   endorsement?: string;
+  socialPosition?: "left" | "right";
+  unbrandedStory?: boolean;
 }
 export interface BrandApplicationExamplesProps extends HTMLAttributes<HTMLDivElement> {
   artwork: BrandApplicationArtwork;
@@ -55,7 +57,7 @@ export const BrandApplicationExamples = forwardRef<HTMLDivElement, BrandApplicat
                 <div className="h-1 w-10 bg-[var(--example-accent)]" />
                 <p className="mt-4 text-sm font-semibold leading-tight">{a.name}</p>
                 <div className="mt-3 max-w-28">{lines}</div>
-                <div className={`mt-auto h-9 w-3/5 ${darkLogoClass}`}>{logo(darkSrc)}</div>
+                <div className={`mt-auto h-9 w-3/5 ${a.socialPosition === "right" ? "self-end" : ""} ${darkLogoClass}`}>{logo(darkSrc)}</div>
               </div>
               <figcaption className="mt-2 text-xs text-muted-foreground">Feed · quiet logo zone</figcaption>
             </figure>
@@ -65,10 +67,10 @@ export const BrandApplicationExamples = forwardRef<HTMLDivElement, BrandApplicat
                   <div className="h-1 w-6 bg-[var(--example-accent)]" />
                   {a.cityLogo ? <div className="mt-4 h-12">{logo(a.cityLogo)}</div> : <p className="mt-4 text-xs font-semibold">{a.name}</p>}
                   {a.cityLogo && <p className="mt-2 text-center text-[10px]">City name</p>}
-                  <div className={`mb-3 mt-auto h-7 ${darkLogoClass}`}>{logo(darkSrc)}</div>
+                  {!a.unbrandedStory && <div className={`mb-3 mt-auto h-7 ${darkLogoClass}`}>{logo(darkSrc)}</div>}
                 </div>
               </div>
-              <figcaption className="mt-2 text-xs text-muted-foreground">{a.cityLogo ? "City Series · city outside lockup" : "Story · clear top and bottom margins"}</figcaption>
+              <figcaption className="mt-2 text-xs text-muted-foreground">{a.unbrandedStory ? "Instagram · no logo watermark" : a.cityLogo ? "City Series · city outside lockup" : "Story · clear top and bottom margins"}</figcaption>
             </figure>
           </>}
           {surface === "signage" && <>

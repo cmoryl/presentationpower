@@ -7,6 +7,7 @@ import { ArrowLeft, Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SUPPLIED_KITS } from "@/lib/supplied-event-kits";
 import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
+import { BrandApplicationGallery } from "@/components/brand/BrandApplicationExamples";
 
 const TITLE = "NeXus London ’26 brand guidelines — TransPerfect Element";
 const DESC = "NeXus London ’26 logo, variations, Dark Blue and Light Blue with Pantone and CMYK, Poppins typography and logo don’ts.";
@@ -213,6 +214,7 @@ function NexusGuide() {
           })}
         </ul>
       </Section>
+      <BrandApplicationGallery id="applications" artwork={{ name: kit.name, color: full, white: logo("Nexus_Logo_2026_White"), dark: kit.colours[0].hex, accent: kit.colours[1].hex }} />
     </main>
   );
 }
