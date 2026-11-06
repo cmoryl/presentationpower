@@ -16,7 +16,7 @@
  *   6. Equal and aligned — same size, same baseline, same gap.
  */
 
-import { BRAND, SPECTRUM } from "@/lib/brand-colors";
+import { BRAND, SPECTRUM } from "./brand-colors";
 
 /** Stage px per inch on the 1920×1080 (13.333″×7.5″) slide stage. */
 export const STAGE_PX_PER_IN = 144;
