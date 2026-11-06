@@ -47,6 +47,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Download } from "lucide-react";
+import { LogoRuleVisual } from "@/components/brand/LogoRuleVisual";
+import { logoRuleDemo } from "@/lib/logo-rule-demos";
 import { toast } from "sonner";
 import { brandSwatchSpec, brandSwatchSpecText } from "@/lib/brand-swatch-spec";
 import { applyBrandGuidePatch } from "@/lib/brand-guide-edits";

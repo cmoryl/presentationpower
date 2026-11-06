@@ -10,6 +10,8 @@ import { AppShell } from "@/components/AppShell";
 import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
 import { NextVisualExamples } from "@/components/events/NextVisualExamples";
 import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
+import { LogoRuleVisual } from "@/components/brand/LogoRuleVisual";
+import { logoRuleDemo } from "@/lib/logo-rule-demos";
 import {
   NEXT_EVENT_ICON_SLUG,
   brandIconSet,
