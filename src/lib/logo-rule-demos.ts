@@ -19,10 +19,12 @@ export type LogoRuleDemo =
   | "typeface" // don't: re-set the wordmark in another face
   | "low-contrast" // don't: colour lockup on a low-contrast field
   | "busy-bg" // don't: place over complex/busy backgrounds
-  | "mix-lockups"; // don't: cram two division lockups into one zone
+  | "mix-lockups" // don't: cram two division lockups into one zone
+  | "no-symbol-combo"; // don't: combine the corporate icon/symbol with the wordmark
 
 const MATCHERS: [RegExp, LogoRuleDemo][] = [
   [/mix (two )?.*lockup|two division/i, "mix-lockups"],
+  [/combine the (t|symbol|icon)|symbol.*with the wordmark|icon.*with the wordmark/i, "no-symbol-combo"],
   [/variant.*background|background.*variant|pick the variant/i, "variant-by-background"],
   [/clear.?space/i, "clear-space"],
   [/minimum size|min\.? size|respect minimum/i, "min-size"],

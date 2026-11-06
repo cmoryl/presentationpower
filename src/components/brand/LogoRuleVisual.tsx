@@ -18,6 +18,8 @@ export interface LogoRuleVisualProps {
   darkGround?: string;
   /** Accent hex for clear-space zone marks. */
   accent?: string;
+  /** Corporate icon artwork, used by the no-symbol-combo demo. */
+  iconSrc?: string;
   alt: string;
 }
 
@@ -46,6 +48,7 @@ export function LogoRuleVisual({
   wordmark,
   darkGround = "#03002C",
   accent = "#003FC7",
+  iconSrc,
   alt,
 }: LogoRuleVisualProps) {
   const white = whiteSrc ?? src;
@@ -175,6 +178,23 @@ export function LogoRuleVisual({
           <div className="flex items-center justify-center">
             <img src={src} alt="" className="max-h-full w-3/5 object-contain" />
             <img src={src} alt="" className="-ml-6 max-h-full w-3/5 object-contain" style={{ filter: "hue-rotate(90deg)" }} />
+          </div>
+        </Panel>
+      );
+      break;
+    case "no-symbol-combo":
+      body = (
+        <Panel ground="#ffffff" label="✗">
+          <div className="flex items-center justify-center gap-2">
+            {iconSrc ? (
+              <span
+                className="flex h-3/5 items-center justify-center rounded-sm p-1.5"
+                style={{ background: darkGround }}
+              >
+                <img src={iconSrc} alt="" className="max-h-10 max-w-full object-contain" />
+              </span>
+            ) : null}
+            <img src={src} alt="" className="max-h-full w-3/5 object-contain" />
           </div>
         </Panel>
       );

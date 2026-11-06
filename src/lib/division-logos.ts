@@ -18,6 +18,7 @@ export type DivisionLogoSet = {
   white?: string; // horizontal, white/color on dark
   stackedColor?: string;
   stackedWhite?: string;
+  icon?: string; // corporate icon only (app icon, favicon, avatar) — never a logo
 };
 
 const B = "/brand-logos";
@@ -133,6 +134,20 @@ function resolvedSetFor(slug: string): DivisionLogoSet | undefined {
   const next = NEXT[slug];
   const classic = classicSetFor(slug);
   if (!next && !classic) return undefined;
+  if (slug === "tp") {
+    // TransPerfect master: the T-symbol + wordmark lockup
+    // (tp-classic-color.svg) is retired. The wordmark is the only logo; the T
+    // survives solely as the corporate icon (app icon, favicon, avatar) and
+    // must never be combined with the wordmark or used as a standalone logo.
+    return {
+      color: `${B}/tp-classic-stacked-color.svg`,
+      black: `${B}/tp-black.svg`,
+      white: `${B}/tp-classic-white.svg`,
+      stackedColor: `${B}/tp-classic-stacked-color.svg`,
+      stackedWhite: `${B}/tp-classic-white.svg`,
+      icon: `${B}/tp-classic-icon.png`,
+    };
+  }
   return {
     color: classic?.color ?? next?.color,
     black: next?.black ?? classic?.color,
