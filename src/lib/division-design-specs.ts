@@ -44,7 +44,9 @@ export const DIVISION_DESIGN_SPECS: Record<string, DivisionDesignSpec> = {
   },
   "bm-subcompany": {
     packId: "skin-s12",
-    darkPackId: "skin-s04",
+    // Corporate dark is retired (Spectrum is light-first): the dark face
+    // resolves to the subcompany light pack instead of Precision Dark.
+    darkPackId: "skin-s12",
     recipe: "R01",
     rationale: "Named subcompanies lead with Operational Enterprise structure.",
   },
