@@ -281,8 +281,8 @@ registerSlideModule({
                       shape="column"
                       progress={0.72}
                       revealIndex={i}
-                      icon={s(it.icon)}
-                      iconSize={s(it.iconSize)}
+                      // The cell header already owns this item's icon. Passing
+                      // it again promotes the figure to icon-lead and duplicates it.
                     />
                     <div
                       className="mt-4 uppercase"
