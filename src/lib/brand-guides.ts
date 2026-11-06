@@ -153,8 +153,8 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
       do: true,
     },
     {
-      title: "Never resize or reorder elements",
-      description: "Wordmark and symbol proportions are fixed.",
+      title: "Never combine the T with the wordmark",
+      description: "The T is the corporate icon only — never part of the logo.",
       do: false,
     },
     {
