@@ -44,3 +44,21 @@
     0 0 0 2px rgba(255, 255, 255, 0.85),
     0 9px 24px rgba(3, 0, 44, 0.1);
 }
+
+/* Large figures marked by useSpectrumNumerals: 135° brand→light gradient,
+   stage by reading order (aqua, blue, violet). */
+[data-style-pack="skin-s06"] [data-spectrum-fig] {
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+}
+[data-style-pack="skin-s06"] [data-spectrum-fig="0"] {
+  background-image: linear-gradient(135deg, #0fb5b2 0%, #a1fbf9 100%) !important;
+}
+[data-style-pack="skin-s06"] [data-spectrum-fig="1"] {
+  background-image: linear-gradient(135deg, #3b7bf0 0%, #8ab8ff 100%) !important;
+}
+[data-style-pack="skin-s06"] [data-spectrum-fig="2"] {
+  background-image: linear-gradient(135deg, #8f6bf0 0%, #c2a3ff 100%) !important;
+}
