@@ -1,0 +1,64 @@
+/* ENTERPRISE SPECTRUM (skin-s06) — Nov 2026 TransPerfect PowerPoint Style Guide.
+   Scoped to the pack wrapper so no other look changes. Values mirror SPECTRUM
+   in src/lib/brand-colors.ts. */
+
+/* No accent seams, ghost counterforms or slabs: "no colored borders, color
+   lives in contained objects". */
+[data-style-pack="skin-s06"] [data-accent-glow] {
+  display: none !important;
+}
+
+/* Titles: Geist Regular, Ink, sentence case. */
+[data-style-pack="skin-s06"] h1,
+[data-style-pack="skin-s06"] h2,
+[data-style-pack="skin-s06"] .slide-title,
+[data-style-pack="skin-s06"] .slide-title-lg {
+  color: #03002c !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.01em !important;
+  text-transform: none !important;
+}
+[data-style-pack="skin-s06"] h3 {
+  color: #03002c !important;
+  font-weight: 500 !important;
+}
+
+/* Eyebrows: SemiBold caps, wide tracking, Blue. */
+[data-style-pack="skin-s06"] .slide-kicker,
+[data-style-pack="skin-s06"] [data-kicker] {
+  color: #003fc7 !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.24em !important;
+  text-transform: uppercase;
+}
+
+/* Body copy role colour. */
+[data-style-pack="skin-s06"] p {
+  color: #3d3b5c;
+}
+
+/* Rounded photo frames with a thin white frame and soft shadow. */
+[data-style-pack="skin-s06"] [data-media-tile] {
+  border-radius: 24px !important;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.85),
+    0 9px 24px rgba(3, 0, 44, 0.1);
+}
+
+/* Large figures marked by useSpectrumNumerals: 135° brand→light gradient,
+   stage by reading order (aqua, blue, violet). */
+[data-style-pack="skin-s06"] [data-spectrum-fig] {
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+}
+[data-style-pack="skin-s06"] [data-spectrum-fig="0"] {
+  background-image: linear-gradient(135deg, #0fb5b2 0%, #a1fbf9 100%) !important;
+}
+[data-style-pack="skin-s06"] [data-spectrum-fig="1"] {
+  background-image: linear-gradient(135deg, #3b7bf0 0%, #8ab8ff 100%) !important;
+}
+[data-style-pack="skin-s06"] [data-spectrum-fig="2"] {
+  background-image: linear-gradient(135deg, #8f6bf0 0%, #c2a3ff 100%) !important;
+}

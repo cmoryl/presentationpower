@@ -93,6 +93,12 @@ export const FROST_CARD = {
 /** The light canvas every corporate slide sits on. */
 export const SPECTRUM_CANVAS_CSS = `linear-gradient(180deg, ${SPECTRUM.canvas.from} 0%, ${SPECTRUM.canvas.to} 100%)`;
 
+/** Soft aqua (bottom-left) and lilac (bottom-right) light the canvas edges, as on every guide page. */
+export const SPECTRUM_CANVAS_GLOWS = [
+  "radial-gradient(60% 55% at 0% 100%, rgba(161,251,249,0.38) 0%, rgba(161,251,249,0) 70%)",
+  "radial-gradient(60% 60% at 100% 100%, rgba(194,163,255,0.30) 0%, rgba(194,163,255,0) 70%)",
+] as const;
+
 export const SPECTRUM_LAYOUT = {
   /** Left/right margins, inches. */
   marginIn: 0.75,

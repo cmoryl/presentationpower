@@ -2,6 +2,7 @@ import { BRAND } from "@/lib/brand-colors";
 import type { BrandMode } from "@/lib/taxonomy";
 import type { CSSProperties, ReactNode } from "react";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useSpectrumNumerals } from "./useSpectrumNumerals";
 import { BrandLockup } from "@/components/BrandLockup";
 import {
   resolveLogoPlacement,
@@ -590,6 +591,7 @@ export function SlideFrame({
   const logoRef = useRef<HTMLDivElement | null>(null);
   const footerRef = useRef<HTMLDivElement | null>(null);
   const [logoOnMedia, setLogoOnMedia] = useState(false);
+  useSpectrumNumerals(rootEl, String(pack?.id ?? "") === "skin-s06");
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -1215,7 +1217,7 @@ export function SlideFrame({
           (the master template keeps the page edge clean) and instead closes
           the page with a hairline rule above the footer band. */}
       {pack ? (
-        pack.topBar ? (
+        pack.topBar && String(pack.id) !== "skin-s06" ? (
           <div
             className="absolute left-0 top-0 h-[4px] w-full"
             style={{ backgroundColor: pack.tokens.accent }}

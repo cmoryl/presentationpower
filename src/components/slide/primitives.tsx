@@ -30,6 +30,8 @@ import { fillLeading, fillPx, typeBounds } from "@/lib/open-space-fill";
 // the composition its editorial rhythm.
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
+import { useStylePack } from "@/components/slide/StylePackContext";
+import { spectrumGradientCss } from "@/lib/spectrum-style";
 
 export function Kicker({
   brand,
@@ -692,6 +694,7 @@ export function StatFigure({
     (/^-|↓|down|less|reduc/i.test(String(value ?? "")) ? "down" : "up");
 
   const vc = valueColor ?? ink.text;
+  const spectrumFig = String(useStylePack()?.id ?? "") === "skin-s06";
   const uc = unitColor ?? ink.muted;
   const labelColor = ink.muted;
   // Overflow safeguards: wide values (e.g. "$220k", "1,240 pts") sitting in
@@ -1571,7 +1574,14 @@ export function StatFigure({
           >
             <span
               style={
-                valueStyle === "gradient" && !valueIsPhrase
+                spectrumFig && !valueIsPhrase
+                  ? {
+                      backgroundImage: spectrumGradientCss(revealIndex),
+                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
+                      color: "transparent",
+                    }
+                  : valueStyle === "gradient" && !valueIsPhrase
                   ? {
                       fontWeight: 900,
                       backgroundImage: `linear-gradient(180deg, ${vc} 0%, ${vc} 45%, ${accent ?? brand.tokens.accent} 100%)`,
@@ -1587,7 +1597,18 @@ export function StatFigure({
             {unitText && !unitIsLong && (
               <span
                 className={`ml-2 align-top ${valueStyle === "gradient" ? "font-bold" : "font-medium"}`}
-                style={{ fontSize: unitFontSize, color: uc, letterSpacing: "-0.02em" }}
+                style={{
+                  fontSize: unitFontSize,
+                  letterSpacing: "-0.02em",
+                  ...(spectrumFig
+                    ? {
+                        backgroundImage: spectrumGradientCss(revealIndex),
+                        WebkitBackgroundClip: "text",
+                        backgroundClip: "text",
+                        color: "transparent",
+                      }
+                    : { color: uc }),
+                }}
               >
                 {unitText}
               </span>

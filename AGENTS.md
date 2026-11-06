@@ -24,7 +24,7 @@
 
 - Every html-to-image capture passes `includeQueryParams: true` — why: proxied images differ only by `?path=`, and without it every download reused the first image fetched.
 
-- The corporate deck style is Spectrum (Nov 2026 style guide): spec constants in `SPECTRUM` (src/lib/brand-colors.ts) + `src/lib/spectrum-style.ts`, applied through skin-s06 (pack frost-card override in design-skin-pack.ts, gradient stats in module-primitives.tsx); sales/agent/division specs coerce to it and the dark corporate look is retired — why: one approved corporate style, no dark corporate pages.
+- The corporate deck style is Spectrum (Nov 2026 style guide): spec constants in `SPECTRUM` (src/lib/brand-colors.ts) + `src/lib/spectrum-style.ts`, applied through skin-s06: canvas-only ground (no photo plates/backdrops), frost-card vars, gradient icon tiles/StatFigure, `useSpectrumNumerals` marking hand-drawn figures, and scoped rules in `src/styles/spectrum-pack.css`; sales/agent/division specs coerce to it and the dark corporate look is retired — why: one approved corporate style, no dark corporate pages.
 
 - Print/PDF pages of another shape (letter, A4, tabloid, A3) render with `pageFit` on ScaledSlide: `PageFitBody` (src/components/slide/PageFit.tsx) picks the largest CSS zoom that keeps text unclipped, non-overlapping and graphics unshrunk — why: one generic relayout instead of per-page hand tuning; module-specific portrait layouts still go in `[data-portrait]` rules.
 

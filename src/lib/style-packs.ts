@@ -2634,6 +2634,15 @@ export function stylePackCssVars(pack: StylePack): Record<string, string> {
     "--pack-card-shadow": geo.extraShadow || "none",
     "--pack-card-clip": geo.clipPath ?? "none",
     "--pack-card-blur": c.blur,
+    // Enterprise Spectrum: the frost card is the whole surface — no accent
+    // wash, a closed keyline and the guide's one soft ink shadow.
+    ...(String(pack.id) === "skin-s06"
+      ? {
+          "--pack-card-bg-image": "none",
+          "--pack-card-border-bottom-color": "#D6DCF0",
+          "--pack-card-shadow": c.shadow,
+        }
+      : {}),
     "--pack-display": ty.display,
     "--pack-body": ty.body,
     "--pack-mono": ty.mono,

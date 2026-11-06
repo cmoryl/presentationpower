@@ -440,15 +440,24 @@ export function IconBadge({
   const dims = ICON_SIZES[spec.size];
   const badgeMode = useContext(SlideModeContext);
   const badgePack = useStylePack();
-  const colors = resolveEmphasisColors(
+  const colors: { bg: string; fg: string; border?: string } = {
+    ...resolveEmphasisColors(
     brand,
     spec.treatment,
     spec.emphasis,
     badgeMode,
     lookGlyphColor(badgePack?.id),
-  );
+  ),
+  };
   const Icon = pickIcon(label, index, override, brand?.id ?? null);
-  const isCircle = spec.treatment === "soft-circle";
+  // Enterprise Spectrum icon tile: gradient square in spectrum order, white
+  // line icon, no keyline, never a circle (guide pg. 11).
+  if (String(badgePack?.id ?? "") === "skin-s06" && spec.treatment !== "on-dark") {
+    colors.bg = spectrumGradientCss(Math.max(0, index - 1));
+    colors.fg = "#FFFFFF";
+    colors.border = undefined;
+  }
+  const isCircle = spec.treatment === "soft-circle" && String(badgePack?.id ?? "") !== "skin-s06";
   const a11y =
     spec.a11yRole === "semantic"
       ? { role: "img" as const, "aria-label": ariaLabel ?? label }
@@ -460,7 +469,7 @@ export function IconBadge({
       style={{
         width: dims.containerPx,
         height: dims.containerPx,
-        backgroundColor: colors.bg,
+        background: colors.bg,
         color: colors.fg,
         border: colors.border ? `1px solid ${colors.border}` : undefined,
         borderRadius: isCircle ? undefined : dims.radiusPx,
