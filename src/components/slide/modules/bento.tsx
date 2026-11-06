@@ -62,7 +62,7 @@ registerSlideModule({
   id: "family:bento-mosaic",
   variantIds: ["MV-BENTO-5", "MV-BENTO-6", "MV-BENTO-7", "MV-BENTO-8"],
   cellControls: { tone: true, icons: true, iconSize: true, iconNudge: true },
-  render: ({ variant, brand, pageNumber, c, ink, isDark }) => {
+  render: ({ variant, brand, pageNumber, c, ink, isDark, spectrum }) => {
     const cellCount =
       variant.id === "MV-BENTO-8"
         ? 8
@@ -104,22 +104,22 @@ registerSlideModule({
               ...cellStyle,
               gridArea: "a",
               backgroundImage:
-                cellTone(anchor, brand.tokens.accent).wash ?? cellStyle.backgroundImage,
+                (spectrum ? undefined : cellTone(anchor, brand.tokens.accent).wash) ?? cellStyle.backgroundImage,
             }}
           >
-            <AccentTick
+            {!spectrum && <AccentTick
               accent={cellTone(anchor, brand.tokens.accent).accent}
               height={3}
               radius={22}
-            />
-            <div
+            />}
+            {!spectrum && <div
               className="pointer-events-none absolute"
               style={{
                 inset: "-30% -40% auto -30%",
                 height: "70%",
                 background: `radial-gradient(60% 60% at 30% 20%, color-mix(in oklab, ${cellTone(anchor, brand.tokens.accent).accent} 22%, transparent), transparent 70%)`,
               }}
-            />
+            />}
             <div className="relative flex items-center gap-4" style={iconWellStyle(anchor)}>
               <IconBadge
                 brand={brand}
@@ -143,14 +143,14 @@ registerSlideModule({
               </span>
             </div>
             <div className={`${wellClass} pt-8`}>
-              <div
+              {!spectrum && <div
                 style={{
                   height: 3,
                   width: 96,
                   marginBottom: 24,
                   backgroundImage: `linear-gradient(90deg, ${cellTone(anchor, brand.tokens.accent).accent}, transparent)`,
                 }}
-              />
+              />}
               <div
                 style={{
                   fontSize: px(46),
@@ -182,11 +182,11 @@ registerSlideModule({
             if (kind === "media") {
               return (
                 <div key={i} style={{ ...cellStyle, gridArea: area }}>
-                  <AccentTick
+                  {!spectrum && <AccentTick
                     accent={cellTone(it, brand.tokens.accent).accent}
                     height={3}
                     radius={22}
-                  />
+                  />}
                   <MediaTile
                     brand={brand}
                     seed={s(it.mediaSeed, s(it.title, `bento-${i}`))}
@@ -238,14 +238,14 @@ registerSlideModule({
                   ...cellStyle,
                   gridArea: area,
                   backgroundImage:
-                    cellTone(it, brand.tokens.accent).wash ?? cellStyle.backgroundImage,
+                    (spectrum ? undefined : cellTone(it, brand.tokens.accent).wash) ?? cellStyle.backgroundImage,
                 }}
               >
-                <AccentTick
+                {!spectrum && <AccentTick
                   accent={cellTone(it, brand.tokens.accent).accent}
                   height={3}
                   radius={22}
-                />
+                />}
                 <div className="flex items-center gap-4" style={iconWellStyle(it)}>
                   <IconBadge
                     brand={brand}
@@ -277,7 +277,7 @@ registerSlideModule({
                       brand={brand}
                       value={s(it.value)}
                       unit={s(it.unit)}
-                      size="sm"
+                      size={spectrum ? "md" : "sm"}
                       shape="column"
                       progress={0.72}
                       revealIndex={i}
@@ -286,7 +286,7 @@ registerSlideModule({
                     />
                     <div
                       className="mt-4 uppercase"
-                      style={{ fontSize: px(16), letterSpacing: "0.2em", color: ink.muted }}
+                      style={{ fontSize: px(16), letterSpacing: "0.2em", color: spectrum ? ink.strong : ink.muted, fontWeight: spectrum ? 600 : undefined }}
                     >
                       {s(it.label)}
                     </div>
