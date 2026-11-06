@@ -1,12 +1,10 @@
-# Roadmap — Spectrum corporate style adoption
+# Roadmap — Spectrum corporate style adoption (done)
 
-- [ ] 1. brand-colors.ts: add Spectrum palette constants; regen brand-tokens.css
-- [ ] 2. New src/lib/spectrum-style.ts (type scale, frost card, ramps, wordmark, margins)
-- [ ] 3. Card spec → frost card in slide primitives/SlideChrome/modules + PPTX emitters
-- [ ] 4. Restyle S06 to Spectrum; retire S04 from corporate/sales (flag, not delete)
-- [ ] 5. Sales presets light-only Spectrum; agent prompt rules; style-intent corporate → S06
-- [ ] 6. Corporate decks: light canvas, no Aurora orbs
-- [ ] 7. Gradient hero numbers (CSS gradient text; PPTX deep-step fallback)
-- [ ] 8. Tests: update parity/spec tests; add spectrum-style.test.ts
-- [ ] 9. Memory + AGENTS updates
-- [ ] 10. Verify: tsgo, vitest, Playwright deck screenshots, PPTX export check
+- [x] SPECTRUM constants in brand-colors.ts + spectrum-style.ts helpers
+- [x] S06 skin restyled as Enterprise Spectrum (catalog + traits + frost card)
+- [x] Gradient spectrum stats in AuroraStatCell when skin-s06 is active
+- [x] Sales looks light-only; dark coerces to Spectrum; dark sales presets removed
+- [x] Agent prompt: light-first default + Spectrum rules
+- [x] Division specs: enterprise + subcompany dark faces resolve to light packs
+- [x] Tests (spectrum-style.test.ts, 13 tests) + full suite green; typecheck clean
+- [x] Memory + AGENTS.md rules recorded
