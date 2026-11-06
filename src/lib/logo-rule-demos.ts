@@ -18,9 +18,11 @@ export type LogoRuleDemo =
   | "flip" // don't: mirror the artwork
   | "typeface" // don't: re-set the wordmark in another face
   | "low-contrast" // don't: colour lockup on a low-contrast field
-  | "busy-bg"; // don't: place over complex/busy backgrounds
+  | "busy-bg" // don't: place over complex/busy backgrounds
+  | "mix-lockups"; // don't: cram two division lockups into one zone
 
 const MATCHERS: [RegExp, LogoRuleDemo][] = [
+  [/mix (two )?.*lockup|two division/i, "mix-lockups"],
   [/variant.*background|background.*variant|pick the variant/i, "variant-by-background"],
   [/clear.?space/i, "clear-space"],
   [/minimum size|min\.? size|respect minimum/i, "min-size"],

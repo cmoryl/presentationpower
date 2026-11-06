@@ -166,6 +166,16 @@ export function LogoRuleVisual({
         </Panel>
       );
       break;
+    case "mix-lockups":
+      body = (
+        <Panel ground="#ffffff">
+          <div className="flex items-center justify-center">
+            <img src={src} alt="" className="max-h-full w-3/5 object-contain" />
+            <img src={src} alt="" className="-ml-6 max-h-full w-3/5 object-contain" style={{ filter: "hue-rotate(90deg)" }} />
+          </div>
+        </Panel>
+      );
+      break;
     case "busy-bg":
       body = (
         <Panel

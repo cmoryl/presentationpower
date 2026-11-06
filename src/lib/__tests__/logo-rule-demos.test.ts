@@ -17,6 +17,7 @@ const DEMOS: LogoRuleDemo[] = [
   "typeface",
   "low-contrast",
   "busy-bg",
+  "mix-lockups",
 ];
 
 describe("logo rule visual demos", () => {
