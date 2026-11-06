@@ -139,6 +139,7 @@ function resolvedSetFor(slug: string): DivisionLogoSet | undefined {
     // (tp-classic-color.svg) is retired. The wordmark is the only logo; the T
     // survives solely as the corporate icon (app icon, favicon, avatar) and
     // must never be combined with the wordmark or used as a standalone logo.
+    // The icon is always the T inside its blue box — never a bare T.
     return {
       color: `${B}/tp-classic-stacked-color.svg`,
       black: `${B}/tp-black.svg`,
