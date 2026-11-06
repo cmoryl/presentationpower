@@ -1,4 +1,5 @@
 import { BRAND } from "@/lib/brand-colors";
+import { SPECTRUM_WORDMARK, STAGE_PX_PER_IN } from "@/lib/spectrum-style";
 import type { BrandMode } from "@/lib/taxonomy";
 import type { CSSProperties, ReactNode } from "react";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
@@ -440,6 +441,7 @@ export function SlideFrame({
   // Alternate style pack (public taste-testing directory). When active it owns
   // the page ground, ink and accent; it never applies on production surfaces.
   const pack = useStylePack();
+  const spectrum = pack?.id === "skin-s06";
   // ELEMENT PRODUCT SKIN (S29). Element markets itself with its own identity, so
   // whenever the Element style pack is active the chrome lockup swaps to the
   // five-brick Element mark — the TransPerfect corporate wordmark never renders
@@ -1087,7 +1089,7 @@ export function SlideFrame({
         (() => {
           // Tiled signature motifs are wallpaper; the minimal direction keeps
           // only non-repeating gestures.
-          if (replacedGround || authoredPlateGround) return null;
+          if (spectrum || replacedGround || authoredPlateGround) return null;
           const sig = packSignature(pack);
           if (!sig) return null;
           const tiled =
@@ -1286,6 +1288,7 @@ export function SlideFrame({
                 ...containerStyle,
                 zIndex: 60,
                 pointerEvents: "none",
+                ...(spectrum ? { width: SPECTRUM_WORDMARK.widthPt * STAGE_PX_PER_IN / 72, right: 108, bottom: 76 } : null),
                 // Spatial Clarity keeps the wordmark 20% smaller — the mark is
                 // one quiet signature, not a competing element in the module.
                 ...(String(pack?.id ?? "").toLowerCase() === "skin-s01"
@@ -1344,7 +1347,7 @@ export function SlideFrame({
           genuinely different layout from look to look. */}
       {(() => {
         const composeModuleId = moduleIdFromSeed(moduleSeed) ?? layoutId ?? variant;
-        const compose = pack ? packCompose(pack, composeModuleId) : null;
+        const compose = pack && !spectrum ? packCompose(pack, composeModuleId) : null;
         // Section separation is a per-MODULE decision, not a look-wide one:
         // each module resolves its own top rule / padding / gutters from the
         // spacing tokens (see module-spacing.ts) so no global plate reaches

@@ -56,6 +56,7 @@ export function Kicker({
   const enterpriseInk = kickerMode === "dark" ? "#FFFFFF" : ENTERPRISE_WHITE.ink;
   return (
     <div
+      data-kicker=""
       className={`${enterprise ? "font-bold" : "font-semibold"} uppercase ${className}`}
       style={{
         color: color ?? `var(--pack-ink-muted, ${enterprise ? enterpriseInk : ink.muted})`,
@@ -198,7 +199,7 @@ export function DisplayTitle({
     color,
   };
   return (
-    <Tag className={`m-0 ${className}`} style={style}>
+    <Tag data-spectrum-title="" className={`m-0 ${className}`} style={style}>
       {children}
     </Tag>
   );
@@ -309,6 +310,7 @@ export function SupportingText({
   const fontSize = size === "xl" ? 40 : size === "lg" ? 32 : size === "md" ? 26 : 22;
   return (
     <p
+      data-spectrum-body=""
       className={`m-0 ${className}`}
       style={{
         fontSize: fillPx(fontSize, "body"),
@@ -335,6 +337,7 @@ export function MetaRow({
   const ink = useSlideInk();
   return (
     <div
+      data-spectrum-meta=""
       className={`flex flex-wrap items-center gap-x-16 gap-y-3 uppercase ${className}`}
       style={{
         color: color ?? ink.faint,

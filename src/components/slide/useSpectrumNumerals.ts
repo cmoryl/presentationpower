@@ -25,6 +25,14 @@ function mark(root: HTMLElement) {
     const v = String(i % 3);
     if (el.getAttribute("data-spectrum-fig") !== v) el.setAttribute("data-spectrum-fig", v);
   });
+  // Mark undersized hand-authored labels as well as shared primitives. The
+  // stylesheet enforces the guide floor without mutating React-owned styles.
+  const text = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let n = text.nextNode(); n; n = text.nextNode()) {
+    const el = n.parentElement;
+    if (!el || !n.textContent?.trim() || el.closest("svg,[aria-hidden='true']")) continue;
+    if (parseFloat(getComputedStyle(el).fontSize) < 24) el.setAttribute("data-spectrum-small", "");
+  }
 }
 
 export function useSpectrumNumerals(root: HTMLElement | null, enabled: boolean) {

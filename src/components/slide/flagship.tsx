@@ -302,6 +302,7 @@ export function EditorialTitle({
     // here injected one top-level heading per thumbnail into every page that
     // shows slide previews. Keep the visual weight, drop the outline impact.
     <div
+      data-spectrum-title=""
       className={`m-0 ${align === "center" ? "text-center" : ""}`}
       style={{
         fontSize: size,
