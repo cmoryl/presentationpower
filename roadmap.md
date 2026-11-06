@@ -1,6 +1,6 @@
 # Roadmap — build review (Week 1)
 
-- [ ] Add brand-specific visual application examples for social, signage, AV/motion and presentations/documents across all online brand guides and shared kits; preserve existing rules and source artwork.
+- [x] Add brand-specific visual application examples across all online brand guides and shared NEXT/Bowl kits; supplied Legalweek pieces remain the examples where no separate logo exists. All 18 logo-based guide/kit surfaces checked with no broken example images or page errors; phone width fits. Existing rules, source artwork and PDF downloads unchanged. Full suite: 2,643 pass; one pre-existing London map-export failure.
 
 - [x] Expand Set 5 with eight coordinated backgrounds, eight separately labelled 12,000px enlargements and four transparent objects (20 new individual downloads; existing ZIPs unchanged). All artwork inspected, both public galleries and mobile checked; enlarged JPG exact bytes/dimensions and PNG alpha verified. Canva originals unchanged. Eleven targeted tests pass; full suite 2,632 pass with the pre-existing unrelated London map-export failure; build OK.
 
