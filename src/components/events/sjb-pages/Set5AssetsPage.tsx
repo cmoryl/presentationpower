@@ -4,7 +4,7 @@ import { useServerFn } from '@tanstack/react-start';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useIsAdmin } from '@/hooks/use-is-admin';
 import { deleteSet5Asset } from '@/lib/sjb-set5-removals.functions';
-import { availableSet5Assets, availableSet5Packs, set5RemovalsOptions } from '@/lib/sjb-set5-availability';
+import { availableSet5Assets, availableSet5Packs, groupedSet5Assets, set5RemovalsOptions } from '@/lib/sjb-set5-availability';
 import { Button } from '@/design-system/element';
 import { SjbLink, SjbShell } from '@/components/events/SjbShare';
 import { type SjbSet5Asset } from '@/lib/sjb-set5-assets';
@@ -28,7 +28,7 @@ export function SjbSet5Assets() {
   const [pendingDelete, setPendingDelete] = useState<SjbSet5Asset | null>(null);
   const [deleting, setDeleting] = useState(false);
   const deleteDialog = useRef<HTMLDialogElement>(null);
-  const [category, setCategory] = useState('All assets');
+  const [group, setGroup] = useState('All assets');
   const [ground, setGround] = useState('Light');
   const [selected, setSelected] = useState<SjbSet5Asset | null>(null);
   const [copied, setCopied] = useState(false);
