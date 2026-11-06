@@ -127,8 +127,8 @@ describe("Spectrum adoption in the build", () => {
   });
 
   it("makes every sales quick-create deck preset a Spectrum deck", async () => {
-    const { salesQuickCreatePresets } = await import("@/lib/quick-create");
-    const deckPresets = salesQuickCreatePresets().filter((p) => p.kind === "deck");
+    const { quickCreatePresets } = await import("@/lib/quick-create");
+    const deckPresets = quickCreatePresets("sales").filter((p) => p.kind === "deck");
     expect(deckPresets.length).toBeGreaterThan(0);
     for (const p of deckPresets) {
       expect(p.stylePackId, p.id).toBe("skin-s06");
