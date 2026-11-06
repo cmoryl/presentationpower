@@ -99,14 +99,19 @@
 
 /* Reserve the font's full line box: legacy optical leading let labels collide
    with numerals after the guide's 12pt floor was applied. */
-[data-style-pack="skin-s06"] [data-spectrum-text] {
+[data-style-pack="skin-s06"] [data-spectrum-repair] [data-spectrum-text] {
   line-height: 1.35 !important;
 }
-[data-style-pack="skin-s06"] [data-spectrum-fig] {
+[data-style-pack="skin-s06"] [data-spectrum-repair] [data-spectrum-fig],
+[data-style-pack="skin-s06"] [data-spectrum-repair] [data-stat-value="figure"] {
   font-size: 96px !important;
   font-weight: 600 !important;
 }
 [data-style-pack="skin-s06"] [data-spectrum-hero] [data-spectrum-fig],
+[data-style-pack="skin-s06"] [data-spectrum-hero] [data-stat-value="figure"],
 [data-style-pack="skin-s06"] [data-module-variant="MV-STAT-IMAGE-TYPE"] .mt-6.tabular-nums[data-spectrum-fig] {
   font-size: 220px !important;
+}
+[data-style-pack="skin-s06"] [data-spectrum-repair] [data-stat-value="figure"] .align-top {
+  font-size: 44px !important;
 }

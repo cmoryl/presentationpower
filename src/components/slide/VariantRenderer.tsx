@@ -307,7 +307,7 @@ function VariantRendererInner(props: Props) {
                   >
                     {/* display:contents keeps layout untouched while exposing the
                   slide mode to CSS (light mode kills text/content shadows). */}
-                    <div data-slide-mode={mode} data-module-variant={variant.id} style={{ display: "contents" }}>
+                    <div data-slide-mode={mode} data-module-variant={variant.id} data-spectrum-repair={SPECTRUM_REPAIRED_MODULES.has(variant.id) ? "" : undefined} style={{ display: "contents" }}>
                       <StatLayoutProvider layout={resolveStatLayout(variant.id, c)}>
                         <StatArrangementProvider
                           arrangement={
