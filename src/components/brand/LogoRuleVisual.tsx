@@ -187,10 +187,7 @@ export function LogoRuleVisual({
         <Panel ground="#ffffff" label="✗">
           <div className="flex items-center justify-center gap-2">
             {iconSrc ? (
-              <span
-                className="flex h-3/5 items-center justify-center rounded-sm p-1.5"
-                style={{ background: darkGround }}
-              >
+              <span className="flex h-3/5 items-center justify-center rounded-sm border border-border bg-white p-1.5">
                 <img src={iconSrc} alt="" className="max-h-10 max-w-full object-contain" />
               </span>
             ) : null}
