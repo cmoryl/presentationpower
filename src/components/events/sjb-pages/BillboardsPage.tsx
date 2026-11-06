@@ -8,6 +8,7 @@ import {
   billboardFile,
   billboardScene,
   billboardCanva,
+  refreshedBillboardFile,
   type BillboardLang,
   SJB_BILLBOARD_COPY,
   SJB_BILLBOARD_LINK,
@@ -81,12 +82,12 @@ export function BillboardsPage() {
                     <Dialog>
                       <DialogTrigger asChild>
                         <button type="button" className="block w-full cursor-zoom-in rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={`View ${d.label} mockup larger`}>
-                          <img src={`/sjb-billboards/scenes/team-${d.id}-${tod}.jpg`} alt={`${d.label} billboard shown beside a San Juan road (illustrative mockup)`} loading="lazy" className="aspect-[16/10] w-full rounded-md object-cover" />
+                          <img src={refreshedBillboardFile(`/sjb-billboards/scenes/team-${d.id}-${tod}.jpg`)} alt={`${d.label} billboard shown beside a San Juan road (illustrative mockup)`} loading="lazy" className="aspect-[16/10] w-full rounded-md object-cover" />
                         </button>
                       </DialogTrigger>
                       <DialogContent className="max-w-[min(96vw,1600px)] p-3">
                         <DialogTitle className="text-sm">{d.label} · generated mockup, not an actual location</DialogTitle>
-                        <img src={`/sjb-billboards/scenes/team-${d.id}-${tod}.jpg`} alt={`${d.label} billboard mockup, enlarged`} className="h-auto max-h-[85vh] w-full rounded-md object-contain" />
+                        <img src={refreshedBillboardFile(`/sjb-billboards/scenes/team-${d.id}-${tod}.jpg`)} alt={`${d.label} billboard mockup, enlarged`} className="h-auto max-h-[85vh] w-full rounded-md object-contain" />
                       </DialogContent>
                     </Dialog>
                     <figcaption className="text-xs text-muted-foreground">{d.tag} · click to enlarge</figcaption>
@@ -164,11 +165,11 @@ export function BillboardsPage() {
               <div className="grid gap-4 lg:grid-cols-2">
                 {SJB_BILLBOARD_TEAM_EXAMPLES.filter((d) => d.label.startsWith(name)).map((d) => (
                   <figure key={d.id} className="space-y-1.5">
-                    <img src={d.preview} width={d.w} height={d.h} loading="lazy" alt={`Team billboard ${d.label}: Tickets on sale, December 16, 2026, sanjuanbowl.com`} className="h-auto w-full rounded-sm border border-border" />
+                    <img src={refreshedBillboardFile(d.preview)} width={d.w} height={d.h} loading="lazy" alt={`Team billboard ${d.label}: Tickets on sale, December 16, 2026, sanjuanbowl.com`} className="h-auto w-full rounded-sm border border-border" />
                     <figcaption className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
                       <span className="mr-auto">{d.w.toLocaleString()} × {d.h}</span>
                       <Button asChild size="sm" variant="ghost">
-                        <a href={d.preview} download><Download className="h-3.5 w-3.5" /> PNG</a>
+                        <a href={refreshedBillboardFile(d.preview)} download><Download className="h-3.5 w-3.5" /> PNG</a>
                       </Button>
                       <Button asChild size="sm" variant="ghost">
                         <a href={d.edit} target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /> Edit in Canva</a>
@@ -201,7 +202,7 @@ export function BillboardsPage() {
             {SJB_BILLBOARD_VECTOR_CANVA.filter((v) => v.lang === lang).map((v) => (
               <img
                 key={v.id}
-                src={`/sjb-billboards/vector/${v.id}.png`}
+                src={refreshedBillboardFile(`/sjb-billboards/vector/${v.id}.png`)}
                 alt={`Tickets On Sale ${v.label} at distance`}
                 loading="lazy"
                 className="mx-auto w-full max-w-[220px] blur-[0.6px] motion-safe:transition-[filter] hover:blur-0"
@@ -210,7 +211,7 @@ export function BillboardsPage() {
             {SJB_BILLBOARD_TEAM_EXAMPLES.map((t) => (
               <img
                 key={t.id}
-                src={t.preview}
+                src={refreshedBillboardFile(t.preview)}
                 alt={`${t.label} at distance`}
                 loading="lazy"
                 className="mx-auto w-full max-w-[220px] blur-[0.6px] motion-safe:transition-[filter] hover:blur-0"
