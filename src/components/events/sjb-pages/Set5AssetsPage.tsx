@@ -35,8 +35,10 @@ export function SjbSet5Assets() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState('');
   const dialog = useRef<HTMLDialogElement>(null);
-  const categories = ['All assets', ...new Set(assets.map(a => a.category)), ...(assets.some(a => a.category === category) || category === 'All assets' ? [] : [category])];
-  const visible = assets.filter(a => category === 'All assets' || a.category === category);
+  const sections = groupedSet5Assets(assets);
+  const groupNames = ['All assets', ...sections.map(s => s.group)];
+  const visibleSections = sections.filter(s => group === 'All assets' || s.group === group);
+  const visibleCount = visibleSections.reduce((sum, s) => sum + s.assets.length, 0);
   const previewGround = ground === 'Dark' ? 'bg-foreground' : 'bg-muted';
   useEffect(() => { if (selected) dialog.current?.showModal(); else dialog.current?.close(); }, [selected]);
   useEffect(() => { if (pendingDelete) deleteDialog.current?.showModal(); else deleteDialog.current?.close(); }, [pendingDelete]);
