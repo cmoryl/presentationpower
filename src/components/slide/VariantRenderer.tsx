@@ -9,6 +9,7 @@
 // ./module-primitives and ./module-kit.
 // ────────────────────────────────────────────────────────────────────────────
 import * as React from "react";
+import { SPECTRUM_REPAIRED_MODULES } from "@/lib/spectrum-repaired-modules";
 import type { ReactNode } from "react";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
