@@ -50,6 +50,8 @@ import {
 import { Download } from "lucide-react";
 import { LogoRuleVisual } from "@/components/brand/LogoRuleVisual";
 import { logoRuleDemo } from "@/lib/logo-rule-demos";
+import { LegibilityNoteVisual } from "@/components/brand/LegibilityNoteVisual";
+import { inferLegibilityDemo } from "@/lib/legibility-demos";
 import { toast } from "sonner";
 import { brandSwatchSpec, brandSwatchSpecText } from "@/lib/brand-swatch-spec";
 import { applyBrandGuidePatch } from "@/lib/brand-guide-edits";
@@ -403,17 +405,17 @@ function BrandGuideView() {
         <Section title="Colour and legibility" eyebrow="03b">
           <div className="py-4">
             <div className="text-sm font-semibold">{guide.colorAccessibility.headline}</div>
-            <ul className="mt-3 space-y-2 text-sm text-foreground/85">
-              {guide.colorAccessibility.notes.map((n) => (
-                <li key={n} className="flex gap-2">
-                  <span
-                    className="mt-2 h-1 w-1 shrink-0 rounded-full"
-                    style={{ background: hero }}
-                  />
-                  <span>{n}</span>
-                </li>
-              ))}
-            </ul>
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+              {guide.colorAccessibility.notes.map((n) => {
+                const demo = inferLegibilityDemo(n);
+                return (
+                  <div key={n} className="flex flex-col gap-3 border-t border-border py-4">
+                    {demo && <LegibilityNoteVisual demo={demo} note={n} alt={n} />}
+                    <p className="text-sm text-foreground/85">{n}</p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </Section>
       )}
