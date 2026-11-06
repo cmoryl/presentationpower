@@ -1,3 +1,15 @@
+import power_portrait_p from '@/assets/sjb-set5-variety/power-portrait-preview.webp.asset.json';
+import power_portrait_n from '@/assets/sjb-set5-variety/power-portrait.jpg.asset.json';
+import power_portrait_e from '@/assets/sjb-set5-variety/power-portrait-12000px.jpg.asset.json';
+import power_email_closeup_p from '@/assets/sjb-set5-variety/power-email-closeup-preview.webp.asset.json';
+import power_email_closeup_n from '@/assets/sjb-set5-variety/power-email-closeup.jpg.asset.json';
+import power_email_closeup_e from '@/assets/sjb-set5-variety/power-email-closeup-12000px.jpg.asset.json';
+import power_burst_center_p from '@/assets/sjb-set5-variety/power-burst-center-preview.webp.asset.json';
+import power_burst_center_n from '@/assets/sjb-set5-variety/power-burst-center.jpg.asset.json';
+import power_burst_center_e from '@/assets/sjb-set5-variety/power-burst-center-12000px.jpg.asset.json';
+import power_light_horizon_p from '@/assets/sjb-set5-variety/power-light-horizon-preview.webp.asset.json';
+import power_light_horizon_n from '@/assets/sjb-set5-variety/power-light-horizon.jpg.asset.json';
+import power_light_horizon_e from '@/assets/sjb-set5-variety/power-light-horizon-12000px.jpg.asset.json';
 import power_wide_p from '@/assets/sjb-set5-variety/power-wide-preview.webp.asset.json';
 import power_wide_n from '@/assets/sjb-set5-variety/power-wide.jpg.asset.json';
 import power_wide_e from '@/assets/sjb-set5-variety/power-wide-12000px.jpg.asset.json';
@@ -46,6 +58,14 @@ import variety30 from '@/assets/sjb-set5-variety/palm-fronds-preview.webp.asset.
 import variety31 from '@/assets/sjb-set5-variety/palm-fronds.png.asset.json';
 
 export const SJB_SET5_VARIETY_ASSETS = [
+{"id": "variety-power-portrait", "title": "Cinematic power · portrait", "category": "Cinematic power · native", "dimensions": "1536 × 1920", "note": "AI-created Set 5 variation with stronger light effects · native 1536 × 1920 · conceptual artwork, not a venue photo", "filename": "power-portrait.jpg", previewUrl: power_portrait_p.url, downloadUrl: power_portrait_n.url },
+{"id": "variety-power-portrait-enlarged", "title": "Cinematic power · portrait · 12,000px", "category": "Cinematic power · enlarged", "dimensions": "9600 × 12000", "note": "Enlarged AI variation · native 1536 × 1920 · added pixels, not native 12K detail · RGB", "filename": "power-portrait-12000px.jpg", previewUrl: power_portrait_p.url, downloadUrl: power_portrait_e.url },
+{"id": "variety-power-email-closeup", "title": "Cinematic power · email close-up", "category": "Cinematic power · native", "dimensions": "1920 × 960", "note": "AI-created Set 5 variation with stronger light effects · native 1920 × 960 · conceptual artwork, not a venue photo", "filename": "power-email-closeup.jpg", previewUrl: power_email_closeup_p.url, downloadUrl: power_email_closeup_n.url },
+{"id": "variety-power-email-closeup-enlarged", "title": "Cinematic power · email close-up · 12,000px", "category": "Cinematic power · enlarged", "dimensions": "12000 × 6000", "note": "Enlarged AI variation · native 1920 × 960 · added pixels, not native 12K detail · RGB", "filename": "power-email-closeup-12000px.jpg", previewUrl: power_email_closeup_p.url, downloadUrl: power_email_closeup_e.url },
+{"id": "variety-power-burst-center", "title": "Cinematic power · center burst", "category": "Cinematic power · native", "dimensions": "1920 × 1088", "note": "AI-created Set 5 variation with stronger light effects · native 1920 × 1088 · conceptual artwork, not a venue photo", "filename": "power-burst-center.jpg", previewUrl: power_burst_center_p.url, downloadUrl: power_burst_center_n.url },
+{"id": "variety-power-burst-center-enlarged", "title": "Cinematic power · center burst · 12,000px", "category": "Cinematic power · enlarged", "dimensions": "12000 × 6800", "note": "Enlarged AI variation · native 1920 × 1088 · added pixels, not native 12K detail · RGB", "filename": "power-burst-center-12000px.jpg", previewUrl: power_burst_center_p.url, downloadUrl: power_burst_center_e.url },
+{"id": "variety-power-light-horizon", "title": "Cinematic power · light horizon", "category": "Cinematic power · native", "dimensions": "1920 × 640", "note": "AI-created Set 5 variation with stronger light effects · native 1920 × 640 · conceptual artwork, not a venue photo", "filename": "power-light-horizon.jpg", previewUrl: power_light_horizon_p.url, downloadUrl: power_light_horizon_n.url },
+{"id": "variety-power-light-horizon-enlarged", "title": "Cinematic power · light horizon · 12,000px", "category": "Cinematic power · enlarged", "dimensions": "12000 × 4000", "note": "Enlarged AI variation · native 1920 × 640 · added pixels, not native 12K detail · RGB", "filename": "power-light-horizon-12000px.jpg", previewUrl: power_light_horizon_p.url, downloadUrl: power_light_horizon_e.url },
 {"id": "variety-power-wide", "title": "Cinematic power · wide", "category": "Cinematic power · native", "dimensions": "1920 × 1088", "note": "AI-created Set 5 variation with stronger light effects · native 1920 × 1088 · conceptual artwork, not a venue photo", "filename": "power-wide.jpg", previewUrl: power_wide_p.url, downloadUrl: power_wide_n.url },
 {"id": "variety-power-wide-enlarged", "title": "Cinematic power · wide · 12,000px", "category": "Cinematic power · enlarged", "dimensions": "12000 × 6800", "note": "Enlarged AI variation · native 1920 × 1088 · added pixels, not native 12K detail · RGB", "filename": "power-wide-12000px.jpg", previewUrl: power_wide_p.url, downloadUrl: power_wide_e.url },
 {"id": "variety-power-ultrawide", "title": "Cinematic power · ultrawide", "category": "Cinematic power · native", "dimensions": "1920 × 640", "note": "AI-created Set 5 variation with stronger light effects · native 1920 × 640 · conceptual artwork, not a venue photo", "filename": "power-ultrawide.jpg", previewUrl: power_ultrawide_p.url, downloadUrl: power_ultrawide_n.url },
