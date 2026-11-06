@@ -33,7 +33,8 @@ describe("per-division design specs", () => {
 
   it("resolves a pack per face", () => {
     expect(divisionPackId("bm-enterprise", "light")).toBe("skin-s06");
-    expect(divisionPackId("bm-enterprise", "dark")).toBe("skin-s04");
+    // Spectrum is light-first: the corporate dark face resolves to Spectrum.
+    expect(divisionPackId("bm-enterprise", "dark")).toBe("skin-s06");
     expect(isKnownPackId(divisionPackId("bm-product", "dark"))).toBe(true);
   });
 

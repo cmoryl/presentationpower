@@ -1,11 +1,13 @@
 /**
- * SALES-ENABLEMENT DECK LOOKS — sales decks ship in Enterprise mode only, in
- * a light and a dark variant.
+ * SALES-ENABLEMENT DECK LOOKS — sales decks ship in Enterprise mode only.
  *
- * Sales enablement is create-only: they pick which of the two approved
- * enterprise looks a deck is born into, and nothing else. Any other style pack
- * that reaches a sales deck (from a stale preset, an import, or an agent
- * suggestion) is coerced back to the matching enterprise pack for its mode.
+ * Since the Nov 2026 Spectrum style guide, the corporate look is LIGHT-FIRST:
+ * there is no dark corporate deck. Sales enablement is create-only: the deck
+ * is born into the approved Enterprise Spectrum look, and nothing else. Any
+ * other style pack that reaches a sales deck (from a stale preset, an import,
+ * or an agent suggestion) is coerced back to it. The retired dark look
+ * (skin-s04) is kept below solely so stale references resolve to Spectrum
+ * instead of breaking.
  */
 
 import { salesApprovedTemplatePackIds } from "./template-registry";
@@ -19,13 +21,15 @@ export const SALES_DECK_LOOKS: Record<
 > = {
   light: {
     stylePackId: "skin-s06",
-    label: "Enterprise · Light",
-    note: "Disciplined grid, layered neutrals, boardroom-safe on projectors.",
+    label: "Enterprise · Spectrum",
+    note: "Light canvas, frosted glass cards, aqua-blue-violet spectrum accents.",
   },
+  // Retired by the Spectrum guide (light-first, no dark pages). Kept mapped to
+  // the Spectrum pack so stale dark references coerce instead of erroring.
   dark: {
-    stylePackId: "skin-s04",
-    label: "Enterprise · Dark",
-    note: "Precision dark planes with restrained accents for on-screen rooms.",
+    stylePackId: "skin-s06",
+    label: "Enterprise · Spectrum",
+    note: "Light canvas, frosted glass cards, aqua-blue-violet spectrum accents.",
   },
 };
 

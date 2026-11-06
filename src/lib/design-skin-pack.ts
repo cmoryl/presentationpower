@@ -186,20 +186,23 @@ const SKIN_TRAITS: Record<string, SkinTraits> = {
     grain: 0.02,
   },
   S06: {
+    // SPECTRUM (Nov 2026 corporate style guide): Geist Regular titles with
+    // tight spacing, SemiBold wide-tracked caps eyebrows, frost cards at the
+    // 0.22″ corner radius (≈32 stage px).
     display: GEIST,
     body: GEIST,
     kicker: GEIST,
     mono: GEIST_MONO,
-    displayWeight: 550,
-    displayTracking: "-0.026em",
+    displayWeight: 400,
+    displayTracking: "-0.02em",
     displayTransform: "none",
-    displayScale: 0.98,
+    displayScale: 1,
     kickerWeight: 600,
-    kickerTracking: "0.16em",
-    radius: 6,
-    surfaceStyle: "flat",
+    kickerTracking: "0.18em",
+    radius: 32,
+    surfaceStyle: "glass",
     topBar: true,
-    grain: 0.02,
+    grain: 0,
   },
   S07: {
     display: GEIST,
@@ -1346,6 +1349,20 @@ export function stylePackFromSkin(skin: DesignSkin, opts?: SkinRenderOptions): S
         : `linear-gradient(180deg, ${rgba("#FFFFFF", 0.86)} 0%, ${rgba("#FFFFFF", 0.4)} 55%, ${rgba("#FFFFFF", 0)} 100%)`,
       border: "none",
       shadow: "none",
+      blur: "none",
+    };
+  }
+
+  // ENTERPRISE SPECTRUM (S06) — the Nov 2026 corporate style guide frost card:
+  // 90° white → #F0F3FB fill, 0.75 pt #D6DCF0 keyline, one soft ink shadow at
+  // 7% (18 pt blur / 7 pt distance ≈ 24 px / 9 px), 0.22″ radius (≈32 px).
+  if ((skin.code ?? "").toUpperCase() === "S06" && !hc) {
+    card = {
+      ...card,
+      bg: "linear-gradient(180deg, #FFFFFF 0%, #F0F3FB 100%)",
+      border: "1px solid #D6DCF0",
+      radius: 32,
+      shadow: "0 9px 24px rgba(3, 0, 44, 0.07)",
       blur: "none",
     };
   }
