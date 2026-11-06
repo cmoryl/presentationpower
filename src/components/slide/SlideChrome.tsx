@@ -650,6 +650,11 @@ export function SlideFrame({
   const logoColor = darkBackdrop || slideDark || logoOnMedia ? "#ffffff" : BRAND.ink;
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
+  // SPECTRUM (Nov 2026 corporate guide): the wordmark sits bottom-right, once
+  // per slide, whenever the Enterprise Spectrum pack is active.
+  if (String(pack?.id ?? "") === "skin-s06" && placement.position !== "hidden") {
+    placement.position = "bottom-right";
+  }
   const showLogo = placement.position !== "hidden";
   // Bottom-adjacent logos sit above the footer band; content needs extra
   // pb so titles / bullets / cards don't slide under the lockup. Top-adjacent
