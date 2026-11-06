@@ -49,6 +49,8 @@
 
 - Brand-kit section navigation uses the shared BrandKitSectionNav with existing section anchors; conditional guide sections supply only rendered destinations — why: visual navigation must stay consistent without duplicating guide content.
 
+- Online guide application examples share BrandApplicationExamples with brand-specific artwork adapters; keep approved logo files intact and label studies separately from production masters — why: every guide must illustrate the same surfaces without inventing brand artwork or print approval.
+
 - Bowl social pages share the Canva snapshot gallery registry; preserve actual artboard sizes and distinguish unsaved drafts from saved originals — why: a parallel native renderer and assumed sizes misrepresent the Canva artwork.
 - Set 5 reusable artwork uses the shared `sjb-set5-assets` registry and asset page under both app/share URLs; CDN originals and lightweight previews stay separate — why: public viewing must not resize downloads or alter saved Canva designs.
 - Standalone Set 5 variations enter through `sjb-set5-variety` with `variety-` IDs, native and enlarged downloads labelled separately; they do not belong to existing ZIP packs — why: deletion must not hide unrelated packs or misrepresent generated detail.

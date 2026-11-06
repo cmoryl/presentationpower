@@ -1,4 +1,5 @@
 import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
+import { NextApplicationExamples } from "@/components/brand/NextApplicationExamples";
 import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LONDON_PACK_GROUNDS, LONDON_PACK_GROUND_NOTE } from "@/lib/next-london-pack-grounds";
@@ -709,9 +710,10 @@ function NextBrandGuide() {
             {NEXT_APPLICATION_RULES.map((a) => (
               <div
                 key={a.surface}
-                className="rounded-2xl border border-black/10 p-6 dark:border-white/10"
+                className="min-w-0 border-t border-border pt-5"
               >
                 <div className="text-lg font-semibold">{a.surface}</div>
+                <NextApplicationExamples surface={a.surface} />
                 <ul className="mt-3 space-y-2 text-sm text-black/65 dark:text-white/65">
                   {a.rules.map((r) => (
                     <li key={r} className="flex gap-2">

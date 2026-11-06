@@ -1,5 +1,6 @@
 // Shared San Juan Bowl brand guide sections (intro, logo, variations, colours,
 import { SJB_LETTERING_SPEC_VISIBLE } from "@/components/events/SjbShare";
+import { SjbApplicationGallery } from "@/components/brand/SjbApplicationGallery";
 // type, don'ts). Rendered by the guide page and the designers kit so both carry
 // the full regular guide. Values come only from src/lib/san-juan-bowl.ts.
 import { X } from "lucide-react";
@@ -166,6 +167,7 @@ export function SjbGuideSections({ withSingleColour = true }: SjbGuideSectionsPr
           })}
         </ul>
       </Section>
+      {withSingleColour && <SjbApplicationGallery />}
     </>
   );
 }

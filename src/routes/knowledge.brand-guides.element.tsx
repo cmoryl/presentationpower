@@ -1,4 +1,6 @@
 import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
+import { BrandApplicationGallery } from "@/components/brand/BrandApplicationExamples";
+import { ELEMENT_LOCKUP_URLS } from "@/components/brand/ElementLogo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ElementLockup, ElementMark, ElementMonogram } from "@/components/brand/ElementLogo";
 import logoSheet from "@/assets/element-logo-set.png.asset.json";
@@ -82,7 +84,7 @@ function ElementIdentityPage() {
       </header>
       <div className="mt-4"><BrandKitPdfExport kitId="element" /></div>
 
-      <BrandKitSectionNav sections={[["logo-system", "Logo system"], ["palette", "Palette"], ["usage-rules", "Usage rules"]]} />
+      <BrandKitSectionNav sections={[["logo-system", "Logo system"], ["palette", "Palette"], ["usage-rules", "Usage rules"], ["applications", "Applications"]]} />
       <section id="logo-system" className="mt-8 scroll-mt-24 grid gap-5 md:grid-cols-3">
         <Panel label="1 · Primary lockup — light">
           <ElementLockup layout="stacked" markSize={54} className="text-[#0D131D]" />
@@ -152,6 +154,7 @@ function ElementIdentityPage() {
           </figcaption>
         </figure>
       </section>
+      <BrandApplicationGallery id="applications" artwork={{ name: "TransPerfect Element", color: ELEMENT_LOCKUP_URLS.mono, white: ELEMENT_LOCKUP_URLS.reversed, stacked: ELEMENT_LOCKUP_URLS.color, dark: PALETTE[0].hex, accent: PALETTE[1].hex }} />
     </div>
   );
 }

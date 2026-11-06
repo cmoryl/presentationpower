@@ -1,4 +1,5 @@
 import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
+import { BrandApplicationGallery } from "@/components/brand/BrandApplicationExamples";
 import { BRAND } from "@/lib/brand-colors";
 import { GuideGrounds, guideHasGrounds, GUIDE_GROUND_FAMILY } from "@/components/brand/GuideGrounds";
 import { DivisionSignageKit } from "@/components/events/DivisionSignageKit";
@@ -121,6 +122,7 @@ function BrandGuideView() {
   guideSections.push(["approved-icons", "Approved icons"]);
   if (guide.socialMedia?.length) guideSections.push(["social-image-watermarks", "Social image watermarks"]);
   if (guide.slug === "globallink") guideSections.push(["product-ecosystem", "Product ecosystem"]);
+  guideSections.push(["applications", "Applications"]);
 
   return (
     <AppShell>
@@ -670,6 +672,16 @@ function BrandGuideView() {
           <GlobalLinkUniverse />
         </Section>
       )}
+
+      {(logos?.color ?? logos?.stackedColor ?? logos?.black) && <BrandApplicationGallery id="applications" artwork={{
+        name: guide.title,
+        color: logos?.color ?? logos?.stackedColor ?? logos?.black ?? "",
+        white: logos?.white ?? logos?.stackedWhite,
+        stacked: logos?.stackedColor,
+        stackedWhite: logos?.stackedWhite,
+        dark: hero,
+        accent,
+      }} />}
 
       {intel && <details className="mt-12 border-t border-border pt-5"><summary className="cursor-pointer text-sm font-semibold">Brand research & supporting knowledge</summary><BrandhubIntelSections intel={intel} hero={hero} accent={accent} /></details>}
 
