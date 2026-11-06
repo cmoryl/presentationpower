@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
 import { BrandApplicationGallery } from "@/components/brand/BrandApplicationExamples";
 import { BRAND } from "@/lib/brand-colors";
@@ -343,12 +344,7 @@ function BrandGuideView() {
                 <div className="w-28 text-xs text-muted-foreground">{ramp.name}</div>
                 <div className="flex flex-1 gap-1">
                   {ramp.stops.map((s) => (
-                    <div
-                      key={s}
-                      className="h-10 flex-1 rounded"
-                      style={{ background: s }}
-                      title={s}
-                    />
+                    <RampStopCell key={s} hex={s} />
                   ))}
                 </div>
               </div>
@@ -794,6 +790,60 @@ function SwatchCard({ swatch, large }: { swatch: ColorSwatch; large?: boolean })
         </dl>
       </div>
     </div>
+  );
+}
+
+/** Pick readable text (white or ink) for a given hex ground. */
+function rampTextColor(hex: string): string {
+  const m = hex.replace("#", "");
+  const full = m.length === 3 ? m.split("").map((c) => c + c).join("") : m;
+  const n = parseInt(full, 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  // Relative luminance (sRGB, simplified)
+  const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  return lum > 0.55 ? "#03002C" : "#FFFFFF";
+}
+
+function hexToRgb(hex: string): string {
+  const m = hex.replace("#", "");
+  const full = m.length === 3 ? m.split("").map((c) => c + c).join("") : m;
+  const n = parseInt(full, 16);
+  return `${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255}`;
+}
+
+/** One web-ramp stop: hover or focus reveals the hex + RGB live, click copies. */
+function RampStopCell({ hex }: { hex: string }) {
+  const [copied, setCopied] = useState(false);
+  const text = rampTextColor(hex);
+  const overlay = text === "#FFFFFF" ? "rgba(3,0,44,0.35)" : "rgba(255,255,255,0.55)";
+  return (
+    <button
+      type="button"
+      className="group relative h-10 flex-1 cursor-copy rounded transition-transform hover:z-10 hover:scale-[1.06] focus-visible:z-10 focus-visible:scale-[1.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      style={{ background: hex }}
+      aria-label={`${hex}, RGB ${hexToRgb(hex)} — click to copy`}
+      onClick={() => {
+        navigator.clipboard?.writeText(hex).then(
+          () => {
+            setCopied(true);
+            toast.success(`Copied ${hex}`);
+            setTimeout(() => setCopied(false), 1200);
+          },
+          () => toast.error("Copy failed"),
+        );
+      }}
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded text-[10px] font-semibold leading-tight opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+        style={{ color: text, background: overlay }}
+      >
+        <span className="font-mono">{copied ? "Copied" : hex.toUpperCase()}</span>
+        <span className="font-mono text-[8px] opacity-80">RGB {hexToRgb(hex)}</span>
+      </span>
+    </button>
   );
 }
 
