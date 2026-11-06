@@ -125,6 +125,7 @@ import { Route as KnowledgeIconLibraryRouteImport } from './routes/knowledge.ico
 import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
 import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
+import { Route as LibraryAuditRouteImport } from './routes/library.audit'
 import { Route as LibraryImportedRouteImport } from './routes/library.imported'
 import { Route as LibraryIndustryBackgroundsRouteImport } from './routes/library.industry-backgrounds'
 import { Route as LibraryMyRouteImport } from './routes/library.my'
@@ -837,6 +838,11 @@ const KnowledgeOracleRoute = KnowledgeOracleRouteImport.update({
 const LibraryIndexRoute = LibraryIndexRouteImport.update({
   id: '/library/',
   path: '/library/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryAuditRoute = LibraryAuditRouteImport.update({
+  id: '/library/audit',
+  path: '/library/audit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryImportedRoute = LibraryImportedRouteImport.update({
@@ -1635,6 +1641,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/icon-library': typeof KnowledgeIconLibraryRoute
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
+  '/library/audit': typeof LibraryAuditRoute
   '/library/imported': typeof LibraryImportedRoute
   '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
@@ -1879,6 +1886,7 @@ export interface FileRoutesByTo {
   '/knowledge/icon-library': typeof KnowledgeIconLibraryRoute
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
+  '/library/audit': typeof LibraryAuditRoute
   '/library/imported': typeof LibraryImportedRoute
   '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
@@ -2128,6 +2136,7 @@ export interface FileRoutesById {
   '/knowledge/icon-library': typeof KnowledgeIconLibraryRoute
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
+  '/library/audit': typeof LibraryAuditRoute
   '/library/imported': typeof LibraryImportedRoute
   '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
@@ -2378,6 +2387,7 @@ export interface FileRouteTypes {
     | '/knowledge/icon-library'
     | '/knowledge/new'
     | '/knowledge/oracle'
+    | '/library/audit'
     | '/library/imported'
     | '/library/industry-backgrounds'
     | '/library/my'
@@ -2622,6 +2632,7 @@ export interface FileRouteTypes {
     | '/knowledge/icon-library'
     | '/knowledge/new'
     | '/knowledge/oracle'
+    | '/library/audit'
     | '/library/imported'
     | '/library/industry-backgrounds'
     | '/library/my'
@@ -2870,6 +2881,7 @@ export interface FileRouteTypes {
     | '/knowledge/icon-library'
     | '/knowledge/new'
     | '/knowledge/oracle'
+    | '/library/audit'
     | '/library/imported'
     | '/library/industry-backgrounds'
     | '/library/my'
@@ -3072,6 +3084,7 @@ export interface RootRouteChildren {
   ForAdminRoute: typeof ForAdminRoute
   ForMarketingRoute: typeof ForMarketingRoute
   ForSalesRoute: typeof ForSalesRoute
+  LibraryAuditRoute: typeof LibraryAuditRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryIndustryBackgroundsRoute: typeof LibraryIndustryBackgroundsRoute
   LibraryMyRoute: typeof LibraryMyRoute
@@ -3945,6 +3958,13 @@ declare module '@tanstack/react-router' {
       path: '/library'
       fullPath: '/library/'
       preLoaderRoute: typeof LibraryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/audit': {
+      id: '/library/audit'
+      path: '/library/audit'
+      fullPath: '/library/audit'
+      preLoaderRoute: typeof LibraryAuditRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library/imported': {
@@ -5214,6 +5234,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForAdminRoute: ForAdminRoute,
   ForMarketingRoute: ForMarketingRoute,
   ForSalesRoute: ForSalesRoute,
+  LibraryAuditRoute: LibraryAuditRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryIndustryBackgroundsRoute: LibraryIndustryBackgroundsRoute,
   LibraryMyRoute: LibraryMyRoute,
