@@ -866,7 +866,7 @@ registerSlideModule({
                 <div className="mt-4 text-center">
                   <SlideTitle brand={brand} title={s(c.title)} />
                 </div>
-                <div className="mt-10 w-[64%]">
+                <div className="mt-6 w-[48%] shrink-0">
                   <DeviceFrame kind="monitor" tone={tone} accent="var(--slide-accent-text)">
                     {screen}
                   </DeviceFrame>

@@ -1060,14 +1060,14 @@ registerSlideModule({
         // through the footer, so cap the run and tighten the row rhythm as it grows.
         const items = arr(c.items).slice(0, 6);
         const dense = items.length >= 5;
-        const rowPad = dense ? "py-3" : "py-5";
+        const rowPad = dense ? "py-2" : "py-3";
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
             <div className={dense ? "mt-8" : "mt-14"}>
               <div
-                className="grid gap-6"
-                style={{ gridTemplateColumns: `240px repeat(${quarters.length}, minmax(0, 1fr))` }}
+                className="grid gap-x-6 gap-y-3"
+                style={{ gridTemplateColumns: `360px repeat(${quarters.length}, minmax(0, 1fr))` }}
               >
                 <div />
                 {quarters.map((q, i) => (
@@ -2031,7 +2031,7 @@ registerSlideModule({
         const quadrants = strs(c.quadrants);
         const target = Number(c.target ?? 0);
         const items = arr(c.items);
-        const S = 720;
+        const S = 570;
         const AQ = "#7FE3F5", LV = BRAND.lavender, BL = "#5B9BFF";
         const clamp = (v: unknown) => Math.max(0.04, Math.min(0.96, Number(v ?? 0.5)));
         const heroIdx = items.findIndex((it) => truthy(it.highlight) || /globallink/i.test(s(it.label)));
@@ -2041,7 +2041,7 @@ registerSlideModule({
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
             <div data-portrait="stack-one" className="mt-8 grid gap-12" style={{ gridTemplateColumns: "1fr 340px" }}>
-              <div className="relative ml-14" style={{ height: S }}>
+              <div className="relative ml-28" style={{ height: S }}>
                 <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 overflow-hidden rounded-[22px]" style={{ border: `1px solid ${isDark ? "rgba(255,255,255,0.14)" : ink.hairline}` }}>
                   {[0, 1, 2, 3].map((q) => {
                     const isTarget = q + 1 === target;
@@ -2103,7 +2103,7 @@ registerSlideModule({
                         className="absolute whitespace-nowrap"
                         style={{
                           left: hero ? 44 : 12,
-                          top: hero ? -16 : -11,
+                          top: hero ? -40 : 12,
                           fontSize: fillPx(hero ? 26 : 17, "body"),
                           fontWeight: hero ? 800 : 500,
                           color: hero ? ink.strong : isDark ? "rgba(255,255,255,0.75)" : ink.body,
@@ -2205,7 +2205,7 @@ registerSlideModule({
                   </div>
                 ))}
               </div>
-              <div className="my-10 flex items-center gap-6">
+              <div className="my-6 flex items-center gap-6">
                 <div className="h-[2px] flex-1" style={{ background: brand.tokens.accent }} />
                 <div
                   className="uppercase"

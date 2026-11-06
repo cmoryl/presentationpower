@@ -31,6 +31,7 @@ function mark(root: HTMLElement) {
   for (let n = text.nextNode(); n; n = text.nextNode()) {
     const el = n.parentElement;
     if (!el || !n.textContent?.trim() || el.closest("svg,[aria-hidden='true']")) continue;
+    el.setAttribute("data-spectrum-text", "");
     if (parseFloat(getComputedStyle(el).fontSize) < 24) el.setAttribute("data-spectrum-small", "");
   }
 }

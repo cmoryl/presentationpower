@@ -883,7 +883,7 @@ registerSlideModule({
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-            <div className="mt-10 grid gap-12" style={{ gridTemplateColumns: "1.15fr 1fr" }}>
+            <div className="mt-8 grid gap-12" style={{ gridTemplateColumns: "1.15fr 1fr", height: 620 }}>
               <div className="min-w-0 p-12" style={moduleCardSurface(brand.tokens.accent, mode)}>
                 <AccentTick accent={brand.tokens.accent} />
                 <StatFigure
