@@ -1,3 +1,12 @@
+import thirds_left_wide_p from '@/assets/sjb-set5-variety/thirds-left-wide-preview.webp.asset.json';
+import thirds_left_wide_n from '@/assets/sjb-set5-variety/thirds-left-wide.jpg.asset.json';
+import thirds_left_wide_e from '@/assets/sjb-set5-variety/thirds-left-wide-12000px.jpg.asset.json';
+import thirds_right_wide_p from '@/assets/sjb-set5-variety/thirds-right-wide-preview.webp.asset.json';
+import thirds_right_wide_n from '@/assets/sjb-set5-variety/thirds-right-wide.jpg.asset.json';
+import thirds_right_wide_e from '@/assets/sjb-set5-variety/thirds-right-wide-12000px.jpg.asset.json';
+import thirds_top_story_p from '@/assets/sjb-set5-variety/thirds-top-story-preview.webp.asset.json';
+import thirds_top_story_n from '@/assets/sjb-set5-variety/thirds-top-story.jpg.asset.json';
+import thirds_top_story_e from '@/assets/sjb-set5-variety/thirds-top-story-12000px.jpg.asset.json';
 import power_portrait_p from '@/assets/sjb-set5-variety/power-portrait-preview.webp.asset.json';
 import power_portrait_n from '@/assets/sjb-set5-variety/power-portrait.jpg.asset.json';
 import power_portrait_e from '@/assets/sjb-set5-variety/power-portrait-12000px.jpg.asset.json';
@@ -58,6 +67,12 @@ import variety30 from '@/assets/sjb-set5-variety/palm-fronds-preview.webp.asset.
 import variety31 from '@/assets/sjb-set5-variety/palm-fronds.png.asset.json';
 
 export const SJB_SET5_VARIETY_ASSETS = [
+{"id": "variety-thirds-left-wide", "title": "Rule of thirds · ball left", "category": "Rule of thirds · native", "dimensions": "1920 × 1088", "note": "AI-created Set 5 variation · football on a thirds line, open copy space · native 1920 × 1088", "filename": "thirds-left-wide.jpg", previewUrl: thirds_left_wide_p.url, downloadUrl: thirds_left_wide_n.url },
+{"id": "variety-thirds-left-wide-enlarged", "title": "Rule of thirds · ball left · 12,000px", "category": "Rule of thirds · enlarged", "dimensions": "12000 × 6800", "note": "Enlarged AI variation · native 1920 × 1088 · added pixels, not native 12K detail · RGB", "filename": "thirds-left-wide-12000px.jpg", previewUrl: thirds_left_wide_p.url, downloadUrl: thirds_left_wide_e.url },
+{"id": "variety-thirds-right-wide", "title": "Rule of thirds · ball right", "category": "Rule of thirds · native", "dimensions": "1920 × 1088", "note": "AI-created Set 5 variation · football on a thirds line, open copy space · native 1920 × 1088", "filename": "thirds-right-wide.jpg", previewUrl: thirds_right_wide_p.url, downloadUrl: thirds_right_wide_n.url },
+{"id": "variety-thirds-right-wide-enlarged", "title": "Rule of thirds · ball right · 12,000px", "category": "Rule of thirds · enlarged", "dimensions": "12000 × 6800", "note": "Enlarged AI variation · native 1920 × 1088 · added pixels, not native 12K detail · RGB", "filename": "thirds-right-wide-12000px.jpg", previewUrl: thirds_right_wide_p.url, downloadUrl: thirds_right_wide_e.url },
+{"id": "variety-thirds-top-story", "title": "Rule of thirds · ball top story", "category": "Rule of thirds · native", "dimensions": "1088 × 1920", "note": "AI-created Set 5 variation · football on a thirds line, open copy space · native 1088 × 1920", "filename": "thirds-top-story.jpg", previewUrl: thirds_top_story_p.url, downloadUrl: thirds_top_story_n.url },
+{"id": "variety-thirds-top-story-enlarged", "title": "Rule of thirds · ball top story · 12,000px", "category": "Rule of thirds · enlarged", "dimensions": "6800 × 12000", "note": "Enlarged AI variation · native 1088 × 1920 · added pixels, not native 12K detail · RGB", "filename": "thirds-top-story-12000px.jpg", previewUrl: thirds_top_story_p.url, downloadUrl: thirds_top_story_e.url },
 {"id": "variety-power-portrait", "title": "Cinematic power · portrait", "category": "Cinematic power · native", "dimensions": "1536 × 1920", "note": "AI-created Set 5 variation with stronger light effects · native 1536 × 1920 · conceptual artwork, not a venue photo", "filename": "power-portrait.jpg", previewUrl: power_portrait_p.url, downloadUrl: power_portrait_n.url },
 {"id": "variety-power-portrait-enlarged", "title": "Cinematic power · portrait · 12,000px", "category": "Cinematic power · enlarged", "dimensions": "9600 × 12000", "note": "Enlarged AI variation · native 1536 × 1920 · added pixels, not native 12K detail · RGB", "filename": "power-portrait-12000px.jpg", previewUrl: power_portrait_p.url, downloadUrl: power_portrait_e.url },
 {"id": "variety-power-email-closeup", "title": "Cinematic power · email close-up", "category": "Cinematic power · native", "dimensions": "1920 × 960", "note": "AI-created Set 5 variation with stronger light effects · native 1920 × 960 · conceptual artwork, not a venue photo", "filename": "power-email-closeup.jpg", previewUrl: power_email_closeup_p.url, downloadUrl: power_email_closeup_n.url },

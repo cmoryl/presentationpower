@@ -7,8 +7,8 @@ describe('Design Set 5 reusable asset delivery', () => {
     expect(SJB_SET5_PACKS.map(p => p.filename)).toEqual([
       'sjb-set5-reusable-assets.zip', 'sjb-set5-motion-v2.zip', 'sjb-set5-motion-v3.zip', 'sjb-set5-hires-backgrounds.zip',
     ]);
-    expect(SJB_SET5_ASSETS).toHaveLength(103);
-    expect(new Set(SJB_SET5_ASSETS.map(a => a.id)).size).toBe(103);
+    expect(SJB_SET5_ASSETS).toHaveLength(109);
+    expect(new Set(SJB_SET5_ASSETS.map(a => a.id)).size).toBe(109);
   });
   it('adds eight native compositions, their enlargements and four transparent objects', () => {
     expect(SJB_SET5_ASSETS.filter(a => a.category === 'New backgrounds · native')).toHaveLength(8);
