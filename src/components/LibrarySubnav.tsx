@@ -4,6 +4,7 @@ import { Layers, Package, Bookmark, Printer, Palette, FileText, Image } from "lu
 type Target =
   | "/library"
   | "/library/audit"
+  | "/library/spec"
   | "/library/industry-backgrounds"
   | "/library/my"
   | "/library/imported"
@@ -21,6 +22,7 @@ type Item = {
 const PRESENTATION_ITEMS: Item[] = [
   { to: "/library", label: "Modules", icon: <Layers size={12} />, exact: true },
   { to: "/library/audit", label: "Guide audit", icon: <FileText size={12} /> },
+  { to: "/library/spec", label: "Living spec", icon: <FileText size={12} /> },
   {
     to: "/library/industry-backgrounds",
     label: "Backgrounds",
