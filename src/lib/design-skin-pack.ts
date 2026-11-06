@@ -1353,6 +1353,20 @@ export function stylePackFromSkin(skin: DesignSkin, opts?: SkinRenderOptions): S
     };
   }
 
+  // ENTERPRISE SPECTRUM (S06) — the Nov 2026 corporate style guide frost card:
+  // 90° white → #F0F3FB fill, 0.75 pt #D6DCF0 keyline, one soft ink shadow at
+  // 7% (18 pt blur / 7 pt distance ≈ 24 px / 9 px), 0.22″ radius (≈32 px).
+  if ((skin.code ?? "").toUpperCase() === "S06" && !hc) {
+    card = {
+      ...card,
+      bg: "linear-gradient(180deg, #FFFFFF 0%, #F0F3FB 100%)",
+      border: "1px solid #D6DCF0",
+      radius: 32,
+      shadow: "0 9px 24px rgba(3, 0, 44, 0.07)",
+      blur: "none",
+    };
+  }
+
   const pack: StylePack = {
     id: skinPackId(skin.code) as StylePack["id"],
     label: `${skin.name}`,

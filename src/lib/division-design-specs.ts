@@ -36,9 +36,11 @@ export type DivisionDesignSpec = {
 export const DIVISION_DESIGN_SPECS: Record<string, DivisionDesignSpec> = {
   "bm-enterprise": {
     packId: "skin-s06",
-    darkPackId: "skin-s04",
+    // Spectrum is light-first: the corporate dark look is retired, so the dark
+    // face resolves to the same Spectrum pack.
+    darkPackId: "skin-s06",
     recipe: "R01",
-    rationale: "Master brand: Enterprise Grid light / Precision Dark dark on the corporate recipe.",
+    rationale: "Master brand: Enterprise Spectrum (light-first) on the corporate recipe.",
   },
   "bm-subcompany": {
     packId: "skin-s12",
