@@ -78,7 +78,11 @@ function SheetPage({
   brandId: string;
 }) {
   const stage = stageForAspect(ar);
-  const brand = BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES.find((b) => b.id === "bm-enterprise");
+  const brand = useMemo(() => {
+    const resolved = BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES.find((b) => b.id === "bm-enterprise");
+    if (!resolved) throw new Error("Enterprise brand is missing from the module inventory");
+    return resolved;
+  }, [brandId]);
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const slide = useMemo(
     () => ({
