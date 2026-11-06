@@ -11,9 +11,11 @@
 
 ## Full module sweep — November 2026 guide
 
-- [ ] Render every registered variant in Spectrum, grouped as openings, context, solution, proof, data, case studies and closings.
-- [ ] Record per-module typography, spacing, layout, imagery and treatment failures before changes.
-- [ ] Correct verified shared and family-specific defects without dropping content.
-- [ ] Repeat the same checks and publish an honest per-module pass/fail report with evidence and remaining failures.
-- [ ] Run relevant regression tests and check the library at desktop and mobile sizes.
+- [x] Render all 214 taxonomy variants in Spectrum, grouped by requested families (custom canvas recorded separately).
+- [x] Record before measurements and screenshots for every module.
+- [x] Correct shared minimum HTML type size, margins, title roles, photo radius, seven full-bleed photo layouts, and shared stat/icon treatments.
+- [x] Repeat measured checks: 192 pass, 22 fail; publish every result at /library/audit with unverified guide checks explicit.
+- [x] Run affected regression tests (28 passing).
+- [ ] Remaining 22 flagged layouts need individual review/corrections; SVG type, all role-specific type ranges, dense content and all-division coverage remain unverified. This is unfinished work, not a certified sweep.
+- [ ] Check audit page on desktop/mobile.
 - PowerPoint downloads are not part of this browser/library sweep; Office verification remains separate.
