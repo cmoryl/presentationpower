@@ -159,7 +159,7 @@ export function skinDigest(skin: DesignSkin): string {
   ].join(" — ");
 }
 
-/** Accept a code (S04), a pack id (skin-s04) or a language name. */
+/** Accept a code (S06), a pack id (skin-s06) or a language name. */
 export function resolveSkin(ref: string): DesignSkin | null {
   const raw = (ref ?? "").trim();
   if (!raw) return null;
@@ -180,7 +180,7 @@ export function resolveSkin(ref: string): DesignSkin | null {
 export const VisualPlanSchema = z.object({
   style_pack_id: z
     .string()
-    .describe("Chosen visual language, as a style pack id like 'skin-s04' (or its S-code)"),
+    .describe("Chosen visual language, as a style pack id like 'skin-s06' (or its S-code)"),
   design_recipe_id: z
     .string()
     .optional()
@@ -330,7 +330,7 @@ export function buildDesignKnowledgeToolSet(): ToolSet {
       inputSchema: z.object({
         style_pack_id: z
           .string()
-          .describe("Style pack id like 'skin-s04', an S-code, or the language name"),
+          .describe("Style pack id like 'skin-s06', an S-code, or the language name"),
       }),
       execute: async ({ style_pack_id }) => {
         const skin = resolveSkin(style_pack_id);

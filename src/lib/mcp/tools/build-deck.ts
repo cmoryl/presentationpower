@@ -94,8 +94,9 @@ export default defineTool({
       );
     }
 
-    // Mixed is the default appearance: dark bookends, light working slides.
-    const appearance = input.appearance ?? "mixed";
+    // Light is the default appearance: the Spectrum corporate style is
+    // light-first with no dark pages. Dark/mixed only on explicit request.
+    const appearance = input.appearance ?? "light";
 
     // Validate + resolve every slide before any row is written.
     const lastIdx = input.slides.length - 1;
