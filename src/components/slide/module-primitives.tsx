@@ -1512,7 +1512,7 @@ export function AuroraStatCell({
   const statPack = useStylePack();
   // Spectrum (Nov 2026 corporate guide): big numbers carry the slide in a
   // spectrum gradient, colored by position — aqua first, blue, violet.
-  const spectrum = statPack?.id === "skin-s06";
+  const spectrum = String(statPack?.id) === "skin-s06";
   const stage = spectrum ? spectrumStage(index) : null;
   const value = s(item.value);
   const unit = s(item.unit);
