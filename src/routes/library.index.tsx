@@ -394,8 +394,9 @@ function Library() {
   const [scopeBrandId, setScopeBrandId] = useState<string>(search.scope ?? "all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<"light" | "dark" | "ab">(search.mode ?? "light");
-  // Alternate design-test look under review; null = the approved brand system.
-  const [packId, setPackIdState] = useState<string | null>(search.look ?? null);
+  // Alternate design-test look under review. Defaults to Enterprise Spectrum,
+  // the approved corporate look (Nov 2026 style guide); null = base system.
+  const [packId, setPackIdState] = useState<string | null>(search.look ?? "skin-s06");
   // Industry recipe (R01–R30) is tracked INDEPENDENTLY of the style pack: it
   // only grounds the selected approved language, never replaces it.
   const [recipeId, setRecipeIdState] = useState<string | null>(

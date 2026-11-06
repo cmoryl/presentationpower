@@ -38,7 +38,7 @@ export default defineTool({
     appearance: z
       .enum(["light", "dark", "mixed"])
       .describe(
-        "Light/dark treatment within the approved brand system. 'mixed' (DEFAULT) = dark cover and closing with light working slides (override per slide with each slide's mode), 'light' = Enterprise Light whole-deck, 'dark' = Enterprise Dark whole-deck. Ignored for the base look when style_pack_id is set.",
+        "Light/dark treatment within the approved brand system. 'light' (DEFAULT) = the whole deck on the light-first Enterprise Spectrum look — the corporate style has no dark pages. 'mixed' and 'dark' are legacy options, only used when the user explicitly asks (override per slide with each slide's mode). Ignored for the base look when style_pack_id is set.",
       )
       .optional(),
     design_recipe_id: z
@@ -94,8 +94,9 @@ export default defineTool({
       );
     }
 
-    // Mixed is the default appearance: dark bookends, light working slides.
-    const appearance = input.appearance ?? "mixed";
+    // Light is the default appearance: the Spectrum corporate style is
+    // light-first with no dark pages. Dark/mixed only on explicit request.
+    const appearance = input.appearance ?? "light";
 
     // Validate + resolve every slide before any row is written.
     const lastIdx = input.slides.length - 1;
@@ -139,8 +140,11 @@ export default defineTool({
 
     // Appearance is expressed through per-slide modes on the approved
     // Enterprise brand system. Alternate skins are stored only when explicitly
-    // authorized above.
-    const stylePackId = input.style_pack_id ?? null;
+    // authorized above. Enterprise decks default to the Enterprise Spectrum
+    // pack (Nov 2026 corporate style guide — light-first, frost cards).
+    const stylePackId =
+      input.style_pack_id ??
+      (input.brand_mode_id === "bm-enterprise" ? "skin-s06" : null);
 
     const supabase = supabaseForUser(ctx);
     const userId = ctx.getUserId?.();

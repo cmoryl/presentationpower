@@ -117,4 +117,21 @@ describe("Spectrum adoption in the build", () => {
     expect(DIVISION_DESIGN_SPECS["bm-enterprise"]?.packId).toBe("skin-s06");
     expect(DIVISION_DESIGN_SPECS["bm-enterprise"]?.darkPackId).toBe("skin-s06");
   });
+
+  it("makes Spectrum the render-time default for enterprise decks", async () => {
+    const { packIdForBrandMode, lookBrandModeId } = await import("@/lib/look-brand");
+    expect(packIdForBrandMode("bm-enterprise")).toBe("skin-s06");
+    expect(lookBrandModeId("skin-s06")).toBe("bm-enterprise");
+    // Other brand scopes keep their own lookups.
+    expect(packIdForBrandMode("bm-product")).toBe("skin-r03");
+  });
+
+  it("makes every sales quick-create deck preset a Spectrum deck", async () => {
+    const { quickCreatePresets } = await import("@/lib/quick-create");
+    const deckPresets = quickCreatePresets("sales").filter((p) => p.kind === "deck");
+    expect(deckPresets.length).toBeGreaterThan(0);
+    for (const p of deckPresets) {
+      expect(p.stylePackId, p.id).toBe("skin-s06");
+    }
+  });
 });

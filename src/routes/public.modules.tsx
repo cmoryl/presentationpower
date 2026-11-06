@@ -255,8 +255,9 @@ function PublicModuleLibrary() {
   const [familyId, setFamilyId] = useState<string>("all");
   const [brandId, setBrandId] = useState<string>(DEFAULT_BRAND_ID);
   const [mode, setMode] = useState<Mode>("light");
-  // Alternate style pack under test. `null` = the approved brand system.
-  const [packId, setPackId] = useState<string | null>(null);
+  // Alternate style pack under test. Defaults to Enterprise Spectrum, the
+  // approved corporate look (Nov 2026 style guide); `null` = base brand system.
+  const [packId, setPackId] = useState<string | null>("skin-s06");
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
