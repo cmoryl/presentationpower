@@ -186,20 +186,23 @@ const SKIN_TRAITS: Record<string, SkinTraits> = {
     grain: 0.02,
   },
   S06: {
+    // SPECTRUM (Nov 2026 corporate style guide): Geist Regular titles with
+    // tight spacing, SemiBold wide-tracked caps eyebrows, frost cards at the
+    // 0.22″ corner radius (≈32 stage px).
     display: GEIST,
     body: GEIST,
     kicker: GEIST,
     mono: GEIST_MONO,
-    displayWeight: 550,
-    displayTracking: "-0.026em",
+    displayWeight: 400,
+    displayTracking: "-0.02em",
     displayTransform: "none",
-    displayScale: 0.98,
+    displayScale: 1,
     kickerWeight: 600,
-    kickerTracking: "0.16em",
-    radius: 6,
-    surfaceStyle: "flat",
+    kickerTracking: "0.18em",
+    radius: 32,
+    surfaceStyle: "glass",
     topBar: true,
-    grain: 0.02,
+    grain: 0,
   },
   S07: {
     display: GEIST,
