@@ -4,6 +4,7 @@
 // type and usage rules, with downloads. Event facts stay "to be confirmed"
 // until issued.
 import { SjbCurvedLettering, SjbPalms } from "@/components/events/SjbGuideSections";
+import { SjbApplicationGallery } from "@/components/brand/SjbApplicationGallery";
 import { ConstructionSection, LargeFormatSection } from "@/components/events/SjbDesignerSections";
 import masterKit from "@/assets/sjb/master-logo-kit.zip.asset.json";
 import brandGuide from "@/assets/sjb/brand-guide.pdf.asset.json";
@@ -380,6 +381,7 @@ export function SjbBrandKit() {
 export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
   return (
     <>
+        <SjbApplicationGallery />
         <section className="space-y-4">
           <div>
             <h2 className="text-[20px] font-bold">Logo</h2>

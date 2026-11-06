@@ -1,4 +1,5 @@
 import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
+import { NextApplicationExamples } from "@/components/brand/NextApplicationExamples";
 // Master NEXT event brand kit — shared by the signed-in page and the partner
 // share view. `shared` hides editors and internal links.
 import { useEffect, useState } from "react";
@@ -318,6 +319,7 @@ export function NextBrandKitView({ shared = false, shareToken }: { shared?: bool
           {NEXT_APPLICATION_RULES.map((s) => (
             <div key={s.surface}>
               <h3 className="text-sm font-semibold">{s.surface}</h3>
+              <NextApplicationExamples surface={s.surface} />
               <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-muted-foreground">
                 {s.rules.map((r) => <li key={r}>{r}</li>)}
               </ul>
