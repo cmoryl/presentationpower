@@ -259,7 +259,13 @@ export function StyleLookPicker({
       : family === "core"
         ? coreEntries
         : familyEntries;
-  const list = useMemo(() => searchLooks(query, base), [query, base]);
+  // S04 is the retired dark corporate look (Nov 2026 Spectrum guide): it stays
+  // resolvable for saved decks but is no longer offered; S06 leads the grid.
+  const list = useMemo(
+    () => searchLooks(query, base).filter((e) => e.code !== "S04" && e.code !== "S06"),
+    [query, base],
+  );
+  const spectrumPack = useMemo(() => stylePackById("skin-s06") ?? null, []);
 
   const pick = (packId: string | null) => {
     // Outcome signal: a pick inside the ranked set is a selection; a pick after
@@ -577,7 +583,32 @@ export function StyleLookPicker({
           </div>
 
           <div className="grid grid-cols-2 items-start gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
-            {/* Approved brand system always leads the grid. */}
+            {/* Corporate Spectrum (Nov 2026 guide) leads the grid as the default. */}
+            {spectrumPack && (
+              <button
+                type="button"
+                onClick={() => pick("skin-s06")}
+                aria-pressed={value === "skin-s06"}
+                className={`rounded-lg border p-1.5 text-left transition ${
+                  value === "skin-s06"
+                    ? "border-[#003FC7] bg-[#003FC7]/[0.05]"
+                    : "border-black/10 bg-white hover:border-[#003FC7]/60 dark:border-white/10 dark:bg-white/[0.03]"
+                }`}
+              >
+                <div className="overflow-hidden rounded">
+                  <ApprovedStyleThumb pack={groundPreview(spectrumPack)} scene="cover" radius={4} />
+                </div>
+                <div className="mt-1.5 flex items-start gap-1">
+                  <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-[#03002C] dark:text-white">
+                    Enterprise Spectrum
+                  </span>
+                  {value === "skin-s06" && <Check size={11} className="text-[#003FC7]" />}
+                </div>
+                <div className="truncate text-[9px] uppercase tracking-wider text-black/40 dark:text-white/40">
+                  Corporate default · S06
+                </div>
+              </button>
+            )}
             <button
               type="button"
               onClick={() => pick(null)}
@@ -593,12 +624,12 @@ export function StyleLookPicker({
               </div>
               <div className="mt-1.5 flex items-start gap-1">
                 <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-[#03002C] dark:text-white">
-                  Brand system
+                  Base brand system
                 </span>
                 {!value && <Check size={11} className="text-[#003FC7]" />}
               </div>
               <div className="truncate text-[9px] uppercase tracking-wider text-black/40 dark:text-white/40">
-                Approved default
+                Legacy base look
               </div>
             </button>
 
