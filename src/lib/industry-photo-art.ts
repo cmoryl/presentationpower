@@ -304,6 +304,8 @@ export function photoCodeForPack(code: string | null | undefined, mode: PhotoMod
 
 /** Wrap a pack so its industry photo plate paints as the ground. */
 export function withIndustryPhotoArt(pack: StylePack, code: string): StylePack {
+  // Enterprise Spectrum (S06): the corporate guide bans full-bleed photos.
+  if (code.toUpperCase() === "S06") return pack;
   const plateCode = photoCodeForPack(code, pack.mode === "dark" ? "dark" : "light");
   const set = plateCode ? INDUSTRY_PHOTO[plateCode] : undefined;
   if (!set || !plateCode) return pack;

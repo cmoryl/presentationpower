@@ -1863,6 +1863,9 @@ export function stylePackById(id: string | null | undefined): StylePack | null {
  */
 export function withOverrides(pack: StylePack, code: string): StylePack {
   const art = withGamesSceneArt(withIndustryPhotoArt(withElementSceneArt(pack, code), code), code);
+  // Enterprise Spectrum (S06) paints only its light canvas — legacy uploaded
+  // replacement photos for the old S06 look must not resurface.
+  if (code.toUpperCase() === "S06") return art;
   // Always wrap: the wrapper resolves BOTH replacement artwork and tuning, and
   // both can appear (or be cleared) at runtime without the pack being rebuilt.
   return withBackgroundOverrides(art, code);
