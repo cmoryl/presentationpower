@@ -300,6 +300,7 @@ function BrandGuideView() {
                     demo={demo}
                     src={logoSrc}
                     whiteSrc={logos?.white ?? logos?.stackedWhite}
+                    iconSrc={logos?.icon}
                     wordmark={guide.title}
                     darkGround={hero}
                     accent={accent}
