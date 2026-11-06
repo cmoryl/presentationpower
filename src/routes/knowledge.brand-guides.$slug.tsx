@@ -282,7 +282,7 @@ function BrandGuideView() {
               <LogoTile label="Stacked · Reversed" src={logos.stackedWhite} bg={hero} />
             )}
             {logos.icon && (
-              <LogoTile label="Corporate icon · not a logo" src={logos.icon} bg="#ffffff" border />
+              <LogoTile label="Corporate icon · not a logo" src={logos.icon} bg={hero} />
             )}
           </div>
         )}
