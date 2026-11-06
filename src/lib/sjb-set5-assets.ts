@@ -122,9 +122,11 @@ import asset120 from '@/assets/sjb-set5-gallery/motion-pack.zip.asset.json';
 import asset121 from '@/assets/sjb-set5-gallery/cinematic-pack.zip.asset.json';
 import { SJB_SET5_HIRES_ASSETS, SJB_SET5_HIRES_PACK } from './sjb-set5-hires';
 import { SJB_SET5_VARIETY_ASSETS } from './sjb-set5-variety';
+import { SJB_SET5_FULL_DESIGNS } from './sjb-set5-full';
 
 export interface SjbSet5Asset { id: string; title: string; category: string; dimensions: string; note: string; previewUrl: string; downloadUrl: string; filename: string; vectorUrl?: string; }
 export const SJB_SET5_ASSETS: readonly SjbSet5Asset[] = [
+...SJB_SET5_FULL_DESIGNS,
 ...SJB_SET5_VARIETY_ASSETS,
 ...SJB_SET5_HIRES_ASSETS,
 {"id": "base-layered-compositions-email-layered.svg", "title": "Email Layered", "category": "Layered artwork", "dimensions": "Mixed vector / raster SVG", "note": "Movable layers \u00b7 embedded raster pieces", "filename": "email-layered.svg", previewUrl: asset1.url, downloadUrl: asset0.url },

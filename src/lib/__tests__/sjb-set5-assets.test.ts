@@ -7,8 +7,8 @@ describe('Design Set 5 reusable asset delivery', () => {
     expect(SJB_SET5_PACKS.map(p => p.filename)).toEqual([
       'sjb-set5-reusable-assets.zip', 'sjb-set5-motion-v2.zip', 'sjb-set5-motion-v3.zip', 'sjb-set5-hires-backgrounds.zip',
     ]);
-    expect(SJB_SET5_ASSETS).toHaveLength(109);
-    expect(new Set(SJB_SET5_ASSETS.map(a => a.id)).size).toBe(109);
+    expect(SJB_SET5_ASSETS).toHaveLength(137);
+    expect(new Set(SJB_SET5_ASSETS.map(a => a.id)).size).toBe(137);
   });
   it('adds eight native compositions, their enlargements and four transparent objects', () => {
     expect(SJB_SET5_ASSETS.filter(a => a.category === 'New backgrounds · native')).toHaveLength(8);
@@ -44,5 +44,14 @@ describe('Design Set 5 reusable asset delivery', () => {
   it('allows viewing both asset pages without signing in', () => {
     expect(isPublicNoLoginPath('/share/san-juan-bowl/set-5-assets')).toBe(true);
     expect(isPublicNoLoginPath('/events/san-juan-bowl/set-5-assets')).toBe(true);
+  });
+});
+import { SJB_SET5_FULL_DESIGNS } from '../sjb-set5-full';
+describe('Set 5 full designs', () => {
+  it('has 12 socials and 16 billboards at the agreed board sizes', () => {
+    expect(SJB_SET5_FULL_DESIGNS.filter((a) => a.category === 'Full designs · social')).toHaveLength(12);
+    const boards = SJB_SET5_FULL_DESIGNS.filter((a) => a.category === 'Full designs · billboards');
+    expect(boards).toHaveLength(16);
+    expect(new Set(boards.map((b) => b.dimensions))).toEqual(new Set(['840 × 400', '1728 × 512']));
   });
 });
