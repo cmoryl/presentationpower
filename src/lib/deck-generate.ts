@@ -260,7 +260,13 @@ export async function generateDeckFromBrief(
     : undefined;
 
   const deck: Deck = assembleDeck(brief, strategyOverride);
-  deck.context = { strategy: strategy ?? undefined, knowledgeSourceIds: [] };
+  deck.context = {
+    strategy: strategy ?? undefined,
+    knowledgeSourceIds: [],
+    // Spectrum (Nov 2026 corporate guide): enterprise decks are born on the
+    // Enterprise Spectrum pack — light-first, frost cards, ordered spectrum.
+    ...(brandModeId === "bm-enterprise" ? { stylePackId: "skin-s06" } : {}),
+  };
 
   // ── 5. Optional AI copy personalization ────────────────────────────────
   let personalized = false;

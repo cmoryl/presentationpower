@@ -4216,6 +4216,9 @@ export const useDeckStore = create<DeckState>()(
             abPaletteOverride: brief.abPaletteOverride ?? null,
             knowledgeSourceIds: brief.knowledgeSourceIds ?? [],
             strategy: strategy ?? undefined,
+            // Spectrum (Nov 2026 corporate guide): enterprise decks are born
+            // on the Enterprise Spectrum pack.
+            ...(brief.brandModeId === "bm-enterprise" ? { stylePackId: "skin-s06" } : {}),
           };
           set((s) => ({
             briefs: { ...s.briefs, [brief.id]: brief },

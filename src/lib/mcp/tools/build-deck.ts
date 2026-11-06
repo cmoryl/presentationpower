@@ -139,8 +139,11 @@ export default defineTool({
 
     // Appearance is expressed through per-slide modes on the approved
     // Enterprise brand system. Alternate skins are stored only when explicitly
-    // authorized above.
-    const stylePackId = input.style_pack_id ?? null;
+    // authorized above. Enterprise decks default to the Enterprise Spectrum
+    // pack (Nov 2026 corporate style guide — light-first, frost cards).
+    const stylePackId =
+      input.style_pack_id ??
+      (input.brand_mode_id === "bm-enterprise" ? "skin-s06" : null);
 
     const supabase = supabaseForUser(ctx);
     const userId = ctx.getUserId?.();
