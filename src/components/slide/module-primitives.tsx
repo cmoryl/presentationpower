@@ -440,13 +440,15 @@ export function IconBadge({
   const dims = ICON_SIZES[spec.size];
   const badgeMode = useContext(SlideModeContext);
   const badgePack = useStylePack();
-  const colors = resolveEmphasisColors(
+  const colors: { bg: string; fg: string; border?: string } = {
+    ...resolveEmphasisColors(
     brand,
     spec.treatment,
     spec.emphasis,
     badgeMode,
     lookGlyphColor(badgePack?.id),
-  );
+  ),
+  };
   const Icon = pickIcon(label, index, override, brand?.id ?? null);
   // Enterprise Spectrum icon tile: gradient square in spectrum order, white
   // line icon, no keyline, never a circle (guide pg. 11).
