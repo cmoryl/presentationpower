@@ -22,6 +22,9 @@ export interface LogoRuleVisualProps {
 }
 
 const IMG = "max-h-full max-w-full object-contain";
+// Transformed (violation) artwork is kept narrower so the whole treated
+// lockup stays inside the panel instead of cropping at the edges.
+const IMG_T = "max-h-full max-w-[68%] object-contain";
 
 function Panel({ ground, children, label }: { ground?: string; children: React.ReactNode; label?: string }) {
   return (
