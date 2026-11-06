@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
 import { BrandApplicationGallery } from "@/components/brand/BrandApplicationExamples";
+import { PhotoRuleVisual } from "@/components/brand/PhotoRuleVisual";
+import { inferPhotoRuleDemo } from "@/lib/photo-rule-demos";
 import { BRAND } from "@/lib/brand-colors";
 import { GuideGrounds, guideHasGrounds, GUIDE_GROUND_FAMILY } from "@/components/brand/GuideGrounds";
 import { DivisionSignageKit } from "@/components/events/DivisionSignageKit";
