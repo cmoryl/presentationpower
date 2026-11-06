@@ -46,6 +46,7 @@ import {
 } from "@/lib/slide-media-refresh";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { statGradient } from "@/lib/stat-contrast";
+import { spectrumGradientCss, spectrumStage } from "@/lib/spectrum-style";
 import { foregroundOn } from "@/lib/export-foreground";
 import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
@@ -1508,6 +1509,11 @@ export function AuroraStatCell({
   centered?: boolean;
 }) {
   const ink = useSlideInk();
+  const statPack = useStylePack();
+  // Spectrum (Nov 2026 corporate guide): big numbers carry the slide in a
+  // spectrum gradient, colored by position — aqua first, blue, violet.
+  const spectrum = statPack?.id === "skin-s06";
+  const stage = spectrum ? spectrumStage(index) : null;
   const value = s(item.value);
   const unit = s(item.unit);
   const label = s(item.label);
@@ -1530,9 +1536,11 @@ export function AuroraStatCell({
         style={{
           width: 76,
           height: 76,
-          background: "color-mix(in oklab, var(--slide-accent-text) 12%, transparent)",
-          border: `1px solid color-mix(in oklab, var(--slide-accent-text) 32%, transparent)`,
-          color: "var(--slide-accent-text)",
+          background: stage
+            ? `color-mix(in oklab, ${stage.deep} 10%, transparent)`
+            : "color-mix(in oklab, var(--slide-accent-text) 12%, transparent)",
+          border: `1px solid color-mix(in oklab, ${stage ? stage.deep : "var(--slide-accent-text)"} 32%, transparent)`,
+          color: stage ? stage.deep : "var(--slide-accent-text)",
           marginTop: centered ? 0 : 8,
         }}
       >
