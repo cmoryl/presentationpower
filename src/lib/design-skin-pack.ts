@@ -23,6 +23,7 @@ import { INDUSTRY_SKINS } from "./industry-skins";
 import { withElementSceneArt } from "./element-scene-art";
 import { withGamesSceneArt } from "./games-scene-art";
 import { withIndustryPhotoArt } from "./industry-photo-art";
+import { SPECTRUM_CANVAS_CSS } from "./spectrum-style";
 
 const SANS = `'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif`;
 const SERIF = `'Instrument Serif', Georgia, 'Times New Roman', serif`;
@@ -1410,6 +1411,9 @@ export function stylePackFromSkin(skin: DesignSkin, opts?: SkinRenderOptions): S
   // contrast keeps the generated CSS ground for legibility.
   const code = (skin.code ?? "").toUpperCase();
   if (hc) return pack;
+  // ENTERPRISE SPECTRUM (S06) — the Nov 2026 guide bans full-bleed photos,
+  // orbs and scene art: the page is only the light white→lilac canvas.
+  if (code === "S06") return { ...pack, grain: 0, ground: () => [SPECTRUM_CANVAS_CSS] };
   // Games (R22) paints from the authored bm-tp-games plate kit.
   return withGamesSceneArt(withIndustryPhotoArt(withElementSceneArt(pack, code), code), code);
 }

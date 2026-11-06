@@ -32,6 +32,8 @@ export function useSkinBackdropImage(
   const map = useSkinBackdropMap();
   if (!packId || !isSkinPackId(packId) || !scene) return null;
   const code = skinCodeFromPackId(packId).toUpperCase();
+  // Spectrum (S06) never paints a photo backdrop — light canvas only.
+  if (code === "S06") return null;
   // Any replaced take of this scene counts: an admin who replaced only "Take C"
   // still expects that artwork on the slides that render this scene.
   const anyTake = Object.keys(map).find((k) => k.startsWith(`${code}:${String(scene)}:`));
