@@ -629,7 +629,7 @@ export function StyleLookPicker({
                 {!value && <Check size={11} className="text-[#003FC7]" />}
               </div>
               <div className="truncate text-[9px] uppercase tracking-wider text-black/40 dark:text-white/40">
-                Approved default
+                Legacy base look
               </div>
             </button>
 
