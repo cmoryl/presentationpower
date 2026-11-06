@@ -113,21 +113,21 @@ export function LogoRuleVisual({
     case "recolor":
       body = (
         <Panel ground="#ffffff">
-          <img src={src} alt="" className={IMG} style={{ filter: "hue-rotate(140deg) saturate(1.6)" }} />
+          <img src={src} alt="" className={IMG_T} style={{ filter: "hue-rotate(140deg) saturate(1.6)" }} />
         </Panel>
       );
       break;
     case "respace":
       body = (
         <Panel ground="#ffffff">
-          <img src={src} alt="" className={IMG} style={{ transform: "scaleX(1.45)" }} />
+          <img src={src} alt="" className={IMG_T} style={{ transform: "scaleX(1.45)" }} />
         </Panel>
       );
       break;
     case "distort":
       body = (
         <Panel ground="#ffffff">
-          <img src={src} alt="" className={IMG} style={{ transform: "scale(1.35, 0.68) rotate(-6deg)" }} />
+          <img src={src} alt="" className={IMG_T} style={{ transform: "scale(1.35, 0.68) rotate(-6deg)" }} />
         </Panel>
       );
       break;
@@ -137,7 +137,7 @@ export function LogoRuleVisual({
           <img
             src={src}
             alt=""
-            className={IMG}
+            className={IMG_T}
             style={{ filter: "drop-shadow(5px 5px 3px rgba(0,0,0,.55)) drop-shadow(0 0 6px rgba(0,63,199,.8))" }}
           />
         </Panel>
@@ -146,7 +146,7 @@ export function LogoRuleVisual({
     case "flip":
       body = (
         <Panel ground="#ffffff">
-          <img src={src} alt="" className={IMG} style={{ transform: "scaleX(-1)" }} />
+          <img src={src} alt="" className={IMG_T} style={{ transform: "scaleX(-1)" }} />
         </Panel>
       );
       break;
