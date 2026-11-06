@@ -30,6 +30,8 @@ export type LogoRule = {
   title: string;
   description: string;
   do?: boolean; // true = do, false = don't
+  /** Visual demonstration shown on the rule card; inferred from the title when omitted. */
+  demo?: LogoRuleDemo;
 };
 
 export type BrandGuideCategory = "master" | "division" | "product" | "portfolio" | "cobrand";
