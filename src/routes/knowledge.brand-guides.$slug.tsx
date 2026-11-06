@@ -287,7 +287,13 @@ function BrandGuideView() {
               <LogoTile label="Stacked · Reversed" src={logos.stackedWhite} bg={hero} />
             )}
             {logos.icon && (
-              <LogoTile label="Corporate icon · not a logo" src={logos.icon} bg="#ffffff" border />
+              <LogoTile label="Corporate icon · Color · not a logo" src={logos.icon} bg={BRAND.white} border />
+            )}
+            {logos.iconBlack && (
+              <LogoTile label="Corporate icon · Black · not a logo" src={logos.iconBlack} bg={BRAND.white} border />
+            )}
+            {logos.iconWhite && (
+              <LogoTile label="Corporate icon · White · not a logo" src={logos.iconWhite} bg={BRAND.ink} />
             )}
           </div>
         )}

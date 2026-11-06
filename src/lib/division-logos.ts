@@ -10,6 +10,9 @@
 // BrandLockup and brand-guide pages pick them up automatically.
 
 import { KEY_TO_SLUG } from "@/lib/division-logo-slugs";
+import corporateIconColor from "@/assets/tp-corporate-icons/color.asset.json";
+import corporateIconBlack from "@/assets/tp-corporate-icons/black.asset.json";
+import corporateIconWhite from "@/assets/tp-corporate-icons/white.asset.json";
 
 export type DivisionLogoSet = {
   color?: string; // horizontal, color on light
@@ -19,6 +22,8 @@ export type DivisionLogoSet = {
   stackedColor?: string;
   stackedWhite?: string;
   icon?: string; // corporate icon only (app icon, favicon, avatar) — never a logo
+  iconBlack?: string;
+  iconWhite?: string;
 };
 
 const B = "/brand-logos";
@@ -139,14 +144,16 @@ function resolvedSetFor(slug: string): DivisionLogoSet | undefined {
     // (tp-classic-color.svg) is retired. The wordmark is the only logo; the T
     // survives solely as the corporate icon (app icon, favicon, avatar) and
     // must never be combined with the wordmark or used as a standalone logo.
-    // The icon is always the T inside its blue box — never a bare T.
+    // Preserve the supplied boxed T SVGs intact; never substitute the app icon.
     return {
       color: `${B}/tp-classic-stacked-color.svg`,
       black: `${B}/tp-black.svg`,
       white: `${B}/tp-classic-white.svg`,
       stackedColor: `${B}/tp-classic-stacked-color.svg`,
       stackedWhite: `${B}/tp-classic-white.svg`,
-      icon: `${B}/tp-classic-icon.png`,
+      icon: corporateIconColor.url,
+      iconBlack: corporateIconBlack.url,
+      iconWhite: corporateIconWhite.url,
     };
   }
   return {
