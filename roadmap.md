@@ -17,5 +17,5 @@
 - [x] Repeat measured checks: 192 pass, 22 fail; publish every result at /library/audit with unverified guide checks explicit.
 - [x] Run affected regression tests (28 passing).
 - [ ] Remaining 22 flagged layouts need individual review/corrections; SVG type, all role-specific type ranges, dense content and all-division coverage remain unverified. This is unfinished work, not a certified sweep.
-- [ ] Check audit page on desktop/mobile.
+- [x] Check audit page on desktop/mobile: all 214 rows visible, no mobile document overflow; removed an unverified filter.
 - PowerPoint downloads are not part of this browser/library sweep; Office verification remains separate.
