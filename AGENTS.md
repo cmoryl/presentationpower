@@ -23,6 +23,7 @@
 - Bowl event brand navigation lives in the existing event registry and links to the shared kit/guide bodies; event-home logo guidance reads `SJB_LOGO_RULES` — why: discoverability must not create a second brand authority.
 
 - Every html-to-image capture passes `includeQueryParams: true` — why: proxied images differ only by `?path=`, and without it every download reused the first image fetched.
+- Manual Bowl billboard refreshes resolve cleaned immutable asset pointers through sjb-billboard-refresh for originals and scene composites — why: downloads, enlargement and both shared pages must show the same saved Canva pixels without stale cache.
 
 - The corporate deck style is Spectrum (Nov 2026 style guide): spec constants in `SPECTRUM` (src/lib/brand-colors.ts) + `src/lib/spectrum-style.ts`, applied through skin-s06: canvas-only ground (no photo plates/backdrops), frost-card vars, gradient icon tiles/StatFigure, `useSpectrumNumerals` marking hand-drawn figures, and scoped rules in `src/styles/spectrum-pack.css`; sales/agent/division specs coerce to it and the dark corporate look is retired — why: one approved corporate style, no dark corporate pages.
 - Spectrum module sweeps enumerate taxonomy variants through the existing dev contact sheet; family-owned full-bleed variants use SpectrumPhotoLayout only in Spectrum, and /library/audit displays recorded measured results with explicit unverified checks — why: preserve renderer authority and never confuse automated checks with full guide certification.

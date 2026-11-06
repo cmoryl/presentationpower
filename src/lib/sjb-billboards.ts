@@ -3,6 +3,8 @@
 // in-scene photos are illustrative mockups from scripts/sjb-billboard-mockups.py.
 // The copy below must match the script's COPY table.
 
+import { refreshedBillboardFile } from "./sjb-billboard-refresh";
+export { refreshedBillboardFile } from "./sjb-billboard-refresh";
 export const SJB_BILLBOARD_URL = "SANJUANBOWL.COM";
 export const SJB_BILLBOARD_LINK = "https://www.sanjuanbowl.com";
 
@@ -28,10 +30,10 @@ export function billboardWordCount(lines: readonly string[]) {
 }
 
 export function billboardFile(w: number, h: number, way: string, lang: BillboardLang) {
-  return `/sjb-billboards/${w}x${h}-${way}-${lang}.png`;
+  return refreshedBillboardFile(`/sjb-billboards/${w}x${h}-${way}-${lang}.png`);
 }
 export function billboardScene(w: number, h: number, way: string, lang: BillboardLang, tod: "day" | "dusk") {
-  return `/sjb-billboards/scenes/${w}x${h}-${way}-${lang}-${tod}.jpg`;
+  return refreshedBillboardFile(`/sjb-billboards/scenes/${w}x${h}-${way}-${lang}-${tod}.jpg`);
 }
 
 export const SJB_BILLBOARD_RESEARCH = [
