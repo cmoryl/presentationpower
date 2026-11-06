@@ -30,6 +30,8 @@ import { fillLeading, fillPx, typeBounds } from "@/lib/open-space-fill";
 // the composition its editorial rhythm.
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
+import { useStylePack } from "@/components/slide/StylePackContext";
+import { spectrumGradientCss } from "@/lib/spectrum-style";
 
 export function Kicker({
   brand,
