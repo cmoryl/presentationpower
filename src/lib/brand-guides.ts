@@ -138,8 +138,8 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
     { label: "Financial Responsibility", description: "Be financially responsible" },
   ],
   logoNotes: {
-    headline: "Wordmark and symbol are treated independently",
-    body: "The logo has two elements: the wordmark (typographic) and the symbol (the T). In digital contexts they appear separately depending on format and function. The symbol comes in square and circular versions so it never crops at the edges as an icon or favicon. Clear space around the wordmark = 1.5× the height of the T.",
+    headline: "The wordmark is the logo — the T is the corporate icon only",
+    body: "The TransPerfect logo is the wordmark alone. The T symbol is no longer part of the logo lockup: it appears only as the corporate icon (app icon, favicon, avatar), in square and circular versions so it never crops at the edges. Never combine the T with the wordmark, and never use the T as a standalone logo. Clear space around the wordmark = 1.5× the height of the T.",
   },
   logoRules: [
     {

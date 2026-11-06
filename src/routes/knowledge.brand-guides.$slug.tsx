@@ -261,14 +261,28 @@ function BrandGuideView() {
         {logos && (
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {logos.color && (
-              <LogoTile label="Horizontal · Color" src={logos.color} bg="#ffffff" border />
+              <LogoTile
+                label={logos.color === logos.stackedColor ? "Wordmark · Color" : "Horizontal · Color"}
+                src={logos.color}
+                bg="#ffffff"
+                border
+              />
             )}
-            {logos.stackedColor && (
+            {logos.stackedColor && logos.stackedColor !== logos.color && (
               <LogoTile label="Stacked · Color" src={logos.stackedColor} bg="#ffffff" border />
             )}
-            {logos.white && <LogoTile label="Horizontal · Reversed" src={logos.white} bg={hero} />}
-            {logos.stackedWhite && (
+            {logos.white && (
+              <LogoTile
+                label={logos.white === logos.stackedWhite ? "Wordmark · Reversed" : "Horizontal · Reversed"}
+                src={logos.white}
+                bg={hero}
+              />
+            )}
+            {logos.stackedWhite && logos.stackedWhite !== logos.white && (
               <LogoTile label="Stacked · Reversed" src={logos.stackedWhite} bg={hero} />
+            )}
+            {logos.icon && (
+              <LogoTile label="Corporate icon · not a logo" src={logos.icon} bg="#ffffff" border />
             )}
           </div>
         )}
