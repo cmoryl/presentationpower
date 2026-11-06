@@ -1557,7 +1557,14 @@ export function AuroraStatCell({
             fontWeight: 600,
             lineHeight: 0.95,
             letterSpacing: "-0.035em",
-            color: ink.strong,
+            ...(stage
+              ? {
+                  backgroundImage: spectrumGradientCss(index),
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                }
+              : { color: ink.strong }),
           }}
         >
           <span>{value || "—"}</span>
@@ -1567,7 +1574,7 @@ export function AuroraStatCell({
                 fontSize: fillPx(48, "figure"),
                 fontWeight: 500,
                 letterSpacing: "-0.02em",
-                color: ink.strong,
+                color: stage ? stage.deep : ink.strong,
               }}
             >
               {unit}
