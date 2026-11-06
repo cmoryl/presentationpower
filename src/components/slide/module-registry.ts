@@ -36,6 +36,8 @@ export type ModuleRenderArgs = {
   dash: DashLook;
   /** Bare-surface skins (Organic Systems S21): no translucent content boxes. */
   bareSurfaces?: boolean;
+  /** Corporate guide treatment, resolved by the shared renderer. */
+  spectrum?: boolean;
   /** `mode === "dark"`, precomputed so families don't re-derive it. */
   isDark: boolean;
   /**

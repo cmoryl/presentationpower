@@ -26,6 +26,7 @@ import { clampLines, fillPx } from "@/lib/open-space-fill";
 import { iconByName } from "@/lib/icon-library";
 import { itemTone } from "@/lib/item-tone";
 import { cellAccent } from "./cell-controls";
+import { SpectrumPhotoLayout } from "../SpectrumPhotoLayout";
 
 registerSlideModule({
   id: "family:image",
@@ -44,7 +45,10 @@ registerSlideModule({
     "MV-IMG-MATRIX-4",
     "MV-IMG-MATRIX-6",
   ],
-  render: ({ variant, brand, pageNumber, c, mode, ink, accentTone, isDark }) => {
+  render: ({ variant, brand, pageNumber, c, mode, ink, accentTone, isDark, spectrum }) => {
+    if (spectrum && ["MV-IMG-FULL-BLEED", "MV-IMG-QUOTE-BG"].includes(variant.id)) {
+      return <SpectrumPhotoLayout brand={brand} pageNumber={pageNumber} content={c} />;
+    }
     switch (variant.id) {
       case "MV-IMG-FULL-BLEED": {
         const _titleLen = s(c.title).length + s(c.body).length;

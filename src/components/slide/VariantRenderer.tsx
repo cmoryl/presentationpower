@@ -325,6 +325,7 @@ function VariantRendererInner(props: Props) {
                             clientLogoUrl: clientLogoUrl ?? null,
                             dash,
                             bareSurfaces,
+                            spectrum: String(activePack?.id) === "skin-s06",
                           })}
                         </StatArrangementProvider>
                       </StatLayoutProvider>
@@ -351,6 +352,7 @@ function renderVariantBody({
   clientLogoUrl,
   dash,
   bareSurfaces = false,
+  spectrum = false,
 }: {
   slide: DeckSlide;
   variant: ModuleVariant;
@@ -364,6 +366,7 @@ function renderVariantBody({
   dash: DashLook;
   /** Bare-surface skins (e.g. Organic Systems S21): no translucent content boxes. */
   bareSurfaces?: boolean;
+  spectrum?: boolean;
 }): ReactNode {
   // Mode-aware ink palette for charts and data viz. Every chart/graph variant
   // MUST use these tokens (never hardcoded `rgba(10,15,28,X)`) so text stays
@@ -421,6 +424,7 @@ function renderVariantBody({
       clientLogoUrl,
       dash,
       bareSurfaces,
+      spectrum,
       isDark,
       ink,
       accentTone,
