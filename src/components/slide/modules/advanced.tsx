@@ -2103,7 +2103,7 @@ registerSlideModule({
                         className="absolute whitespace-nowrap"
                         style={{
                           left: hero ? 44 : 12,
-                          top: hero ? -40 : 12,
+                          top: hero ? -40 : (Number(it.y) < 0.5 ? 40 : 12),
                           fontSize: fillPx(hero ? 26 : 17, "body"),
                           fontWeight: hero ? 800 : 500,
                           color: hero ? ink.strong : isDark ? "rgba(255,255,255,0.75)" : ink.body,

@@ -110,13 +110,13 @@ export function OrbitRing({
 registerSlideModule({
   id: "family:growth-orbits",
   variantIds: ["MV-PROOF-GROWTH-ORBITS"],
-  render: ({ brand, pageNumber, c, mode, ink, isDark, bareSurfaces }) => {
+  render: ({ brand, pageNumber, c, mode, ink, isDark, bareSurfaces, spectrum }) => {
     const accent = accentInk(brand.tokens.accent, mode, 4.5);
     const logos = arr(c.items).slice(0, MAX_LOGOS);
     const growth = arr(c.growth).slice(0, MAX_GROWTH);
     // No acquisitions wall → the growth list inherits its space at a larger scale.
     const gk = logos.length === 0 ? 1.7 : 1;
-    const cardsMode = s(c.display) === "cards";
+    const cardsMode = spectrum || s(c.display) === "cards";
     const orbits = arr(c.orbits).slice(0, MAX_ORBITS);
     const wall = resolveLogoWall(c.logoWall);
     // Ring colour, weight and dot treatment are authored per face.
@@ -209,7 +209,7 @@ registerSlideModule({
                           />
                         ) : (
                           <div
-                            className="truncate text-center"
+                            className="min-w-0 text-center"
                             style={{
                               fontSize: fillPx(18, "body"),
                               fontWeight: 700,
@@ -244,7 +244,7 @@ registerSlideModule({
                     ))}
                   </div>
                 ) : (
-                <div className="mt-4 flex flex-col" style={{ gap: 18 * gk }}>
+                <div className="mt-4 flex flex-col" style={{ gap: spectrum ? 8 : 18 * gk }}>
                   {growth.map((g: Item, i) => (
                     <div key={i} className="flex items-baseline" style={{ gap: 22 }}>
                       <div

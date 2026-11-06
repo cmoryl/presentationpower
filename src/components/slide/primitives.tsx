@@ -1563,7 +1563,7 @@ export function StatFigure({
             data-stat-value={valueIsPhrase ? "phrase" : "figure"}
             className={valueIsPhrase ? "font-semibold" : "font-semibold tabular-nums"}
             style={{
-              fontSize: valueFontSize,
+              fontSize: spectrumFig ? (size === "colossal" ? 220 : 96) : valueFontSize,
               lineHeight: fillLeading("figure", valueIsPhrase ? 1.05 : 0.92),
               letterSpacing: valueIsPhrase ? "-0.02em" : "-0.035em",
               color: vc,
@@ -1601,7 +1601,7 @@ export function StatFigure({
               <span
                 className={`ml-2 align-top ${valueStyle === "gradient" ? "font-bold" : "font-medium"}`}
                 style={{
-                  fontSize: unitFontSize,
+                  fontSize: spectrumFig ? 44 : unitFontSize,
                   letterSpacing: "-0.02em",
                   ...(spectrumFig
                     ? {
