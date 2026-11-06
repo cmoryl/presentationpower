@@ -280,6 +280,7 @@ registerSlideModule({
                       size="sm"
                       shape="column"
                       progress={0.72}
+                      revealIndex={i}
                       icon={s(it.icon)}
                       iconSize={s(it.iconSize)}
                     />
