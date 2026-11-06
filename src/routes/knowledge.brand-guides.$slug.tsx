@@ -47,6 +47,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Download } from "lucide-react";
+import { LogoRuleVisual } from "@/components/brand/LogoRuleVisual";
+import { logoRuleDemo } from "@/lib/logo-rule-demos";
 import { toast } from "sonner";
 import { brandSwatchSpec, brandSwatchSpecText } from "@/lib/brand-swatch-spec";
 import { applyBrandGuidePatch } from "@/lib/brand-guide-edits";
@@ -269,22 +271,39 @@ function BrandGuideView() {
           </div>
         )}
         <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
-          {guide.logoRules.map((r) => (
-            <div
-              key={r.title}
-              className="flex gap-3 border-t border-border py-4"
-            >
+          {guide.logoRules.map((r) => {
+            const demo = logoRuleDemo(r);
+            const logoSrc = logos?.color ?? logos?.stackedColor;
+            return (
               <div
-                className="shrink-0 text-xs font-semibold text-muted-foreground"
+                key={r.title}
+                className="flex flex-col gap-3 border-t border-border py-4"
               >
-                {r.do ? "DO" : "×"}
+                {demo && logoSrc && (
+                  <LogoRuleVisual
+                    demo={demo}
+                    src={logoSrc}
+                    whiteSrc={logos?.white ?? logos?.stackedWhite}
+                    wordmark={guide.title}
+                    darkGround={hero}
+                    accent={accent}
+                    alt={`${r.do ? "Correct" : "Incorrect"}: ${r.title}`}
+                  />
+                )}
+                <div className="flex gap-3">
+                  <div
+                    className="shrink-0 text-xs font-semibold text-muted-foreground"
+                  >
+                    {r.do ? "DO" : "×"}
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-foreground">{r.title}</div>
+                    <div className="mt-0.5 text-xs text-muted-foreground">{r.description}</div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="text-sm font-semibold text-foreground">{r.title}</div>
-                <div className="mt-0.5 text-xs text-muted-foreground">{r.description}</div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </Section>
 
