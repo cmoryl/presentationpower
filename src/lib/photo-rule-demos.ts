@@ -48,10 +48,10 @@ const MATCHERS: Matcher[] = [
   { pattern: /soft .*light|depth of field/i, demo: "soft-light-dof" },
   { pattern: /open space|clear of faces/i, demo: "open-space" },
   { pattern: /gradient wash|soft-transition/i, demo: "gradient-wash" },
+  { pattern: /legible|readable metric/i, demo: "legible-crop" },
   { pattern: /lead with the product|real ui|connector map|dashboard/i, demo: "product-first" },
   { pattern: /people alongside|person in the frame|human-first|show humans/i, demo: "humans-in-frame" },
   { pattern: /light and uncluttered|surfaces light/i, demo: "clean-surfaces" },
-  { pattern: /legible|readable metric/i, demo: "legible-crop" },
 ];
 
 /** Pick the visual demonstration for a photography rule line. */
