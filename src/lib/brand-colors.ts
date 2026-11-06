@@ -57,6 +57,74 @@ export const ACCENT_RAMP = [
   BRAND.lavender.toLowerCase(),
 ] as const;
 
+/**
+ * SPECTRUM — the corporate deck style from the TransPerfect PowerPoint Style
+ * Guide (MarComm, Q4 2026). Full replacement of the previous enterprise card
+ * look for slide modules, decks, sales presets and the presentation agent.
+ * Light-first: every corporate slide sits on the white→lilac canvas; there are
+ * no dark corporate pages. Events, Bowl, print and social keep BRAND above.
+ */
+export const SPECTRUM = {
+  /** Text colors by role. */
+  ink: BRAND.ink, // titles & headings
+  body: "#3D3B5C", // running text
+  eyebrow: BRAND.blue, // eyebrows & links
+  footnote: "#5E6B99", // footnotes / sources
+  /** Theme palette additions. */
+  slate: "#424061",
+  mist: "#E6E6EA",
+  royal: "#2F5FDB",
+  sky: "#8AB8FF",
+  ice: "#B9D6FF",
+  /** Light canvas: white → lilac. */
+  canvas: { from: "#FFFFFF", to: "#F0F3FB" },
+  /** Spectrum stages — always in this order: aqua 1st, blue 2nd, violet 3rd. */
+  stages: [
+    {
+      name: "aqua",
+      brand: "#0FB5B2",
+      light: BRAND.aqua,
+      deep: "#0A8E99",
+      tint: "#C9F6F4",
+      tintSoft: "#E3FDFC",
+    },
+    {
+      name: "blue",
+      brand: "#3B7BF0",
+      light: "#8AB8FF",
+      deep: "#1A3FC2",
+      tint: "#CFE0FF",
+      tintSoft: "#E6EFFF",
+    },
+    {
+      name: "violet",
+      brand: "#8F6BF0",
+      light: BRAND.lavender,
+      deep: "#3D1FA6",
+      tint: "#DDD0FF",
+      tintSoft: "#EFE7FF",
+    },
+  ],
+  /** The only deep saturated block allowed — one per slide, GlobalLink only. */
+  globalLinkCard: ["#1F6FD1", "#2F55D6", "#6440D2"],
+  /** Frost card — the corporate container spec. */
+  frostCard: {
+    /** Corner radius, inches (0.22″ ≈ 32 stage px at 144 px/in). */
+    radiusIn: 0.22,
+    /** 90° fill gradient. */
+    fillFrom: "#FFFFFF",
+    fillTo: "#F0F3FB",
+    /** 0.75 pt keyline. */
+    line: "#D6DCF0",
+    linePt: 0.75,
+    /** Outer shadow: ink at 7% (93% transparent), blur 18 pt, distance 7 pt. */
+    shadowColor: BRAND.ink,
+    shadowAlpha: 0.07,
+    shadowBlurPt: 18,
+    shadowDistancePt: 7,
+  },
+} as const;
+
 /** Hex without '#', as PowerPoint/pptxgenjs expects. */
 export const pptxHex = (hex: string) => hex.replace("#", "").toUpperCase();
 
