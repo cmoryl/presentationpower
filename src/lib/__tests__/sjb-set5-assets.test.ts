@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { SJB_SET5_ASSETS, SJB_SET5_PACKS } from '../sjb-set5-assets';
+import { SET5_ASSET_GROUPS, groupedSet5Assets, set5AssetGroup } from '../sjb-set5-availability';
 import { isPublicNoLoginPath } from '../sign-out';
 
 describe('Design Set 5 reusable asset delivery', () => {
@@ -44,6 +45,17 @@ describe('Design Set 5 reusable asset delivery', () => {
   it('allows viewing both asset pages without signing in', () => {
     expect(isPublicNoLoginPath('/share/san-juan-bowl/set-5-assets')).toBe(true);
     expect(isPublicNoLoginPath('/events/san-juan-bowl/set-5-assets')).toBe(true);
+  });
+  it('groups every asset into a known browsing section with no leftovers', () => {
+    for (const asset of SJB_SET5_ASSETS) {
+      expect(SET5_ASSET_GROUPS).toContain(set5AssetGroup(asset.category));
+    }
+    const sections = groupedSet5Assets(SJB_SET5_ASSETS);
+    expect(sections.map(s => s.group)).toEqual([...SET5_ASSET_GROUPS]);
+    expect(sections.reduce((sum, s) => sum + s.assets.length, 0)).toBe(SJB_SET5_ASSETS.length);
+    expect(sections.find(s => s.group === 'Finished designs')?.assets).toHaveLength(28);
+    expect(sections.find(s => s.group === 'Enlarged 12,000px backgrounds')?.assets).toHaveLength(27);
+    expect(sections.find(s => s.group === 'Movable objects (transparent)')?.assets).toHaveLength(16);
   });
 });
 import { SJB_SET5_FULL_DESIGNS } from '../sjb-set5-full';

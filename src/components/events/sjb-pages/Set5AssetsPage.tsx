@@ -4,7 +4,7 @@ import { useServerFn } from '@tanstack/react-start';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useIsAdmin } from '@/hooks/use-is-admin';
 import { deleteSet5Asset } from '@/lib/sjb-set5-removals.functions';
-import { availableSet5Assets, availableSet5Packs, set5RemovalsOptions } from '@/lib/sjb-set5-availability';
+import { availableSet5Assets, availableSet5Packs, groupedSet5Assets, set5RemovalsOptions } from '@/lib/sjb-set5-availability';
 import { Button } from '@/design-system/element';
 import { SjbLink, SjbShell } from '@/components/events/SjbShare';
 import { type SjbSet5Asset } from '@/lib/sjb-set5-assets';
@@ -28,15 +28,17 @@ export function SjbSet5Assets() {
   const [pendingDelete, setPendingDelete] = useState<SjbSet5Asset | null>(null);
   const [deleting, setDeleting] = useState(false);
   const deleteDialog = useRef<HTMLDialogElement>(null);
-  const [category, setCategory] = useState('All assets');
+  const [group, setGroup] = useState('All assets');
   const [ground, setGround] = useState('Light');
   const [selected, setSelected] = useState<SjbSet5Asset | null>(null);
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState('');
   const dialog = useRef<HTMLDialogElement>(null);
-  const categories = ['All assets', ...new Set(assets.map(a => a.category)), ...(assets.some(a => a.category === category) || category === 'All assets' ? [] : [category])];
-  const visible = assets.filter(a => category === 'All assets' || a.category === category);
+  const sections = groupedSet5Assets(assets);
+  const groupNames = ['All assets', ...sections.map(s => s.group)];
+  const visibleSections = sections.filter(s => group === 'All assets' || s.group === group);
+  const visibleCount = visibleSections.reduce((sum, s) => sum + s.assets.length, 0);
   const previewGround = ground === 'Dark' ? 'bg-foreground' : 'bg-muted';
   useEffect(() => { if (selected) dialog.current?.showModal(); else dialog.current?.close(); }, [selected]);
   useEffect(() => { if (pendingDelete) deleteDialog.current?.showModal(); else deleteDialog.current?.close(); }, [pendingDelete]);
@@ -75,17 +77,20 @@ export function SjbSet5Assets() {
       <p className="mt-5 border-l-2 border-border pl-3 text-sm leading-relaxed text-muted-foreground">New Set 5 variations include eight background compositions in native and 12,000px enlarged versions, plus four transparent objects. These are AI-created matching artwork, not exact Canva originals or real venue photographs; the new additions are individual downloads, not included in the existing ZIP packs. Other 12,000px backgrounds include cleaned enlarged Canva originals and separately labelled AI-edited detail rebuilds. These are not native 12K images: enlargement adds pixels, not recovered detail; rebuilds may change small details. Each asset lists its actual source resolution. The email original was recovered at 840 × 426, below the Canva catalogue's 1,200 × 608. Existing objects and cinematic effects have native detail up to 1,920px. Vector effects scale independently; layered SVGs contain raster pieces, not recovered original layers. RGB assets; final billboard suitability depends on size, viewing distance and printer requirements. Saved Canva designs are unchanged.</p>
       {error && <p role="alert" className="mt-4 text-destructive">{error}</p>}
       <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
-        <label htmlFor="set5-category" className="grid gap-1.5 text-sm font-medium">Asset type<select id="set5-category" value={category} onChange={e => setCategory(e.target.value)} className="h-10 max-w-full rounded-md border border-input bg-background px-3 text-foreground focus-visible:ring-2 focus-visible:ring-ring">{categories.map(c => <option key={c}>{c}</option>)}</select></label>
+        <label htmlFor="set5-category" className="grid gap-1.5 text-sm font-medium">Asset type<select id="set5-category" value={group} onChange={e => setGroup(e.target.value)} className="h-10 max-w-full rounded-md border border-input bg-background px-3 text-foreground focus-visible:ring-2 focus-visible:ring-ring">{groupNames.map(g => <option key={g}>{g}</option>)}</select></label>
         <fieldset><legend className="mb-1.5 text-sm font-medium">Preview background</legend><div className="flex gap-1">{['Light', 'Dark'].map(g => <Button key={g} variant={ground === g ? 'default' : 'outline'} size="sm" aria-pressed={ground === g} onClick={() => setGround(g)}>{g}</Button>)}</div></fieldset>
       </div>
-      <p className="mt-5 text-sm text-muted-foreground">{visible.length} assets</p>
-      <div className="mt-4 grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {visible.map(asset => <article key={asset.id} className="min-w-0 overflow-hidden rounded-lg border border-border bg-background">
+      <p className="mt-5 text-sm text-muted-foreground">{visibleCount} assets</p>
+      {visibleSections.map(section => <section key={section.group} aria-label={section.group} className="mt-8">
+        <h2 className="border-b border-border pb-2 text-xl font-semibold">{section.group}<span className="ml-2 text-sm font-normal text-muted-foreground">{section.assets.length}</span></h2>
+        <div className="mt-4 grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {section.assets.map(asset => <article key={asset.id} className="min-w-0 overflow-hidden rounded-lg border border-border bg-background">
           {isAdmin && <div className="flex justify-end px-2 pt-2"><Button variant="ghost" size="icon" aria-label={`Delete ${asset.title}`} title={`Delete ${asset.title}`} onClick={() => { setError(''); setPendingDelete(asset); }}><Trash2 className="size-4 text-destructive" /></Button></div>}
           <Button variant="ghost" aria-label={`Enlarge ${asset.title}`} onClick={() => setSelected(asset)} className={`relative block h-64 w-full rounded-none p-3 hover:bg-transparent ${previewGround}`}><img src={asset.previewUrl} alt={asset.title} loading="lazy" className="h-full w-full object-contain" /><Maximize2 className="absolute bottom-3 right-3 rounded bg-background text-foreground" aria-hidden /></Button>
-          <div className="p-4"><p className="text-xs text-muted-foreground">{asset.category}</p><h2 className="mt-1 font-semibold">{asset.title}</h2><p className="mt-1 text-sm text-muted-foreground">{asset.dimensions}</p><p className="mt-2 text-xs leading-relaxed text-muted-foreground">{asset.note}</p><div className="mt-4 flex flex-wrap gap-2"><Button variant="outline" size="sm" disabled={busy === asset.filename} onClick={() => download(asset.downloadUrl, asset.filename)}><Download />{busy === asset.filename ? 'Preparing…' : `Save ${asset.filename.split('.').pop()?.toUpperCase()}`}</Button>{asset.vectorUrl && <Button variant="outline" size="sm" onClick={() => download(asset.vectorUrl ?? '', asset.filename.replace(/\.png$/, '.svg'))}><Download />Save SVG</Button>}</div></div>
+          <div className="p-4"><p className="text-xs text-muted-foreground">{asset.category}</p><h3 className="mt-1 font-semibold">{asset.title}</h3><p className="mt-1 text-sm text-muted-foreground">{asset.dimensions}</p><p className="mt-2 text-xs leading-relaxed text-muted-foreground">{asset.note}</p><div className="mt-4 flex flex-wrap gap-2"><Button variant="outline" size="sm" disabled={busy === asset.filename} onClick={() => download(asset.downloadUrl, asset.filename)}><Download />{busy === asset.filename ? 'Preparing…' : `Save ${asset.filename.split('.').pop()?.toUpperCase()}`}</Button>{asset.vectorUrl && <Button variant="outline" size="sm" onClick={() => download(asset.vectorUrl ?? '', asset.filename.replace(/\.png$/, '.svg'))}><Download />Save SVG</Button>}</div></div>
         </article>)}
-      </div>
+        </div>
+      </section>)}
       <dialog ref={dialog} onClose={() => setSelected(null)} onCancel={() => setSelected(null)} aria-labelledby="set5-preview-title" className="fixed inset-0 m-auto max-h-[92dvh] w-[min(1100px,94vw)] overflow-auto rounded-lg border border-border bg-background p-5 text-foreground shadow-xl backdrop:bg-foreground/60">
         {selected && <><div className="mb-4 flex items-start justify-between gap-3"><div><h2 id="set5-preview-title" className="text-lg font-semibold">{selected.title}</h2><p className="text-sm text-muted-foreground">{selected.dimensions} · {selected.note}</p></div><Button variant="ghost" size="icon" aria-label="Close preview" onClick={() => setSelected(null)}><X /></Button></div><div className={`flex min-h-64 items-center justify-center p-4 ${previewGround}`}><img src={selected.previewUrl} alt={selected.title} className="max-h-[65dvh] max-w-full object-contain" /></div><Button className="mt-4" variant="outline" disabled={busy === selected.filename} onClick={() => download(selected.downloadUrl, selected.filename)}><Download />Save original</Button>{error && <p role="alert" className="mt-3 text-destructive">{error}</p>}</>}
       </dialog>

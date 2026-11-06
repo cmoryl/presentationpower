@@ -141,3 +141,4 @@
 
 - [x] LogoHub: last-updated date + monthly online logo check flagged for admin review
 - [x] Billboards: fold team versions into main boards with roadside mockups + lightbox
+- [x] Set 5 asset area: seven browsing sections (Finished designs, Backgrounds, Enlarged 12,000px, Movable objects, Motion & light effects, Layered artwork, Official logos) with headings + group filter; grouping lives in sjb-set5-availability.ts, categories unchanged
