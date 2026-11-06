@@ -21,13 +21,7 @@ import { AccentRule } from "../Connectors";
 import { hexA } from "@/lib/accent-tokens";
 import { foregroundOn } from "@/lib/export-foreground";
 import { fillPx } from "@/lib/open-space-fill";
-import { useStylePack } from "../StylePackContext";
 import { SpectrumPhotoLayout } from "../SpectrumPhotoLayout";
-
-function SpectrumOpeningPhoto(props: React.ComponentProps<typeof SpectrumPhotoLayout> & { fallback: React.ReactNode }) {
-  const pack = useStylePack();
-  return String(pack?.id) === "skin-s06" ? <SpectrumPhotoLayout {...props} /> : <>{props.fallback}</>;
-}
 
 registerSlideModule({
   id: "family:opening",
@@ -48,7 +42,10 @@ registerSlideModule({
     "MV-OP-COVER-MONOGRAM",
     "MV-OP-COVER-STACKED",
   ],
-  render: ({ variant, brand, pageNumber, c, mode, ink, accentTone, isDark }) => {
+  render: ({ variant, brand, pageNumber, c, mode, ink, accentTone, isDark, spectrum }) => {
+    if (spectrum && ["MV-OP-COVER-MEDIA", "MV-OP-COVER-GRADIENT"].includes(variant.id)) {
+      return <SpectrumPhotoLayout brand={brand} pageNumber={pageNumber} content={c} />;
+    }
     switch (variant.id) {
       case "MV-OP-COVER":
         return (
@@ -142,7 +139,6 @@ registerSlideModule({
         // stays visible.
         const platedCover = brand.id === "bm-tp-games" && !s(c.mediaUrl) && !s(c.mediaPath);
         return (
-          <SpectrumOpeningPhoto brand={brand} pageNumber={pageNumber} content={c} fallback={
           <SlideFrame
             brand={brand}
             pageNumber={pageNumber}
@@ -225,7 +221,6 @@ registerSlideModule({
               </MetaRow>
             </div>
           </SlideFrame>
-          } />
         );
       }
       case "MV-OP-COVER-MINIMAL":
