@@ -106,7 +106,7 @@
   font-size: 96px !important;
   font-weight: 600 !important;
 }
-[data-style-pack="skin-s06"] [data-module-variant="MV-STAT-HERO-NUMBER"] [data-spectrum-fig],
-[data-style-pack="skin-s06"] [data-module-variant="MV-STAT-IMAGE-TYPE"] [data-spectrum-fig] {
+[data-style-pack="skin-s06"] [data-spectrum-hero] [data-spectrum-fig],
+[data-style-pack="skin-s06"] [data-module-variant="MV-STAT-IMAGE-TYPE"] .mt-6.tabular-nums[data-spectrum-fig] {
   font-size: 220px !important;
 }
