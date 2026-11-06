@@ -1,5 +1,10 @@
 # Roadmap — Spectrum corporate style adoption (done)
 
+## Canva billboard refresh — November 6
+- [ ] Refresh all 19 saved billboard designs, preserving pixels and removing export metadata.
+- [ ] Recompose all 40 day/dusk roadside examples using refreshed files.
+- [ ] Verify downloads and examples on the shared Element page.
+
 - [x] SPECTRUM constants in brand-colors.ts + spectrum-style.ts helpers
 - [x] S06 skin restyled as Enterprise Spectrum (catalog + traits + frost card)
 - [x] Gradient spectrum stats in AuroraStatCell when skin-s06 is active
