@@ -441,7 +441,7 @@ export function SlideFrame({
   // Alternate style pack (public taste-testing directory). When active it owns
   // the page ground, ink and accent; it never applies on production surfaces.
   const pack = useStylePack();
-  const spectrum = pack?.id === "skin-s06";
+  const spectrum = String(pack?.id) === "skin-s06";
   // ELEMENT PRODUCT SKIN (S29). Element markets itself with its own identity, so
   // whenever the Element style pack is active the chrome lockup swaps to the
   // five-brick Element mark — the TransPerfect corporate wordmark never renders
