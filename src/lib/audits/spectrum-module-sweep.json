@@ -202,15 +202,17 @@
       "name": "Big idea",
       "familyId": "MF-03",
       "family": "Context",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-INS-SO-WHAT",
@@ -361,31 +363,35 @@
       "name": "Numbered step spotlight",
       "familyId": "MF-04",
       "family": "Solution",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-PROC-STAGE-ORBITS",
       "name": "Stage orbits (numbered medallions)",
       "familyId": "MF-04",
       "family": "Solution",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text outside margins/stage",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-PROC-BEFORE-AFTER",
@@ -465,14 +471,16 @@
       "name": "Journey timeline (vertical, 3-6)",
       "familyId": "MF-04",
       "family": "Solution",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text outside margins/stage"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-PROC-SWIMLANE-FLOW",
@@ -565,15 +573,17 @@
       "name": "Growth proof split (logos + orbit stats)",
       "familyId": "MF-05",
       "family": "Proof",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-SOL-CAP-CARDS",
@@ -1178,15 +1188,17 @@
       "name": "Desktop monitor showcase",
       "familyId": "MF-04",
       "family": "Solution",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text outside margins/stage",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text outside margins/stage"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-SHOW-PHONE",
@@ -1429,15 +1441,17 @@
       "name": "Client outcome matrix",
       "familyId": "MF-06",
       "family": "Case studies",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-CLIENT-DETAIL-3",
@@ -1529,14 +1543,16 @@
       "name": "Bento \u2014 8 cell",
       "familyId": "MF-04",
       "family": "Solution",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text outside margins/stage"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-BENTO-VALUE-CLOSE",
@@ -1771,14 +1787,16 @@
       "name": "Roadmap \u2014 quarters",
       "familyId": "MF-04",
       "family": "Solution",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text outside margins/stage"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-FUNNEL",
@@ -1845,29 +1863,33 @@
       "name": "Strategy 2\u00d72 matrix",
       "familyId": "MF-05",
       "family": "Data",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text outside margins/stage",
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-ICEBERG",
       "name": "Iceberg \u2014 above/below",
       "familyId": "MF-03",
       "family": "Context",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text outside margins/stage"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-EDITORIAL-SPREAD",
@@ -1949,15 +1971,17 @@
       "name": "Pull-quote stack",
       "familyId": "MF-05",
       "family": "Proof",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-DEFINITION",
@@ -2013,16 +2037,18 @@
       "name": "Dashboard \u2014 weekly summary",
       "familyId": "MF-05",
       "family": "Data",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text outside margins/stage",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-DASH-DONUT-TRIO",
@@ -2419,16 +2445,18 @@
       "name": "Locations \u2014 world map with pins",
       "familyId": "MF-05",
       "family": "Data",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text outside margins/stage",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-LOC-WORLD-STATS",
@@ -2475,16 +2503,18 @@
       "name": "Stat \u2014 giant hero number",
       "familyId": "MF-05",
       "family": "Data",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text outside margins/stage",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-STAT-TYPE-WALL",
@@ -2503,30 +2533,34 @@
       "name": "Stat \u2014 proof board (headline results + scale rail)",
       "familyId": "MF-05",
       "family": "Proof",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-LOC-CITY-DIRECTORY",
       "name": "Locations \u2014 city directory",
       "familyId": "MF-05",
       "family": "Data",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-STAT-KPI-RAIL",
@@ -2594,15 +2628,17 @@
       "name": "Stat \u2014 actual \u2192 target \u2192 delta",
       "familyId": "MF-05",
       "family": "Data",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-STAT-EDITORIAL-DASH",
@@ -2622,59 +2658,67 @@
       "name": "Stat \u2014 asymmetrical mosaic",
       "familyId": "MF-05",
       "family": "Data",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text outside margins/stage"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-STAT-IMAGE-TYPE",
       "name": "Stat \u2014 image + oversized type",
       "familyId": "MF-05",
       "family": "Data",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-STAT-PHOTO-TRIO",
       "name": "Stat \u2014 photo trio with figures",
       "familyId": "MF-05",
       "family": "Data",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-STAT-PHOTO-BAND",
       "name": "Stat \u2014 photo band KPI rail",
       "familyId": "MF-05",
       "family": "Data",
-      "status": "FAIL",
+      "status": "PASS",
       "before": [
         "type below 12pt",
         "text collisions",
         "side padding not 0.75in"
       ],
-      "failures": [
+      "failures": [],
+      "previousFailures": [
         "text collisions"
-      ]
+      ],
+      "followUp": "Rechecked November 6: layout corrections, full text-line spacing and guide-sized figures; browser checks only."
     },
     {
       "id": "MV-STAT-PORTRAIT-PROOF",

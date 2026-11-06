@@ -9,6 +9,7 @@
 // ./module-primitives and ./module-kit.
 // ────────────────────────────────────────────────────────────────────────────
 import * as React from "react";
+import { SPECTRUM_REPAIRED_MODULES } from "@/lib/spectrum-repaired-modules";
 import type { ReactNode } from "react";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
@@ -307,7 +308,7 @@ function VariantRendererInner(props: Props) {
                   >
                     {/* display:contents keeps layout untouched while exposing the
                   slide mode to CSS (light mode kills text/content shadows). */}
-                    <div data-slide-mode={mode} style={{ display: "contents" }}>
+                    <div data-slide-mode={mode} data-module-variant={variant.id} data-spectrum-repair={SPECTRUM_REPAIRED_MODULES.has(variant.id) ? "" : undefined} style={{ display: "contents" }}>
                       <StatLayoutProvider layout={resolveStatLayout(variant.id, c)}>
                         <StatArrangementProvider
                           arrangement={

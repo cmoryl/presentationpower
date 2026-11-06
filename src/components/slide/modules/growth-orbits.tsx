@@ -110,13 +110,13 @@ export function OrbitRing({
 registerSlideModule({
   id: "family:growth-orbits",
   variantIds: ["MV-PROOF-GROWTH-ORBITS"],
-  render: ({ brand, pageNumber, c, mode, ink, isDark, bareSurfaces }) => {
+  render: ({ brand, pageNumber, c, mode, ink, isDark, bareSurfaces, spectrum }) => {
     const accent = accentInk(brand.tokens.accent, mode, 4.5);
     const logos = arr(c.items).slice(0, MAX_LOGOS);
     const growth = arr(c.growth).slice(0, MAX_GROWTH);
     // No acquisitions wall → the growth list inherits its space at a larger scale.
     const gk = logos.length === 0 ? 1.7 : 1;
-    const cardsMode = s(c.display) === "cards";
+    const cardsMode = spectrum || s(c.display) === "cards";
     const orbits = arr(c.orbits).slice(0, MAX_ORBITS);
     const wall = resolveLogoWall(c.logoWall);
     // Ring colour, weight and dot treatment are authored per face.
@@ -173,7 +173,7 @@ registerSlideModule({
             )}
 
             {logos.length > 0 && (
-              <div className="mt-10" data-intro-item="" data-intro-step={1}>
+              <div className={spectrum ? "mt-4" : "mt-10"} data-intro-item="" data-intro-step={1}>
                 {s(c.logosLabel) && <Kicker brand={brand}>{s(c.logosLabel)}</Kicker>}
                 <div
                   className="mt-4 grid"
@@ -209,7 +209,7 @@ registerSlideModule({
                           />
                         ) : (
                           <div
-                            className="truncate text-center"
+                            className="min-w-0 text-center"
                             style={{
                               fontSize: fillPx(18, "body"),
                               fontWeight: 700,
@@ -227,12 +227,12 @@ registerSlideModule({
             )}
 
             {growth.length > 0 && (
-              <div className="mt-10" data-intro-item="" data-intro-step={2}>
+              <div className={spectrum ? "mt-4" : "mt-10"} data-intro-item="" data-intro-step={2}>
                 {s(c.growthLabel) && <Kicker brand={brand}>{s(c.growthLabel)}</Kicker>}
                 {cardsMode ? (
-                  <div className="mt-5 flex flex-col gap-4">
+                  <div className={`mt-5 flex flex-col ${spectrum ? "gap-2" : "gap-4"}`}>
                     {growth.map((g: Item, i) => (
-                      <div key={i} className="flex items-center gap-7 rounded-2xl px-7 py-5" style={{ background: isDark ? "rgba(255,255,255,0.05)" : "rgba(10,15,28,0.03)", border: `1px solid ${ink.hairline}`, borderLeft: `4px solid ${accent}` }}>
+                      <div key={i} className={`flex items-center gap-7 rounded-2xl px-7 ${spectrum ? "py-0" : "py-5"}`} style={{ background: isDark ? "rgba(255,255,255,0.05)" : "rgba(10,15,28,0.03)", border: `1px solid ${ink.hairline}`, borderLeft: spectrum ? undefined : `4px solid ${accent}` }}>
                         <div className="shrink-0 tabular-nums" style={{ minWidth: 120, fontSize: fillPx(76, "display"), fontWeight: 800, lineHeight: 1, letterSpacing: "-0.04em", color: ink.strong }}>
                           {formatStatValue(g.value, g)}
                         </div>
@@ -244,7 +244,7 @@ registerSlideModule({
                     ))}
                   </div>
                 ) : (
-                <div className="mt-4 flex flex-col" style={{ gap: 18 * gk }}>
+                <div className="mt-4 flex flex-col" style={{ gap: spectrum ? 8 : 18 * gk }}>
                   {growth.map((g: Item, i) => (
                     <div key={i} className="flex items-baseline" style={{ gap: 22 }}>
                       <div

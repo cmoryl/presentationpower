@@ -866,7 +866,7 @@ registerSlideModule({
                 <div className="mt-4 text-center">
                   <SlideTitle brand={brand} title={s(c.title)} />
                 </div>
-                <div className="mt-10 w-[64%]">
+                <div className="mt-6 w-[48%] shrink-0">
                   <DeviceFrame kind="monitor" tone={tone} accent="var(--slide-accent-text)">
                     {screen}
                   </DeviceFrame>
@@ -955,7 +955,7 @@ registerSlideModule({
                       ...moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", {
                         radius: 22,
                       }),
-                      padding: dense ? 24 : 32,
+                      padding: dense ? 16 : 32,
                     }}
                   >
                     <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
@@ -1014,7 +1014,7 @@ registerSlideModule({
                       </span>
                     </div>
                     <div
-                      className={dense ? "mt-5" : "mt-7"}
+                      className={dense ? "mt-3" : "mt-7"}
                       style={{
                         fontSize: dense ? 26 : 30,
                         fontWeight: 600,
@@ -1028,7 +1028,7 @@ registerSlideModule({
                       {s(it.result)}
                     </SupportingText>
                     <div
-                      className={dense ? "mt-5 pt-4" : "mt-7 pt-6"}
+                      className={dense ? "mt-3 pt-2" : "mt-7 pt-6"}
                       style={{ borderTop: `1px solid ${ink.hairline}` }}
                     >
                       <StatFigure

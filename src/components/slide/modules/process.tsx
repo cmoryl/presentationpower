@@ -1384,7 +1384,7 @@ registerSlideModule({
                   backgroundImage: `linear-gradient(180deg, transparent, color-mix(in oklab, ${accent} 44%, transparent) 14%, color-mix(in oklab, ${accent} 44%, transparent) 86%, transparent)`,
                 }}
               />
-              <div className="flex flex-col" style={{ gap: count >= 5 ? 22 : 30 }}>
+              <div className="flex flex-col" style={{ gap: count >= 5 ? 12 : 20 }}>
                 {stages.map((it, i) => {
                   const flagged = truthy(it.highlight);
                   const line = itemTone(it) ?? (flagged ? BRAND.pink : accent);
@@ -1429,7 +1429,7 @@ registerSlideModule({
                         )}
                       </div>
                       <div
-                        className="relative min-w-0 flex-1 px-7 pb-8 pt-6"
+                        className="relative min-w-0 flex-1 px-7 pb-4 pt-3"
                         style={{ borderRadius: 22, backgroundImage: cellWash(it, line) }}
                       >
                         <div
