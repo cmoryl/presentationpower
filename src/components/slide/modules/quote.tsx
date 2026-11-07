@@ -17,6 +17,7 @@ import {
   StatFigure,
 } from "../primitives";
 import { fillPx } from "@/lib/open-space-fill";
+import { SPECTRUM_LINE_GRADIENT } from "@/lib/spectrum-style";
 
 const ACCENT = "var(--slide-accent-text)";
 
@@ -29,7 +30,9 @@ registerSlideModule({
     "MV-QUOTE-METRIC",
     "MV-QUOTE-POSTER",
   ],
-  render: ({ variant, brand, pageNumber, c, ink }) => {
+  render: ({ variant, brand, pageNumber, c, ink, spectrum }) => {
+    // Spectrum: rules run the 90° aqua→blue→violet line, not a flat accent.
+    const RULE = spectrum ? SPECTRUM_LINE_GRADIENT : ACCENT;
     switch (variant.id) {
       case "MV-QUOTE-MULTI":
         return (
