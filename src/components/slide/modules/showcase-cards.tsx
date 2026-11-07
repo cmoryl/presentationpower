@@ -269,7 +269,9 @@ registerSlideModule({
                       padding: dense ? "22px 22px 24px" : isDark ? "34px 28px 30px" : "28px 28px 30px",
                       backgroundImage: isDark
                         ? "linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.04) 55%, rgba(255,255,255,0) 100%)"
-                        : `${cardWashGradient(fill)}, ${baseTint}`,
+                        : spectrum
+                          ? FROST_CARD.fillCss
+                          : `${cardWashGradient(fill)}, ${baseTint}`,
                       backdropFilter: isDark ? "blur(16px) saturate(130%)" : undefined,
                     }}
                   >
@@ -296,7 +298,7 @@ registerSlideModule({
                           fontWeight: 800,
                           lineHeight: 1.2,
                           letterSpacing: "-0.01em",
-                          color: isDark ? "#FFFFFF" : leadColor,
+                          color: isDark ? "#FFFFFF" : spectrum ? ink.strong : leadColor,
                         }}
                       >
                         {card.lead}
