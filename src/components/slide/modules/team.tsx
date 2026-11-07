@@ -47,16 +47,22 @@ registerSlideModule({
         const cols = people.length === 4 ? 4 : people.length === 2 ? 2 : 3;
         const portraitPx = cols === 4 ? 168 : 200;
         const roleColor = isDark ? "rgba(255,255,255,0.62)" : "rgba(10,15,28,0.58)";
+        // Spectrum: the guide's frost card — white→#F0F3FB fill, #D6DCF0
+        // keyline, one soft shadow. No accent glow, no accent top rule.
         const cardBg = bareSurfaces
           ? "transparent"
-          : isDark
-            ? "rgba(255,255,255,0.03)"
-            : "rgba(10,15,28,0.02)";
+          : spectrum
+            ? FROST_CARD.fillCss
+            : isDark
+              ? "rgba(255,255,255,0.03)"
+              : "rgba(10,15,28,0.02)";
         const cardRing = bareSurfaces
           ? "transparent"
-          : isDark
-            ? "rgba(255,255,255,0.10)"
-            : "rgba(10,15,28,0.08)";
+          : spectrum
+            ? FROST_CARD.borderCss
+            : isDark
+              ? "rgba(255,255,255,0.10)"
+              : "rgba(10,15,28,0.08)";
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, "Team")} />
