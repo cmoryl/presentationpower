@@ -203,7 +203,16 @@ registerSlideModule({
                             borderTop: "1px solid rgba(255,255,255,0.30)",
                             padding: dense ? "16px 18px" : "22px 22px",
                           }
-                        : { background: fill, padding: dense ? "16px 18px" : "22px 22px" }
+                        : spectrum
+                          ? {
+                              // Spectrum: the label band is part of the frost
+                              // card — white fill, ink text, a thin keyline
+                              // above instead of an accent-filled band.
+                              background: "#FFFFFF",
+                              borderTop: `1px solid ${FROST_CARD.borderCss.replace("1px solid ", "")}`,
+                              padding: dense ? "16px 18px" : "22px 22px",
+                            }
+                          : { background: fill, padding: dense ? "16px 18px" : "22px 22px" }
                     }
                   >
                     {isDark && (
@@ -242,7 +251,7 @@ registerSlideModule({
                         lineHeight: 1.05,
                         letterSpacing: st.bandCase === "upper" ? "0.05em" : "-0.02em",
                         textTransform: st.bandCase === "upper" ? "uppercase" : "none",
-                        color: isDark ? "#FFFFFF" : bandInk,
+                        color: isDark ? "#FFFFFF" : spectrum ? ink.strong : bandInk,
                         textAlign: "center",
                         position: "relative",
                         textShadow: isDark ? `0 0 18px ${AQUA}55` : undefined,
