@@ -107,12 +107,21 @@ registerSlideModule({
                   className="relative flex min-w-0 flex-col overflow-hidden"
                   style={{ borderRadius: st.cardRadius }}
                 >
-                  {/* Hairline frame that dissolves along the bottom edge. */}
+                  {/* Hairline frame that dissolves along the bottom edge.
+                      Spectrum cards close on all sides with the frost keyline. */}
                   <div
                     aria-hidden
                     data-decorative
                     className="pointer-events-none absolute inset-0 z-10"
-                    style={openBottomFrame(frameLine, st.cardRadius)}
+                    style={
+                      spectrum
+                        ? {
+                            border: FROST_CARD.borderCss,
+                            borderRadius: st.cardRadius,
+                            boxShadow: FROST_CARD.shadowCss,
+                          }
+                        : openBottomFrame(frameLine, st.cardRadius)
+                    }
                   />
                   {/* Photograph — each card owns its own image */}
                   <div
@@ -125,12 +134,14 @@ registerSlideModule({
                       borderTopRightRadius: st.cardRadius,
                     }}
                   >
-                    <div
-                      aria-hidden
-                      data-decorative
-                      className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[3px]"
-                      style={{ background: "linear-gradient(90deg, transparent, var(--slide-accent-text), transparent)" }}
-                    />
+                    {!spectrum && (
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[3px]"
+                        style={{ background: "linear-gradient(90deg, transparent, var(--slide-accent-text), transparent)" }}
+                      />
+                    )}
                     <MediaTile
                       brand={brand}
                       seed={s(card.mediaSeed, s(card.label, `capability-${i + 1}`))}
