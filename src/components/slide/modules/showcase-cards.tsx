@@ -382,7 +382,7 @@ registerSlideModule({
           ? "rgba(255,255,255,0.07)"
           : "rgba(3,0,44,0.04)"
         : undefined;
-    const tileBorder = st.tileLook === "outline" ? `1px solid ${accent}` : undefined;
+    const tileBorder = st.tileLook === "outline" && !spectrum ? `1px solid ${accent}` : undefined;
     const iconBox = Math.round(96 * st.iconScale);
     const centered = st.labelAlign === "center";
 
@@ -431,10 +431,12 @@ registerSlideModule({
                 style={{
                   width: iconBox,
                   height: iconBox,
-                  borderRadius: st.tileRadius,
-                  background: tileBg,
+                  borderRadius: spectrum ? 16 : st.tileRadius,
+                  // Spectrum: gradient icon tile in stage order, white glyph.
+                  background: spectrum ? undefined : tileBg,
+                  backgroundImage: spectrum ? spectrumGradientCss(i) : undefined,
                   border: tileBorder,
-                  color: accent,
+                  color: spectrum ? "#FFFFFF" : accent,
                 }}
               >
                 {Icon ? (
