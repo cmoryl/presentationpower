@@ -114,7 +114,11 @@ registerSlideModule({
                           background: photo
                             ? undefined
                             : `radial-gradient(circle at 30% 25%, ${hexA(brand.tokens.accent, 0.333)} 0%, ${brand.tokens.primary}CC 70%)`,
-                          boxShadow: `0 0 0 2px ${hexA(brand.tokens.accent, 0.333)}, 0 24px 60px -20px ${hexA(brand.tokens.accent, 0.4)}`,
+                          boxShadow: spectrum
+                            ? // Spectrum: portrait ring in the stage colour for
+                              // this card's position — aqua first, blue, violet.
+                              `0 0 0 2px ${hexA(spectrumStage(i).brand, 0.55)}, 0 24px 60px -20px ${hexA(spectrumStage(i).brand, 0.35)}`
+                            : `0 0 0 2px ${hexA(brand.tokens.accent, 0.333)}, 0 24px 60px -20px ${hexA(brand.tokens.accent, 0.4)}`,
                           overflow: "hidden",
                         }}
                       >
