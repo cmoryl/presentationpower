@@ -104,7 +104,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
 
 exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token-derived palette in bm-enterprise / dark 1`] = `
 {
-  "backgroundContainsPrimary": true,
+  "backgroundContainsPrimary": false,
   "backgroundContainsSurface": false,
   "brand": "bm-enterprise",
   "expected": {
