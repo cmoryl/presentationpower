@@ -1074,6 +1074,7 @@ export function AuroraSidePanel({
   const ctxAccent = useSlideAccent();
   const a = accent ?? ctxAccent ?? undefined;
   const ink = useSlideInk(a);
+  const spectrum = String(useStylePack()?.id ?? "") === "skin-s06";
   const shown = items.slice(0, maxItems);
   return (
     <GlassTile radius={28} padding="px-12 py-12" accent={a} className={className}>
@@ -1098,13 +1099,28 @@ export function AuroraSidePanel({
           >
             <div
               className="tabular-nums"
-              style={{
-                fontSize: 40,
-                fontWeight: 600,
-                letterSpacing: "-0.02em",
-                color: "var(--slide-accent-text)",
-                lineHeight: 1,
-              }}
+              style={
+                spectrum
+                  ? {
+                      // Spectrum: step numerals in the stage gradient (aqua
+                      // first, blue, violet), never flat accent text.
+                      fontSize: 40,
+                      fontWeight: 600,
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1,
+                      backgroundImage: spectrumGradientCss(i),
+                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
+                      color: "transparent",
+                    }
+                  : {
+                      fontSize: 40,
+                      fontWeight: 600,
+                      letterSpacing: "-0.02em",
+                      color: "var(--slide-accent-text)",
+                      lineHeight: 1,
+                    }
+              }
             >
               {String(numberStart + i).padStart(2, "0")}
             </div>
