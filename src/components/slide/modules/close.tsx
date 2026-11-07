@@ -21,6 +21,7 @@ import { Trophy } from "lucide-react";
 import { AuroraOrb, AuroraSidePanel, GlassTile } from "../flagship";
 import { hexA } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
+import { spectrumGradientCss } from "@/lib/spectrum-style";
 
 registerSlideModule({
   id: "family:close",
@@ -38,7 +39,7 @@ registerSlideModule({
     "MV-CLOSE-DUAL-CTA",
     "MV-CLOSE-METRIC-PROMISE",
   ],
-  render: ({ variant, brand, pageNumber, c, mode, ink, isDark }) => {
+  render: ({ variant, brand, pageNumber, c, mode, ink, isDark, spectrum }) => {
     switch (variant.id) {
       case "MV-CLOSE-CTA": {
         const steps: Item[] =
@@ -340,13 +341,28 @@ registerSlideModule({
                 </div>
                 <div
                   className="mt-8 tabular-nums"
-                  style={{
-                    fontSize: fillPx(96, "display"),
-                    lineHeight: 1,
-                    fontWeight: 600,
-                    letterSpacing: "-0.03em",
-                    color: "var(--slide-accent-text)",
-                  }}
+                  style={
+                    spectrum
+                      ? {
+                          // Spectrum: the one hero number carries the slide in
+                          // the stage gradient, never flat accent text.
+                          fontSize: fillPx(96, "display"),
+                          lineHeight: 1,
+                          fontWeight: 600,
+                          letterSpacing: "-0.03em",
+                          backgroundImage: spectrumGradientCss(0),
+                          WebkitBackgroundClip: "text",
+                          backgroundClip: "text",
+                          color: "transparent",
+                        }
+                      : {
+                          fontSize: fillPx(96, "display"),
+                          lineHeight: 1,
+                          fontWeight: 600,
+                          letterSpacing: "-0.03em",
+                          color: "var(--slide-accent-text)",
+                        }
+                  }
                 >
                   {s(c.decisionBy, "—")}
                 </div>
