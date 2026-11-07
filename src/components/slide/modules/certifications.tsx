@@ -11,7 +11,7 @@ import { ClientLogoImg, pickLogoForMode } from "../client-logo";
 import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { resolveCertStyle } from "@/lib/cert-style";
-import { spectrumGradientCss } from "@/lib/spectrum-style";
+import { FROST_CARD, SPECTRUM, spectrumGradientCss } from "@/lib/spectrum-style";
 import { LoopHalo } from "./process";
 
 const GLOWS = ["#7FB3F5", "#7FE3F5", BRAND.lavender];
@@ -382,12 +382,21 @@ registerSlideModule({
                     data-intro-step={3 + i}
                     className="relative flex min-w-0 items-start"
                     style={{
-                      background: isDark ? "linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03))" : cardBg,
-                      border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : cardBorder}`,
-                      borderLeft: isDark ? undefined : st.accentBar > 0 ? `${st.accentBar}px solid ${accent}` : undefined,
+                      background: isDark
+                        ? "linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03))"
+                        : spectrum
+                          ? FROST_CARD.fillCss
+                          : cardBg,
+                      border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : spectrum ? SPECTRUM.frostCard.line : cardBorder}`,
+                      // Spectrum: no accent edge bars — the frost keyline frames the card.
+                      borderLeft: isDark || spectrum ? undefined : st.accentBar > 0 ? `${st.accentBar}px solid ${accent}` : undefined,
                       borderBottom: isDark ? `2px solid ${g}AA` : undefined,
-                      borderRadius: isDark ? 16 : st.cardRadius,
-                      boxShadow: isDark ? `inset 0 1px 0 rgba(255,255,255,0.2), 0 20px 44px -28px ${g}` : cardShadow,
+                      borderRadius: isDark ? 16 : spectrum ? FROST_CARD.radiusPx : st.cardRadius,
+                      boxShadow: isDark
+                        ? `inset 0 1px 0 rgba(255,255,255,0.2), 0 20px 44px -28px ${g}`
+                        : spectrum
+                          ? FROST_CARD.shadowCss
+                          : cardShadow,
                       backdropFilter: isDark ? "blur(16px)" : undefined,
                       alignItems: isDark ? "center" : undefined,
                       gap: 22,
