@@ -51,7 +51,7 @@ function toneText(tone: CapCardTone): string {
 registerSlideModule({
   id: "family:showcase-cards",
   variantIds: ["MV-SOL-CAP-CARDS", "MV-SHOW-DEVICE-QUAD"],
-  render: ({ variant, brand, pageNumber, c, mode, ink, isDark: isDarkMode }) => {
+  render: ({ variant, brand, pageNumber, c, mode, ink, isDark: isDarkMode, spectrum }) => {
     // Dark grounds (dark mode or a per-slide dark backdrop) render white ink.
     const isDark = isDarkMode || /^(#fff(fff)?|white|rgba?\(255, ?255, ?255)/i.test(String(ink.strong).trim());
     const accent = accentInk(brand.tokens.accent, mode, 4.5);
