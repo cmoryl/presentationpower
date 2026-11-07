@@ -32,6 +32,7 @@ import { useId, useMemo } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideMode, useSlideAccent, useSlideInk } from "./SlideChrome";
 import { auroraOrbs, auroraLayerOpacity } from "@/lib/aurora-svg";
+import { spectrumGradientCss } from "@/lib/spectrum-style";
 
 export type SlideRegister = "corporate" | "product" | "editorial";
 
