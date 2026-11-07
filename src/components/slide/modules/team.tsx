@@ -29,6 +29,7 @@ registerSlideModule({
       isDark,
       ink,
       accentTone,
+      spectrum,
     } = args;
     void slide;
     void clientLogoUrl;
