@@ -223,11 +223,12 @@ export function Hairline({
   className?: string;
   vertical?: boolean;
 }) {
+  const gradient = color.startsWith("linear-gradient") || color.startsWith("radial-gradient");
   return (
     <div
       className={className}
       style={{
-        backgroundColor: color,
+        ...(gradient ? { backgroundImage: color } : { backgroundColor: color }),
         opacity,
         width: vertical ? thicknessPx : widthPx,
         height: vertical ? widthPx : thicknessPx,
