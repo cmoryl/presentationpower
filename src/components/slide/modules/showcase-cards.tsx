@@ -16,6 +16,7 @@ import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { iconByName } from "@/lib/icon-library";
 import { cardBaseGradient, cardWashGradient, openBottomFrame } from "@/lib/surface-tokens";
+import { FROST_CARD, spectrumGradientCss } from "@/lib/spectrum-style";
 import {
   readBenefits,
   readCards,
@@ -95,7 +96,9 @@ registerSlideModule({
               const glow = [accent, AQUA, LAVENDER][i % 3];
               const textInk = isDark ? "#FFFFFF" : ink.strong;
               void glow;
-              const markFill = isDark ? AQUA : fill;
+              // Spectrum: no accent-filled bands — labels sit on the frost
+              // card in ink, marks pick up the stage colour by position.
+              const markFill = isDark ? AQUA : spectrum ? ["#0BC5C8", "#003FC7", "#7C5CFF"][i % 3]! : fill;
               return (
                 <div
                   key={i}
