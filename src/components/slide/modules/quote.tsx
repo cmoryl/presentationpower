@@ -17,6 +17,7 @@ import {
   StatFigure,
 } from "../primitives";
 import { fillPx } from "@/lib/open-space-fill";
+import { SPECTRUM_LINE_GRADIENT } from "@/lib/spectrum-style";
 
 const ACCENT = "var(--slide-accent-text)";
 
@@ -29,7 +30,9 @@ registerSlideModule({
     "MV-QUOTE-METRIC",
     "MV-QUOTE-POSTER",
   ],
-  render: ({ variant, brand, pageNumber, c, ink }) => {
+  render: ({ variant, brand, pageNumber, c, ink, spectrum }) => {
+    // Spectrum: rules run the 90° aqua→blue→violet line, not a flat accent.
+    const RULE = spectrum ? SPECTRUM_LINE_GRADIENT : ACCENT;
     switch (variant.id) {
       case "MV-QUOTE-MULTI":
         return (
@@ -81,7 +84,7 @@ registerSlideModule({
                 <QuoteMark color={ACCENT} size={520} className="absolute -top-4 -left-2" />
                 <div className="relative">
                   <Kicker brand={brand}>In their words</Kicker>
-                  <Hairline color={ACCENT} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
+                  <Hairline color={RULE} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
                   <div
                     style={{
                       fontSize: fillPx(60, "display"),
@@ -116,7 +119,7 @@ registerSlideModule({
                 <QuoteMark color={ACCENT} size={560} className="absolute -top-10 -left-6" />
                 <div className="relative">
                   <Kicker brand={brand}>Testimonial</Kicker>
-                  <Hairline color={ACCENT} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
+                  <Hairline color={RULE} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
                   <div
                     style={{
                       fontSize: fillPx(56, "display"),
@@ -149,7 +152,7 @@ registerSlideModule({
               <QuoteMark color={ACCENT} size={520} className="absolute -top-6 -left-4" />
               <div className="relative">
                 <Kicker brand={brand}>In their words</Kicker>
-                <Hairline color={ACCENT} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
+                <Hairline color={RULE} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
                 <div
                   style={{
                     fontSize: fillPx(58, "display"),
@@ -166,7 +169,7 @@ registerSlideModule({
                 </div>
               </div>
               <div>
-                <Hairline color={ACCENT} widthPx={56} thicknessPx={2} className="mb-6" />
+                <Hairline color={RULE} widthPx={56} thicknessPx={2} className="mb-6" />
                 <Kicker brand={brand}>{s(c.metricLabel, "Outcome")}</Kicker>
                 <div className="mt-8">
                   <StatFigure
@@ -198,7 +201,7 @@ registerSlideModule({
                 <Kicker brand={brand} color={ACCENT}>
                   Testimonial
                 </Kicker>
-                <Hairline color={ACCENT} widthPx={120} thicknessPx={2} className="mt-8 mb-12" />
+                <Hairline color={RULE} widthPx={120} thicknessPx={2} className="mt-8 mb-12" />
                 <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1620}>
                   {s(c.quote)}
                 </DisplayTitle>

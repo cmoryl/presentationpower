@@ -16,6 +16,7 @@ import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { iconByName } from "@/lib/icon-library";
 import { cardBaseGradient, cardWashGradient, openBottomFrame } from "@/lib/surface-tokens";
+import { FROST_CARD, spectrumGradientCss, spectrumStage } from "@/lib/spectrum-style";
 import {
   readBenefits,
   readCards,
@@ -51,7 +52,7 @@ function toneText(tone: CapCardTone): string {
 registerSlideModule({
   id: "family:showcase-cards",
   variantIds: ["MV-SOL-CAP-CARDS", "MV-SHOW-DEVICE-QUAD"],
-  render: ({ variant, brand, pageNumber, c, mode, ink, isDark: isDarkMode }) => {
+  render: ({ variant, brand, pageNumber, c, mode, ink, isDark: isDarkMode, spectrum }) => {
     // Dark grounds (dark mode or a per-slide dark backdrop) render white ink.
     const isDark = isDarkMode || /^(#fff(fff)?|white|rgba?\(255, ?255, ?255)/i.test(String(ink.strong).trim());
     const accent = accentInk(brand.tokens.accent, mode, 4.5);
@@ -95,7 +96,9 @@ registerSlideModule({
               const glow = [accent, AQUA, LAVENDER][i % 3];
               const textInk = isDark ? "#FFFFFF" : ink.strong;
               void glow;
-              const markFill = isDark ? AQUA : fill;
+              // Spectrum: no accent-filled bands — labels sit on the frost
+              // card in ink, marks pick up the stage colour by position.
+              const markFill = isDark ? AQUA : spectrum ? spectrumStage(i).brand : fill;
               return (
                 <div
                   key={i}
@@ -104,12 +107,21 @@ registerSlideModule({
                   className="relative flex min-w-0 flex-col overflow-hidden"
                   style={{ borderRadius: st.cardRadius }}
                 >
-                  {/* Hairline frame that dissolves along the bottom edge. */}
+                  {/* Hairline frame that dissolves along the bottom edge.
+                      Spectrum cards close on all sides with the frost keyline. */}
                   <div
                     aria-hidden
                     data-decorative
                     className="pointer-events-none absolute inset-0 z-10"
-                    style={openBottomFrame(frameLine, st.cardRadius)}
+                    style={
+                      spectrum
+                        ? {
+                            border: FROST_CARD.borderCss,
+                            borderRadius: st.cardRadius,
+                            boxShadow: FROST_CARD.shadowCss,
+                          }
+                        : openBottomFrame(frameLine, st.cardRadius)
+                    }
                   />
                   {/* Photograph — each card owns its own image */}
                   <div
@@ -122,12 +134,14 @@ registerSlideModule({
                       borderTopRightRadius: st.cardRadius,
                     }}
                   >
-                    <div
-                      aria-hidden
-                      data-decorative
-                      className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[3px]"
-                      style={{ background: "linear-gradient(90deg, transparent, var(--slide-accent-text), transparent)" }}
-                    />
+                    {!spectrum && (
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[3px]"
+                        style={{ background: "linear-gradient(90deg, transparent, var(--slide-accent-text), transparent)" }}
+                      />
+                    )}
                     <MediaTile
                       brand={brand}
                       seed={s(card.mediaSeed, s(card.label, `capability-${i + 1}`))}
@@ -189,7 +203,16 @@ registerSlideModule({
                             borderTop: "1px solid rgba(255,255,255,0.30)",
                             padding: dense ? "16px 18px" : "22px 22px",
                           }
-                        : { background: fill, padding: dense ? "16px 18px" : "22px 22px" }
+                        : spectrum
+                          ? {
+                              // Spectrum: the label band is part of the frost
+                              // card — white fill, ink text, a thin keyline
+                              // above instead of an accent-filled band.
+                              background: "#FFFFFF",
+                              borderTop: `1px solid ${FROST_CARD.borderCss.replace("1px solid ", "")}`,
+                              padding: dense ? "16px 18px" : "22px 22px",
+                            }
+                          : { background: fill, padding: dense ? "16px 18px" : "22px 22px" }
                     }
                   >
                     {isDark && (
@@ -228,7 +251,7 @@ registerSlideModule({
                         lineHeight: 1.05,
                         letterSpacing: st.bandCase === "upper" ? "0.05em" : "-0.02em",
                         textTransform: st.bandCase === "upper" ? "uppercase" : "none",
-                        color: isDark ? "#FFFFFF" : bandInk,
+                        color: isDark ? "#FFFFFF" : spectrum ? ink.strong : bandInk,
                         textAlign: "center",
                         position: "relative",
                         textShadow: isDark ? `0 0 18px ${AQUA}55` : undefined,
@@ -246,7 +269,9 @@ registerSlideModule({
                       padding: dense ? "22px 22px 24px" : isDark ? "34px 28px 30px" : "28px 28px 30px",
                       backgroundImage: isDark
                         ? "linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.04) 55%, rgba(255,255,255,0) 100%)"
-                        : `${cardWashGradient(fill)}, ${baseTint}`,
+                        : spectrum
+                          ? FROST_CARD.fillCss
+                          : `${cardWashGradient(fill)}, ${baseTint}`,
                       backdropFilter: isDark ? "blur(16px) saturate(130%)" : undefined,
                     }}
                   >
@@ -273,7 +298,7 @@ registerSlideModule({
                           fontWeight: 800,
                           lineHeight: 1.2,
                           letterSpacing: "-0.01em",
-                          color: isDark ? "#FFFFFF" : leadColor,
+                          color: isDark ? "#FFFFFF" : spectrum ? ink.strong : leadColor,
                         }}
                       >
                         {card.lead}
@@ -357,7 +382,7 @@ registerSlideModule({
           ? "rgba(255,255,255,0.07)"
           : "rgba(3,0,44,0.04)"
         : undefined;
-    const tileBorder = st.tileLook === "outline" ? `1px solid ${accent}` : undefined;
+    const tileBorder = st.tileLook === "outline" && !spectrum ? `1px solid ${accent}` : undefined;
     const iconBox = Math.round(96 * st.iconScale);
     const centered = st.labelAlign === "center";
 
@@ -406,10 +431,12 @@ registerSlideModule({
                 style={{
                   width: iconBox,
                   height: iconBox,
-                  borderRadius: st.tileRadius,
-                  background: tileBg,
+                  borderRadius: spectrum ? 16 : st.tileRadius,
+                  // Spectrum: gradient icon tile in stage order, white glyph.
+                  background: spectrum ? undefined : tileBg,
+                  backgroundImage: spectrum ? spectrumGradientCss(i) : undefined,
                   border: tileBorder,
-                  color: accent,
+                  color: spectrum ? "#FFFFFF" : accent,
                 }}
               >
                 {Icon ? (

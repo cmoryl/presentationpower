@@ -11,6 +11,7 @@ import { ClientLogoImg, pickLogoForMode } from "../client-logo";
 import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { resolveCertStyle } from "@/lib/cert-style";
+import { FROST_CARD, SPECTRUM, spectrumGradientCss } from "@/lib/spectrum-style";
 import { LoopHalo } from "./process";
 
 const GLOWS = ["#7FB3F5", "#7FE3F5", BRAND.lavender];
@@ -42,7 +43,7 @@ function splitStat(text: string): { figure: string; label: string } {
 registerSlideModule({
   id: "family:certifications",
   variantIds: ["MV-PROOF-CERT-ORBITS"],
-  render: ({ brand, pageNumber, c, mode, ink, isDark }) => {
+  render: ({ brand, pageNumber, c, mode, ink, isDark, spectrum }) => {
     const accent = accentInk(brand.tokens.accent, mode, 4.5);
     const st = resolveCertStyle(c.certStyle);
     const certs = arr(c.certs).slice(0, MAX_CERTS);
@@ -77,7 +78,8 @@ registerSlideModule({
     // How loudly the accent runs: quiet keeps decorative marks neutral, strong
     // pushes the accent into the statement heading as well.
     const decoAccent = st.accentRole === "quiet" ? muted : accent;
-    const headingColor = st.accentRole === "strong" ? accent : ink.strong;
+    // Spectrum: headings stay ink; colour lives in gradient figures only.
+    const headingColor = spectrum ? ink.strong : st.accentRole === "strong" ? accent : ink.strong;
     const badgeBox = Math.round((dense ? 70 : 82) * st.badgeScale);
     const centerHead = st.headerAlign === "center";
 
@@ -145,8 +147,9 @@ registerSlideModule({
                       className="flex min-w-0 flex-1 flex-col justify-between"
                       style={{
                         background: tileBg,
-                        borderLeft: st.statTile === "plain" ? undefined : `5px solid ${accent}`,
-                        borderRadius: 4,
+                        // Spectrum: no accent side rules on stat tiles.
+                        borderLeft: spectrum || st.statTile === "plain" ? undefined : `5px solid ${accent}`,
+                        borderRadius: spectrum ? 16 : 4,
                         padding:
                           st.statTile === "plain"
                             ? "0 0 4px"
@@ -160,13 +163,28 @@ registerSlideModule({
                     >
                       {figure && (
                         <span
-                          style={{
-                            fontSize: fillPx(Math.round(40 * st.statSize), "display"),
-                            fontWeight: 800,
-                            lineHeight: 1,
-                            letterSpacing: "-0.02em",
-                            color: st.statFigureColor === "ink" ? ink.strong : accent,
-                          }}
+                          style={
+                            spectrum
+                              ? {
+                                  // Spectrum: stat figures in the stage
+                                  // gradient, coloured by position.
+                                  fontSize: fillPx(Math.round(40 * st.statSize), "display"),
+                                  fontWeight: 800,
+                                  lineHeight: 1,
+                                  letterSpacing: "-0.02em",
+                                  backgroundImage: spectrumGradientCss(i),
+                                  WebkitBackgroundClip: "text",
+                                  backgroundClip: "text",
+                                  color: "transparent",
+                                }
+                              : {
+                                  fontSize: fillPx(Math.round(40 * st.statSize), "display"),
+                                  fontWeight: 800,
+                                  lineHeight: 1,
+                                  letterSpacing: "-0.02em",
+                                  color: st.statFigureColor === "ink" ? ink.strong : accent,
+                                }
+                          }
                         >
                           {figure}
                         </span>
@@ -364,12 +382,21 @@ registerSlideModule({
                     data-intro-step={3 + i}
                     className="relative flex min-w-0 items-start"
                     style={{
-                      background: isDark ? "linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03))" : cardBg,
-                      border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : cardBorder}`,
-                      borderLeft: isDark ? undefined : st.accentBar > 0 ? `${st.accentBar}px solid ${accent}` : undefined,
+                      background: isDark
+                        ? "linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03))"
+                        : spectrum
+                          ? FROST_CARD.fillCss
+                          : cardBg,
+                      border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : spectrum ? SPECTRUM.frostCard.line : cardBorder}`,
+                      // Spectrum: no accent edge bars — the frost keyline frames the card.
+                      borderLeft: isDark || spectrum ? undefined : st.accentBar > 0 ? `${st.accentBar}px solid ${accent}` : undefined,
                       borderBottom: isDark ? `2px solid ${g}AA` : undefined,
-                      borderRadius: isDark ? 16 : st.cardRadius,
-                      boxShadow: isDark ? `inset 0 1px 0 rgba(255,255,255,0.2), 0 20px 44px -28px ${g}` : cardShadow,
+                      borderRadius: isDark ? 16 : spectrum ? FROST_CARD.radiusPx : st.cardRadius,
+                      boxShadow: isDark
+                        ? `inset 0 1px 0 rgba(255,255,255,0.2), 0 20px 44px -28px ${g}`
+                        : spectrum
+                          ? FROST_CARD.shadowCss
+                          : cardShadow,
                       backdropFilter: isDark ? "blur(16px)" : undefined,
                       alignItems: isDark ? "center" : undefined,
                       gap: 22,

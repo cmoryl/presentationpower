@@ -9,6 +9,7 @@ import { SlideFrame, SlideTitle, arr, s } from "../module-kit";
 import { hexA } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { pickHeadshot } from "@/assets/backdrops/portraits";
+import { FROST_CARD, spectrumStage } from "@/lib/spectrum-style";
 
 registerSlideModule({
   id: "family:team",
@@ -28,6 +29,7 @@ registerSlideModule({
       isDark,
       ink,
       accentTone,
+      spectrum,
     } = args;
     void slide;
     void clientLogoUrl;
@@ -45,16 +47,22 @@ registerSlideModule({
         const cols = people.length === 4 ? 4 : people.length === 2 ? 2 : 3;
         const portraitPx = cols === 4 ? 168 : 200;
         const roleColor = isDark ? "rgba(255,255,255,0.62)" : "rgba(10,15,28,0.58)";
+        // Spectrum: the guide's frost card — white→#F0F3FB fill, #D6DCF0
+        // keyline, one soft shadow. No accent glow, no accent top rule.
         const cardBg = bareSurfaces
           ? "transparent"
-          : isDark
-            ? "rgba(255,255,255,0.03)"
-            : "rgba(10,15,28,0.02)";
+          : spectrum
+            ? FROST_CARD.fillCss
+            : isDark
+              ? "rgba(255,255,255,0.03)"
+              : "rgba(10,15,28,0.02)";
         const cardRing = bareSurfaces
           ? "transparent"
-          : isDark
-            ? "rgba(255,255,255,0.10)"
-            : "rgba(10,15,28,0.08)";
+          : spectrum
+            ? FROST_CARD.borderCss
+            : isDark
+              ? "rgba(255,255,255,0.10)"
+              : "rgba(10,15,28,0.08)";
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, "Team")} />
@@ -80,13 +88,15 @@ registerSlideModule({
                     className="relative overflow-hidden rounded-3xl p-10"
                     style={{
                       background: cardBg,
-                      border: bareSurfaces ? "none" : `1px solid ${cardRing}`,
-                      backgroundImage: bareSurfaces
-                        ? undefined
-                        : `radial-gradient(120% 60% at 50% -20%, ${brand.tokens.accent}${isDark ? "1F" : "14"} 0%, transparent 60%)`,
+                      border: bareSurfaces ? "none" : spectrum ? cardRing : `1px solid ${cardRing}`,
+                      boxShadow: spectrum && !bareSurfaces ? FROST_CARD.shadowCss : undefined,
+                      backgroundImage:
+                        bareSurfaces || spectrum
+                          ? undefined
+                          : `radial-gradient(120% 60% at 50% -20%, ${brand.tokens.accent}${isDark ? "1F" : "14"} 0%, transparent 60%)`,
                     }}
                   >
-                    {!bareSurfaces && (
+                    {!bareSurfaces && !spectrum && (
                       <div
                         aria-hidden
                         className="absolute inset-x-0 top-0 h-[3px]"
@@ -104,7 +114,11 @@ registerSlideModule({
                           background: photo
                             ? undefined
                             : `radial-gradient(circle at 30% 25%, ${hexA(brand.tokens.accent, 0.333)} 0%, ${brand.tokens.primary}CC 70%)`,
-                          boxShadow: `0 0 0 2px ${hexA(brand.tokens.accent, 0.333)}, 0 24px 60px -20px ${hexA(brand.tokens.accent, 0.4)}`,
+                          boxShadow: spectrum
+                            ? // Spectrum: portrait ring in the stage colour for
+                              // this card's position — aqua first, blue, violet.
+                              `0 0 0 2px ${hexA(spectrumStage(i).brand, 0.55)}, 0 24px 60px -20px ${hexA(spectrumStage(i).brand, 0.35)}`
+                            : `0 0 0 2px ${hexA(brand.tokens.accent, 0.333)}, 0 24px 60px -20px ${hexA(brand.tokens.accent, 0.4)}`,
                           overflow: "hidden",
                         }}
                       >
