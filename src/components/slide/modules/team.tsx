@@ -88,13 +88,15 @@ registerSlideModule({
                     className="relative overflow-hidden rounded-3xl p-10"
                     style={{
                       background: cardBg,
-                      border: bareSurfaces ? "none" : `1px solid ${cardRing}`,
-                      backgroundImage: bareSurfaces
-                        ? undefined
-                        : `radial-gradient(120% 60% at 50% -20%, ${brand.tokens.accent}${isDark ? "1F" : "14"} 0%, transparent 60%)`,
+                      border: bareSurfaces ? "none" : spectrum ? cardRing : `1px solid ${cardRing}`,
+                      boxShadow: spectrum && !bareSurfaces ? FROST_CARD.shadowCss : undefined,
+                      backgroundImage:
+                        bareSurfaces || spectrum
+                          ? undefined
+                          : `radial-gradient(120% 60% at 50% -20%, ${brand.tokens.accent}${isDark ? "1F" : "14"} 0%, transparent 60%)`,
                     }}
                   >
-                    {!bareSurfaces && (
+                    {!bareSurfaces && !spectrum && (
                       <div
                         aria-hidden
                         className="absolute inset-x-0 top-0 h-[3px]"
