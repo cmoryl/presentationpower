@@ -9,6 +9,7 @@ import { SlideFrame, SlideTitle, arr, s } from "../module-kit";
 import { hexA } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { pickHeadshot } from "@/assets/backdrops/portraits";
+import { FROST_CARD, spectrumStage } from "@/lib/spectrum-style";
 
 registerSlideModule({
   id: "family:team",
