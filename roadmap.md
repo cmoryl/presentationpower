@@ -2,7 +2,7 @@
 
 ## Bowl generated-scene logo intro and billboard videos
 - [x] Assemble approved shields, football and light-action source references; reference collection approved. Gold-player cutout is unavailable separately.
-- [ ] Present cinematic bilingual video plan and collect music choice; obtain scene-still approval.
+- [ ] Plan and cinematic stadium anthem approved; football stills checked. Logo stills rejected for altered artwork; awaiting exact-logo composition choice before still approval.
 - [ ] Generate, compose and visually/audio-check videos, preserving supplied logos and original billboard artwork.
 
 ## Selected Bowl billboard campaign
