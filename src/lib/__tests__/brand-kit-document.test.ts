@@ -10,10 +10,24 @@ describe("Brand-kit PDF selection", () => {
   it("refuses an empty section selection", () => {
     expect(() => selectKitDocumentSections(model, [])).toThrow("Choose at least one section.");
   });
-  it("keeps the Bowl measurement sheet, type scale and version history out of PDFs", async () => {
+  it("includes Bowl ink and object layers without exposing hidden measurement, type-scale or history sections", async () => {
     const bowl = await makeKitDocument("san-juan-bowl");
-    expect(bowl.sections.map(s => s.id)).toEqual(["logos", "single", "lettering", "small", "icons", "lockups", "colours", "type", "resources"]);
-    expect(bowl.version).toBe("1.0");
+    expect(bowl.sections.map(s => s.id)).toEqual(["logos", "backgrounds", "single", "lettering", "small", "icons", "lockups", "colours", "separations", "layers", "type", "production", "resources"]);
+    expect(bowl.version).toBe("1.1");
+  });
+  it("exports four source ink plates with SVG and PNG originals", async () => {
+    const section = (await makeKitDocument("san-juan-bowl")).sections.find(s => s.id === "separations");
+    const plates = section?.assets?.filter(a => a.image);
+    expect(plates).toHaveLength(4);
+    expect(plates?.map(a => a.links.map(l => l.label))).toEqual(Array.from({ length: 4 }, () => ["Vector plate SVG", "Transparent PNG 2400"]));
+  });
+  it("keeps sponsor lettering separate from ribbon and stars in object exports", async () => {
+    const assets = (await makeKitDocument("san-juan-bowl")).sections.find(s => s.id === "layers")?.assets;
+    const lettering = assets?.find(a => a.title === "TRANSPERFECT lettering");
+    const ribbon = assets?.find(a => a.title === "Ribbon and stars");
+    expect(lettering?.image).toBeTruthy();
+    expect(ribbon?.image).toBeTruthy();
+    expect(lettering?.image).not.toBe(ribbon?.image);
   });
   it("does not invent Legalweek logo rules or a supplied guide", async () => {
     const kit = await makeKitDocument("legalweek");
