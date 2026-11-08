@@ -1,5 +1,10 @@
 # Roadmap — Spectrum corporate style adoption (done)
 
+## Bowl generated-scene logo intro and billboard videos
+- [ ] Assemble approved logo, football and matching gold/light-action source references; obtain reference approval.
+- [ ] Present cinematic bilingual video plan and collect music choice; obtain scene-still approval.
+- [ ] Generate, compose and visually/audio-check videos, preserving supplied logos and original billboard artwork.
+
 ## Selected Bowl billboard campaign
 - [x] Match the seven screenshot-selected Canva designs and refresh five missing originals and ten scenes.
 - [x] Show only selected artwork in both billboard pages; verify seven boards, 2 English/5 Spanish filters, enlarged dusk view, no broken images/mobile overflow; six tests pass.
