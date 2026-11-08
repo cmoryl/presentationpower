@@ -12,7 +12,10 @@ export default defineConfig({
   test: {
     setupFiles: ["tests/support/london-font.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
-    exclude: ["**/node_modules/**", "tests/e2e/**", "**/dist/**", "**/.nitro/**"],
+    // `src/routes/library.spec.tsx` is the /library/spec page — a TanStack
+    // route file whose name matches the test glob but holds no tests, so
+    // vitest reported "No test suite found". Route files are never tests.
+    exclude: ["**/node_modules/**", "tests/e2e/**", "**/dist/**", "**/.nitro/**", "src/routes/**"],
     // Several suites sweep whole catalogs (150+ signage panels, 200+ module
     // variants, the full layout-arbiter combination space). They do real work,
     // so vitest's 5s default failed purely because the catalogs grew — a
