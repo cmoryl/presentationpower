@@ -1,5 +1,9 @@
 # Roadmap — Spectrum corporate style adoption (done)
 
+## Selected Bowl billboard campaign
+- [ ] Match the seven screenshot-selected Canva designs and refresh missing originals/scenes.
+- [ ] Show only selected artwork in both billboard pages; verify downloads and filters.
+
 ## Canva billboard refresh — November 8
 - [x] Export all 19 saved designs, clean metadata, and refresh artwork and roadside examples (93 immutable assets).
 - [x] Verify public page: 41 images, no broken images or runtime errors, enlarged scene and native 840×400 download; 3 billboard tests passed.
