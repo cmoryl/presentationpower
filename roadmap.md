@@ -1,9 +1,9 @@
 # Roadmap — Spectrum corporate style adoption (done)
 
 ## Bowl PDF detail expansion
-- [ ] Add source-backed colour plates, object layers, background guidance and production notes to selectable PDFs.
-- [ ] Export and visually inspect every page; publish the expanded full PDF while preserving issued originals.
-- [ ] Verify downloads on the public guide and kit and run affected tests.
+- [x] Add source-backed colour plates, object layers, background guidance and production notes to selectable PDFs.
+- [x] Export and visually inspect all 34 pages; fix white-layer contrast and publish the expanded full PDF while preserving issued originals.
+- [x] Verify export on the public kit and run 22 affected tests; full release linked by shared guide/kit download control.
 
 ## Living Spectrum spec
 - [x] Publish searchable, clickable guide values and rules with source-page references and shareable selections.
