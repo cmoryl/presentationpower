@@ -344,7 +344,7 @@ export function SjbBrandKit() {
             download="san-juan-bowl-brand-guide-v1.0.pdf"
             className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#003FC7]"
           >
-            <Download className="h-4 w-4" /> Full brand guide v1.0 (PDF)
+            <Download className="h-4 w-4" /> Issued brand guide v1.0 (PDF)
           </a>
           <a
             href={masterKit.url}

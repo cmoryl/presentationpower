@@ -1,5 +1,6 @@
 import nextPdf from "@/assets/brand-kits/next-brand-kit-v1.0.pdf.asset.json";
 import nexusPdf from "@/assets/brand-kits/nexus-brand-kit-v1.0.pdf.asset.json";
+import bowlPdf from "@/assets/brand-kits/san-juan-bowl-brand-kit-v1.1.pdf.asset.json";
 /**
  * Released brand-kit PDFs: full-section exports built from the live kit, checked page by
  * page, then served unchanged from /downloads/brand-kits/. Re-release by exporting again,
@@ -19,7 +20,7 @@ export const KIT_RELEASES: Record<string, KitRelease> = {
   "transperfect-cobrand": { file: "/downloads/brand-kits/transperfect-cobrand-brand-kit-v26.06-3.0.pdf", version: "26.06 / 3.0", released: "2026-11-03", pages: 22 },
   "trial-interactive": { file: "/downloads/brand-kits/trial-interactive-brand-kit-v26.06-3.0.pdf", version: "26.06 / 3.0", released: "2026-11-03", pages: 22 },
   "element": { file: "/downloads/brand-kits/element-brand-kit-v1.0.pdf", version: "1.0", released: "2026-11-03", pages: 7 },
-  "san-juan-bowl": { file: "/downloads/brand-kits/san-juan-bowl-brand-kit-v1.0.pdf", version: "1.0", released: "2026-11-03", pages: 20 },
+  "san-juan-bowl": { file: bowlPdf.url, version: "1.1", released: "2026-11-08", pages: 34 },
   "nexus": { file: nexusPdf.url, version: "1.0", released: "2026-11-03", pages: 23 },
   "hackathon": { file: "/downloads/brand-kits/hackathon-brand-kit-v1.0.pdf", version: "1.0", released: "2026-11-03", pages: 15 },
   "legalweek": { file: "/downloads/brand-kits/legalweek-brand-kit-v1.0.pdf", version: "1.0", released: "2026-11-03", pages: 16 },

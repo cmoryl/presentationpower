@@ -334,10 +334,10 @@ export async function buildKitDocumentPdf(model: KitDocument, ids: string[], pro
   }
 
   // ---------- Cover ----------
-  strip = aura(1200, 12, 1);
+  strip = model.id === "san-juan-bowl" ? null : aura(1200, 12, 1);
   progress?.("Designing cover…");
   doc.setFillColor(...primary).rect(0, 0, W, H, "F");
-  { const a = aura(1684, 1190); if (a) doc.addImage(a, "JPEG", 0, 0, W, H, undefined, "FAST"); }
+  if (model.id !== "san-juan-bowl") { const a = aura(1684, 1190); if (a) doc.addImage(a, "JPEG", 0, 0, W, H, undefined, "FAST"); }
   doc.setFillColor(...white).rect(M, 62, 40, 4, "F");
   eyebrow("Brand kit", M, 52, white);
   const panel = { x: W - M - 300, y: 62, w: 300, h: 300 };
