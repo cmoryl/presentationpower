@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { SjbLink } from "@/components/events/SjbShare";
 import { SjbLetteringStacked } from "@/components/events/SjbLetteringStacked";
 import { SjbLockups, SjbSmallMark } from "@/components/events/SjbMarkLockups";
+import { SjbColourSeparations } from "@/components/events/SjbColourSeparations";
+import { SjbLayerViewer } from "@/components/events/SjbLayerViewer";
+import { SjbMicroAssets } from "@/components/events/SjbMicroAssets";
 import {
   SJB_CLEAR_SPACE,
   SJB_COLORS,
@@ -41,9 +44,13 @@ const DONT: Record<SjbMisuseDemo, { img?: React.CSSProperties; ground?: React.CS
   retype: { text: "San Juan Bowl" },
 };
 
-export interface SjbGuideSectionsProps { withSingleColour?: boolean }
+export interface SjbGuideSectionsProps {
+  withSingleColour?: boolean;
+  /** Pages that already carry the full construction section (Designers) skip the repeated layer viewers. */
+  withLayers?: boolean;
+}
 
-export function SjbGuideSections({ withSingleColour = true }: SjbGuideSectionsProps = {}) {
+export function SjbGuideSections({ withSingleColour = true, withLayers = true }: SjbGuideSectionsProps = {}) {
   return (
     <>
       <Section n="01" title="Introduction">
@@ -124,7 +131,22 @@ export function SjbGuideSections({ withSingleColour = true }: SjbGuideSectionsPr
         <ul className="mt-3 space-y-1 text-xs text-muted-foreground">{SJB_COLOR_NOTES.map((n) => <li key={n}>{n}</li>)}</ul>
       </Section>
 
-      <Section n="05" title="Typography">
+      <Section n="05" title="Colour separations &amp; layers">
+        <SjbColourSeparations />
+        {withLayers && (
+          <div className="mt-6 space-y-2">
+            <p className="max-w-3xl text-sm text-muted-foreground">
+              The badge is assembled from the object layers below — the same pieces the plates
+              above are cut from. They are inspection components at source coordinates, not
+              standalone marks.
+            </p>
+            <SjbLayerViewer />
+            <SjbMicroAssets />
+          </div>
+        )}
+      </Section>
+
+      <Section n="06" title="Typography">
         <p className="max-w-3xl text-sm text-muted-foreground">{SJB_TYPE_NOTE}</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {([["Geist Regular", 400], ["Geist Bold", 700]] as const).map(([name, w]) => (
@@ -142,7 +164,7 @@ export function SjbGuideSections({ withSingleColour = true }: SjbGuideSectionsPr
         </Button>
       </Section>
 
-      <Section n="06" title="Logo don’ts">
+      <Section n="07" title="Logo don’ts">
         <ul className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {SJB_MISUSE.map((d) => {
             const s = DONT[d.id] ?? {};
