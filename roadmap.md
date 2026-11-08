@@ -1,7 +1,7 @@
 # Roadmap — Spectrum corporate style adoption (done)
 
 ## Bowl generated-scene logo intro and billboard videos
-- [ ] Assemble approved logo, football and matching gold/light-action source references; obtain reference approval.
+- [x] Assemble approved shields, football and light-action source references; reference collection approved. Gold-player cutout is unavailable separately.
 - [ ] Present cinematic bilingual video plan and collect music choice; obtain scene-still approval.
 - [ ] Generate, compose and visually/audio-check videos, preserving supplied logos and original billboard artwork.
 
