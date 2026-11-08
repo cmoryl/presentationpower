@@ -1,8 +1,8 @@
 # Roadmap — Spectrum corporate style adoption (done)
 
 ## Canva billboard refresh — November 8
-- [ ] Export all 19 saved designs, clean metadata, and refresh artwork and roadside examples.
-- [ ] Verify public-page images, enlarged views and downloads; run billboard tests.
+- [x] Export all 19 saved designs, clean metadata, and refresh artwork and roadside examples (93 immutable assets).
+- [x] Verify public page: 41 images, no broken images or runtime errors, enlarged scene and native 840×400 download; 3 billboard tests passed.
 
 ## Bowl PDF detail expansion
 - [x] Add source-backed colour plates, object layers, background guidance and production notes to selectable PDFs.
