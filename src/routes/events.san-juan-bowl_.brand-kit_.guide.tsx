@@ -10,7 +10,7 @@ import { SjbGuideSections } from "@/components/events/SjbGuideSections";
 import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 
 const TITLE = "San Juan Bowl brand guide — TransPerfect Element";
-const DESC = "San Juan Bowl badge, variants, clear space, colours with CMYK/RGB/HEX, Geist typography and logo don’ts.";
+const DESC = "San Juan Bowl badge, variants, clear space, colours with CMYK/RGB/HEX, per-ink colour separations and layers, Geist typography and logo don’ts.";
 
 export const Route = createFileRoute("/events/san-juan-bowl_/brand-kit_/guide")({
   head: () => ({
