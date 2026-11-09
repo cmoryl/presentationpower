@@ -10,6 +10,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, CircleDashed } from "lucide-react"
 
 import { AppShell } from "@/components/AppShell";
 import { EventTimeline } from "@/components/events/EventTimeline";
+import { SjbRecentUpdates } from "@/components/events/SjbRecentUpdates";
 import { SjbEventAreas } from "@/components/events/SjbEventAreas";
 import { SJB_LOGOS, SJB_LOGO_RULES } from "@/lib/san-juan-bowl";
 import { getEventIntake } from "@/lib/event-intake.functions";
@@ -171,7 +172,7 @@ function EventHome() {
           <EventTimeline eventId={eventId} ready={progress.ready} total={progress.total} /></>)}
         </header>
 
-        {isBowl ? <SjbEventAreas /> : (<>
+        {isBowl ? <><SjbRecentUpdates /><SjbEventAreas /></> : (<>
         <nav aria-label="Event sections" className="mt-6 flex flex-wrap gap-1 border-b border-[#03002C]/12">
           {(["overview", ...tabs.map((t) => t.id)] as const).map((id) => {
             const on = id === tab;
