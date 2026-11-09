@@ -9,7 +9,6 @@ import { z } from "zod";
 import { ArrowLeft, ArrowRight, CheckCircle2, CircleDashed } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
-import { Button } from "@/design-system/element";
 import { EventTimeline } from "@/components/events/EventTimeline";
 import { SjbEventAreas } from "@/components/events/SjbEventAreas";
 import { SJB_LOGOS, SJB_LOGO_RULES } from "@/lib/san-juan-bowl";
