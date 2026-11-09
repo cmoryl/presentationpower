@@ -7,6 +7,7 @@ NOTE = ("\nPictures:\n- Every picture is embedded inside the .svg (no linked fil
         "- The same pictures are also supplied separately in images/ at the size Canva exported; 01-background is the full background.\n")
 for p in sorted(D.glob('*.asset.json')):
     ptr = json.loads(p.read_text())
+    if len(sys.argv) > 1 and ptr['created_at'] >= sys.argv[1]: continue
     data = urllib.request.urlopen(urllib.request.Request('http://localhost:8080' + ptr['url'], headers={'User-Agent': 'curl/8'})).read()
     zin = zipfile.ZipFile(io.BytesIO(data)); out = io.BytesIO(); zout = zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED)
     for n in zin.namelist():
