@@ -9,8 +9,8 @@ import { z } from "zod";
 import { ArrowLeft, ArrowRight, CheckCircle2, CircleDashed } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
-import { Button } from "@/design-system/element";
 import { EventTimeline } from "@/components/events/EventTimeline";
+import { SjbEventAreas } from "@/components/events/SjbEventAreas";
 import { SJB_LOGOS, SJB_LOGO_RULES } from "@/lib/san-juan-bowl";
 import { getEventIntake } from "@/lib/event-intake.functions";
 import { EVENT_INTAKE_ITEMS, INTAKE_STATUS_LABEL, summarizeIntake, type IntakeStatus } from "@/lib/event-intake";
@@ -155,31 +155,7 @@ function EventHome() {
           <p className="mt-1 text-[15px] text-[#03002C]/75">
             {[entry.venue, entry.city, entry.dates].filter(Boolean).join(" · ")}
           </p>
-          {eventId === "san-juan-bowl" && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button asChild>
-                <Link to="/events/san-juan-bowl/brand-kit">
-                  Complete brand kit <ArrowRight aria-hidden />
-                </Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link to="/events/san-juan-bowl/brand-kit/guide">Brand guide <ArrowRight aria-hidden /></Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link to="/share/san-juan-bowl">Public share link <ArrowRight aria-hidden /></Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link to="/events/san-juan-bowl/social">
-                  Social templates <ArrowRight aria-hidden />
-                </Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link to="/events/san-juan-bowl/billboards">
-                  Digital billboards <ArrowRight aria-hidden />
-                </Link>
-              </Button>
-            </div>
-          )}
+
           <div className="mt-3 flex items-center gap-3">
             <div className="h-2 w-48 overflow-hidden rounded-full bg-[#03002C]/10 dark:bg-card">
               <div
@@ -216,7 +192,9 @@ function EventHome() {
           })}
         </nav>
 
-        {eventId === "san-juan-bowl" && (tab === "overview" || tab === "brand") && (
+        {eventId === "san-juan-bowl" && tab === "overview" && <SjbEventAreas />}
+
+        {eventId === "san-juan-bowl" && tab === "brand" && (
           <section aria-labelledby="bowl-brand-rules" className="mt-6 grid gap-6 border-y border-border py-6 sm:grid-cols-[180px_1fr]">
             <img src={SJB_LOGOS[0].svg} alt="TransPerfect San Juan Bowl official full-colour logo" className="mx-auto max-h-48 w-full max-w-48 object-contain" />
             <div>
