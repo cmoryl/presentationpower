@@ -1,7 +1,8 @@
 # Roadmap — Spectrum corporate style adoption (done)
 
 ## Bowl generated-scene logo intro and billboard videos
-- [x] Assemble approved shields, football and light-action source references; reference collection approved. Gold-player cutout is unavailable separately.
+- [ ] Revise all five videos using recovered live Canva player/background artwork, unchanged shields and campaign-matched special effects; inspect exports and add to the existing collection.
+- [x] Assemble approved shields, football and light-action source references; reference collection approved. Gold-player cutout subsequently recovered from the Canva PowerPoint export.
 - [x] Plan, stadium anthem, hybrid exact-logo composition and two football stills approved. Rejected AI-rendered shields/cards stay excluded.
 - [x] Generated both football clips and composed five videos with original shields; inspected all final copy/holds and measured sound levels. Audio listening remains unverified; delivered as review drafts, 1080p exports with 720p source footage, not roadside-certified.
 
