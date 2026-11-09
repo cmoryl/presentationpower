@@ -513,3 +513,61 @@ export function builtInEvent(id: string): EventEntry | undefined {
 export function readinessProgress(items: readonly ReadyItem[]): { ready: number; total: number } {
   return { ready: items.filter((i) => i.state === "ready").length, total: items.length };
 }
+
+/** San Juan Bowl event home: every area grouped by what people come to do. */
+export type EventAreaGroup = { id: string; title: string; summary: string; tools: EventTool[] };
+export const SJB_EVENT_AREAS: EventAreaGroup[] = [
+  {
+    id: "brand",
+    title: "Brand & logos",
+    summary: "Logos, colours, type and the rules for using them.",
+    tools: [
+      { label: "Brand kit", detail: "Every logo, colour and download in one place.", link: { to: "/events/san-juan-bowl/brand-kit" } },
+      { label: "Brand guide", detail: "How to use the logo, colours and type.", link: { to: "/events/san-juan-bowl/brand-kit/guide" } },
+      { label: "Single-colour logos", detail: "Navy, black and white versions.", link: { to: "/events/san-juan-bowl/brand-kit/single-colour" } },
+      { label: "Lettering spec", detail: "Lettering measurements and construction.", link: { to: "/events/san-juan-bowl/brand-kit/lettering" } },
+      { label: "Designer files", detail: "Production files for designers and vendors.", link: { to: "/events/san-juan-bowl/brand-kit/designers" } },
+    ],
+  },
+  {
+    id: "marketing",
+    title: "Marketing & campaigns",
+    summary: "Ready-made social posts, billboards and background art.",
+    tools: [
+      { label: "Social posts", detail: "Every campaign set, with picture and Illustrator downloads.", link: { to: "/events/san-juan-bowl/social" } },
+      { label: "Digital billboards", detail: "English and Spanish roadside boards with examples.", link: { to: "/events/san-juan-bowl/billboards" } },
+      { label: "Set 5 design assets", detail: "High-resolution backgrounds and layers for large prints.", link: { to: "/events/san-juan-bowl/set-5-assets" } },
+    ],
+  },
+  {
+    id: "venue",
+    title: "Stadium & game day",
+    summary: "The venue, the fan rules and what's still to come.",
+    tools: [
+      { label: "Stadium 3D view", detail: "Hiram Bithorn Stadium and field in 3D.", link: { to: "/events/san-juan-bowl/stadium" } },
+      { label: "Stadium policies", detail: "Prohibited items, bag and smoking rules — English and Spanish.", link: { to: "/events/san-juan-bowl/stadium-policies" } },
+      { label: "Venue maps", detail: "Floor plans, once the venue sends them.", link: { to: "/events/next/maps/$eventId", params: { eventId: SJB_EVENT.id } } },
+      { label: "Venue checklist", detail: "What's still needed from the venue and organisers.", link: { to: "/events/next/intake/$eventId", params: { eventId: SJB_EVENT.id } } },
+    ],
+  },
+  {
+    id: "production",
+    title: "Signs & print",
+    summary: "On-site signs, badges and pillars.",
+    tools: [
+      { label: "Sign set", detail: "Build and download every venue sign.", link: { to: "/events/next/signs/$eventId", params: { eventId: SJB_EVENT.id } } },
+      { label: "Name badges", detail: "The approved badge family.", link: { to: "/events/next/badges" } },
+      { label: "Pillars", detail: "The approved pillar faces.", link: { to: "/events/next/pillars" } },
+    ],
+  },
+  {
+    id: "share",
+    title: "Share with others",
+    summary: "Links that open without signing in.",
+    tools: [
+      { label: "Public brand kit", detail: "Brand kit for partners and vendors.", link: { to: "/share/san-juan-bowl" } },
+      { label: "Public social posts", detail: "Social posts anyone can download.", link: { to: "/share/san-juan-bowl/social" } },
+      { label: "Public billboards", detail: "Billboard examples for the team.", link: { to: "/share/san-juan-bowl/billboards" } },
+    ],
+  },
+];
