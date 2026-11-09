@@ -1,5 +1,9 @@
 # Roadmap — Spectrum corporate style adoption (done)
 
+## Bowl editable Illustrator social exports
+- [x] Check an actual live Canva social: no native AI/SVG export; PPTX retains two live text objects and four separate raster images, including a fused football/background and raster logos.
+- [ ] Build and verify fully editable Illustrator masters before adding downloads. Blocked: native Illustrator creation/open verification is unavailable here; fused source imagery cannot be represented as independently editable original objects without reconstruction. No export button or editable-master claim added; saved Canva originals remain unchanged.
+
 ## Bowl generated-scene logo intro and billboard videos
 - On hold by user instruction: all delivered video drafts are rejected and not approved. No further revisions, publishing or use; resume only on explicit request.
 - [x] Revise all five videos using recovered live Canva player/background artwork, unchanged shields and campaign-matched special effects; inspect sampled frames of every export and add to the existing collection. Sound measures −13.7/−13.9 LUFS; listening and exhaustive motion review remain unverified. Enlarged player/football close-up are softer; intro wipe has a brief folded-strip appearance. Delivered as review drafts.
