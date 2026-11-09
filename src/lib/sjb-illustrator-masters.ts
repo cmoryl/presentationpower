@@ -23,3 +23,9 @@ export function sjbIllustratorMaster(designId: string): string | null {
 export function sjbIllustratorMasterIds(): string[] {
   return Object.keys(BY_ID);
 }
+
+/** Readable download name, e.g. "SJB-Set-1-Gold-Night-Story-1080x1920-illustrator.zip". */
+export function sjbIllustratorFileName(parts: string[]): string {
+  const slug = parts.join(' ').normalize('NFKD').replace(/[^\w\s-]/g, '').trim().replace(/[\s_]+/g, '-').replace(/-+/g, '-');
+  return `SJB-${slug}-illustrator.zip`;
+}
