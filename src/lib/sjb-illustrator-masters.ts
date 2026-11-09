@@ -3,14 +3,16 @@
 // text, the supplied vector Bowl shield swapped in for its picture, and the
 // original Canva images embedded. Canva originals are never modified.
 // Packages are snapshots — re-run the rebuild after Canva edits (manual).
-const POINTERS = import.meta.glob<{ url: string }>('../assets/sjb-illustrator/*.asset.json', { eager: true, import: 'default' });
+type Pointer = { url?: string; default?: { url?: string } };
+const POINTERS = import.meta.glob<Pointer>('/src/assets/sjb-illustrator/*.asset.json', { eager: true });
 
 export const SJB_ILLUSTRATOR_SNAPSHOT_DATE = '2026-11-09';
 
 const BY_ID: Record<string, string> = {};
 for (const [path, pointer] of Object.entries(POINTERS)) {
-  const m = path.match(/sjb-(.+)-illustrator\.zip\.asset\.json$/);
-  if (m && pointer?.url) BY_ID[m[1]] = pointer.url;
+  const m = path.match(/\/sjb-([^/]+)-illustrator\.zip\.asset\.json$/);
+  const url = pointer?.default?.url ?? pointer?.url;
+  if (m && url) BY_ID[m[1]] = url;
 }
 
 /** Download URL of the editable Illustrator package for a Canva design, if one was built. */

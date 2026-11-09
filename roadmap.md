@@ -2,7 +2,8 @@
 
 ## Bowl editable Illustrator social exports
 - [x] Check an actual live Canva social: no native AI/SVG export; PPTX retains two live text objects and four separate raster images, including a fused football/background and raster logos.
-- [ ] Build and verify fully editable Illustrator masters before adding downloads. Blocked: native Illustrator creation/open verification is unavailable here; fused source imagery cannot be represented as independently editable original objects without reconstruction. No export button or editable-master claim added; saved Canva originals remain unchanged.
+- [x] Rebuild all 133 saved socials as layered Illustrator-ready SVG packages (one layer per Canva object, live text, vector Bowl shield, original images embedded) with an "Illustrator file" button on the public socials page. Canva originals unchanged.
+- [ ] Open-in-Illustrator check by a designer. Blocked: Adobe Illustrator is not available here; fused images (e.g. football inside a background) stay single pictures.
 
 ## Bowl generated-scene logo intro and billboard videos
 - On hold by user instruction: all delivered video drafts are rejected and not approved. No further revisions, publishing or use; resume only on explicit request.
