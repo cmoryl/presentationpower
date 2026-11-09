@@ -1,6 +1,7 @@
 # Roadmap — Spectrum corporate style adoption (done)
 
 ## Bowl generated-scene logo intro and billboard videos
+- On hold by user instruction: all delivered video drafts are rejected and not approved. No further revisions, publishing or use; resume only on explicit request.
 - [x] Revise all five videos using recovered live Canva player/background artwork, unchanged shields and campaign-matched special effects; inspect sampled frames of every export and add to the existing collection. Sound measures −13.7/−13.9 LUFS; listening and exhaustive motion review remain unverified. Enlarged player/football close-up are softer; intro wipe has a brief folded-strip appearance. Delivered as review drafts.
 - [x] Assemble approved shields, football and light-action source references; reference collection approved. Gold-player cutout subsequently recovered from the Canva PowerPoint export.
 - [x] Plan, stadium anthem, hybrid exact-logo composition and two football stills approved. Rejected AI-rendered shields/cards stay excluded.
