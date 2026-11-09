@@ -10,7 +10,7 @@ export const SJB_ILLUSTRATOR_SNAPSHOT_DATE = '2026-11-09';
 
 const BY_ID: Record<string, string> = {};
 for (const [path, pointer] of Object.entries(POINTERS)) {
-  const m = path.match(/sjb-(.+)-illustrator\.zip\.asset\.json$/);
+  const m = path.match(/\/sjb-([^/]+)-illustrator\.zip\.asset\.json$/);
   const url = pointer?.default?.url ?? pointer?.url;
   if (m && url) BY_ID[m[1]] = url;
 }
