@@ -128,6 +128,7 @@ function EventHome() {
       };
     });
   const progress = readinessProgress(readiness);
+  const isBowl = eventId === "san-juan-bowl";
   const summary = entry.readiness ? null : summarizeIntake((intake.data?.intake ?? []) as never);
 
   return (
@@ -156,7 +157,7 @@ function EventHome() {
             {[entry.venue, entry.city, entry.dates].filter(Boolean).join(" · ")}
           </p>
 
-          <div className="mt-3 flex items-center gap-3">
+          {!isBowl && (<><div className="mt-3 flex items-center gap-3">
             <div className="h-2 w-48 overflow-hidden rounded-full bg-[#03002C]/10 dark:bg-card">
               <div
                 className="h-full bg-primary"
@@ -167,9 +168,10 @@ function EventHome() {
               {progress.ready} of {progress.total} ready
             </span>
           </div>
-          <EventTimeline eventId={eventId} ready={progress.ready} total={progress.total} />
+          <EventTimeline eventId={eventId} ready={progress.ready} total={progress.total} /></>)}
         </header>
 
+        {isBowl ? <SjbEventAreas /> : (<>
         <nav aria-label="Event sections" className="mt-6 flex flex-wrap gap-1 border-b border-[#03002C]/12">
           {(["overview", ...tabs.map((t) => t.id)] as const).map((id) => {
             const on = id === tab;
@@ -192,7 +194,6 @@ function EventHome() {
           })}
         </nav>
 
-        {eventId === "san-juan-bowl" && tab === "overview" && <SjbEventAreas />}
 
         {eventId === "san-juan-bowl" && tab === "brand" && (
           <section aria-labelledby="bowl-brand-rules" className="mt-6 grid gap-6 border-y border-border py-6 sm:grid-cols-[180px_1fr]">
@@ -247,6 +248,7 @@ function EventHome() {
             )}
           </section>
         )}
+        </>)}
       </div>
     </AppShell>
   );
