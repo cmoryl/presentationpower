@@ -78,7 +78,7 @@ def convert(pptx, out, shield_dark, shield_color, design_id, page=1):
                 report.append(('vector-shield', kind))
             else:
                 mime = 'image/png' if data[:4] == b'\x89PNG' else 'image/jpeg'
-                layers.append(f'<g id="{lid}"{tf}><image x="{ix:.2f}" y="{iy:.2f}" width="{iw:.2f}" height="{ih:.2f}" preserveAspectRatio="none" href="data:{mime};base64,{base64.b64encode(data).decode()}"/></g>')
+                layers.append(f'<g id="{lid}"{tf}><image x="{ix:.2f}" y="{iy:.2f}" width="{iw:.2f}" height="{ih:.2f}" preserveAspectRatio="none" xlink:href="data:{mime};base64,{base64.b64encode(data).decode()}"/></g>')
                 report.append(('image', descr or name))
             continue
         tb = sp.find('p:txBody', NS)
