@@ -71,6 +71,18 @@
    "1920": "DAHaiOHrw78"
   }
  },
+ "07": {
+  "dark": {
+   "1350": "DAHaipuXmyk",
+   "1080": "DAHaiuL53UQ",
+   "1920": "DAHairfOIWo"
+  },
+  "light": {
+   "1350": "DAHaiis6Oes",
+   "1080": "DAHaiuIZc90",
+   "1920": "DAHaivcofGc"
+  }
+ },
  "08": {
   "dark": {
    "1350": "DAHaiD3thaA"
@@ -97,6 +109,18 @@
    "1080": "DAHaiV4gDaM",
    "1350": "DAHaiT6G6yM",
    "1920": "DAHaifdIkc4"
+  }
+ },
+ "11": {
+  "dark": {
+   "1350": "DAHaihTXt3w",
+   "1080": "DAHaikKLA9U",
+   "1920": "DAHaim4VyzY"
+  },
+  "light": {
+   "1350": "DAHaioSUYMI",
+   "1080": "DAHaipLj51w",
+   "1920": "DAHaivQ3NFU"
   }
  },
  "12": {
