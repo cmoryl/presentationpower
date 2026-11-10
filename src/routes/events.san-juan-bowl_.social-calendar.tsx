@@ -115,7 +115,7 @@ function CalendarPage() {
 }
 
 function PostRow({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode }) {
-  const [showCaption, setShowCaption] = useState(false);
+  const [showCaption, setShowCaption] = useState(Boolean(post.caption));
   const sizes = SJB_CALENDAR_SIZES.map((s) => ({ s, d: sjbCalendarDesign(post.n, mode, s.id) }));
   const anyBuilt = sizes.some(({ d }) => d);
   return (
