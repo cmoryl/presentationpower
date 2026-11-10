@@ -23,7 +23,7 @@ export function SjbBreadcrumbs() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const parts = pathname.replace(/^\/events\/san-juan-bowl\/?/, "").split("/").filter(Boolean);
   return (
-    <nav aria-label="Breadcrumb" className="[&:has(+*_header)]:hidden mx-auto flex max-w-6xl flex-wrap items-center gap-1 px-6 pt-4 text-sm text-muted-foreground">
+    <nav aria-label="Breadcrumb" className="[&:has(+*>header)]:hidden mx-auto flex max-w-6xl flex-wrap items-center gap-1 px-6 pt-4 text-sm text-muted-foreground">
       <Link to="/events/$eventId" params={{ eventId: "san-juan-bowl" }} className={linkCls}>
         San Juan Bowl
       </Link>
