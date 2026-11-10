@@ -1,5 +1,6 @@
 # Roadmap
 ## Bowl social calendar
+- [ ] Dark (gold player) font match: rebuild from Set 2 layouts with gold-player background. Pilot post 04 feed copy DAHajRThRh8 (transaction 7751216736737611556) previewed; awaiting approval, then roll out to 01–15, 27, 29 × 3 sizes, export, clean, and wire in.
 - [x] Calendar-first landing page with visual campaign selectors, larger artwork in month grids and preserved day navigation; campaign switching and highlighted day navigation verified.
 - [ ] Refresh scheduled Light action posts from user-edited feed masters: existing feed pictures refreshed and cleaned; resized square/story drafts created, with overlap corrections in progress. New size previews require approval before committing/exporting and updating calendar links. Posts 01/07 still need resizing.
 - [ ] Set 2 balanced spacing (posts 02, 03, 04, 27 × 3 sizes) previewed; awaiting approval, then save, clean exports and refresh.
