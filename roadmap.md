@@ -4,6 +4,6 @@
 - [x] Canva designs (dark + light, 3 sizes): posts 01–06
 - [x] Canva feed designs (dark + light): posts 08, 09, TV announcement, countdown
 - [ ] Square/Story sizes for 08, 09, TV announcement, countdown
-- [ ] Canva designs for remaining 18 posts
+- [ ] Canva designs: 10, 12, 14 done (all 6 each); still to build 07, 11, 13, 15–25, 28
 - [ ] Preview pictures, cleaned of AI labels
 - [ ] Illustrator files for calendar designs
