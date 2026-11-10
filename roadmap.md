@@ -1,5 +1,6 @@
 # Roadmap
 ## Bowl social calendar
+- [ ] Post 04 conference-logo spacing: inspect all nine Set 2/3/4 sizes, separate side marks from shield, then obtain Canva preview approval before saving and refreshing cleaned calendar pictures.
 - [x] Post 04: approved lowered content saved in all nine Set 2/3/4 Canva designs; full-size JPGs cleaned, uploaded and wired into the calendar.
 - [ ] Remaining build: Set 2/3/4 for the other 24 posts, plus dark/light for 16–25 and 28; clean full-size exports and wire saved files into the calendar. Other 282 designs remain unbuilt; new Canva drafts require preview approval before committing.
 - [x] Calendar page with every post from the sheet
