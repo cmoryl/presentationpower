@@ -41,7 +41,7 @@ const STATUS_TONE: Record<string, string> = {
 };
 
 // Which projections template matches each calendar look (null = not built in that look yet).
-const PROJECTION_LOOK: Record<SjbCalendarMode, "dark" | "blue" | null> = { dark: "dark", light: null, set2: null, set3: null, set4: "blue" };
+const PROJECTION_LOOK: Record<SjbCalendarMode, "dark" | "blue" | "night" | null> = { dark: "dark", light: null, set2: "night", set3: "dark", set4: "blue" };
 
 function CalendarPage() {
   const [mode, setMode] = useState<SjbCalendarMode>("dark");
