@@ -2,6 +2,7 @@
 // Legalweek shipped no brand guide: colours are the values read from its live files
 // (see LEGALWEEK_COLOURS), type is the supplied Poppins, and no logo rules or don'ts
 // are invented — the page says so where the package is silent.
+import { BrandSocialPosts } from "@/components/brand/BrandApplicationExamples";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -101,6 +102,8 @@ function LegalweekGuide() {
       </Section>
       <Section n="07" title="Applications · supplied artwork">
         <p className="text-sm text-muted-foreground">The original pieces show the branding in context. No separate logo or unsupplied application is recreated.</p>
+        {kit.pieces.some((p) => p.group === "Social media" && p.preview) && <div className="mt-6"><h3 className="text-lg font-semibold">Social</h3>
+          <BrandSocialPosts className="mt-3" brandName={kit.name} posts={kit.pieces.filter((p) => p.group === "Social media" && p.preview).map((p) => ({ src: p.preview ?? "", title: p.title, size: p.size, href: p.preview ?? undefined }))} /></div>}
         <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {kit.pieces.filter((p) => p.preview).map((p) => <figure key={p.file} className="min-w-0 border-t border-border pt-4">
             <a href={p.preview ?? p.file} target="_blank" rel="noreferrer" className="flex h-64 items-center justify-center bg-muted p-4 focus-visible:outline-2 focus-visible:outline-ring">

@@ -703,7 +703,7 @@ function BrandGuideView() {
         </Section>
       )}
 
-      {(logos?.color ?? logos?.stackedColor ?? logos?.black) && <BrandApplicationGallery id="applications" artwork={{
+      {(logos?.color ?? logos?.stackedColor ?? logos?.black) && <BrandApplicationGallery id="applications" socialPosts={[]} artwork={{
         name: guide.title,
         color: logos?.color ?? logos?.stackedColor ?? logos?.black ?? "",
         white: logos?.white ?? logos?.stackedWhite,

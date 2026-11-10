@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, X, Camera } from "lucide-react";
 import { Button } from "@/design-system/element";
+import { NextLivePhotography } from "@/components/events/NextLivePhotography";
 import { supabase } from "@/integrations/supabase/client";
 import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
 import { NEXT_EXAMPLE_AREAS, NEXT_EXAMPLE_EVENTS, loadNextArtworkExamples, nextExamplesAllowPhotos, type NextVisualExample } from "@/lib/next-visual-examples";
@@ -74,6 +75,7 @@ export function NextVisualExamples({ shared = false }: NextVisualExamplesProps) 
   const field = "h-9 min-w-0 rounded-md border border-border bg-background px-3 text-sm";
   return <section id="visual-examples" aria-labelledby="next-examples-heading" className="mt-12 scroll-mt-24 border-t border-border pt-8">
     <h2 id="next-examples-heading" className="text-2xl font-semibold">Event examples</h2>
+    <NextLivePhotography />
     {!shared && <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Example type">
       <Button size="sm" variant={mode === "photo" ? "default" : "outline"} aria-pressed={mode === "photo"} onClick={() => changeMode("photo")}><Camera size={16} />Real event photographs</Button>
       <Button size="sm" variant={mode === "artwork" ? "default" : "outline"} aria-pressed={mode === "artwork"} onClick={() => changeMode("artwork")}>Artwork variations</Button>
