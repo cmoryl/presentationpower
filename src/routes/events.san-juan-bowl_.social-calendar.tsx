@@ -65,10 +65,10 @@ function CalendarPage() {
     <main className="mx-auto max-w-6xl px-6 py-10">
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl social calendar</h1>
       <p className="mt-2 max-w-3xl text-muted-foreground">
-        Posts from the team's calendar sheet, Nov 7 – Dec 17, 2026. Each post has Canva designs in four looks (dark, light, Set 3 and Set 4)
+        Posts from the team's calendar sheet, Nov 7 – Dec 17, 2026. Each post has Canva designs in five looks (dark, light, Set 2, Set 3 and Set 4)
         in Feed, Square and Story sizes, with picture downloads. {built} of {SJB_CALENDAR_POSTS.length} posts are built in Canva so far.
       </p>
-      <div className="mt-5 flex items-center gap-2" role="group" aria-label="Look">
+      <div className="mt-5 flex flex-wrap items-center gap-2" role="group" aria-label="Look">
         {SJB_CALENDAR_MODES.map(({ id: m, label }) => (
           <Button key={m} size="sm" variant={mode === m ? "default" : "outline"} aria-pressed={mode === m} onClick={() => setMode(m)}>
             {label}
@@ -105,80 +105,64 @@ function CalendarPage() {
 }
 
 function PostRow({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode }) {
-  const feed = sjbCalendarDesign(post.n, mode, "1350");
   const [showCaption, setShowCaption] = useState(false);
+  const sizes = SJB_CALENDAR_SIZES.map((s) => ({ s, d: sjbCalendarDesign(post.n, mode, s.id) }));
+  const anyBuilt = sizes.some(({ d }) => d);
   return (
-    <article className="grid gap-4 rounded-md border border-border bg-card p-4 sm:grid-cols-[8rem_1fr]">
-      <div className="aspect-[4/5] w-32 overflow-hidden rounded bg-muted">
-        {feed?.previewUrl ? (
-          <a href={feed.canvaUrl} target="_blank" rel="noreferrer" aria-label={`Open ${post.title} in Canva`}>
-            <img src={feed.previewUrl} alt={`${post.title}, ${mode} feed post`} className="h-full w-full object-cover" loading="lazy" />
-          </a>
-        ) : feed ? (
-          <a href={feed.canvaUrl} target="_blank" rel="noreferrer" className="flex h-full flex-col items-center justify-center gap-1 p-2 text-center text-xs text-foreground hover:bg-muted/70">
-            <span className="font-semibold">{post.headline[0]}</span><span>{post.headline[1]}</span>
-            <span className="mt-1 text-muted-foreground">Open in Canva</span>
-          </a>
-        ) : (
-          <div className="flex h-full items-center justify-center p-2 text-center text-xs text-muted-foreground">Not built in Canva yet</div>
-        )}
-      </div>
-      <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-semibold text-foreground">{post.title}</h3>
-          <span className={`rounded px-2 py-0.5 text-xs font-medium ${STATUS_TONE[post.status] ?? "bg-muted text-muted-foreground"}`}>{post.status}</span>
-          <span className="text-xs text-muted-foreground">{post.phase} · {post.channel}</span>
+    <article className="rounded-md border border-border bg-card p-5">
+      <header className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h3 className="text-lg font-semibold text-foreground">{post.title}</h3>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span>{post.phase} · {post.channel}</span>
+          <span className={`rounded px-2 py-0.5 font-medium ${STATUS_TONE[post.status] ?? "bg-muted text-muted-foreground"}`}>{post.status}</span>
         </div>
-        <p className="mt-1 text-sm text-muted-foreground">{post.brief}</p>
-        <p className="mt-1 text-sm"><span className="text-muted-foreground">Artwork headline:</span> {post.headline.join(" / ")}</p>
-        {post.owners && <p className="text-sm"><span className="text-muted-foreground">Owners:</span> {post.owners}</p>}
-        {post.waitingOn && <p className="mt-1 text-sm text-amber-800">Waiting on: {post.waitingOn}</p>}
-        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
-          {SJB_CALENDAR_SIZES.map((s) => {
-            const d = sjbCalendarDesign(post.n, mode, s.id);
-            return (
-              <div key={s.id} className="flex flex-col gap-1.5 text-sm">
-                {d?.previewUrl && (
+      </header>
+      <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{post.brief}</p>
+      {post.waitingOn && <p className="mt-1 text-sm text-amber-800">Waiting on: {post.waitingOn}</p>}
+
+      {anyBuilt ? (
+        <ul className="mt-4 flex flex-wrap items-end gap-6">
+          {sizes.map(({ s, d }) => (
+            <li key={s.id} className="flex flex-col gap-2">
+              <div className="flex h-56 items-end">
+                {d?.previewUrl ? (
                   <a href={d.previewUrl} target="_blank" rel="noreferrer" aria-label={`View ${post.title} ${s.label.toLowerCase()} picture`}>
-                    <img src={d.previewUrl} alt={`${post.title}, ${mode} ${s.label.toLowerCase()} post`} className="h-28 w-auto rounded border border-border object-cover" style={{ aspectRatio: `${s.w} / ${s.h}` }} loading="lazy" />
+                    <img src={d.previewUrl} alt={`${post.title}, ${s.label.toLowerCase()} post`} className="h-56 w-auto rounded border border-border object-cover shadow-sm" style={{ aspectRatio: `${s.w} / ${s.h}` }} loading="lazy" />
                   </a>
-                )}
-                <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">{s.label} {s.w}×{s.h}</span>
-                {d ? (
-                  <>
-                    <Button size="sm" variant="outline" asChild><a href={d.canvaUrl} target="_blank" rel="noreferrer">Canva</a></Button>
-                    {d.downloadUrl && (
-                      <Button size="sm" variant="outline" asChild><a href={d.downloadUrl} download={d.downloadName}>Picture</a></Button>
-                    )}
-                    {d.illustratorUrl ? (
-                      <Button size="sm" variant="outline" asChild><a href={d.illustratorUrl} download>Illustrator</a></Button>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">Illustrator file coming</span>
-                    )}
-                  </>
                 ) : (
-                  <span className="text-xs text-muted-foreground">—</span>
+                  <div className="flex h-56 items-center justify-center rounded border border-dashed border-border bg-muted/40 px-3 text-center text-xs text-muted-foreground" style={{ aspectRatio: `${s.w} / ${s.h}` }}>
+                    {d ? "Picture coming" : "Not built yet"}
+                  </div>
                 )}
               </div>
+              <p className="text-xs font-medium text-foreground">{s.label} <span className="text-muted-foreground">{s.w}×{s.h}</span></p>
+              {d && (
+                <div className="flex flex-wrap gap-1.5">
+                  <Button size="sm" variant="outline" asChild><a href={d.canvaUrl} target="_blank" rel="noreferrer">Canva</a></Button>
+                  {d.downloadUrl && <Button size="sm" variant="outline" asChild><a href={d.downloadUrl} download={d.downloadName}>Picture</a></Button>}
+                  {d.illustratorUrl && <Button size="sm" variant="outline" asChild><a href={d.illustratorUrl} download>Illustrator</a></Button>}
                 </div>
-            );
-          })}
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-4 rounded border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">Not built in this look yet.</p>
+      )}
+
+      {post.caption && (
+        <div className="mt-4 border-t border-border pt-3">
+          <Button size="sm" variant="ghost" onClick={() => setShowCaption((v) => !v)} aria-expanded={showCaption}>
+            {showCaption ? "Hide caption" : "Show approved caption"}
+          </Button>
+          {showCaption && (
+            <div className="mt-2 rounded border border-border bg-muted/40 p-3">
+              <pre className="whitespace-pre-wrap font-sans text-sm text-foreground">{post.caption}</pre>
+              <Button size="sm" variant="outline" className="mt-2" onClick={() => navigator.clipboard.writeText(post.caption!)}>Copy caption</Button>
+            </div>
+          )}
         </div>
-        {post.caption && (
-          <div className="mt-3">
-            <Button size="sm" variant="ghost" onClick={() => setShowCaption((v) => !v)} aria-expanded={showCaption}>
-              {showCaption ? "Hide caption" : "Show approved caption"}
-            </Button>
-            {showCaption && (
-              <div className="mt-2 rounded border border-border bg-muted/40 p-3">
-                <pre className="whitespace-pre-wrap font-sans text-sm text-foreground">{post.caption}</pre>
-                <Button size="sm" variant="outline" className="mt-2" onClick={() => navigator.clipboard.writeText(post.caption!)}>Copy caption</Button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      )}
     </article>
   );
 }
