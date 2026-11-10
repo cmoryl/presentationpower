@@ -1,17 +1,17 @@
 {
   "post": "04",
-  "status": "committed-exported-cleaned-wired",
-  "revision": "Approved lowered positions saved in all nine Canva designs; full-size JPG exports stripped of hidden metadata and uploaded to calendar pointers.",
+  "status": "conference-spacing-awaiting-preview-approval",
+  "revision": "Existing lowered-content pictures remain live. Six Set 2/4 conference-spacing drafts inspected: secondary marks are 110px wide with preserved proportions and aligned centers; shield, headline and background unchanged. Set 3 already separates marks in the footer and is unchanged. Approval required before save/export/clean/refresh.",
   "headline": "SAN JUAN ROOTS.\nNEW TRADITION.",
   "designs": [
-    { "look": "set2", "size": "1350", "designId": "DAHai4nSCtc", "transactionId": "4199002520508372053" },
-    { "look": "set2", "size": "1080", "designId": "DAHaixyeXHc", "transactionId": "4779966873394055093" },
-    { "look": "set2", "size": "1920", "designId": "DAHai6-QuJc", "transactionId": "6540874325615056054" },
+    { "look": "set2", "size": "1350", "designId": "DAHai4nSCtc", "transactionId": "3132775311098025025" },
+    { "look": "set2", "size": "1080", "designId": "DAHaixyeXHc", "transactionId": "4557038694314866124" },
+    { "look": "set2", "size": "1920", "designId": "DAHai6-QuJc", "transactionId": "981180591175958535" },
     { "look": "set3", "size": "1350", "designId": "DAHai6cDjm0", "transactionId": "7148860276814607470" },
     { "look": "set3", "size": "1080", "designId": "DAHai-86c4M", "transactionId": "1976476103262903059" },
     { "look": "set3", "size": "1920", "designId": "DAHai8-IvYU", "transactionId": "5775262396103624890" },
-    { "look": "set4", "size": "1350", "designId": "DAHai-4B8c4", "transactionId": "981180588225727873" },
-    { "look": "set4", "size": "1080", "designId": "DAHai8069Kw", "transactionId": "7548554745769135165" },
-    { "look": "set4", "size": "1920", "designId": "DAHaizbjnds", "transactionId": "4199002526455972734" }
+    { "look": "set4", "size": "1350", "designId": "DAHai-4B8c4", "transactionId": "2767983744410006388" },
+    { "look": "set4", "size": "1080", "designId": "DAHai8069Kw", "transactionId": "5024287157633689545" },
+    { "look": "set4", "size": "1920", "designId": "DAHaizbjnds", "transactionId": "4703405683003969172" }
   ]
 }
