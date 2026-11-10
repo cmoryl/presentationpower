@@ -43,6 +43,16 @@
    "1080": "DAHaiDpGAvk",
    "1350": "DAHaiMAu5xg",
    "1920": "DAHaiJVO5JA"
+  },
+  "set3": {
+   "1350": "DAHaikZ8IT8",
+   "1080": "DAHaipP_nnI",
+   "1920": "DAHaijdOAw4"
+  },
+  "set4": {
+   "1350": "DAHaiq3AMXE",
+   "1080": "DAHairDgr8U",
+   "1920": "DAHaimLrz1c"
   }
  },
  "04": {
@@ -187,6 +197,16 @@
   },
   "light": {
    "1350": "DAHaiOk55vE"
+  },
+  "set3": {
+   "1350": "DAHaiktOY8o",
+   "1080": "DAHaioTK4Mg",
+   "1920": "DAHaip2dmXU"
+  },
+  "set4": {
+   "1350": "DAHaihWqANo",
+   "1080": "DAHaiqX-IuA",
+   "1920": "DAHaiha6rsA"
   }
  },
  "29": {
