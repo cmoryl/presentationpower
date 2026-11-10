@@ -86,19 +86,19 @@ function DemoPageFrame({
 
           {page.role === "headline" && (
             <>
-              <div style={{ fontSize: px(2.6), letterSpacing: "0.2em", opacity: 0.75 }}>{post.phase.toUpperCase()} · {SJB_DEMO_FACTS[0].value.toUpperCase()}</div>
+              <div style={{ marginTop: px(9), fontSize: px(2.6), letterSpacing: "0.2em", opacity: 0.75 }}>{post.phase.toUpperCase()} · {SJB_DEMO_FACTS[0].value.toUpperCase()}</div>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: px(2) }}>
                 <div style={{ fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: "-0.02em" }}>{post.headline[0]}</div>
                 <div style={{ fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: "-0.02em", color: look.accent }}>{post.headline[1]}</div>
                 <div style={{ width: px(22), height: px(0.7), backgroundColor: look.accent, marginTop: px(4) }} />
               </div>
-              <div style={{ fontSize: px(2.8), opacity: 0.8 }}>{post.brief.slice(0, 118)}</div>
+              <div style={{ fontSize: px(2.8), opacity: 0.8 }}>{SJB_DEMO_SITE} · {SJB_DEMO_FACTS[0].value}</div>
             </>
           )}
 
           {page.role === "details" && (
             <>
-              <div style={{ fontSize: px(2.6), letterSpacing: "0.2em", opacity: 0.75 }}>THE DETAILS</div>
+              <div style={{ marginTop: px(9), fontSize: px(2.6), letterSpacing: "0.2em", opacity: 0.75 }}>THE DETAILS</div>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: px(4) }}>
                 {SJB_DEMO_FACTS.map((f) => (
                   <div key={f.label} style={{ display: "flex", flexDirection: "column", gap: px(0.6), borderBottom: `1px solid ${look.dark ? "rgba(255,255,255,0.18)" : "rgba(13,14,33,0.18)"}`, paddingBottom: px(2.4) }}>
@@ -158,6 +158,23 @@ function DemoPageFrame({
           }}
         >
           APPROVED SINGLE IMAGE
+        </div>
+      )}
+      {/* Drawn pages carry the site line; the approved-image cover is left untouched. */}
+      {page.photoKind === "none" && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: pad,
+            left: pad,
+            fontSize: px(2.6),
+            fontWeight: 600,
+            letterSpacing: "0.14em",
+            opacity: 0.9,
+            fontFamily: FONT,
+          }}
+        >
+          {SJB_DEMO_SITE}
         </div>
       )}
       <div
