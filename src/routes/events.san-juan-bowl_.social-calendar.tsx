@@ -237,8 +237,6 @@ function CalendarGrid({ mode, format, onOpen, undated }: { mode: SjbCalendarMode
       >
         {preview ? (
           <img src={preview} alt="" className="aspect-[4/5] w-full rounded-sm object-contain bg-muted" loading="lazy" />
-        ) : format === "single" ? (
-          <span className="flex aspect-[4/5] w-full items-center justify-center rounded-sm bg-muted text-muted-foreground">Awaiting artwork</span>
         ) : (
           <span className="flex aspect-[4/5] w-full items-center justify-center overflow-hidden rounded-sm bg-muted">
             <SjbDemoChip post={p} mode={mode} format={format} displayHeight={160} />

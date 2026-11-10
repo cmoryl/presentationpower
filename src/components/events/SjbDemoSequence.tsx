@@ -333,9 +333,13 @@ export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
   );
 }
 
-/** Small demo cover for the month-grid chips. */
+/** Small demo cover for the month-grid chips. The single-image format has no
+ *  sequence of its own, so its chip reuses the drawn 1080×1350 cover. */
 export function SjbDemoChip({ post, mode, format, displayHeight = 96 }: SjbDemoSequenceProps & { displayHeight?: number }) {
-  const demo = useMemo(() => sjbCalendarDemo(post, mode, format), [post, mode, format]);
+  const demo = useMemo(
+    () => sjbCalendarDemo(post, mode, format === "single" ? "linkedin-portrait" : format),
+    [post, mode, format],
+  );
   if (!demo?.spec) return null;
   return (
     <ScaledPage
