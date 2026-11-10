@@ -1,6 +1,7 @@
 # Roadmap
 ## Bowl social calendar
-- [ ] Current request: posts 05–25 and 28 in Set 2/3/4 (198 designs). Post 05 all nine previewed (docs/sjb-set234-batch-pending.json), awaiting save approval; then same method for the rest, clean exports, wire into calendar.
+- [x] Posts 05–25 and 28: all 198 Set 2/3/4 Canva designs saved and their size-specific links registered in the calendar; existing dark/light links preserved.
+- [ ] Current request remaining: inspect all 198 saved designs for alignment, wrapping and logo/content separation, correct exceptions, export full-size pictures, clean metadata and upload previews/downloads. No new pictures or Illustrator files uploaded yet; older artwork remains unaudited.
 - [ ] Dark (gold player) font match: rebuild from Set 2 layouts with gold-player background. Pilot post 04 feed copy DAHajRThRh8 (transaction 7751216736737611556) previewed; awaiting approval, then roll out to 01–15, 27, 29 × 3 sizes, export, clean, and wire in.
 - [x] Calendar-first landing page with visual campaign selectors, larger artwork in month grids and preserved day navigation; campaign switching and highlighted day navigation verified.
 - [ ] Refresh scheduled Light action posts from user-edited feed masters: existing feed pictures refreshed and cleaned; resized square/story drafts created, with overlap corrections in progress. New size previews require approval before committing/exporting and updating calendar links. Posts 01/07 still need resizing.
