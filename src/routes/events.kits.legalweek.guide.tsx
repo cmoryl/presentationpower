@@ -2,6 +2,8 @@
 // Legalweek shipped no brand guide: colours are the values read from its live files
 // (see LEGALWEEK_COLOURS), type is the supplied Poppins, and no logo rules or don'ts
 // are invented — the page says so where the package is silent.
+import { ApprovedGradients } from "@/components/brand/ApprovedGradients";
+import { gradientsForKit } from "@/lib/approved-gradients";
 import { BrandSocialPosts } from "@/components/brand/BrandApplicationExamples";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
@@ -69,7 +71,7 @@ function LegalweekGuide() {
 
       <Section n="03" title="Screen colours">
         <Swatches colours={[...screen, ...white]} />
-        {kit.gradientNote && <p className="mt-3 max-w-3xl text-sm text-muted-foreground">{kit.gradientNote}</p>}
+        <ApprovedGradients className="mt-4 md:grid-cols-1" gradients={gradientsForKit(kit.id)} />
       </Section>
 
       <Section n="04" title="Print colours">

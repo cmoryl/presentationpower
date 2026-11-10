@@ -66,7 +66,7 @@ function GradientInUse({ g }: { g: ApprovedGradient }) {
     case "card":
       return (
         <div className={cn(wrap, "bg-muted/40")}>{label}
-          <div className="w-full rounded-lg border p-3 shadow-sm" style={{ background: g.css, borderColor: g.stops[1] ? undefined : undefined }}>
+          <div className="w-full rounded-lg border p-3 shadow-sm" style={{ background: g.css }}>
             <div className="text-xs text-muted-foreground">Frost card</div>
             <div className="mt-1 text-sm font-semibold text-foreground">Global reach</div>
             <div className="mt-1 h-1.5 w-2/3 rounded bg-muted" />
@@ -92,10 +92,11 @@ function GradientInUse({ g }: { g: ApprovedGradient }) {
     case "symbol":
       return (
         <div className={wrap}>{label}
-          <svg viewBox="0 0 100 100" className="h-20 w-20" role="img" aria-label="Gradient applied to the symbol">
+          <svg viewBox="0 0 100 100" className="h-20 w-20" role="img" aria-label="Direction study of the symbol gradient, not the logo artwork">
             <defs><linearGradient id={`${g.id}-x`} x1="0" x2="1">{g.stops.map((s, i) => <stop key={s.hex} offset={i / Math.max(1, g.stops.length - 1)} stopColor={s.hex} />)}</linearGradient></defs>
             <path d="M15 15 L40 15 L50 35 L60 15 L85 15 L62 50 L85 85 L60 85 L50 65 L40 85 L15 85 L38 50 Z" fill={`url(#${g.id}-x)`} />
           </svg>
+          <span className="absolute bottom-2 text-[10px] text-muted-foreground">Direction study — use the supplied logo files</span>
         </div>
       );
   }

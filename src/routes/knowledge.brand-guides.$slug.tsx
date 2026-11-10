@@ -1,3 +1,5 @@
+import { ApprovedGradients } from "@/components/brand/ApprovedGradients";
+import { gradientsForGuide } from "@/lib/approved-gradients";
 import { useState } from "react";
 import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
 import { BrandApplicationGallery } from "@/components/brand/BrandApplicationExamples";
@@ -115,7 +117,10 @@ function BrandGuideView() {
 
   const guideSections: [string, string][] = [];
   if (guide.values?.length) guideSections.push(["core-values", "Core values"]);
-  guideSections.push(["logo-system", "Logo system"], ["color-palette", "Color palette"], ["typography", "Typography"]);
+  guideSections.push(["logo-system", "Logo system"], ["color-palette", "Color palette"]);
+  const approvedGradients = gradientsForGuide(guide.slug);
+  if (approvedGradients.length) guideSections.push(["approved-gradients", "Approved gradients"]);
+  guideSections.push(["typography", "Typography"]);
   if (guide.colorAccessibility) guideSections.push(["colour-and-legibility", "Colour and legibility"]);
   if (guide.photography || guide.brandVisuals) guideSections.push(["imagery", "Imagery"]);
   if (guide.motion?.videoIds.some((id) => brandVideoById(id))) guideSections.push(["motion", "Motion"]);
@@ -360,6 +365,15 @@ function BrandGuideView() {
           </div>
         </div>
       </Section>
+
+      {approvedGradients.length > 0 && (
+        <Section title="Approved gradients" eyebrow="03a">
+          <p className="mb-6 max-w-2xl text-sm text-muted-foreground">
+            Every gradient approved for this brand, with its stops, direction and how it looks in use.
+          </p>
+          <ApprovedGradients gradients={approvedGradients} />
+        </Section>
+      )}
 
       {/* Typography */}
       <Section title="Typography" eyebrow="04">
