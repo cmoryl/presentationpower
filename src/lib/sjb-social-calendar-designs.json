@@ -87,6 +87,42 @@
    "1350": "DAHaiIwqC6s"
   }
  },
+ "10": {
+  "dark": {
+   "1350": "DAHaieaahhI",
+   "1080": "DAHaiRdA1rU",
+   "1920": "DAHaieRPSAo"
+  },
+  "light": {
+   "1080": "DAHaiV4gDaM",
+   "1350": "DAHaiT6G6yM",
+   "1920": "DAHaifdIkc4"
+  }
+ },
+ "12": {
+  "dark": {
+   "1350": "DAHaieDLauU",
+   "1080": "DAHaiQt-8A0",
+   "1920": "DAHaiRpelVY"
+  },
+  "light": {
+   "1080": "DAHaiUGeKFs",
+   "1350": "DAHaiWnWtOM",
+   "1920": "DAHaiSW92MI"
+  }
+ },
+ "14": {
+  "dark": {
+   "1350": "DAHaiZp4U1c",
+   "1080": "DAHaiQrBGW4",
+   "1920": "DAHaiW9-sq0"
+  },
+  "light": {
+   "1080": "DAHaicSCoGs",
+   "1350": "DAHaibsePz4",
+   "1920": "DAHaiUeCwww"
+  }
+ },
  "27": {
   "dark": {
    "1350": "DAHaiI04YUs"
