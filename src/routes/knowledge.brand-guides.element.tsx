@@ -50,7 +50,7 @@ function Panel({
       }`}
     >
       <div
-        className={`text-[10px] uppercase tracking-[0.3em] ${dark ? "text-white/50" : "text-black/45 dark:text-white/50"}`}
+        className={`text-[11px] uppercase tracking-[0.3em] ${dark ? "text-white/70" : "text-black/60 dark:text-white/70"}`}
       >
         {label}
       </div>
@@ -70,7 +70,7 @@ function ElementIdentityPage() {
       </Link>
 
       <header className="mt-4">
-        <div className="text-[11px] uppercase tracking-[0.3em] text-black/45 dark:text-white/50">
+        <div className="text-[11px] uppercase tracking-[0.3em] text-black/60 dark:text-white/70">
           Product master brand
         </div>
         <h1 className="mt-2 text-4xl font-semibold tracking-tight dark:text-white">
@@ -118,7 +118,7 @@ function ElementIdentityPage() {
               <div className="h-20 rounded-t-xl" style={{ background: c.hex }} />
               <div className="px-3 py-2">
                 <div className="text-xs font-medium dark:text-white">{c.label}</div>
-                <div className="text-[11px] tabular-nums text-black/50 dark:text-white/50">
+                <div className="text-[11px] tabular-nums text-black/60 dark:text-white/70">
                   {c.hex}
                 </div>
               </div>
@@ -149,7 +149,7 @@ function ElementIdentityPage() {
             loading="lazy"
             className="w-full rounded-lg"
           />
-          <figcaption className="mt-3 text-[11px] text-black/50 dark:text-white/50">
+          <figcaption className="mt-3 text-[11px] text-black/60 dark:text-white/70">
             Source identity sheet — the reference for every variant above.
           </figcaption>
         </figure>
