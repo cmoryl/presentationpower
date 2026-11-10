@@ -3,6 +3,7 @@ import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 // dark/light Canva designs (three sizes) and Illustrator files per post.
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
 import {
   SJB_CALENDAR_POSTS,
@@ -39,6 +40,11 @@ const STATUS_TONE: Record<string, string> = {
 
 function CalendarPage() {
   const [mode, setMode] = useState<SjbCalendarMode>("dark");
+  const [view, setView] = useState<"list" | "calendar">("list");
+  const openPost = (itemId: string) => {
+    setView("list");
+    requestAnimationFrame(() => document.getElementById(`post-${itemId}`)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
   const groups = useMemo(() => {
     const dated = new Map<string, SjbCalendarPost[]>();
     const undated: SjbCalendarPost[] = [];
@@ -63,20 +69,30 @@ function CalendarPage() {
             {m === "dark" ? "Dark (gold player)" : "Light (light action)"}
           </Button>
         ))}
+        <span className="mx-2 h-5 w-px bg-border" aria-hidden />
+        {(["list", "calendar"] as const).map((v) => (
+          <Button key={v} size="sm" variant={view === v ? "default" : "outline"} aria-pressed={view === v} onClick={() => setView(v)}>
+            {v === "list" ? "List" : "Calendar"}
+          </Button>
+        ))}
       </div>
 
+      {view === "calendar" ? (
+        <CalendarGrid mode={mode} onOpen={openPost} undated={groups.undated} />
+      ) : (
       <ol className="mt-8 space-y-8">
         {groups.dated.map(([date, posts]) => (
           <li key={date} className="grid gap-4 md:grid-cols-[9rem_1fr]">
             <h2 className="pt-1 text-sm font-semibold uppercase text-muted-foreground">{fmt(date)}</h2>
-            <div className="space-y-4">{posts.map((p) => <PostRow key={p.itemId} post={p} mode={mode} />)}</div>
+            <div className="space-y-4">{posts.map((p) => <div key={p.itemId} id={`post-${p.itemId}`} className="scroll-mt-24"><PostRow post={p} mode={mode} /></div>)}</div>
           </li>
         ))}
         <li className="grid gap-4 md:grid-cols-[9rem_1fr]">
           <h2 className="pt-1 text-sm font-semibold uppercase text-muted-foreground">No date yet</h2>
-          <div className="space-y-4">{groups.undated.map((p) => <PostRow key={p.itemId} post={p} mode={mode} />)}</div>
+          <div className="space-y-4">{groups.undated.map((p) => <div key={p.itemId} id={`post-${p.itemId}`} className="scroll-mt-24"><PostRow post={p} mode={mode} /></div>)}</div>
         </li>
       </ol>
+      )}
     </main>
   );
 }
@@ -147,5 +163,80 @@ function PostRow({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode 
         )}
       </div>
     </article>
+  );
+}
+
+const MONTHS = [
+  { y: 2026, m: 10, label: "November 2026" },
+  { y: 2026, m: 11, label: "December 2026" },
+];
+const GAME_DAY_ISO = new Date(`${SJB_EVENT.datesLabel} UTC`).toISOString().slice(0, 10);
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function CalendarGrid({ mode, onOpen, undated }: { mode: SjbCalendarMode; onOpen: (id: string) => void; undated: SjbCalendarPost[] }) {
+  const byDate = useMemo(() => {
+    const m = new Map<string, SjbCalendarPost[]>();
+    for (const p of SJB_CALENDAR_POSTS) if (p.date) m.set(p.date, [...(m.get(p.date) ?? []), p]);
+    return m;
+  }, []);
+  const chip = (p: SjbCalendarPost) => {
+    const preview = sjbCalendarDesign(p.n, mode, "1350")?.previewUrl;
+    return (
+      <button
+        key={p.itemId}
+        type="button"
+        onClick={() => onOpen(p.itemId)}
+        className="flex w-full items-center gap-1.5 rounded-sm border border-border bg-card p-1 text-left text-xs text-foreground hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        {preview ? (
+          <img src={preview} alt="" className="h-8 w-6 shrink-0 rounded-[2px] object-cover" loading="lazy" />
+        ) : (
+          <span className="h-8 w-6 shrink-0 rounded-[2px] bg-muted" aria-hidden />
+        )}
+        <span className="line-clamp-2 leading-tight">{p.title}</span>
+      </button>
+    );
+  };
+  return (
+    <div className="mt-8 space-y-10">
+      {MONTHS.map(({ y, m, label }) => {
+        const first = new Date(Date.UTC(y, m, 1)).getUTCDay();
+        const days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+        const cells: (number | null)[] = [...Array(first).fill(null), ...Array.from({ length: days }, (_, i) => i + 1)];
+        while (cells.length % 7) cells.push(null);
+        return (
+          <section key={label} aria-label={label}>
+            <h2 className="mb-3 text-lg font-semibold text-foreground">{label}</h2>
+            <div className="grid grid-cols-7 overflow-hidden rounded-md border border-border">
+              {WEEKDAYS.map((d) => (
+                <div key={d} className="border-b border-border bg-muted px-2 py-1.5 text-xs font-semibold uppercase text-muted-foreground">{d}</div>
+              ))}
+              {cells.map((d, i) => {
+                const iso = d ? `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}` : "";
+                const posts = d ? byDate.get(iso) ?? [] : [];
+                const gameDay = iso === GAME_DAY_ISO;
+                return (
+                  <div key={i} className={`min-h-28 border-b border-r border-border p-1.5 ${d ? "bg-background" : "bg-muted/40"} ${gameDay ? "ring-2 ring-inset ring-primary" : ""}`}>
+                    {d && (
+                      <div className="mb-1 flex items-center justify-between text-xs">
+                        <span className="font-medium text-foreground">{d}</span>
+                        {gameDay && <span className="font-semibold text-primary">Game day</span>}
+                      </div>
+                    )}
+                    <div className="space-y-1">{posts.map(chip)}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })}
+      {undated.length > 0 && (
+        <section aria-label="No date yet">
+          <h2 className="mb-3 text-lg font-semibold text-foreground">No date yet</h2>
+          <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-5">{undated.map(chip)}</div>
+        </section>
+      )}
+    </div>
   );
 }
