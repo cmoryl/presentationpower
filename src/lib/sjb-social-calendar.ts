@@ -1,15 +1,16 @@
 // San Juan Bowl social calendar, imported from the team's calendar spreadsheet
 // (San_Juan_Bowl_Social_Media_Social_Calendar, Nov 10 2026). Each post gets Canva
-// designs in four looks (dark, light, Set 3, Set 4), in
+// designs in five looks (dark, light, Set 2, Set 3, Set 4), in
 // three sizes. Design IDs live in sjb-social-calendar-designs.json; posts without
 // an entry there have not been built in Canva yet.
 import designs from "./sjb-social-calendar-designs.json";
 import { sjbIllustratorMaster } from "./sjb-illustrator-masters";
 
-export type SjbCalendarMode = "dark" | "light" | "set3" | "set4";
+export type SjbCalendarMode = "dark" | "light" | "set2" | "set3" | "set4";
 export const SJB_CALENDAR_MODES: { id: SjbCalendarMode; label: string }[] = [
   { id: "dark", label: "Dark (gold player)" },
   { id: "light", label: "Light (light action)" },
+  { id: "set2", label: "Set 2 (night grandstand)" },
   { id: "set3", label: "Set 3 (player spotlight)" },
   { id: "set4", label: "Set 4 (stadium + field)" },
 ];
