@@ -1,13 +1,14 @@
 import { Button } from "@/design-system/element";
-import { SJB_PROJECTION_LOOKS, SJB_PROJECTION_SIZES, SJB_PROJECTIONS_ZIP, sjbProjection } from "@/lib/sjb-projections";
+import { type SjbProjectionLook, SJB_PROJECTION_LOOKS, SJB_PROJECTION_SIZES, SJB_PROJECTIONS_ZIP, sjbProjection } from "@/lib/sjb-projections";
 
 /** Weekly Bowl projections templates: live Canva + PNG/JPG downloads. */
-export function SjbProjections() {
+export function SjbProjections({ look: only, lookLabel }: { look?: SjbProjectionLook | null; lookLabel?: string } = {}) {
+  const looks = only === undefined ? SJB_PROJECTION_LOOKS : SJB_PROJECTION_LOOKS.filter((l) => l.id === only);
   return (
     <section aria-labelledby="sjb-projections" className="mt-10">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 id="sjb-projections" className="text-2xl font-semibold text-foreground">Bowl projections</h2>
+          <h2 id="sjb-projections" className="text-2xl font-semibold text-foreground">Bowl projections{lookLabel ? ` · ${lookLabel}` : ""}</h2>
           <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
             Weekly round-up of where outlets project teams for the Bowl. Edit the week number, outlets and team slots in
             Canva, and drop in team logos when projections come in. Team slots say “ACC TEAM” / “SUN BELT TEAM” until then.
@@ -17,7 +18,10 @@ export function SjbProjections() {
           <Button size="sm" variant="outline" asChild><a href={SJB_PROJECTIONS_ZIP} download="san-juan-bowl-projections-templates.zip">Download all (ZIP)</a></Button>
         )}
       </div>
-      {SJB_PROJECTION_LOOKS.map((look) => (
+      {looks.length === 0 && (
+        <p className="mt-4 rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">No projections version in this look yet.</p>
+      )}
+      {looks.map((look) => (
         <div key={look.id} className="mt-6">
           <h3 className="text-sm font-semibold text-foreground">{look.label}</h3>
           <ul className="mt-3 grid gap-4 sm:grid-cols-3">

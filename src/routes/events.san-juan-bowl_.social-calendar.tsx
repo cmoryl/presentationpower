@@ -40,6 +40,9 @@ const STATUS_TONE: Record<string, string> = {
   "Not Started": "bg-muted text-muted-foreground",
 };
 
+// Which projections template matches each calendar look (null = not built in that look yet).
+const PROJECTION_LOOK: Record<SjbCalendarMode, "dark" | "blue" | null> = { dark: "dark", light: null, set2: null, set3: null, set4: "blue" };
+
 function CalendarPage() {
   const [mode, setMode] = useState<SjbCalendarMode>("dark");
   const [view, setView] = useState<"list" | "calendar">("list");
@@ -65,7 +68,6 @@ function CalendarPage() {
         Posts from the team's calendar sheet, Nov 7 – Dec 17, 2026. Each post has Canva designs in four looks (dark, light, Set 3 and Set 4)
         in Feed, Square and Story sizes, with picture downloads. {built} of {SJB_CALENDAR_POSTS.length} posts are built in Canva so far.
       </p>
-      <SjbProjections />
       <div className="mt-5 flex items-center gap-2" role="group" aria-label="Look">
         {SJB_CALENDAR_MODES.map(({ id: m, label }) => (
           <Button key={m} size="sm" variant={mode === m ? "default" : "outline"} aria-pressed={mode === m} onClick={() => setMode(m)}>
@@ -79,6 +81,8 @@ function CalendarPage() {
           </Button>
         ))}
       </div>
+
+      <SjbProjections look={PROJECTION_LOOK[mode]} lookLabel={SJB_CALENDAR_MODES.find((m) => m.id === mode)?.label} />
 
       {view === "calendar" ? (
         <CalendarGrid mode={mode} onOpen={openPost} undated={groups.undated} />
