@@ -49,6 +49,7 @@ export const SJB_DEMO_LOOKS: Record<SjbCalendarMode, SjbDemoLook> = {
     glow: `radial-gradient(120% 90% at 82% 8%, ${rgba("gold", 0.22)} 0%, rgba(0, 0, 0, 0) 60%), radial-gradient(110% 80% at 10% 100%, ${rgba("sky", 0.14)} 0%, rgba(0, 0, 0, 0) 55%)`,
     ink: hex("white"),
     accent: hex("gold"),
+    badgeInk: hex("navy"),
     dark: true,
   },
   light: {
@@ -56,6 +57,7 @@ export const SJB_DEMO_LOOKS: Record<SjbCalendarMode, SjbDemoLook> = {
     glow: `radial-gradient(120% 90% at 80% 6%, ${rgba("sky", 0.16)} 0%, rgba(0, 0, 0, 0) 58%), radial-gradient(110% 80% at 6% 100%, ${rgba("gold", 0.2)} 0%, rgba(0, 0, 0, 0) 55%)`,
     ink: hex("navy"),
     accent: hex("sky"),
+    badgeInk: hex("navy"),
     dark: false,
   },
   set2: {
@@ -63,6 +65,7 @@ export const SJB_DEMO_LOOKS: Record<SjbCalendarMode, SjbDemoLook> = {
     glow: `radial-gradient(130% 80% at 50% 100%, ${rgba("sky", 0.28)} 0%, rgba(0, 0, 0, 0) 62%), radial-gradient(90% 60% at 12% 6%, ${rgba("sky", 0.12)} 0%, rgba(0, 0, 0, 0) 50%)`,
     ink: hex("white"),
     accent: hex("sky"),
+    badgeInk: hex("navy"),
     dark: true,
   },
   set3: {
@@ -70,6 +73,7 @@ export const SJB_DEMO_LOOKS: Record<SjbCalendarMode, SjbDemoLook> = {
     glow: `radial-gradient(80% 60% at 50% 34%, ${rgba("gold", 0.26)} 0%, rgba(0, 0, 0, 0) 62%), radial-gradient(120% 70% at 90% 100%, ${rgba("sky", 0.12)} 0%, rgba(0, 0, 0, 0) 55%)`,
     ink: hex("white"),
     accent: hex("gold"),
+    badgeInk: hex("navy"),
     dark: true,
   },
   set4: {
@@ -77,6 +81,7 @@ export const SJB_DEMO_LOOKS: Record<SjbCalendarMode, SjbDemoLook> = {
     glow: `radial-gradient(140% 70% at 50% 106%, ${rgba("sky", 0.34)} 0%, rgba(0, 0, 0, 0) 60%), radial-gradient(70% 45% at 88% 10%, ${rgba("gold", 0.16)} 0%, rgba(0, 0, 0, 0) 52%)`,
     ink: hex("white"),
     accent: hex("gold"),
+    badgeInk: hex("navy"),
     dark: true,
   },
 };
