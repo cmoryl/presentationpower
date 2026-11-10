@@ -78,7 +78,7 @@ function DemoPageFrame({
                 <div style={{ fontSize: px(9), fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.02em" }}>{post.headline[0]}</div>
                 <div style={{ fontSize: px(9), fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.02em", color: look.accent }}>{post.headline[1]}</div>
               </div>
-              <div style={{ fontSize: px(2.8), letterSpacing: "0.16em", textAlign: "center", opacity: 0.85 }}>
+              <div style={{ fontSize: px(2.8), letterSpacing: "0.16em", textAlign: "center", opacity: 0.85, marginBottom: px(5) }}>
                 {SJB_DEMO_FACTS[0].value.toUpperCase()} · {SJB_DEMO_FACTS[1].value.toUpperCase()}
               </div>
             </>
