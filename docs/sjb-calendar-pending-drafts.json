@@ -1,17 +1,17 @@
 {
   "post": "04",
   "status": "conference-spacing-and-website-awaiting-preview-approval",
-  "revision": "All nine post 04 Set 2/3/4 drafts visibly include SANJUANBOWL.COM below event details/date. Set 2/4 preserve pending separated secondary marks. Set 3 story date/URL is centered at 64px to fit both lines within the artboard. Previews inspected; existing calendar pictures remain live until approval, save, export, metadata cleaning and refresh.",
+  "revision": "All nine post 04 Set 2/3/4 drafts include SANJUANBOWL.COM. Conference logos now form compact balanced groups near the lower main shield, with visible gaps and preserved proportions in each size; Set 3 marks moved from footer to shield area. Revised previews inspected. Existing calendar pictures remain live until approval, save, export, metadata cleaning and refresh.",
   "headline": "SAN JUAN ROOTS.\nNEW TRADITION.",
   "designs": [
-    { "look": "set2", "size": "1350", "designId": "DAHai4nSCtc", "transactionId": "3132775311098025025" },
-    { "look": "set2", "size": "1080", "designId": "DAHaixyeXHc", "transactionId": "4557038694314866124" },
-    { "look": "set2", "size": "1920", "designId": "DAHai6-QuJc", "transactionId": "981180591175958535" },
-    { "look": "set3", "size": "1350", "designId": "DAHai6cDjm0", "transactionId": "7858177220022659610" },
-    { "look": "set3", "size": "1080", "designId": "DAHai-86c4M", "transactionId": "2699303850713447858" },
-    { "look": "set3", "size": "1920", "designId": "DAHai8-IvYU", "transactionId": "7548554749139292260" },
-    { "look": "set4", "size": "1350", "designId": "DAHai-4B8c4", "transactionId": "2767983744410006388" },
-    { "look": "set4", "size": "1080", "designId": "DAHai8069Kw", "transactionId": "5024287157633689545" },
-    { "look": "set4", "size": "1920", "designId": "DAHaizbjnds", "transactionId": "4703405683003969172" }
+    { "look": "set2", "size": "1350", "designId": "DAHai4nSCtc", "transactionId": "4697776184091743847" },
+    { "look": "set2", "size": "1080", "designId": "DAHaixyeXHc", "transactionId": "1457436252931797986" },
+    { "look": "set2", "size": "1920", "designId": "DAHai6-QuJc", "transactionId": "1839116320522691364" },
+    { "look": "set3", "size": "1350", "designId": "DAHai6cDjm0", "transactionId": "6740158614603222321" },
+    { "look": "set3", "size": "1080", "designId": "DAHai-86c4M", "transactionId": "4760826577431606295" },
+    { "look": "set3", "size": "1920", "designId": "DAHai8-IvYU", "transactionId": "7548554746214112757" },
+    { "look": "set4", "size": "1350", "designId": "DAHai-4B8c4", "transactionId": "3645059770416521627" },
+    { "look": "set4", "size": "1080", "designId": "DAHai8069Kw", "transactionId": "247093850412604330" },
+    { "look": "set4", "size": "1920", "designId": "DAHaizbjnds", "transactionId": "8828702943582067376" }
   ]
 }
