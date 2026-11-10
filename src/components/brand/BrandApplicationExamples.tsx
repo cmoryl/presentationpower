@@ -71,7 +71,7 @@ export const BrandApplicationExamples = forwardRef<HTMLDivElement, BrandApplicat
     return (
       <div ref={ref} {...props} style={vars} className={`my-4 min-w-0 ${className}`} data-brand-application={surface}>
         {surface === "social" && (socialPosts?.length
-          ? <BrandSocialPosts posts={socialPosts.slice(0, 4)} brandName={a.name} className="mb-4" />
+          ? <BrandSocialPosts posts={socialPosts.slice(0, 8)} brandName={a.name} className="mb-4" />
           : socialPosts && <p className="mb-3 text-[11px] text-muted-foreground">No saved {a.name} social posts yet · layout studies below</p>)}
         <div className="grid grid-cols-2 gap-3">
           {surface === "social" && <>

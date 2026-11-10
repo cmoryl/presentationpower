@@ -9,5 +9,5 @@ export function SjbApplicationGallery({ className }: SjbApplicationGalleryProps)
 /** One saved, non-email Canva post per campaign set. */
 const SJB_SOCIAL_POSTS = SJB_CANVA_COLLECTIONS.flatMap((c) => {
   const d = SJB_CANVA_GALLERY.find((g) => g.collectionId === c.id && g.status === "saved" && !g.format && g.width === 1080 && g.height === 1350);
-  return d ? [{ src: d.previewUrl, title: `${c.label ?? c.id} · ${d.name}`, size: `${d.width}×${d.height}` }] : [];
+  return d ? [{ src: d.previewUrl, title: `${c.name} · ${d.name}`, size: `${d.width}×${d.height}` }] : [];
 });
