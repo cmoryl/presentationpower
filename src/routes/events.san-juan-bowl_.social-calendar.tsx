@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
 import { SjbProjections } from "@/components/events/SjbProjections";
+import { SjbCalendarLookCards } from "@/components/events/SjbCalendarLookCards";
 import {
   SJB_CALENDAR_POSTS,
   SJB_CALENDAR_SIZES,
@@ -78,16 +79,12 @@ function CalendarPage() {
     }
     return { dated: [...dated.entries()].sort(([a], [b]) => a.localeCompare(b)), undated };
   }, []);
-  const built = SJB_CALENDAR_POSTS.filter((p) => sjbCalendarBuilt(p.n)).length;
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10">
+    <main className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6">
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl social calendar</h1>
-      <p className="mt-2 max-w-3xl text-muted-foreground">
-        Posts from the team's calendar sheet, Nov 7 – Dec 17, 2026. Each post has Canva designs in five looks (dark, light, Set 2, Set 3 and Set 4)
-        in Feed, Square and Story sizes, with picture downloads. {built} of {SJB_CALENDAR_POSTS.length} posts are built in Canva so far.
-      </p>
-      <LookCards mode={mode} onChange={setMode} />
+      <p className="mt-2 text-sm text-muted-foreground">November – December 2026</p>
+      <SjbCalendarLookCards mode={mode} onChange={setMode} />
       <div className="mt-6 flex flex-wrap items-center gap-2" role="group" aria-label="View">
         {(["list", "calendar"] as const).map((v) => (
           <Button key={v} size="sm" variant={view === v ? "default" : "outline"} aria-pressed={view === v} onClick={() => setView(v)}>
@@ -95,8 +92,6 @@ function CalendarPage() {
           </Button>
         ))}
       </div>
-
-      <SjbProjections look={PROJECTION_LOOK[mode]} lookLabel={SJB_CALENDAR_MODES.find((m) => m.id === mode)?.label} />
 
       {view === "calendar" ? (
         <CalendarGrid mode={mode} onOpen={openPost} undated={groups.undated} />
@@ -114,6 +109,7 @@ function CalendarPage() {
         </li>
       </ol>
       )}
+      <SjbProjections look={PROJECTION_LOOK[mode]} lookLabel={SJB_CALENDAR_MODES.find((m) => m.id === mode)?.label} />
     </main>
   );
 }
@@ -172,7 +168,7 @@ function PostRow({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode 
           {showCaption && (
             <div className="mt-2 rounded border border-border bg-muted/40 p-3">
               <pre className="whitespace-pre-wrap font-sans text-sm text-foreground">{post.caption}</pre>
-              <Button size="sm" variant="outline" className="mt-2" onClick={() => navigator.clipboard.writeText(post.caption!)}>Copy caption</Button>
+              <Button size="sm" variant="outline" className="mt-2" onClick={() => { if (post.caption) void navigator.clipboard.writeText(post.caption); }}>Copy caption</Button>
             </div>
           )}
         </div>
@@ -197,19 +193,21 @@ function CalendarGrid({ mode, onOpen, undated }: { mode: SjbCalendarMode; onOpen
   const chip = (p: SjbCalendarPost) => {
     const preview = sjbCalendarDesign(p.n, mode, "1350")?.previewUrl;
     return (
-      <button
+      <Button
         key={p.itemId}
         type="button"
         onClick={() => onOpen(p.itemId)}
-        className="flex w-full items-center gap-1.5 rounded-sm border border-border bg-card p-1 text-left text-xs text-foreground hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        variant="outline"
+        className="group flex h-auto w-full min-w-0 flex-col items-stretch gap-2 overflow-hidden rounded-sm border-border bg-card p-1.5 text-left text-xs whitespace-normal text-foreground transition-all duration-200 hover:border-primary hover:shadow-sm motion-reduce:transition-none"
+        aria-label={`Open ${p.title}`}
       >
         {preview ? (
-          <img src={preview} alt="" className="h-8 w-6 shrink-0 rounded-[2px] object-cover" loading="lazy" />
+          <img src={preview} alt="" className="aspect-[4/5] w-full rounded-sm object-contain bg-muted" loading="lazy" />
         ) : (
-          <span className="h-8 w-6 shrink-0 rounded-[2px] bg-muted" aria-hidden />
+          <span className="flex aspect-[4/5] w-full items-center justify-center rounded-sm bg-muted text-muted-foreground">Awaiting artwork</span>
         )}
-        <span className="line-clamp-2 leading-tight">{p.title}</span>
-      </button>
+        <span className="line-clamp-2 leading-snug">{p.title}</span>
+      </Button>
     );
   };
   return (
@@ -222,7 +220,7 @@ function CalendarGrid({ mode, onOpen, undated }: { mode: SjbCalendarMode; onOpen
         return (
           <section key={label} aria-label={label}>
             <h2 className="mb-3 text-lg font-semibold text-foreground">{label}</h2>
-            <div className="grid grid-cols-7 overflow-hidden rounded-md border border-border">
+            <div className="overflow-x-auto rounded-md border border-border"><div className="grid min-w-[840px] grid-cols-7">
               {WEEKDAYS.map((d) => (
                 <div key={d} className="border-b border-border bg-muted px-2 py-1.5 text-xs font-semibold uppercase text-muted-foreground">{d}</div>
               ))}
@@ -231,7 +229,7 @@ function CalendarGrid({ mode, onOpen, undated }: { mode: SjbCalendarMode; onOpen
                 const posts = d ? byDate.get(iso) ?? [] : [];
                 const gameDay = iso === GAME_DAY_ISO;
                 return (
-                  <div key={i} className={`min-h-28 border-b border-r border-border p-1.5 ${d ? "bg-background" : "bg-muted/40"} ${gameDay ? "ring-2 ring-inset ring-primary" : ""}`}>
+                  <div key={i} className={`min-h-32 border-b border-r border-border p-2 ${d ? "bg-background" : "bg-muted/40"} ${gameDay ? "ring-2 ring-inset ring-primary" : ""}`}>
                     {d && (
                       <div className="mb-1 flex items-center justify-between text-xs">
                         <span className="font-medium text-foreground">{d}</span>
@@ -242,7 +240,7 @@ function CalendarGrid({ mode, onOpen, undated }: { mode: SjbCalendarMode; onOpen
                   </div>
                 );
               })}
-            </div>
+            </div></div>
           </section>
         );
       })}
