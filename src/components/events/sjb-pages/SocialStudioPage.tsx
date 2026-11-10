@@ -1,3 +1,4 @@
+import { SjbProjections } from "@/components/events/SjbProjections";
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Download, ExternalLink, FolderOpen, Layers, Maximize2, X } from 'lucide-react';
 import { sjbIllustratorMaster, sjbIllustratorFileName } from '@/lib/sjb-illustrator-masters';
@@ -64,6 +65,7 @@ export function SjbSocialStudio() {
         <div><p className="text-sm text-muted-foreground">{SJB_EVENT.name}</p><h1 className="mt-1 text-3xl font-bold">Social designs</h1><p className="mt-2 text-sm text-muted-foreground">Canva collection · Preview edition</p></div>
         <Button asChild variant="outline"><a href={SJB_CANVA_FOLDER_URL} target="_blank" rel="noreferrer"><ExternalLink />Canva folder</a></Button>
       </header>
+      <SjbProjections />
       <nav aria-label="Design campaigns" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {[{ id: 'all', name: 'All campaigns', blurb: 'Every design set', accent: '#03002C' } as const, ...SJB_CANVA_COLLECTIONS].map(c => {
           const active = collectionId === c.id;

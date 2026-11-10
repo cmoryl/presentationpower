@@ -9,3 +9,4 @@
 - [ ] Illustrator files for calendar designs
 - [ ] Calendar Set 3 + Set 4 looks (all posts × 3 sizes): masters built (post 02 done); still to build every other post. Masters: Set3 feed DAHais2R8co / sq DAHailawSAs / story DAHaisNRcgo; Set4 feed DAHainfGaUM / sq DAHaiiM1NBQ / story DAHairX-TNc
 - [ ] Re-export older calendar pictures at full size (current ones are 720 px wide previews)
+- [ ] Bowl projections: dark + blue, 3 sizes built (Canva + PNG/JPG/ZIP). Illustrator files not made yet.
