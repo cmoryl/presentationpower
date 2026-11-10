@@ -1,3 +1,4 @@
+import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 // /events/san-juan-bowl/brand-kit/single-colour — one-colour usage by process
 // (embroidery, foil, etching, one-ink print) with event-colour ink choices.
 // Sizes are recommended starting points; the vendor's proof decides.
@@ -15,5 +16,5 @@ export const Route = createFileRoute("/events/san-juan-bowl_/brand-kit_/single-c
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: SingleColourPage,
+  component: withSjbTrail(SingleColourPage),
 });

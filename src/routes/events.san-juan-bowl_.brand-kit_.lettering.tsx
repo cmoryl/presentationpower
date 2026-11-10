@@ -1,3 +1,4 @@
+import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 // /events/san-juan-bowl/brand-kit/lettering — construction spec for the exact
 // SAN JUAN BOWL lettering master: horizon lines, proportions, stroke and shadow
 // geometry, per-letter dimensions and anchor coordinates, sizes and verification.
@@ -15,5 +16,5 @@ export const Route = createFileRoute("/events/san-juan-bowl_/brand-kit_/letterin
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: LetteringSpecPage,
+  component: withSjbTrail(LetteringSpecPage),
 });

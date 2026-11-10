@@ -1,3 +1,4 @@
+import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 // /events/san-juan-bowl/brand-kit — the San Juan Bowl brand kit: supplied
 // logo variants with background previews, clear space, minimum sizes,
 // approved backgrounds, misuse gallery and badge anatomy, plus the palette,
@@ -21,5 +22,5 @@ export const Route = createFileRoute("/events/san-juan-bowl_/brand-kit")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: SjbBrandKit,
+  component: withSjbTrail(SjbBrandKit),
 });
