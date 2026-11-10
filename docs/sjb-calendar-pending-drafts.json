@@ -1,6 +1,7 @@
 {
   "post": "04",
   "status": "awaiting-preview-approval",
+  "revision": "Headline and details lowered by 32px square, 40px feed, 56px story; Set 3 footer marks move with its text. Revised previews shown; awaiting approval to save.",
   "headline": "SAN JUAN ROOTS.\nNEW TRADITION.",
   "designs": [
     { "look": "set2", "size": "1350", "designId": "DAHai4nSCtc", "transactionId": "4199002520508372053" },
