@@ -1,5 +1,6 @@
 # Roadmap
 ## Bowl social calendar
+- [ ] Apply approved feedback to post 04: lower headline/details in all nine sizes, preserve logos/backgrounds, show revised previews before saving.
 - [ ] Current request: build Set 2/3/4 for the 25 remaining posts starting at 04, plus dark/light for 16–25 and 28; clean full-size exports and wire the saved files into the calendar. Post 04's nine drafts (all three sets × Feed/Square/Story) are prepared and shown; Canva requires preview approval before saving. Draft IDs and transaction IDs retained in docs/sjb-calendar-pending-drafts.json. Other 282 designs remain unbuilt; calendar unchanged until drafts are saved and exported.
 - [x] Calendar page with every post from the sheet
 - [x] Canva designs (dark + light, 3 sizes): posts 01–06
