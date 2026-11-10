@@ -1,6 +1,7 @@
 # Roadmap
 ## Bowl social calendar
 - [ ] Refresh scheduled Light action posts from user-edited feed masters: existing feed pictures refreshed and cleaned; resized square/story drafts created, with overlap corrections in progress. New size previews require approval before committing/exporting and updating calendar links. Posts 01/07 still need resizing.
+- [ ] Set 2 balanced spacing (posts 02, 03, 04, 27 × 3 sizes) previewed; awaiting approval, then save, clean exports and refresh.
 - [ ] Website on every Bowl social artwork: all nine post 04 Set 2/3/4 designs approved, saved, cleaned and refreshed. Audit/backfill other existing posts and include on all remaining builds.
 - [x] Post 04 conference-logo spacing: all nine revised Set 2/3/4 designs approved, saved, cleaned and refreshed with visible gaps. Other existing posts still require this spacing audit.
 - [x] Post 04: approved lowered content saved in all nine Set 2/3/4 Canva designs; full-size JPGs cleaned, uploaded and wired into the calendar.
