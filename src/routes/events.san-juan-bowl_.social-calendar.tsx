@@ -10,6 +10,7 @@ import {
   SJB_CALENDAR_SIZES,
   sjbCalendarBuilt,
   sjbCalendarDesign,
+  SJB_CALENDAR_MODES,
   type SjbCalendarMode,
   type SjbCalendarPost,
 } from "@/lib/sjb-social-calendar";
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/events/san-juan-bowl_/social-calendar")({
   head: () => ({
     meta: [
       { title: "San Juan Bowl social calendar · TransPerfect Element" },
-      { name: "description", content: "Every planned San Juan Bowl social post by date, with dark and light Canva designs and Illustrator files." },
+      { name: "description", content: "Every planned San Juan Bowl social post by date, in four looks with Canva links, picture downloads and Illustrator files." },
       { property: "og:title", content: "San Juan Bowl social calendar" },
       { property: "og:description", content: "Planned Bowl posts from launch to game week, with live Canva and Illustrator files." },
       { property: "og:type", content: "website" },
@@ -64,9 +65,9 @@ function CalendarPage() {
         billboard looks, in Feed, Square and Story sizes. {built} of {SJB_CALENDAR_POSTS.length} posts are built in Canva so far.
       </p>
       <div className="mt-5 flex items-center gap-2" role="group" aria-label="Look">
-        {(["dark", "light"] as const).map((m) => (
+        {SJB_CALENDAR_MODES.map(({ id: m, label }) => (
           <Button key={m} size="sm" variant={mode === m ? "default" : "outline"} aria-pressed={mode === m} onClick={() => setMode(m)}>
-            {m === "dark" ? "Dark (gold player)" : "Light (light action)"}
+            {label}
           </Button>
         ))}
         <span className="mx-2 h-5 w-px bg-border" aria-hidden />
@@ -141,6 +142,9 @@ function PostRow({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode 
                 {d ? (
                   <>
                     <Button size="sm" variant="outline" asChild><a href={d.canvaUrl} target="_blank" rel="noreferrer">Canva</a></Button>
+                    {d.downloadUrl && (
+                      <Button size="sm" variant="outline" asChild><a href={d.downloadUrl} download={d.downloadName}>Picture</a></Button>
+                    )}
                     {d.illustratorUrl ? (
                       <Button size="sm" variant="outline" asChild><a href={d.illustratorUrl} download>Illustrator</a></Button>
                     ) : (
