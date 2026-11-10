@@ -95,19 +95,7 @@ function DemoPageFrame({
             </>
           )}
 
-          {page.role === "details" && (
-            <>
-              <div style={{ marginTop: px(9), fontSize: px(2.6), letterSpacing: "0.2em", opacity: 0.75 }}>THE DETAILS</div>
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: px(4) }}>
-                {SJB_DEMO_FACTS.map((f) => (
-                  <div key={f.label} style={{ display: "flex", flexDirection: "column", gap: px(0.6), borderBottom: `1px solid ${look.dark ? "rgba(255,255,255,0.18)" : "rgba(13,14,33,0.18)"}`, paddingBottom: px(2.4) }}>
-                    <span style={{ fontSize: px(2.2), letterSpacing: "0.18em", opacity: 0.7 }}>{f.label.toUpperCase()}</span>
-                    <span style={{ fontSize: px(4.4), fontWeight: 600, lineHeight: 1.2 }}>{f.value}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+          {page.role === "details" && <DetailsPage look={look} px={px} wide={width / height >= 0.95} tall={height / width >= 1.6} />}
 
           {page.role === "tickets" && (
             <>
@@ -353,5 +341,62 @@ export function SjbDemoChip({ post, mode, format, displayHeight = 96 }: SjbDemoS
       displayHeight={displayHeight}
       frameRef={() => {}}
     />
+  );
+}
+
+/** Splits "December 16, 2026" into the parts the date block sets at three sizes. */
+function dateParts(label: string) {
+  const m = label.match(/^([A-Za-z]+)\s+(\d{1,2}),\s*(\d{4})$/);
+  return m ? { month: m[1].slice(0, 3).toUpperCase(), day: m[2], year: m[3] } : null;
+}
+
+/**
+ * The details page: the date is the hero, the other facts sit as short
+ * labelled rows a reader can scan in a second. Square pages put date and
+ * facts side by side; portrait and story pages stack them, story with more air.
+ */
+function DetailsPage({ look, px, wide, tall }: { look: SjbDemoLook; px: (n: number) => string; wide: boolean; tall: boolean }) {
+  const [date, venue, kickoff, matchup] = SJB_DEMO_FACTS;
+  const d = dateParts(date.value);
+  const rule = look.dark ? "rgba(255,255,255,0.16)" : "rgba(13,14,33,0.14)";
+  const label = { fontSize: px(2.3), fontWeight: 700, letterSpacing: "0.2em", color: look.accent } as const;
+
+  const dateBlock = d ? (
+    <div style={{ display: "flex", flexDirection: "column", lineHeight: 0.9 }}>
+      <span style={label}>SAVE THE DATE</span>
+      <span style={{ fontSize: px(wide ? 9 : 10), fontWeight: 800, letterSpacing: "0.04em", marginTop: px(2.4) }}>{d.month}</span>
+      <span style={{ fontSize: px(wide ? 27 : tall ? 34 : 30), fontWeight: 800, letterSpacing: "-0.04em", color: look.accent, lineHeight: 0.82 }}>{d.day}</span>
+      <span style={{ fontSize: px(wide ? 6 : 6.6), fontWeight: 600, letterSpacing: "0.12em", opacity: 0.9, marginTop: px(1.6) }}>{d.year}</span>
+    </div>
+  ) : (
+    <div style={{ fontSize: px(7), fontWeight: 800 }}>{date.value}</div>
+  );
+
+  const [time, ...zones] = kickoff.value.split(" / ");
+  const rows = [
+    { k: "Where", main: venue.value.split(",")[0], sub: venue.value.split(",").slice(1).join(",").trim() },
+    { k: "Kickoff", main: time, sub: zones.join(" / ") },
+    { k: "Matchup", main: matchup.value, sub: "" },
+  ];
+  const facts = (
+    <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "center" }}>
+      {rows.map((r, i) => (
+        <div key={r.k} style={{ display: "flex", gap: px(3), alignItems: "flex-start", padding: `${px(tall ? 3.6 : 2.6)} 0`, borderTop: i ? `1px solid ${rule}` : "none" }}>
+          <div style={{ width: px(0.9), alignSelf: "stretch", backgroundColor: look.accent, borderRadius: px(0.4) }} />
+          <div style={{ display: "flex", flexDirection: "column", gap: px(0.8), minWidth: 0 }}>
+            <span style={{ ...label, color: look.ink, opacity: 0.72 }}>{r.k.toUpperCase()}</span>
+            <span style={{ fontSize: px(wide ? 4.6 : 5.2), fontWeight: 700, lineHeight: 1.12, letterSpacing: "-0.01em" }}>{r.main}</span>
+            {r.sub && <span style={{ fontSize: px(wide ? 3 : 3.3), fontWeight: 500, lineHeight: 1.3, opacity: 0.85 }}>{r.sub}</span>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: wide ? "row" : "column", gap: px(wide ? 6 : tall ? 8 : 5), marginTop: px(9), marginBottom: px(8), alignItems: wide ? "center" : "stretch" }}>
+      <div style={{ flex: wide ? "0 0 38%" : "0 0 auto", paddingRight: wide ? px(5) : 0, borderRight: wide ? `1px solid ${rule}` : "none" }}>{dateBlock}</div>
+      {facts}
+    </div>
   );
 }
