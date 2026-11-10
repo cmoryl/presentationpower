@@ -1,3 +1,4 @@
+import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 // /events/san-juan-bowl/stadium — the BoothHUB interactive stadium, embedded.
 // BoothHUB owns the model; Element only frames its public showcase page.
 import { createFileRoute } from "@tanstack/react-router";
@@ -14,5 +15,5 @@ export const Route = createFileRoute("/events/san-juan-bowl_/stadium")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: StadiumPage,
+  component: withSjbTrail(StadiumPage),
 });

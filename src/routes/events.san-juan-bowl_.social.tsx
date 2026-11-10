@@ -1,3 +1,4 @@
+import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 // Bowl Canva collection gallery; artwork remains editable in Canva.
 import { createFileRoute } from "@tanstack/react-router";
 import { SjbSocialStudio } from "@/components/events/sjb-pages/SocialStudioPage";
@@ -20,5 +21,5 @@ export const Route = createFileRoute("/events/san-juan-bowl_/social")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: SjbSocialStudio,
+  component: withSjbTrail(SjbSocialStudio),
 });

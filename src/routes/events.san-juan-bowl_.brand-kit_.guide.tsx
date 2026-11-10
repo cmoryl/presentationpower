@@ -1,3 +1,4 @@
+import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 // /events/san-juan-bowl/brand-kit/guide — San Juan Bowl brand guide page in the
 // NeXus guide layout. Every value comes from src/lib/san-juan-bowl.ts: Geist is
 // the Bowl's face (not Poppins) and no Pantone is approved, so none is invented.
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/events/san-juan-bowl_/brand-kit_/guide")(
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: SjbGuide,
+  component: withSjbTrail(SjbGuide),
 });
 
 const NAVY = SJB_COLORS[0].hex;

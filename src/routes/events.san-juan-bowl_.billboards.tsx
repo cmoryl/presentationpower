@@ -1,3 +1,4 @@
+import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 import { createFileRoute } from "@tanstack/react-router";
 import { BillboardsPage } from "@/components/events/sjb-pages/BillboardsPage";
 
@@ -12,5 +13,5 @@ export const Route = createFileRoute("/events/san-juan-bowl_/billboards")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: BillboardsPage,
+  component: withSjbTrail(BillboardsPage),
 });

@@ -1,3 +1,4 @@
+import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 import { createFileRoute } from '@tanstack/react-router';
 import { SjbSet5Assets } from '@/components/events/sjb-pages/Set5AssetsPage';
 import { set5RemovalsOptions } from '@/lib/sjb-set5-availability';
@@ -12,5 +13,5 @@ export const Route = createFileRoute('/events/san-juan-bowl_/set-5-assets')({
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
   ] }),
-  component: SjbSet5Assets,
+  component: withSjbTrail(SjbSet5Assets),
 });

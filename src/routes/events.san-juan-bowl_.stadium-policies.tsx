@@ -1,3 +1,4 @@
+import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 // /events/san-juan-bowl/stadium-policies — public stadium policy poster (EN + ES),
 // refreshed manually from the live Canva design with AI export metadata stripped.
 import { createFileRoute } from "@tanstack/react-router";
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/events/san-juan-bowl_/stadium-policies")(
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: PoliciesPage,
+  component: withSjbTrail(PoliciesPage),
 });
 
 const PAGES = [
