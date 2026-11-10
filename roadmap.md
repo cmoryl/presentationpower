@@ -30,3 +30,6 @@
 - [ ] Calendar Set 3 + Set 4 looks (all posts × 3 sizes): masters built (posts 02, 03, 27 done; Set 2 also done for 02, 03, 27 — 25 posts remain in Set 2); still to build every other post. Masters: Set3 feed DAHais2R8co / sq DAHailawSAs / story DAHaisNRcgo; Set4 feed DAHainfGaUM / sq DAHaiiM1NBQ / story DAHairX-TNc
 - [ ] Re-export older calendar pictures at full size (current ones are 720 px wide previews)
 - [ ] Bowl projections: dark + blue, 3 sizes built (Canva + PNG/JPG/ZIP). Illustrator files not made yet.
+
+- [ ] Set 4: conference logos clear of shield — done Feed 01,02,03,04 (shield 680@200,10; ACC 140w@90,610; SBC 120w@880,620); remaining 24 Feed + all Square/Story; then re-export cleaned pictures
+- [ ] Set 3: ACC logo switched to white on all dark-background ads
