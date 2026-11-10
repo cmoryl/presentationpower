@@ -1,6 +1,7 @@
 # Roadmap
 ## Bowl social calendar
-- [ ] Refresh calendar pictures/downloads from the latest saved Canva edits; six approved Dark/Light masters saved. Older Set 2 draft transactions are no longer available: preserve live Canva versions rather than recreating stale edits.
+- [x] Saved six approved Dark/Light masters; refreshed 46 existing feed pictures (17 Dark + 17 Light + 12 Set 2/3/4), with pixel-preserving metadata cleanup and full-size uploads; approved post 04 square/Story pictures linked. User-edited feed originals preserved.
+- [ ] Remaining refresh: other square/Story pictures and newer Set 2/3/4 posts. Old Set 2 draft transactions are unavailable; latest live files were exported instead. Uncorrected Light adaptations remain pending layout checks, not overwritten into live calendars.
 - [ ] Add LinkedIn 4:5 and square carousels, Instagram 4:5 carousels, and 9:16 Story sequences for every post in all five styles; create genuine multi-page Canva artwork, audit page spacing, and publish cleaned page exports and format-appropriate downloads. Preserve current single-image designs.
 - [x] Show existing approved captions automatically when opening a day from Calendar view; preserve hide/show and copy controls.
 - [ ] Include reusable projections templates in all five styles and three sizes, inside the corresponding calendars.
@@ -14,7 +15,7 @@
 - [ ] Website on every Bowl social artwork: all nine post 04 Set 2/3/4 designs approved, saved, cleaned and refreshed. Audit/backfill other existing posts and include on all remaining builds.
 - [x] Post 04 conference-logo spacing: all nine revised Set 2/3/4 designs approved, saved, cleaned and refreshed with visible gaps. Other existing posts still require this spacing audit.
 - [x] Post 04: approved lowered content saved in all nine Set 2/3/4 Canva designs; full-size JPGs cleaned, uploaded and wired into the calendar.
-- [ ] Dark/Light missing coverage: 82 Canva versions remain. Six copied masters corrected and previewed with websites, reusable headlines and separated logos; Canva requires explicit approval of these previews before committing (docs/sjb-five-style-masters-pending.json).
+- [ ] Dark/Light missing coverage: 82 Canva versions remain; six reusable masters now approved, saved and exported (docs/sjb-five-style-masters-pending.json).
 - [x] Calendar page with every post from the sheet
 - [x] Canva designs (dark + light, 3 sizes): posts 01–06
 - [x] Canva feed designs (dark + light): posts 08, 09, TV announcement, countdown

@@ -1,5 +1,5 @@
 {
-  "status": "previewed-awaiting-approval",
+  "status": "approval-received-but-old-transactions-unavailable-live-files-preserved",
   "change": "Set 2 text blocks lowered to balance space between the logo group and bottom edge; SANJUANBOWL.COM added where missing (posts 03, 27).",
   "transactions": {
     "02": {"1350": "679439420713066955", "1080": "679439421645740286", "1920": "4743938081791272528"},
