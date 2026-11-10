@@ -1,7 +1,7 @@
 # Roadmap
 ## Bowl social calendar
-- [x] Apply feedback to post 04: headline/details lowered in all nine drafts (32px square / 40px feed / 56px story); revised previews shown. Bowl shield/backgrounds unchanged; Set 3 footer marks move with the details. Saving awaits approval of revised previews.
-- [ ] Current request: build Set 2/3/4 for the 25 remaining posts starting at 04, plus dark/light for 16–25 and 28; clean full-size exports and wire the saved files into the calendar. Post 04's nine drafts (all three sets × Feed/Square/Story) are prepared and shown; Canva requires preview approval before saving. Draft IDs and transaction IDs retained in docs/sjb-calendar-pending-drafts.json. Other 282 designs remain unbuilt; calendar unchanged until drafts are saved and exported.
+- [x] Post 04: approved lowered content saved in all nine Set 2/3/4 Canva designs; full-size JPGs cleaned, uploaded and wired into the calendar.
+- [ ] Remaining build: Set 2/3/4 for the other 24 posts, plus dark/light for 16–25 and 28; clean full-size exports and wire saved files into the calendar. Other 282 designs remain unbuilt; new Canva drafts require preview approval before committing.
 - [x] Calendar page with every post from the sheet
 - [x] Canva designs (dark + light, 3 sizes): posts 01–06
 - [x] Canva feed designs (dark + light): posts 08, 09, TV announcement, countdown
