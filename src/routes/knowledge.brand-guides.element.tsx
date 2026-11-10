@@ -154,7 +154,7 @@ function ElementIdentityPage() {
           </figcaption>
         </figure>
       </section>
-      <BrandApplicationGallery id="applications" artwork={{ name: "TransPerfect Element", color: ELEMENT_LOCKUP_URLS.mono, white: ELEMENT_LOCKUP_URLS.reversed, stacked: ELEMENT_LOCKUP_URLS.color, dark: PALETTE[0].hex, accent: PALETTE[1].hex }} />
+      <BrandApplicationGallery id="applications" socialPosts={[]} artwork={{ name: "TransPerfect Element", color: ELEMENT_LOCKUP_URLS.mono, white: ELEMENT_LOCKUP_URLS.reversed, stacked: ELEMENT_LOCKUP_URLS.color, dark: PALETTE[0].hex, accent: PALETTE[1].hex }} />
     </div>
   );
 }

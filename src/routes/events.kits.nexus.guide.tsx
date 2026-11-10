@@ -214,7 +214,7 @@ function NexusGuide() {
           })}
         </ul>
       </Section>
-      <BrandApplicationGallery id="applications" artwork={{ name: kit.name, color: full, white: logo("Nexus_Logo_2026_White"), dark: kit.colours[0].hex, accent: kit.colours[1].hex }} />
+      <BrandApplicationGallery id="applications" socialPosts={[]} artwork={{ name: kit.name, color: full, white: logo("Nexus_Logo_2026_White"), dark: kit.colours[0].hex, accent: kit.colours[1].hex }} />
     </main>
   );
 }
