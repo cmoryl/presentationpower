@@ -1,0 +1,17 @@
+{
+  "batch": "Posts 05-25 and 28, Set 2/3/4",
+  "status": "post-05-previewed-awaiting-approval",
+  "method": "Copy approved post 04 designs, replace headline only (tagged autofill field 'headline' for later posts); website, logos and gaps unchanged.",
+  "post05": [
+    {"look":"set2","size":"1350","designId":"DAHajUiIw2Q","transactionId":"3365836597269126050"},
+    {"look":"set2","size":"1080","designId":"DAHajVsOsEo","transactionId":"480155135281979338"},
+    {"look":"set2","size":"1920","designId":"DAHajQkV5VE","transactionId":"247093857951995444"},
+    {"look":"set3","size":"1350","designId":"DAHajbejgIA","transactionId":"1524990251051154330"},
+    {"look":"set3","size":"1080","designId":"DAHajcp9yaU","transactionId":"1336964967728969084"},
+    {"look":"set3","size":"1920","designId":"DAHajXFSS0A","transactionId":"3925408849889281224"},
+    {"look":"set4","size":"1350","designId":"DAHajcQp6ss","transactionId":"1889781821202433196"},
+    {"look":"set4","size":"1080","designId":"DAHajTKuMX0","transactionId":"980054695459498076"},
+    {"look":"set4","size":"1920","designId":"DAHajbXl9HE","transactionId":"7174755982967884378"}
+  ],
+  "remaining": ["06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","28"]
+}
