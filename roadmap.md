@@ -1,5 +1,6 @@
 # Roadmap
 ## Bowl social calendar
+- [ ] Current request: build Set 2/3/4 for the 25 remaining posts starting at 04, plus dark/light for 16–25 and 28; clean full-size exports and wire the saved files into the calendar. Post 04 feed drafts prepared in all three sets; Canva requires preview approval before saving.
 - [x] Calendar page with every post from the sheet
 - [x] Canva designs (dark + light, 3 sizes): posts 01–06
 - [x] Canva feed designs (dark + light): posts 08, 09, TV announcement, countdown
