@@ -1,0 +1,16 @@
+{
+  "post": "04",
+  "status": "awaiting-preview-approval",
+  "headline": "SAN JUAN ROOTS.\nNEW TRADITION.",
+  "designs": [
+    { "look": "set2", "size": "1350", "designId": "DAHai4nSCtc", "transactionId": "4199002520508372053" },
+    { "look": "set2", "size": "1080", "designId": "DAHaixyeXHc", "transactionId": "4779966873394055093" },
+    { "look": "set2", "size": "1920", "designId": "DAHai6-QuJc", "transactionId": "6540874325615056054" },
+    { "look": "set3", "size": "1350", "designId": "DAHai6cDjm0", "transactionId": "7148860276814607470" },
+    { "look": "set3", "size": "1080", "designId": "DAHai-86c4M", "transactionId": "1976476103262903059" },
+    { "look": "set3", "size": "1920", "designId": "DAHai8-IvYU", "transactionId": "5775262396103624890" },
+    { "look": "set4", "size": "1350", "designId": "DAHai-4B8c4", "transactionId": "981180588225727873" },
+    { "look": "set4", "size": "1080", "designId": "DAHai8069Kw", "transactionId": "7548554745769135165" },
+    { "look": "set4", "size": "1920", "designId": "DAHaizbjnds", "transactionId": "4199002526455972734" }
+  ]
+}
