@@ -1,0 +1,41 @@
+{
+  "status": "drafts-previewed-awaiting-required-canva-save-approval",
+  "masters": [
+    {
+      "look": "dark",
+      "size": "1350",
+      "designId": "DAHajpZvwXY",
+      "transactionId": "3365836600223653173"
+    },
+    {
+      "look": "dark",
+      "size": "1080",
+      "designId": "DAHajoCytZU",
+      "transactionId": "247093860192521088"
+    },
+    {
+      "look": "dark",
+      "size": "1920",
+      "designId": "DAHajiytABc",
+      "transactionId": "547709134045501851"
+    },
+    {
+      "look": "light",
+      "size": "1350",
+      "designId": "DAHajo4wCvg",
+      "transactionId": "2829908247235120355"
+    },
+    {
+      "look": "light",
+      "size": "1080",
+      "designId": "DAHajnld4P8",
+      "transactionId": "6365233951972811518"
+    },
+    {
+      "look": "light",
+      "size": "1920",
+      "designId": "DAHajnUr3cQ",
+      "transactionId": "370942850192842783"
+    }
+  ]
+}

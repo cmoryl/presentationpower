@@ -1,8 +1,8 @@
 # Roadmap
 ## Bowl social calendar
-- [ ] Show existing approved captions automatically when opening a day from Calendar view; preserve hide/show and copy controls.
+- [x] Show existing approved captions automatically when opening a day from Calendar view; preserve hide/show and copy controls.
 - [ ] Include reusable projections templates in all five styles and three sizes, inside the corresponding calendars.
-- [ ] Complete coverage for all 28 calendar posts × five styles × Feed/Square/Story (420 versions): fill the 100 missing Canva designs, audit every version, and publish cleaned full-size pictures/downloads in the existing five calendars. Preserve user-edited feed originals; approval is required before saving any Canva editing transactions.
+- [ ] Complete coverage for all 28 calendar posts × five styles × Feed/Square/Story (420 versions): 18 missing Set 2/3/4 Canva designs for posts 01/29 saved and linked; fill the remaining 82 missing Canva designs, audit every version, and publish cleaned full-size pictures/downloads in the existing five calendars. Preserve user-edited feed originals; approval is required before saving any Canva editing transactions.
 - [x] Posts 05–25 and 28: all 198 Set 2/3/4 Canva designs saved and their size-specific links registered in the calendar; existing dark/light links preserved.
 - [ ] Current request remaining: inspect all 198 saved designs for alignment, wrapping and logo/content separation, correct exceptions, export full-size pictures, clean metadata and upload previews/downloads. No new pictures or Illustrator files uploaded yet; older artwork remains unaudited.
 - [ ] Dark (gold player) font match: rebuild from Set 2 layouts with gold-player background. Pilot post 04 feed copy DAHajRThRh8 (transaction 7751216736737611556) previewed; awaiting approval, then roll out to 01–15, 27, 29 × 3 sizes, export, clean, and wire in.
@@ -12,7 +12,7 @@
 - [ ] Website on every Bowl social artwork: all nine post 04 Set 2/3/4 designs approved, saved, cleaned and refreshed. Audit/backfill other existing posts and include on all remaining builds.
 - [x] Post 04 conference-logo spacing: all nine revised Set 2/3/4 designs approved, saved, cleaned and refreshed with visible gaps. Other existing posts still require this spacing audit.
 - [x] Post 04: approved lowered content saved in all nine Set 2/3/4 Canva designs; full-size JPGs cleaned, uploaded and wired into the calendar.
-- [ ] Remaining build: Set 2/3/4 for the other 24 posts, plus dark/light for 16–25 and 28; clean full-size exports and wire saved files into the calendar. Other 282 designs remain unbuilt; new Canva drafts require preview approval before committing.
+- [ ] Dark/Light missing coverage: 82 Canva versions remain. Six copied masters corrected and previewed with websites, reusable headlines and separated logos; Canva requires explicit approval of these previews before committing (docs/sjb-five-style-masters-pending.json).
 - [x] Calendar page with every post from the sheet
 - [x] Canva designs (dark + light, 3 sizes): posts 01–06
 - [x] Canva feed designs (dark + light): posts 08, 09, TV announcement, countdown
