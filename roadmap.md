@@ -1,5 +1,6 @@
 # Roadmap
 ## Bowl social calendar
+- [x] Demo multi-page sequences for every post, look and format awaiting artwork: four labelled pages (cover, headline, details, tickets) drawn from the post's approved headline and announced event facts only, viewable in the calendar and downloadable as a LinkedIn PDF or a ZIP of 1080-px pictures with the DEMO LAYOUT badge on every page. Real Canva multi-page artwork still has to replace them.
 - [x] Built and linked all 82 missing Dark/Light Feed/Square/Story Canva versions; all 28 posts now have five looks × three sizes (420 links), existing originals preserved.
 - [ ] New 82 versions: inspect layouts and export cleaned full-size pictures/downloads. Canva links are available; new image previews remain pending, not substituted with thumbnails.
 - [x] Refreshed remaining saved originals: 90 versions total (72 stale registered square/Story pictures and all 18 post 01/29 Set 2/3/4 versions). Original dimensions and unchanged pixels verified; metadata cleaned; all 90 served downloads hash-checked. No Canva originals overwritten. Signed-in calendar interaction unavailable because session mint found no matching account.

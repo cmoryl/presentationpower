@@ -7,6 +7,7 @@ import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
 import { SjbProjections } from "@/components/events/SjbProjections";
 import { SjbCalendarLookCards } from "@/components/events/SjbCalendarLookCards";
+import { SjbDemoChip, SjbDemoSequence } from "@/components/events/SjbDemoSequence";
 import { SJB_CALENDAR_FORMATS, sjbCalendarSequence, type SjbCalendarFormat } from "@/lib/sjb-calendar-formats";
 import {
   SJB_CALENDAR_POSTS,
@@ -205,7 +206,7 @@ function SequenceArtwork({ post, mode, format }: { post: SjbCalendarPost; mode: 
           {sequence.zipUrl && <Button asChild size="sm" variant="outline"><a href={sequence.zipUrl} download>All pictures</a></Button>}
           {sequence.illustratorUrl && <Button asChild size="sm" variant="outline"><a href={sequence.illustratorUrl} download>Illustrator</a></Button>}
         </div>
-      </> : <p className="mt-3 rounded border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">Multi-page artwork pending</p>}
+      </> : <SjbDemoSequence post={post} mode={mode} format={format} />}
     </section>
   );
 }
@@ -237,7 +238,9 @@ function CalendarGrid({ mode, format, onOpen, undated }: { mode: SjbCalendarMode
         {preview ? (
           <img src={preview} alt="" className="aspect-[4/5] w-full rounded-sm object-contain bg-muted" loading="lazy" />
         ) : (
-          <span className="flex aspect-[4/5] w-full items-center justify-center rounded-sm bg-muted text-muted-foreground">Awaiting artwork</span>
+          <span className="flex aspect-[4/5] w-full items-center justify-center overflow-hidden rounded-sm bg-muted">
+            <SjbDemoChip post={p} mode={mode} format={format} displayHeight={160} />
+          </span>
         )}
         <span className="line-clamp-2 leading-snug">{p.title}</span>
       </Button>
