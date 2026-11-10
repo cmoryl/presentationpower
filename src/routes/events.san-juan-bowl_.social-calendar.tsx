@@ -7,6 +7,7 @@ import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
 import { SjbProjections } from "@/components/events/SjbProjections";
 import { SjbCalendarLookCards } from "@/components/events/SjbCalendarLookCards";
+import { SJB_CALENDAR_FORMATS, sjbCalendarSequence, type SjbCalendarFormat } from "@/lib/sjb-calendar-formats";
 import {
   SJB_CALENDAR_POSTS,
   SJB_CALENDAR_SIZES,
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/events/san-juan-bowl_/social-calendar")({
   head: () => ({
     meta: [
       { title: "San Juan Bowl social calendar · TransPerfect Element" },
-      { name: "description", content: "Every planned San Juan Bowl social post by date, in four looks with Canva links, picture downloads and Illustrator files." },
+      { name: "description", content: "Every planned San Juan Bowl social post by date, in five looks, with single images, LinkedIn and Instagram carousels, and Story sequences." },
       { property: "og:title", content: "San Juan Bowl social calendar" },
       { property: "og:description", content: "Planned Bowl posts from launch to game week, with live Canva and Illustrator files." },
       { property: "og:type", content: "website" },
@@ -47,6 +48,7 @@ const PROJECTION_LOOK: Record<SjbCalendarMode, "dark" | "blue" | "night" | null>
 function CalendarPage() {
   const [mode, setMode] = useState<SjbCalendarMode>("dark");
   const [view, setView] = useState<"list" | "calendar">("calendar");
+  const [format, setFormat] = useState<SjbCalendarFormat>("single");
   const [flash, setFlash] = useState<{ itemId: string; dayId: string } | null>(null);
 
   // Arriving from a month-grid cell: that day's area stays framed until the
@@ -85,6 +87,9 @@ function CalendarPage() {
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl social calendar</h1>
       <p className="mt-2 text-sm text-muted-foreground">November – December 2026</p>
       <SjbCalendarLookCards mode={mode} onChange={setMode} />
+      <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Social format">
+        {SJB_CALENDAR_FORMATS.map((f) => <Button key={f.id} size="sm" variant={format === f.id ? "default" : "outline"} aria-pressed={format === f.id} onClick={() => setFormat(f.id)}>{f.label}</Button>)}
+      </div>
       <div className="mt-6 flex flex-wrap items-center gap-2" role="group" aria-label="View">
         {(["list", "calendar"] as const).map((v) => (
           <Button key={v} size="sm" variant={view === v ? "default" : "outline"} aria-pressed={view === v} onClick={() => setView(v)}>
@@ -94,18 +99,18 @@ function CalendarPage() {
       </div>
 
       {view === "calendar" ? (
-        <CalendarGrid mode={mode} onOpen={openPost} undated={groups.undated} />
+        <CalendarGrid mode={mode} format={format} onOpen={openPost} undated={groups.undated} />
       ) : (
       <ol className="mt-8 space-y-8">
         {groups.dated.map(([date, posts]) => (
           <li key={date} id={`day-${date}`} className={`grid scroll-mt-24 gap-4 rounded-xl p-3 md:grid-cols-[9rem_1fr] ${flash?.dayId === `day-${date}` ? "sjb-day-flash" : ""}`}>
             <h2 className="pt-1 text-sm font-semibold uppercase text-muted-foreground">{fmt(date)}</h2>
-            <div className="space-y-4">{posts.map((p) => <div key={p.itemId} id={`post-${p.itemId}`} className={`scroll-mt-24 rounded-md ${flash?.itemId === p.itemId ? "ring-2 ring-primary ring-offset-4 ring-offset-background" : ""}`}><PostRow post={p} mode={mode} /></div>)}</div>
+            <div className="space-y-4">{posts.map((p) => <div key={p.itemId} id={`post-${p.itemId}`} className={`scroll-mt-24 rounded-md ${flash?.itemId === p.itemId ? "ring-2 ring-primary ring-offset-4 ring-offset-background" : ""}`}><PostRow post={p} mode={mode} format={format} /></div>)}</div>
           </li>
         ))}
         <li id="day-undated" className={`grid scroll-mt-24 gap-4 rounded-xl p-3 md:grid-cols-[9rem_1fr] ${flash?.dayId === "day-undated" ? "sjb-day-flash" : ""}`}>
           <h2 className="pt-1 text-sm font-semibold uppercase text-muted-foreground">No date yet</h2>
-          <div className="space-y-4">{groups.undated.map((p) => <div key={p.itemId} id={`post-${p.itemId}`} className={`scroll-mt-24 rounded-md ${flash?.itemId === p.itemId ? "ring-2 ring-primary ring-offset-4 ring-offset-background" : ""}`}><PostRow post={p} mode={mode} /></div>)}</div>
+          <div className="space-y-4">{groups.undated.map((p) => <div key={p.itemId} id={`post-${p.itemId}`} className={`scroll-mt-24 rounded-md ${flash?.itemId === p.itemId ? "ring-2 ring-primary ring-offset-4 ring-offset-background" : ""}`}><PostRow post={p} mode={mode} format={format} /></div>)}</div>
         </li>
       </ol>
       )}
@@ -114,7 +119,7 @@ function CalendarPage() {
   );
 }
 
-function PostRow({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode }) {
+function PostRow({ post, mode, format }: { post: SjbCalendarPost; mode: SjbCalendarMode; format: SjbCalendarFormat }) {
   const [showCaption, setShowCaption] = useState(Boolean(post.caption));
   const sizes = SJB_CALENDAR_SIZES.map((s) => ({ s, d: sjbCalendarDesign(post.n, mode, s.id) }));
   const anyBuilt = sizes.some(({ d }) => d);
@@ -130,7 +135,7 @@ function PostRow({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode 
       <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{post.brief}</p>
       {post.waitingOn && <p className="mt-1 text-sm text-amber-800">Waiting on: {post.waitingOn}</p>}
 
-      {anyBuilt ? (
+      {format !== "single" ? <SequenceArtwork post={post} mode={mode} format={format} /> : anyBuilt ? (
         <ul className="mt-4 flex flex-wrap items-end gap-6">
           {sizes.map(({ s, d }) => (
             <li key={s.id} className="flex flex-col gap-2">
@@ -177,6 +182,34 @@ function PostRow({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode 
   );
 }
 
+function SequenceArtwork({ post, mode, format }: { post: SjbCalendarPost; mode: SjbCalendarMode; format: SjbCalendarFormat }) {
+  const sequence = sjbCalendarSequence(post.n, mode, format);
+  const spec = SJB_CALENDAR_FORMATS.find((f) => f.id === format);
+  return (
+    <section className="mt-4 border-t border-border pt-4" aria-label={spec?.label}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h4 className="text-sm font-semibold">{spec?.label}</h4>
+        <span className="text-xs text-muted-foreground">{spec?.width}×{spec?.height} per {format === "story-sequence" ? "frame" : "page"}</span>
+      </div>
+      {sequence ? <>
+        <ol className="mt-3 flex gap-4 overflow-x-auto pb-3">
+          {sequence.pages.map((page, i) => <li key={page.previewUrl} className="w-44 shrink-0">
+            <a href={page.previewUrl} target="_blank" rel="noreferrer"><img src={page.previewUrl} alt={`${post.title}, page ${i + 1}`} className="max-h-72 w-full rounded border border-border object-contain" loading="lazy" /></a>
+            <p className="mt-2 text-xs text-muted-foreground">{format === "story-sequence" ? "Frame" : "Page"} {i + 1}</p>
+            <Button asChild size="sm" variant="outline" className="mt-2"><a href={page.downloadUrl} download={page.downloadName}>Picture</a></Button>
+          </li>)}
+        </ol>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Button asChild size="sm" variant="outline"><a href={sequence.canvaUrl} target="_blank" rel="noreferrer">Canva</a></Button>
+          {sequence.pdfUrl && <Button asChild size="sm" variant="outline"><a href={sequence.pdfUrl} download>Carousel PDF</a></Button>}
+          {sequence.zipUrl && <Button asChild size="sm" variant="outline"><a href={sequence.zipUrl} download>All pictures</a></Button>}
+          {sequence.illustratorUrl && <Button asChild size="sm" variant="outline"><a href={sequence.illustratorUrl} download>Illustrator</a></Button>}
+        </div>
+      </> : <p className="mt-3 rounded border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">Multi-page artwork pending</p>}
+    </section>
+  );
+}
+
 const MONTHS = [
   { y: 2026, m: 10, label: "November 2026" },
   { y: 2026, m: 11, label: "December 2026" },
@@ -184,14 +217,14 @@ const MONTHS = [
 const GAME_DAY_ISO = new Date(`${SJB_EVENT.datesLabel} UTC`).toISOString().slice(0, 10);
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-function CalendarGrid({ mode, onOpen, undated }: { mode: SjbCalendarMode; onOpen: (id: string) => void; undated: SjbCalendarPost[] }) {
+function CalendarGrid({ mode, format, onOpen, undated }: { mode: SjbCalendarMode; format: SjbCalendarFormat; onOpen: (id: string) => void; undated: SjbCalendarPost[] }) {
   const byDate = useMemo(() => {
     const m = new Map<string, SjbCalendarPost[]>();
     for (const p of SJB_CALENDAR_POSTS) if (p.date) m.set(p.date, [...(m.get(p.date) ?? []), p]);
     return m;
   }, []);
   const chip = (p: SjbCalendarPost) => {
-    const preview = sjbCalendarDesign(p.n, mode, "1350")?.previewUrl;
+    const preview = format === "single" ? sjbCalendarDesign(p.n, mode, "1350")?.previewUrl : sjbCalendarSequence(p.n, mode, format)?.pages[0]?.previewUrl;
     return (
       <Button
         key={p.itemId}
