@@ -1,5 +1,6 @@
 # Roadmap
 ## Bowl social calendar
+- [ ] Build the 82 missing Dark/Light Feed/Square/Story versions, preserving saved originals; link every new Canva size and publish cleaned pictures after layout checks.
 - [x] Refreshed remaining saved originals: 90 versions total (72 stale registered square/Story pictures and all 18 post 01/29 Set 2/3/4 versions). Original dimensions and unchanged pixels verified; metadata cleaned; all 90 served downloads hash-checked. No Canva originals overwritten. Signed-in calendar interaction unavailable because session mint found no matching account.
 - [x] Saved six approved Dark/Light masters; refreshed 46 existing feed pictures (17 Dark + 17 Light + 12 Set 2/3/4), with pixel-preserving metadata cleanup and full-size uploads; approved post 04 square/Story pictures linked. User-edited feed originals preserved.
 - [ ] Remaining broader coverage: newer Set 2/3/4 posts 05–25/28 still need exports. Existing registered square/Story pictures and saved post 01/29 versions refreshed. Uncorrected Light adaptation drafts remain separate, not overwritten into live calendars.
