@@ -1,7 +1,8 @@
 # Roadmap
 ## Bowl social calendar
+- [x] Refreshed remaining saved originals: 90 versions total (72 stale registered square/Story pictures and all 18 post 01/29 Set 2/3/4 versions). Original dimensions and unchanged pixels verified; metadata cleaned; all 90 served downloads hash-checked. No Canva originals overwritten. Signed-in calendar interaction unavailable because session mint found no matching account.
 - [x] Saved six approved Dark/Light masters; refreshed 46 existing feed pictures (17 Dark + 17 Light + 12 Set 2/3/4), with pixel-preserving metadata cleanup and full-size uploads; approved post 04 square/Story pictures linked. User-edited feed originals preserved.
-- [ ] Remaining refresh: other square/Story pictures and newer Set 2/3/4 posts. Old Set 2 draft transactions are unavailable; latest live files were exported instead. Uncorrected Light adaptations remain pending layout checks, not overwritten into live calendars.
+- [ ] Remaining broader coverage: newer Set 2/3/4 posts 05–25/28 still need exports. Existing registered square/Story pictures and saved post 01/29 versions refreshed. Uncorrected Light adaptation drafts remain separate, not overwritten into live calendars.
 - [ ] Add LinkedIn 4:5 and square carousels, Instagram 4:5 carousels, and 9:16 Story sequences for every post in all five styles; create genuine multi-page Canva artwork, audit page spacing, and publish cleaned page exports and format-appropriate downloads. Preserve current single-image designs.
 - [x] Show existing approved captions automatically when opening a day from Calendar view; preserve hide/show and copy controls.
 - [ ] Include reusable projections templates in all five styles and three sizes, inside the corresponding calendars.
