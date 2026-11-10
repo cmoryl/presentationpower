@@ -137,7 +137,8 @@ const DESIGNS = designs as DesignMap;
 export function sjbCalendarDesign(n: string, mode: SjbCalendarMode, size: SjbCalendarSize) {
   const id = DESIGNS[n]?.[mode]?.[size];
   if (!id) return null;
-  return { id, canvaUrl: `https://www.canva.com/design/${id}/edit`, illustratorUrl: sjbIllustratorMaster(id), previewUrl: `/sjb-calendar/${id}.png` };
+  return { id, canvaUrl: `https://www.canva.com/design/${id}/edit`, illustratorUrl: sjbIllustratorMaster(id), // Preview pictures are added once exported from Canva and cleaned of AI labels.
+    previewUrl: null as string | null };
 }
 export function sjbCalendarBuilt(n: string) {
   return Boolean(DESIGNS[n]?.dark || DESIGNS[n]?.light);

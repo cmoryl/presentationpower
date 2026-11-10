@@ -87,10 +87,14 @@ function PostRow({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode 
   return (
     <article className="grid gap-4 rounded-md border border-border bg-card p-4 sm:grid-cols-[8rem_1fr]">
       <div className="aspect-[4/5] w-32 overflow-hidden rounded bg-muted">
-        {feed ? (
+        {feed?.previewUrl ? (
           <a href={feed.canvaUrl} target="_blank" rel="noreferrer" aria-label={`Open ${post.title} in Canva`}>
-            <img src={feed.previewUrl} alt={`${post.title}, ${mode} feed post`} className="h-full w-full object-cover" loading="lazy"
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+            <img src={feed.previewUrl} alt={`${post.title}, ${mode} feed post`} className="h-full w-full object-cover" loading="lazy" />
+          </a>
+        ) : feed ? (
+          <a href={feed.canvaUrl} target="_blank" rel="noreferrer" className="flex h-full flex-col items-center justify-center gap-1 p-2 text-center text-xs text-foreground hover:bg-muted/70">
+            <span className="font-semibold">{post.headline[0]}</span><span>{post.headline[1]}</span>
+            <span className="mt-1 text-muted-foreground">Open in Canva</span>
           </a>
         ) : (
           <div className="flex h-full items-center justify-center p-2 text-center text-xs text-muted-foreground">Not built in Canva yet</div>
