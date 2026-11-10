@@ -61,8 +61,8 @@ function CalendarPage() {
     <main className="mx-auto max-w-6xl px-6 py-10">
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl social calendar</h1>
       <p className="mt-2 max-w-3xl text-muted-foreground">
-        Posts from the team's calendar sheet, Nov 7 – Dec 17, 2026. Each post has Canva designs in the dark and light
-        billboard looks, in Feed, Square and Story sizes. {built} of {SJB_CALENDAR_POSTS.length} posts are built in Canva so far.
+        Posts from the team's calendar sheet, Nov 7 – Dec 17, 2026. Each post has Canva designs in four looks (dark, light, Set 3 and Set 4)
+        in Feed, Square and Story sizes, with picture downloads. {built} of {SJB_CALENDAR_POSTS.length} posts are built in Canva so far.
       </p>
       <div className="mt-5 flex items-center gap-2" role="group" aria-label="Look">
         {SJB_CALENDAR_MODES.map(({ id: m, label }) => (
