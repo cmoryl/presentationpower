@@ -2,7 +2,7 @@ import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 // /events/san-juan-bowl/social-calendar — the team's Bowl social calendar with
 // dark/light Canva designs (three sizes) and Illustrator files per post.
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
 import { SjbProjections } from "@/components/events/SjbProjections";
@@ -46,9 +46,28 @@ const PROJECTION_LOOK: Record<SjbCalendarMode, "dark" | "blue" | "night" | null>
 function CalendarPage() {
   const [mode, setMode] = useState<SjbCalendarMode>("dark");
   const [view, setView] = useState<"list" | "calendar">("list");
+  const [flash, setFlash] = useState<{ itemId: string; dayId: string } | null>(null);
+
+  // Arriving from a month-grid cell: that day's area stays framed until the
+  // reader moves on, so the jump lands somewhere recognisable.
+  useEffect(() => {
+    if (!flash) return;
+    const t = window.setTimeout(() => setFlash(null), 6000);
+    return () => window.clearTimeout(t);
+  }, [flash]);
+
   const openPost = (itemId: string) => {
+    const post = SJB_CALENDAR_POSTS.find((p) => p.itemId === itemId);
+    const dayId = post?.date ? `day-${post.date}` : "day-undated";
+    setFlash({ itemId, dayId });
     setView("list");
-    requestAnimationFrame(() => document.getElementById(`post-${itemId}`)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    requestAnimationFrame(() => {
+      const card = document.getElementById(`post-${itemId}`);
+      const day = document.getElementById(dayId);
+      // Show the whole day when it fits on screen, otherwise the post itself.
+      const fits = !!day && day.getBoundingClientRect().height <= window.innerHeight - 96;
+      (fits ? day : (card ?? day))?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
   const groups = useMemo(() => {
     const dated = new Map<string, SjbCalendarPost[]>();
@@ -89,14 +108,14 @@ function CalendarPage() {
       ) : (
       <ol className="mt-8 space-y-8">
         {groups.dated.map(([date, posts]) => (
-          <li key={date} className="grid gap-4 md:grid-cols-[9rem_1fr]">
+          <li key={date} id={`day-${date}`} className={`grid scroll-mt-24 gap-4 rounded-xl p-3 md:grid-cols-[9rem_1fr] ${flash?.dayId === `day-${date}` ? "sjb-day-flash" : ""}`}>
             <h2 className="pt-1 text-sm font-semibold uppercase text-muted-foreground">{fmt(date)}</h2>
-            <div className="space-y-4">{posts.map((p) => <div key={p.itemId} id={`post-${p.itemId}`} className="scroll-mt-24"><PostRow post={p} mode={mode} /></div>)}</div>
+            <div className="space-y-4">{posts.map((p) => <div key={p.itemId} id={`post-${p.itemId}`} className={`scroll-mt-24 rounded-md ${flash?.itemId === p.itemId ? "ring-2 ring-primary ring-offset-4 ring-offset-background" : ""}`}><PostRow post={p} mode={mode} /></div>)}</div>
           </li>
         ))}
-        <li className="grid gap-4 md:grid-cols-[9rem_1fr]">
+        <li id="day-undated" className={`grid scroll-mt-24 gap-4 rounded-xl p-3 md:grid-cols-[9rem_1fr] ${flash?.dayId === "day-undated" ? "sjb-day-flash" : ""}`}>
           <h2 className="pt-1 text-sm font-semibold uppercase text-muted-foreground">No date yet</h2>
-          <div className="space-y-4">{groups.undated.map((p) => <div key={p.itemId} id={`post-${p.itemId}`} className="scroll-mt-24"><PostRow post={p} mode={mode} /></div>)}</div>
+          <div className="space-y-4">{groups.undated.map((p) => <div key={p.itemId} id={`post-${p.itemId}`} className={`scroll-mt-24 rounded-md ${flash?.itemId === p.itemId ? "ring-2 ring-primary ring-offset-4 ring-offset-background" : ""}`}><PostRow post={p} mode={mode} /></div>)}</div>
         </li>
       </ol>
       )}

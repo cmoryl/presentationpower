@@ -1549,6 +1549,31 @@ body.export-mode [data-print-surface] {
   font-size: var(--p-px) !important;
 }
 
+/* Bowl social calendar: arriving from a month-grid day cell, that day's list
+   area gets an accent frame so the jump lands somewhere recognisable. The
+   frame is an outline, so it never shifts the layout when it appears. */
+@keyframes sjb-day-in {
+  0% {
+    outline-color: color-mix(in oklab, var(--color-primary) 100%, transparent);
+    outline-offset: 2px;
+  }
+  100% {
+    outline-color: color-mix(in oklab, var(--color-primary) 62%, transparent);
+    outline-offset: 10px;
+  }
+}
+.sjb-day-flash {
+  outline: 2px solid color-mix(in oklab, var(--color-primary) 62%, transparent);
+  outline-offset: 10px;
+  background-color: color-mix(in oklab, var(--color-primary) 5%, transparent);
+  animation: sjb-day-in 900ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sjb-day-flash {
+    animation: none;
+  }
+}
+
 /* Live editors: the artwork preview stays on screen while the settings
    column scrolls. Desktop only — on narrow screens the page stacks. */
 @utility editor-pin {
