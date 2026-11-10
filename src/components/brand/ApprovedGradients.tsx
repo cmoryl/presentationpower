@@ -43,7 +43,7 @@ export const ApprovedGradients = React.forwardRef<HTMLDivElement, ApprovedGradie
 ApprovedGradients.displayName = "ApprovedGradients";
 
 function GradientInUse({ g }: { g: ApprovedGradient }) {
-  const label = <span className="absolute left-3 top-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">In use</span>;
+  const label = <span className="absolute left-3 top-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">In use</span>;
   const wrap = "relative flex h-40 items-center justify-center bg-background p-4";
   switch (g.example) {
     case "numeral":
@@ -76,7 +76,7 @@ function GradientInUse({ g }: { g: ApprovedGradient }) {
     case "ground":
       return (
         <div className="relative h-40 p-4" style={{ background: g.css }}>
-          <span className="absolute left-3 top-2 rounded bg-background/80 px-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">In use</span>
+          <span className="absolute left-3 top-2 rounded bg-background/80 px-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">In use</span>
           <div className="absolute bottom-4 left-4 right-4 rounded bg-background/85 p-2 text-sm font-semibold text-foreground">Headline sits on the ground</div>
         </div>
       );
@@ -96,7 +96,7 @@ function GradientInUse({ g }: { g: ApprovedGradient }) {
             <defs><linearGradient id={`${g.id}-x`} x1="0" x2="1">{g.stops.map((s, i) => <stop key={s.hex} offset={i / Math.max(1, g.stops.length - 1)} stopColor={s.hex} />)}</linearGradient></defs>
             <path d="M15 15 L40 15 L50 35 L60 15 L85 15 L62 50 L85 85 L60 85 L50 65 L40 85 L15 85 L38 50 Z" fill={`url(#${g.id}-x)`} />
           </svg>
-          <span className="absolute bottom-2 text-[10px] text-muted-foreground">Direction study — use the supplied logo files</span>
+          <span className="absolute bottom-2 text-[11px] text-muted-foreground">Direction study — use the supplied logo files</span>
         </div>
       );
   }

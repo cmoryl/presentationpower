@@ -297,7 +297,7 @@ function KitBuilderInner() {
                   />
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-medium text-black/85">{v.name}</div>
-                    <div className="text-[10px] uppercase tracking-widest text-black/45">
+                    <div className="text-[11px] uppercase tracking-widest text-black/60">
                       {v.familyId} · {v.id}
                     </div>
                   </div>
@@ -324,7 +324,7 @@ function KitBuilderInner() {
                     : "border-black/10 bg-white/70 hover:border-[#003FC7]/40"
                 }`}
               >
-                <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+                <div className="text-[11px] font-semibold uppercase tracking-widest text-black/60">
                   {p.formatIds.length} formats
                 </div>
                 <div className="mt-1 font-medium text-black/85">{p.label}</div>
@@ -336,7 +336,7 @@ function KitBuilderInner() {
 
         {/* Format detail — adjustable */}
         <div className="rounded-2xl border border-black/10 bg-white/60 p-4">
-          <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-black/50">
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-black/60">
             Formats in this kit ({formatIds.length})
           </div>
           <div className="space-y-3">
@@ -349,7 +349,7 @@ function KitBuilderInner() {
               }, {}),
             ).map(([platform, list]) => (
               <div key={platform} className="min-w-0">
-                <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-black/40">
+                <div className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-black/60">
                   {PLATFORM_LABELS[platform as keyof typeof PLATFORM_LABELS] ?? platform}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -367,7 +367,7 @@ function KitBuilderInner() {
                         }`}
                       >
                         <span>{f.label}</span>
-                        <span className="text-[10px] opacity-70">
+                        <span className="text-[11px] opacity-70">
                           {f.width}×{f.height}
                         </span>
                       </button>
@@ -384,7 +384,7 @@ function KitBuilderInner() {
       <AdminSection eyebrow="Step 3" title="Brand + event details (optional)">
         <div className="grid gap-3 sm:grid-cols-3">
           <label className="rounded-2xl border border-black/10 bg-white/70 p-3 text-sm">
-            <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+            <div className="text-[11px] font-semibold uppercase tracking-widest text-black/60">
               Brand
             </div>
             <select
@@ -400,7 +400,7 @@ function KitBuilderInner() {
             </select>
           </label>
           <label className="rounded-2xl border border-black/10 bg-white/70 p-3 text-sm">
-            <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+            <div className="text-[11px] font-semibold uppercase tracking-widest text-black/60">
               Mode
             </div>
             <div className="mt-1 inline-flex rounded-sm border border-black/10 bg-black/[0.03] p-0.5 text-[11px] uppercase tracking-widest">
@@ -420,7 +420,7 @@ function KitBuilderInner() {
           </label>
           <label className="rounded-2xl border border-black/10 bg-white/70 p-3 text-sm">
             <div className="flex items-center justify-between">
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+              <div className="text-[11px] font-semibold uppercase tracking-widest text-black/60">
                 Attach event facts
               </div>
               <input
@@ -580,7 +580,7 @@ function AssetCard({
           <div className="truncate text-[11px] uppercase tracking-widest text-black/60">
             {format.label}
           </div>
-          <div className="text-[10px] text-black/40">
+          <div className="text-[11px] text-black/60">
             {format.width}×{format.height} · {aspectClass(format)} · {asset.mode}
           </div>
         </div>
@@ -630,7 +630,7 @@ function TextField({
 }) {
   return (
     <label className="block text-sm">
-      <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-black/50">
+      <div className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-black/60">
         {label}
       </div>
       <input
@@ -749,11 +749,11 @@ function WizardFlow(p: WizardProps) {
                   ? "bg-[#03002C] text-white"
                   : done
                     ? "bg-[#003FC7]/10 text-[#003FC7]"
-                    : "text-black/50 hover:bg-black/5"
+                    : "text-black/60 hover:bg-black/5"
               }`}
             >
               <span
-                className={`inline-flex h-5 w-5 items-center justify-center rounded-sm text-[10px] font-semibold ${
+                className={`inline-flex h-5 w-5 items-center justify-center rounded-sm text-[11px] font-semibold ${
                   active ? "bg-white/20" : done ? "bg-[#003FC7]/20" : "bg-black/10"
                 }`}
               >
@@ -784,7 +784,7 @@ function WizardFlow(p: WizardProps) {
                     }`}
                   >
                     <div className="font-medium text-black/85">{b.name}</div>
-                    <div className="text-[10px] uppercase tracking-widest text-black/45">
+                    <div className="text-[11px] uppercase tracking-widest text-black/60">
                       {b.id}
                     </div>
                   </button>
@@ -792,7 +792,7 @@ function WizardFlow(p: WizardProps) {
               })}
             </div>
             <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-3">
-              <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-black/50">
+              <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-black/60">
                 Render mode
               </div>
               <div className="inline-flex rounded-sm border border-black/10 bg-black/[0.03] p-0.5 text-[11px] uppercase tracking-widest">
@@ -905,7 +905,7 @@ function WizardFlow(p: WizardProps) {
                         : "border-black/10 bg-white/70 hover:border-[#003FC7]/40"
                     }`}
                   >
-                    <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+                    <div className="text-[11px] font-semibold uppercase tracking-widest text-black/60">
                       {profile.formatIds.length} formats
                     </div>
                     <div className="mt-1 font-medium text-black/85">{profile.label}</div>
@@ -915,7 +915,7 @@ function WizardFlow(p: WizardProps) {
               })}
             </div>
             <div className="mt-4 rounded-2xl border border-black/10 bg-white/60 p-4">
-              <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-black/50">
+              <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-black/60">
                 Formats in this kit ({formatIds.length})
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -933,7 +933,7 @@ function WizardFlow(p: WizardProps) {
                       }`}
                     >
                       <span>{f.label}</span>
-                      <span className="text-[10px] opacity-70">
+                      <span className="text-[11px] opacity-70">
                         {f.width}×{f.height}
                       </span>
                     </button>
@@ -1057,7 +1057,7 @@ function WizardFlow(p: WizardProps) {
                     <div className="text-[11px] uppercase tracking-widest text-black/60">
                       {asset.format.label}
                     </div>
-                    <div className="text-[10px] text-black/40">
+                    <div className="text-[11px] text-black/60">
                       {asset.format.width}×{asset.format.height} · {asset.mode}
                     </div>
                     <SocialRenderer
@@ -1089,7 +1089,7 @@ function WizardFlow(p: WizardProps) {
         >
           <ArrowLeft size={12} /> Back
         </button>
-        <div className="text-[11px] uppercase tracking-widest text-black/50">
+        <div className="text-[11px] uppercase tracking-widest text-black/60">
           Step {step + 1} of {WIZARD_STEPS.length} · {WIZARD_STEPS[step].label}
         </div>
         {isLast ? (

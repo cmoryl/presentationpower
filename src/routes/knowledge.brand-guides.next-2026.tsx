@@ -70,7 +70,7 @@ function CmykStops({ stops }: { stops: string[] }) {
           <li key={`${hex}-${i}`} className="flex flex-wrap items-center gap-x-2">
             <span className="h-3 w-3 rounded-sm border border-black/10" style={{ background: hex }} />
             {hex} · C{p(b.c)} M{p(b.m)} Y{p(b.y)} K{p(b.k)}
-            <span className={b.approved ? "text-black/50 dark:text-white/50" : "font-semibold"}>
+            <span className={b.approved ? "text-black/60 dark:text-white/70" : "font-semibold"}>
               {b.approved ? "approved" : "working build, proof first"}
             </span>
           </li>
@@ -95,7 +95,7 @@ function Section({
 }) {
   return (
     <section id={id} className="scroll-mt-24 border-t border-black/10 pt-12 dark:border-white/10">
-      <div className="text-[11px] uppercase tracking-[0.3em] text-black/45 dark:text-white/45">
+      <div className="text-[11px] uppercase tracking-[0.3em] text-black/60 dark:text-white/45">
         {eyebrow}
       </div>
       <h2 className="mt-3 text-3xl font-semibold tracking-tight">{title}</h2>
@@ -204,7 +204,7 @@ function DivisionPanel({ division }: { division: NextDivisionBrand }) {
             ["Pantone", division.pantone],
           ].map(([k, v]) => (
             <div key={k}>
-              <dt className="uppercase tracking-[0.2em] text-black/40 dark:text-white/40">{k}</dt>
+              <dt className="uppercase tracking-[0.2em] text-black/60 dark:text-white/40">{k}</dt>
               <dd className="mt-1 font-medium tabular-nums">{v}</dd>
             </div>
           ))}
@@ -434,7 +434,7 @@ function NextBrandGuide() {
 
         {/* Color */}
         <Section id="color" eyebrow="04 · Color" title="The NEXT palette">
-          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-black/50 dark:text-white/50">
+          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-black/60 dark:text-white/70">
             Structural colors
           </h3>
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
@@ -446,7 +446,7 @@ function NextBrandGuide() {
                 <div className="h-24" style={{ background: c.hex }} />
                 <div className="bg-white p-4 dark:bg-white/[0.04]">
                   <div className="font-medium">{c.name}</div>
-                  <div className="mt-1 text-xs tabular-nums text-black/50 dark:text-white/50">
+                  <div className="mt-1 text-xs tabular-nums text-black/60 dark:text-white/70">
                     {c.hex} · RGB {c.rgb}
                   </div>
                   <p className="mt-2 text-xs text-black/60 dark:text-white/60">{c.role}</p>
@@ -455,7 +455,7 @@ function NextBrandGuide() {
             ))}
           </div>
 
-          <h3 className="mt-12 text-sm font-semibold uppercase tracking-[0.2em] text-black/50 dark:text-white/50">
+          <h3 className="mt-12 text-sm font-semibold uppercase tracking-[0.2em] text-black/60 dark:text-white/70">
             Track accents
           </h3>
           <p className="mt-2 max-w-3xl text-sm text-black/60 dark:text-white/60">
@@ -466,7 +466,7 @@ function NextBrandGuide() {
           <div className="mt-5 overflow-x-auto">
             <table className="w-full min-w-[720px] border-collapse text-sm">
               <thead>
-                <tr className="border-b border-black/10 text-left text-[11px] uppercase tracking-[0.2em] text-black/45 dark:border-white/10 dark:text-white/45">
+                <tr className="border-b border-black/10 text-left text-[11px] uppercase tracking-[0.2em] text-black/60 dark:border-white/10 dark:text-white/45">
                   <th className="py-3 pr-4 font-medium">Track</th>
                   <th className="py-3 pr-4 font-medium">Swatch</th>
                   <th className="py-3 pr-4 font-medium">HEX</th>
@@ -509,7 +509,7 @@ function NextBrandGuide() {
         <Section id="type" eyebrow="05 · Typography" title="Typefaces">
           <div className="grid gap-6 md:grid-cols-2">
             <div className="rounded-2xl border border-black/10 p-6 dark:border-white/10">
-              <div className="text-[11px] uppercase tracking-[0.25em] text-black/45 dark:text-white/45">
+              <div className="text-[11px] uppercase tracking-[0.25em] text-black/60 dark:text-white/45">
                 Logo typeface
               </div>
               <div className="mt-3 text-2xl font-semibold">{NEXT_TYPOGRAPHY.logoFont}</div>
@@ -518,7 +518,7 @@ function NextBrandGuide() {
               </p>
             </div>
             <div className="rounded-2xl border border-black/10 p-6 dark:border-white/10">
-              <div className="text-[11px] uppercase tracking-[0.25em] text-black/45 dark:text-white/45">
+              <div className="text-[11px] uppercase tracking-[0.25em] text-black/60 dark:text-white/45">
                 Communications typeface
               </div>
               <div className="mt-3 text-2xl font-semibold">{NEXT_TYPOGRAPHY.headlineFont}</div>
@@ -543,7 +543,7 @@ function NextBrandGuide() {
                 >
                   {s.sample}
                 </div>
-                <div className="shrink-0 text-xs tabular-nums text-black/45 dark:text-white/45">
+                <div className="shrink-0 text-xs tabular-nums text-black/60 dark:text-white/45">
                   {s.label} · {s.sizePx}px · {s.weight} · tracking {s.tracking}
                 </div>
               </div>
@@ -594,7 +594,7 @@ function NextBrandGuide() {
             </div>
           </div>
 
-          <h3 className="mt-12 text-sm font-semibold uppercase tracking-[0.2em] text-black/50 dark:text-white/50">
+          <h3 className="mt-12 text-sm font-semibold uppercase tracking-[0.2em] text-black/60 dark:text-white/70">
             Per-division clear space & minimum size
           </h3>
           <p className="mt-2 max-w-3xl text-sm text-black/60 dark:text-white/60">
@@ -621,7 +621,7 @@ function NextBrandGuide() {
                       style={{ background: d.accent }}
                     />
                     {d.name}
-                    <span className="ml-auto tabular-nums text-black/45 dark:text-white/45">
+                    <span className="ml-auto tabular-nums text-black/60 dark:text-white/45">
                       {d.accent}
                     </span>
                   </div>
@@ -636,7 +636,7 @@ function NextBrandGuide() {
                       loading="lazy"
                     />
                     <span
-                      className="absolute -top-2.5 left-3 bg-white px-1.5 text-[10px] font-medium"
+                      className="absolute -top-2.5 left-3 bg-white px-1.5 text-[11px] font-medium"
                       style={{ color: d.accent }}
                     >
                       X

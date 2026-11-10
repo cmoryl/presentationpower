@@ -572,7 +572,7 @@ function BrandGuideView() {
                         loading="lazy"
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                      <div className="absolute bottom-1.5 left-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
+                      <div className="absolute bottom-1.5 left-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[11px] font-medium uppercase tracking-wider text-white">
                         P{String(i + 1).padStart(2, "0")}
                       </div>
                     </div>
@@ -598,7 +598,7 @@ function BrandGuideView() {
                         loading="lazy"
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                      <div className="absolute bottom-1.5 left-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
+                      <div className="absolute bottom-1.5 left-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[11px] font-medium uppercase tracking-wider text-white">
                         A{String(i + 1).padStart(2, "0")}
                       </div>
                     </div>
@@ -799,12 +799,12 @@ function SwatchCard({ swatch, large }: { swatch: ColorSwatch; large?: boolean })
               void navigator.clipboard?.writeText(brandSwatchSpecText(swatch));
               toast.success(`${swatch.name} values copied`);
             }}
-            className="shrink-0 rounded-md border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:bg-muted"
+            className="shrink-0 rounded-md border border-border px-1.5 py-0.5 text-[11px] text-muted-foreground hover:bg-muted"
           >
             Copy
           </button>
         </div>
-        <dl className="mt-2 space-y-0.5 text-[10px] text-muted-foreground">
+        <dl className="mt-2 space-y-0.5 text-[11px] text-muted-foreground">
           {rows.map((r) => (
             <div key={r.label} className="flex items-baseline gap-1.5">
               <dt className="w-10 shrink-0 tracking-[0.12em]">{r.label}</dt>
@@ -868,11 +868,11 @@ function RampStopCell({ hex }: { hex: string }) {
     >
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded text-[10px] font-semibold leading-tight opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+        className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded text-[11px] font-semibold leading-tight opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
         style={{ color: text, background: overlay }}
       >
         <span className="font-mono">{copied ? "Copied" : hex.toUpperCase()}</span>
-        <span className="font-mono text-[8px] opacity-80">RGB {hexToRgb(hex)}</span>
+        <span className="font-mono text-[11px] opacity-80">RGB {hexToRgb(hex)}</span>
       </span>
     </button>
   );
@@ -908,7 +908,7 @@ function TypeSample({ style }: { style: TypeStyle }) {
         <div className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
           {style.label}
         </div>
-        <div className="text-[10px] text-muted-foreground">
+        <div className="text-[11px] text-muted-foreground">
           {style.sizePx}px · {style.weight} · track {style.tracking} · lead {style.leading}
         </div>
       </div>
@@ -992,7 +992,7 @@ function BrandhubIntelSections({
                 className="border-t border-border py-4 text-sm text-foreground/85"
               >
                 <div
-                  className="mb-1 text-[10px] font-semibold uppercase tracking-[0.25em]"
+                  className="mb-1 text-[11px] font-semibold uppercase tracking-[0.25em]"
                   style={{ color: hero }}
                 >
                   Advantage {String(i + 1).padStart(2, "0")}
@@ -1106,7 +1106,7 @@ function BrandhubIntelSections({
                 <div className="flex items-center gap-2">
                   {g.priority && (
                     <span
-                      className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white"
+                      className="rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-white"
                       style={{
                         background:
                           g.priority === "high"
@@ -1120,7 +1120,7 @@ function BrandhubIntelSections({
                     </span>
                   )}
                   {typeof g.confidence === "number" && (
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-[11px] text-muted-foreground">
                       confidence {Math.round(g.confidence * 100)}%
                     </span>
                   )}
@@ -1144,7 +1144,7 @@ function BrandhubIntelSections({
                 className="border-t border-border py-4 text-sm text-foreground/85"
               >
                 <div
-                  className="mb-1 text-[10px] font-semibold uppercase tracking-[0.25em]"
+                  className="mb-1 text-[11px] font-semibold uppercase tracking-[0.25em]"
                   style={{ color: hero }}
                 >
                   Entry {String(i + 1).padStart(2, "0")}
@@ -1167,7 +1167,7 @@ function BrandhubIntelSections({
 function IntelCard({ label, body }: { label: string; body: string }) {
   return (
     <div className="rounded-2xl bg-card/10 p-5 backdrop-blur-sm ring-1 ring-white/20">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.3em] opacity-70">{label}</div>
+      <div className="text-[11px] font-semibold uppercase tracking-[0.3em] opacity-70">{label}</div>
       <p className="mt-2 text-sm leading-[150%] opacity-95">{body}</p>
     </div>
   );
@@ -1177,14 +1177,14 @@ function VoiceCard({ label, values, hero }: { label: string; values: string[]; h
   if (!values.length) {
     return (
       <div className="rounded-xl border border-dashed border-border p-4">
-        <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{label}</div>
+        <div className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">{label}</div>
         <div className="mt-2 text-xs text-muted-foreground/70">—</div>
       </div>
     );
   }
   return (
     <div className="border-t border-border py-4">
-      <div className="text-[10px] uppercase tracking-[0.25em]" style={{ color: hero }}>
+      <div className="text-[11px] uppercase tracking-[0.25em]" style={{ color: hero }}>
         {label}
       </div>
       <div className="mt-2 flex flex-wrap gap-1.5">
@@ -1226,7 +1226,7 @@ function LogoTile({
         loading="lazy"
       />
       <div
-        className="text-[10px] uppercase tracking-[0.25em]"
+        className="text-[11px] uppercase tracking-[0.25em]"
         style={{ color: onDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)" }}
       >
         {label}
@@ -1234,7 +1234,7 @@ function LogoTile({
       <a
         href={src}
         download={filename}
-        className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] opacity-0 ring-1 transition group-hover:opacity-100"
+        className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.2em] opacity-0 ring-1 transition group-hover:opacity-100"
         style={{
           background: onDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.06)",
           color: onDark ? "#fff" : BRAND.ink,
