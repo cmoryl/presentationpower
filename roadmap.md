@@ -1,5 +1,6 @@
 # Roadmap
 ## Bowl social calendar
+- [ ] Add LinkedIn 4:5 and square carousels, Instagram 4:5 carousels, and 9:16 Story sequences for every post in all five styles; create genuine multi-page Canva artwork, audit page spacing, and publish cleaned page exports and format-appropriate downloads. Preserve current single-image designs.
 - [x] Show existing approved captions automatically when opening a day from Calendar view; preserve hide/show and copy controls.
 - [ ] Include reusable projections templates in all five styles and three sizes, inside the corresponding calendars.
 - [ ] Complete coverage for all 28 calendar posts × five styles × Feed/Square/Story (420 versions): 18 missing Set 2/3/4 Canva designs for posts 01/29 saved and linked; fill the remaining 82 missing Canva designs, audit every version, and publish cleaned full-size pictures/downloads in the existing five calendars. Preserve user-edited feed originals; approval is required before saving any Canva editing transactions.
