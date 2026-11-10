@@ -1,8 +1,8 @@
 # Roadmap
 ## Bowl social calendar
-- [ ] Refresh scheduled Light action posts from user-edited feed masters: adapt square/story versions, inspect layouts, clean full-size exports, update calendar links and pictures.
-- [ ] Website on every Bowl social artwork: SANJUANBOWL.COM added and visually checked in all nine post 04 Set 2/3/4 drafts; blocked on preview approval before saving and cleaning refreshed pictures. Audit/backfill other existing posts and include on all remaining builds.
-- [ ] Post 04 conference-logo spacing: all nine revised previews inspected; Set 2/3/4 marks now sit closer to the main shield in compact balanced groups with visible gaps. Blocked on preview approval before saving/exporting/cleaning and refreshing live pictures. Other existing posts still require this spacing audit.
+- [ ] Refresh scheduled Light action posts from user-edited feed masters: existing feed pictures refreshed and cleaned; resized square/story drafts created, with overlap corrections in progress. New size previews require approval before committing/exporting and updating calendar links. Posts 01/07 still need resizing.
+- [ ] Website on every Bowl social artwork: all nine post 04 Set 2/3/4 designs approved, saved, cleaned and refreshed. Audit/backfill other existing posts and include on all remaining builds.
+- [x] Post 04 conference-logo spacing: all nine revised Set 2/3/4 designs approved, saved, cleaned and refreshed with visible gaps. Other existing posts still require this spacing audit.
 - [x] Post 04: approved lowered content saved in all nine Set 2/3/4 Canva designs; full-size JPGs cleaned, uploaded and wired into the calendar.
 - [ ] Remaining build: Set 2/3/4 for the other 24 posts, plus dark/light for 16–25 and 28; clean full-size exports and wire saved files into the calendar. Other 282 designs remain unbuilt; new Canva drafts require preview approval before committing.
 - [x] Calendar page with every post from the sheet
