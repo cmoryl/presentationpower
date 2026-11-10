@@ -11,34 +11,18 @@
       "1920": "DAHaiNCeUWE"
     },
     "set2": {
-      "1350": {
-        "id": "DAHajgieOik"
-      },
-      "1080": {
-        "id": "DAHajjIBZZk"
-      }
+      "1350": "DAHajgieOik",
+      "1080": "DAHajjIBZZk"
     },
     "set3": {
-      "1350": {
-        "id": "DAHajpNJ_5U"
-      },
-      "1080": {
-        "id": "DAHajs_2PC0"
-      },
-      "1920": {
-        "id": "DAHajnb8k2w"
-      }
+      "1350": "DAHajpNJ_5U",
+      "1080": "DAHajs_2PC0",
+      "1920": "DAHajnb8k2w"
     },
     "set4": {
-      "1350": {
-        "id": "DAHajlH12Ss"
-      },
-      "1080": {
-        "id": "DAHajh7C66w"
-      },
-      "1920": {
-        "id": "DAHajhmlc_U"
-      }
+      "1350": "DAHajlH12Ss",
+      "1080": "DAHajh7C66w",
+      "1920": "DAHajhmlc_U"
     }
   },
   "02": {
@@ -442,37 +426,19 @@
       "1350": "DAHaiAdEHsU"
     },
     "set2": {
-      "1350": {
-        "id": "DAHajrx4H2A"
-      },
-      "1080": {
-        "id": "DAHajpeOJ8M"
-      },
-      "1920": {
-        "id": "DAHajnoPPcc"
-      }
+      "1350": "DAHajrx4H2A",
+      "1080": "DAHajpeOJ8M",
+      "1920": "DAHajnoPPcc"
     },
     "set3": {
-      "1350": {
-        "id": "DAHajuZw_lw"
-      },
-      "1080": {
-        "id": "DAHajnpvslQ"
-      },
-      "1920": {
-        "id": "DAHajjYriro"
-      }
+      "1350": "DAHajuZw_lw",
+      "1080": "DAHajnpvslQ",
+      "1920": "DAHajjYriro"
     },
     "set4": {
-      "1350": {
-        "id": "DAHajjgAsqA"
-      },
-      "1080": {
-        "id": "DAHajrV5fZo"
-      },
-      "1920": {
-        "id": "DAHajgifcAo"
-      }
+      "1350": "DAHajjgAsqA",
+      "1080": "DAHajrV5fZo",
+      "1920": "DAHajgifcAo"
     }
   },
   "16": {
