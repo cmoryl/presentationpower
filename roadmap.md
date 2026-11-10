@@ -1,5 +1,7 @@
 # Roadmap
 ## Bowl social calendar
+- [x] Built and linked all 82 missing Dark/Light Feed/Square/Story Canva versions; all 28 posts now have five looks × three sizes (420 links), existing originals preserved.
+- [ ] New 82 versions: inspect layouts and export cleaned full-size pictures/downloads. Canva links are available; new image previews remain pending, not substituted with thumbnails.
 - [x] Refreshed remaining saved originals: 90 versions total (72 stale registered square/Story pictures and all 18 post 01/29 Set 2/3/4 versions). Original dimensions and unchanged pixels verified; metadata cleaned; all 90 served downloads hash-checked. No Canva originals overwritten. Signed-in calendar interaction unavailable because session mint found no matching account.
 - [x] Saved six approved Dark/Light masters; refreshed 46 existing feed pictures (17 Dark + 17 Light + 12 Set 2/3/4), with pixel-preserving metadata cleanup and full-size uploads; approved post 04 square/Story pictures linked. User-edited feed originals preserved.
 - [ ] Remaining broader coverage: newer Set 2/3/4 posts 05–25/28 still need exports. Existing registered square/Story pictures and saved post 01/29 versions refreshed. Uncorrected Light adaptation drafts remain separate, not overwritten into live calendars.
@@ -16,7 +18,7 @@
 - [ ] Website on every Bowl social artwork: all nine post 04 Set 2/3/4 designs approved, saved, cleaned and refreshed. Audit/backfill other existing posts and include on all remaining builds.
 - [x] Post 04 conference-logo spacing: all nine revised Set 2/3/4 designs approved, saved, cleaned and refreshed with visible gaps. Other existing posts still require this spacing audit.
 - [x] Post 04: approved lowered content saved in all nine Set 2/3/4 Canva designs; full-size JPGs cleaned, uploaded and wired into the calendar.
-- [ ] Dark/Light missing coverage: 82 Canva versions remain; six reusable masters now approved, saved and exported (docs/sjb-five-style-masters-pending.json).
+- [x] Dark/Light Canva coverage completed: all 82 missing versions saved and linked using approved masters or live feed resizes; new exports/layout checks tracked above.
 - [x] Calendar page with every post from the sheet
 - [x] Canva designs (dark + light, 3 sizes): posts 01–06
 - [x] Canva feed designs (dark + light): posts 08, 09, TV announcement, countdown
