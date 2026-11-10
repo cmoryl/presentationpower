@@ -148,6 +148,13 @@
       "when": 1793915077707,
       "tag": "0020_set5_asset_removals",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1794327761614,
+      "tag": "0021_next_guide_photo_shortlist",
+      "breakpoints": true
     }
   ]
 }

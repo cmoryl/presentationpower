@@ -2614,6 +2614,9 @@ export type Database = {
           created_by: string | null
           division: string | null
           event_id: string
+          guide_status: string | null
+          guide_status_at: string | null
+          guide_status_by: string | null
           height: number | null
           id: string
           marketing_at: string | null
@@ -2636,6 +2639,9 @@ export type Database = {
           created_by?: string | null
           division?: string | null
           event_id: string
+          guide_status?: string | null
+          guide_status_at?: string | null
+          guide_status_by?: string | null
           height?: number | null
           id?: string
           marketing_at?: string | null
@@ -2658,6 +2664,9 @@ export type Database = {
           created_by?: string | null
           division?: string | null
           event_id?: string
+          guide_status?: string | null
+          guide_status_at?: string | null
+          guide_status_by?: string | null
           height?: number | null
           id?: string
           marketing_at?: string | null
@@ -5935,6 +5944,19 @@ export type Database = {
       }
       get_london_head_revision: { Args: never; Returns: Json }
       get_next_brand_kit_share: { Args: { _token: string }; Returns: Json }
+      get_next_guide_photos: {
+        Args: never
+        Returns: {
+          event_id: string
+          height: number
+          id: string
+          path: string
+          room: string
+          sign_kind: string
+          thumb_path: string
+          width: number
+        }[]
+      }
       get_shared_deck: { Args: { _token: string }; Returns: Json }
       get_shared_deck_locales: {
         Args: { _token: string }
