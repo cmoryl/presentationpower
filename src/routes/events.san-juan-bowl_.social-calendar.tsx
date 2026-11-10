@@ -5,6 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
+import { SjbProjections } from "@/components/events/SjbProjections";
 import {
   SJB_CALENDAR_POSTS,
   SJB_CALENDAR_SIZES,
@@ -64,6 +65,7 @@ function CalendarPage() {
         Posts from the team's calendar sheet, Nov 7 – Dec 17, 2026. Each post has Canva designs in four looks (dark, light, Set 3 and Set 4)
         in Feed, Square and Story sizes, with picture downloads. {built} of {SJB_CALENDAR_POSTS.length} posts are built in Canva so far.
       </p>
+      <SjbProjections />
       <div className="mt-5 flex items-center gap-2" role="group" aria-label="Look">
         {SJB_CALENDAR_MODES.map(({ id: m, label }) => (
           <Button key={m} size="sm" variant={mode === m ? "default" : "outline"} aria-pressed={mode === m} onClick={() => setMode(m)}>
