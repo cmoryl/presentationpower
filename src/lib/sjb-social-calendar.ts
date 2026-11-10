@@ -1,12 +1,18 @@
 // San Juan Bowl social calendar, imported from the team's calendar spreadsheet
 // (San_Juan_Bowl_Social_Media_Social_Calendar, Nov 10 2026). Each post gets Canva
-// designs in the dark (gold player) and light (light action) billboard looks, in
+// designs in four looks (dark, light, Set 3, Set 4), in
 // three sizes. Design IDs live in sjb-social-calendar-designs.json; posts without
 // an entry there have not been built in Canva yet.
 import designs from "./sjb-social-calendar-designs.json";
 import { sjbIllustratorMaster } from "./sjb-illustrator-masters";
 
-export type SjbCalendarMode = "dark" | "light";
+export type SjbCalendarMode = "dark" | "light" | "set3" | "set4";
+export const SJB_CALENDAR_MODES: { id: SjbCalendarMode; label: string }[] = [
+  { id: "dark", label: "Dark (gold player)" },
+  { id: "light", label: "Light (light action)" },
+  { id: "set3", label: "Set 3 (player spotlight)" },
+  { id: "set4", label: "Set 4 (stadium + field)" },
+];
 export type SjbCalendarSize = "1350" | "1080" | "1920";
 export const SJB_CALENDAR_SIZES: { id: SjbCalendarSize; label: string; w: number; h: number }[] = [
   { id: "1350", label: "Feed", w: 1080, h: 1350 },
@@ -144,8 +150,10 @@ export function sjbCalendarDesign(n: string, mode: SjbCalendarMode, size: SjbCal
   const id = DESIGNS[n]?.[mode]?.[size];
   if (!id) return null;
   return { id, canvaUrl: `https://www.canva.com/design/${id}/edit`, illustratorUrl: sjbIllustratorMaster(id),
-    previewUrl: SJB_CALENDAR_PREVIEWS[id] ?? null };
+    previewUrl: SJB_CALENDAR_PREVIEWS[id] ?? null,
+    downloadUrl: SJB_CALENDAR_PREVIEWS[id] ?? null,
+    downloadName: `san-juan-bowl-calendar-${n}-${mode}-${size}.jpg` };
 }
 export function sjbCalendarBuilt(n: string) {
-  return Boolean(DESIGNS[n]?.dark || DESIGNS[n]?.light);
+  return Boolean(DESIGNS[n] && Object.keys(DESIGNS[n]).length);
 }
