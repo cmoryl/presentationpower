@@ -525,7 +525,7 @@ export const SJB_EVENT_AREAS: EventAreaGroup[] = [
       { label: "Brand kit", detail: "Every logo, colour and download in one place.", link: { to: "/events/san-juan-bowl/brand-kit" } },
       { label: "Brand guide", detail: "How to use the logo, colours and type.", link: { to: "/events/san-juan-bowl/brand-kit/guide" } },
       { label: "Single-colour logos", detail: "Navy, black and white versions.", link: { to: "/events/san-juan-bowl/brand-kit/single-colour" } },
-      { label: "Lettering spec", detail: "Lettering measurements and construction.", link: { to: "/events/san-juan-bowl/brand-kit/lettering" } },
+      // Lettering spec is withheld (SJB_LETTERING_SPEC_VISIBLE); re-add its entry when it is re-enabled.
       { label: "Designer files", detail: "Production files for designers and vendors.", link: { to: "/events/san-juan-bowl/brand-kit/designers" } },
     ],
   },
