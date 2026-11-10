@@ -1,5 +1,7 @@
 # Roadmap
 ## Bowl social calendar
+- [ ] Show existing approved captions automatically when opening a day from Calendar view; preserve hide/show and copy controls.
+- [ ] Include reusable projections templates in all five styles and three sizes, inside the corresponding calendars.
 - [ ] Complete coverage for all 28 calendar posts × five styles × Feed/Square/Story (420 versions): fill the 100 missing Canva designs, audit every version, and publish cleaned full-size pictures/downloads in the existing five calendars. Preserve user-edited feed originals; approval is required before saving any Canva editing transactions.
 - [x] Posts 05–25 and 28: all 198 Set 2/3/4 Canva designs saved and their size-specific links registered in the calendar; existing dark/light links preserved.
 - [ ] Current request remaining: inspect all 198 saved designs for alignment, wrapping and logo/content separation, correct exceptions, export full-size pictures, clean metadata and upload previews/downloads. No new pictures or Illustrator files uploaded yet; older artwork remains unaudited.

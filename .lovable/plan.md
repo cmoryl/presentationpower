@@ -5,6 +5,8 @@
 - Create the **100 missing Canva versions**, preserving existing originals and your updated Light feed designs.
 - Refresh pictures and full-size downloads for all completed versions, removing hidden export metadata before publishing.
 - Keep each version inside its existing campaign calendar, with its corresponding live Canva link and downloads. Do not introduce a separate calendar or duplicate campaign area.
+- Include the reusable **projections templates in all five styles and all three sizes**, keeping team names as placeholders until confirmed.
+- Automatically show a post's existing approved caption when opening its day from the visual calendar; keep manual hide/show and copy controls. Do not invent captions for days without approved copy.
 
 ## Artwork checks
 - Adapt text size and line breaks to each format; check alignment and clipping.
