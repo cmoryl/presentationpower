@@ -229,7 +229,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
   }
 
   return (
-    <div className="min-h-dvh bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
+    <div data-app-shell className="min-h-dvh bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
       <header
         ref={headerRef}
         className={
