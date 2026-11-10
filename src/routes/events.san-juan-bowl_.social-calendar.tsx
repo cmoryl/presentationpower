@@ -3,6 +3,7 @@ import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 // dark/light Canva designs (three sizes) and Illustrator files per post.
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
 import {
   SJB_CALENDAR_POSTS,
@@ -169,6 +170,7 @@ const MONTHS = [
   { y: 2026, m: 10, label: "November 2026" },
   { y: 2026, m: 11, label: "December 2026" },
 ];
+const GAME_DAY_ISO = new Date(`${SJB_EVENT.datesLabel} UTC`).toISOString().slice(0, 10);
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function CalendarGrid({ mode, onOpen, undated }: { mode: SjbCalendarMode; onOpen: (id: string) => void; undated: SjbCalendarPost[] }) {
@@ -212,7 +214,7 @@ function CalendarGrid({ mode, onOpen, undated }: { mode: SjbCalendarMode; onOpen
               {cells.map((d, i) => {
                 const iso = d ? `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}` : "";
                 const posts = d ? byDate.get(iso) ?? [] : [];
-                const gameDay = iso === "2026-12-16";
+                const gameDay = iso === GAME_DAY_ISO;
                 return (
                   <div key={i} className={`min-h-28 border-b border-r border-border p-1.5 ${d ? "bg-background" : "bg-muted/40"} ${gameDay ? "ring-2 ring-inset ring-primary" : ""}`}>
                     {d && (
