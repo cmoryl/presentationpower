@@ -45,7 +45,7 @@ const PROJECTION_LOOK: Record<SjbCalendarMode, "dark" | "blue" | "night" | null>
 
 function CalendarPage() {
   const [mode, setMode] = useState<SjbCalendarMode>("dark");
-  const [view, setView] = useState<"list" | "calendar">("list");
+  const [view, setView] = useState<"list" | "calendar">("calendar");
   const [flash, setFlash] = useState<{ itemId: string; dayId: string } | null>(null);
 
   // Arriving from a month-grid cell: that day's area stays framed until the
@@ -87,16 +87,11 @@ function CalendarPage() {
         Posts from the team's calendar sheet, Nov 7 – Dec 17, 2026. Each post has Canva designs in five looks (dark, light, Set 2, Set 3 and Set 4)
         in Feed, Square and Story sizes, with picture downloads. {built} of {SJB_CALENDAR_POSTS.length} posts are built in Canva so far.
       </p>
-      <div className="mt-5 flex flex-wrap items-center gap-2" role="group" aria-label="Look">
-        {SJB_CALENDAR_MODES.map(({ id: m, label }) => (
-          <Button key={m} size="sm" variant={mode === m ? "default" : "outline"} aria-pressed={mode === m} onClick={() => setMode(m)}>
-            {label}
-          </Button>
-        ))}
-        <span className="mx-2 h-5 w-px bg-border" aria-hidden />
+      <LookCards mode={mode} onChange={setMode} />
+      <div className="mt-6 flex flex-wrap items-center gap-2" role="group" aria-label="View">
         {(["list", "calendar"] as const).map((v) => (
           <Button key={v} size="sm" variant={view === v ? "default" : "outline"} aria-pressed={view === v} onClick={() => setView(v)}>
-            {v === "list" ? "List" : "Calendar"}
+            {v === "list" ? "Day-by-day list" : "Calendar"}
           </Button>
         ))}
       </div>
