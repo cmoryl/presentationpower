@@ -131,14 +131,20 @@ export const SJB_CALENDAR_POSTS: SjbCalendarPost[] = [
   P("28", "13483557621", "San Juan top things to do", "Historical sites, restaurants, beaches and more to visit while there.", "", null, "Launch", "", ["SAN JUAN", "TOP THINGS TO DO"], { waitingOn: "Choice of places to feature" }),
 ];
 
+// Cleaned (AI-label-free) Canva exports, one pointer per design id.
+const PREVIEW_POINTERS = import.meta.glob<{ url: string }>("../assets/sjb-calendar/*.jpg.asset.json", { eager: true, import: "default" });
+export const SJB_CALENDAR_PREVIEWS: Record<string, string> = Object.fromEntries(
+  Object.entries(PREVIEW_POINTERS).map(([path, ptr]) => [path.split("/").pop()!.replace(".jpg.asset.json", ""), ptr.url]),
+);
+
 type DesignMap = Record<string, Partial<Record<SjbCalendarMode, Partial<Record<SjbCalendarSize, string>>>>>;
 const DESIGNS = designs as DesignMap;
 
 export function sjbCalendarDesign(n: string, mode: SjbCalendarMode, size: SjbCalendarSize) {
   const id = DESIGNS[n]?.[mode]?.[size];
   if (!id) return null;
-  return { id, canvaUrl: `https://www.canva.com/design/${id}/edit`, illustratorUrl: sjbIllustratorMaster(id), // Preview pictures are added once exported from Canva and cleaned of AI labels.
-    previewUrl: null as string | null };
+  return { id, canvaUrl: `https://www.canva.com/design/${id}/edit`, illustratorUrl: sjbIllustratorMaster(id),
+    previewUrl: SJB_CALENDAR_PREVIEWS[id] ?? null };
 }
 export function sjbCalendarBuilt(n: string) {
   return Boolean(DESIGNS[n]?.dark || DESIGNS[n]?.light);
