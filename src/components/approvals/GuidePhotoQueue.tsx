@@ -10,7 +10,7 @@ type Row = { id: string; event_id: string; thumb_path: string | null; path: stri
 export function GuidePhotoQueue() {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["guide-photo-queue"], queryFn: async () => {
-    const { data, error } = await supabase.from("event_photos").select("id,event_id,thumb_path,path,sign_kind,room,guide_status,marketing_ok").not("guide_status", "is", null).order("sign_kind");
+    const { data, error } = await supabase.from("event_photos").select("id,event_id,thumb_path,path,sign_kind,room,guide_status,marketing_ok").not("guide_status", "is", null).order("sign_kind").order("id");
     if (error) throw error;
     const rows = (data ?? []) as Row[];
     const paths = rows.map((r) => r.thumb_path ?? r.path);
