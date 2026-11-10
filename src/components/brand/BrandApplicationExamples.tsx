@@ -16,10 +16,30 @@ export interface BrandApplicationArtwork {
   socialPosition?: "left" | "right";
   unbrandedStory?: boolean;
 }
+export interface BrandSocialPost { src: string; title: string; size?: string; href?: string }
 export interface BrandApplicationExamplesProps extends HTMLAttributes<HTMLDivElement> {
   artwork: BrandApplicationArtwork;
   surface: BrandApplicationSurface;
+  /** Real saved social artwork; when absent the social surface says so and shows layout studies only. */
+  socialPosts?: BrandSocialPost[];
 }
+
+export interface BrandSocialPostsProps extends HTMLAttributes<HTMLDivElement> { posts: BrandSocialPost[]; brandName: string }
+/** Saved, issued social posts shown as they were published — never redrawn. */
+export const BrandSocialPosts = forwardRef<HTMLDivElement, BrandSocialPostsProps>(function BrandSocialPosts({ posts, brandName, className = "", ...props }, ref) {
+  return <div ref={ref} {...props} className={`min-w-0 ${className}`} data-brand-social-posts>
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {posts.map((p) => {
+        const img = <img src={p.src} alt={`${brandName} social post: ${p.title}`} loading="lazy" className="aspect-square w-full bg-muted object-contain" />;
+        return <figure key={p.src} className="min-w-0">
+          {p.href ? <a href={p.href} target="_blank" rel="noreferrer" className="block focus-visible:outline-2 focus-visible:outline-primary">{img}</a> : img}
+          <figcaption className="mt-1 text-[11px] leading-snug text-muted-foreground">{p.title}{p.size ? ` · ${p.size}` : ""}</figcaption>
+        </figure>;
+      })}
+    </div>
+    <p className="mt-2 text-[11px] text-muted-foreground">Saved social posts · shown as issued</p>
+  </div>;
+});
 
 const SURFACES: { id: BrandApplicationSurface; title: string }[] = [
   { id: "social", title: "Social" },
@@ -30,7 +50,7 @@ const SURFACES: { id: BrandApplicationSurface; title: string }[] = [
 
 /** Layout studies made from issued artwork, never presented as production masters. */
 export const BrandApplicationExamples = forwardRef<HTMLDivElement, BrandApplicationExamplesProps>(
-  function BrandApplicationExamples({ artwork: a, surface, className = "", style, ...props }, ref) {
+  function BrandApplicationExamples({ artwork: a, surface, socialPosts, className = "", style, ...props }, ref) {
     const darkSrc = a.white ?? a.color;
     const stacked = a.stacked ?? a.color;
     const stackedDark = a.stackedWhite ?? a.white ?? a.stacked ?? a.color;
@@ -50,6 +70,9 @@ export const BrandApplicationExamples = forwardRef<HTMLDivElement, BrandApplicat
     const lines = <div aria-hidden className="space-y-2"><div className="h-1 w-full bg-current opacity-20" /><div className="h-1 w-4/5 bg-current opacity-20" /><div className="h-1 w-3/5 bg-current opacity-20" /></div>;
     return (
       <div ref={ref} {...props} style={vars} className={`my-4 min-w-0 ${className}`} data-brand-application={surface}>
+        {surface === "social" && (socialPosts?.length
+          ? <BrandSocialPosts posts={socialPosts.slice(0, 4)} brandName={a.name} className="mb-4" />
+          : socialPosts && <p className="mb-3 text-[11px] text-muted-foreground">No saved {a.name} social posts yet · layout studies below</p>)}
         <div className="grid grid-cols-2 gap-3">
           {surface === "social" && <>
             <figure className="min-w-0">
@@ -145,10 +168,10 @@ export const BrandApplicationExamples = forwardRef<HTMLDivElement, BrandApplicat
   },
 );
 
-export interface BrandApplicationGalleryProps extends HTMLAttributes<HTMLElement> { artwork: BrandApplicationArtwork }
-export const BrandApplicationGallery = forwardRef<HTMLElement, BrandApplicationGalleryProps>(function BrandApplicationGallery({ artwork, className = "", ...props }, ref) {
+export interface BrandApplicationGalleryProps extends HTMLAttributes<HTMLElement> { artwork: BrandApplicationArtwork; socialPosts?: BrandSocialPost[] }
+export const BrandApplicationGallery = forwardRef<HTMLElement, BrandApplicationGalleryProps>(function BrandApplicationGallery({ artwork, socialPosts = [], className = "", ...props }, ref) {
   return <section ref={ref} {...props} className={`mt-12 scroll-mt-24 ${className}`}>
     <h2 className="text-2xl font-semibold">Applications</h2>
-    <div className="mt-6 grid gap-8 md:grid-cols-2">{SURFACES.map((s) => <div key={s.id} className="min-w-0 border-t border-border pt-4"><h3 className="text-lg font-semibold">{s.title}</h3><BrandApplicationExamples artwork={artwork} surface={s.id} /></div>)}</div>
+    <div className="mt-6 grid gap-8 md:grid-cols-2">{SURFACES.map((s) => <div key={s.id} className="min-w-0 border-t border-border pt-4"><h3 className="text-lg font-semibold">{s.title}</h3><BrandApplicationExamples artwork={artwork} surface={s.id} socialPosts={socialPosts} /></div>)}</div>
   </section>;
 });
