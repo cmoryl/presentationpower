@@ -1,0 +1,32 @@
+{
+  "status": "size-adaptations-in-progress-awaiting-preview-approval",
+  "feeds": "Existing user-edited Light feed exports cleaned and asset pointers refreshed; feed artwork remains the source of truth.",
+  "note": "Resized drafts must not replace live pictures before their layouts are checked and previews approved. Some adaptations remain uncorrected. Post 01 and 07 still require resizing.",
+  "sizes": {
+    "02": ["DAHajFxPq1c", "DAHajH6vpiI"],
+    "03": ["DAHajFJs8og", "DAHajADOtBw"],
+    "04": ["DAHajOsh75c", "DAHajFMVS5o"],
+    "05": ["DAHajEn6les", "DAHajPh4ZUc"],
+    "06": ["DAHajE3oFv4", "DAHajADCZYM"],
+    "08": ["DAHajIR29p8", "DAHajN2wclo"],
+    "09": ["DAHajBs-BNY", "DAHajHyDmck"],
+    "10": ["DAHajHxOigA", "DAHajLuQRPs"],
+    "12": ["DAHajBX4BIA", "DAHajArSLEI"],
+    "14": ["DAHajCnk6-4", "DAHajCeERUI"],
+    "15": ["DAHajDq0BqY", "DAHajLL8uDg"],
+    "27": ["DAHajGJf0vg", "DAHajPmM9g8"],
+    "29": ["DAHajJA4YIw", "DAHajMIW7Lg"]
+  },
+  "knownOpenTransactions": {
+    "02-square": "5106477848044018412",
+    "02-story": "1457436250327900387",
+    "06-square": "3645059769584913051",
+    "06-story": "1732155828519994958",
+    "08-square": "1053238186988950320",
+    "08-story": "1524990246939937661",
+    "14-square": "6009449573081782708",
+    "14-story": "5024287155293126627",
+    "29-square": "5770758795593074119",
+    "29-story": "3132775311787212068"
+  }
+}
