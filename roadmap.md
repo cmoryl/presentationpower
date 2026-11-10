@@ -1,6 +1,6 @@
 # Roadmap
 ## Bowl social calendar
-- [ ] Calendar-first landing page with visual campaign selectors, larger artwork in month grids and preserved day navigation; verify interactions.
+- [x] Calendar-first landing page with visual campaign selectors, larger artwork in month grids and preserved day navigation; campaign switching and highlighted day navigation verified.
 - [ ] Refresh scheduled Light action posts from user-edited feed masters: existing feed pictures refreshed and cleaned; resized square/story drafts created, with overlap corrections in progress. New size previews require approval before committing/exporting and updating calendar links. Posts 01/07 still need resizing.
 - [ ] Set 2 balanced spacing (posts 02, 03, 04, 27 × 3 sizes) previewed; awaiting approval, then save, clean exports and refresh.
 - [ ] Website on every Bowl social artwork: all nine post 04 Set 2/3/4 designs approved, saved, cleaned and refreshed. Audit/backfill other existing posts and include on all remaining builds.
