@@ -1,8 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ComponentType } from "react";
 
-// Bowl area pages render without the app shell (they are public), so they
-// carry their own trail back to the Bowl landing page.
+// Bowl area pages without the app shell carry their own trail back to the Bowl
+// landing page; when the page renders the app shell (signed-in), its own trail is
+// used and this one hides itself via :has() so the two never stack.
 const LABELS: Record<string, string> = {
   "brand-kit": "Brand kit",
   designers: "Designer files",
@@ -22,7 +23,7 @@ export function SjbBreadcrumbs() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const parts = pathname.replace(/^\/events\/san-juan-bowl\/?/, "").split("/").filter(Boolean);
   return (
-    <nav aria-label="Breadcrumb" className="mx-auto flex max-w-6xl flex-wrap items-center gap-1 px-6 pt-4 text-sm text-muted-foreground">
+    <nav aria-label="Breadcrumb" className="[&:has(+*_header)]:hidden mx-auto flex max-w-6xl flex-wrap items-center gap-1 px-6 pt-4 text-sm text-muted-foreground">
       <Link to="/events/$eventId" params={{ eventId: "san-juan-bowl" }} className={linkCls}>
         San Juan Bowl
       </Link>
