@@ -130,7 +130,13 @@ function PostRow({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode 
           {SJB_CALENDAR_SIZES.map((s) => {
             const d = sjbCalendarDesign(post.n, mode, s.id);
             return (
-              <div key={s.id} className="flex items-center gap-2 text-sm">
+              <div key={s.id} className="flex flex-col gap-1.5 text-sm">
+                {d?.previewUrl && (
+                  <a href={d.previewUrl} target="_blank" rel="noreferrer" aria-label={`View ${post.title} ${s.label.toLowerCase()} picture`}>
+                    <img src={d.previewUrl} alt={`${post.title}, ${mode} ${s.label.toLowerCase()} post`} className="h-28 w-auto rounded border border-border object-cover" style={{ aspectRatio: `${s.w} / ${s.h}` }} loading="lazy" />
+                  </a>
+                )}
+                <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">{s.label} {s.w}×{s.h}</span>
                 {d ? (
                   <>
@@ -145,6 +151,7 @@ function PostRow({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode 
                   <span className="text-xs text-muted-foreground">—</span>
                 )}
               </div>
+                </div>
             );
           })}
         </div>
