@@ -92,7 +92,6 @@ function DemoPageFrame({
                 <div style={{ fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: "-0.02em", color: look.accent }}>{post.headline[1]}</div>
                 <div style={{ width: px(22), height: px(0.7), backgroundColor: look.accent, marginTop: px(4) }} />
               </div>
-              <div style={{ fontSize: px(2.8), opacity: 0.8 }}>{SJB_DEMO_SITE} · {SJB_DEMO_FACTS[0].value}</div>
             </>
           )}
 
