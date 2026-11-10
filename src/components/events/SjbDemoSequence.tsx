@@ -16,7 +16,7 @@ import {
   exportAssetsZip,
   type AssetCaptureTarget,
 } from "@/lib/asset-export";
-import { SJB_DEMO_BADGE, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarDemo, type SjbDemoPage } from "@/lib/sjb-calendar-demo";
+import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarDemo, type SjbDemoPage } from "@/lib/sjb-calendar-demo";
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
 import type { SjbCalendarMode, SjbCalendarPost } from "@/lib/sjb-social-calendar";
 import type { SjbCalendarFormat } from "@/lib/sjb-calendar-formats";
@@ -100,7 +100,7 @@ function DemoPageFrame({
             <>
               <div style={{ fontSize: px(2.6), letterSpacing: "0.2em", opacity: 0.75 }}>THE DETAILS</div>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: px(4) }}>
-                {SJB_DEMO_FACTS.slice(0).map((f) => (
+                {SJB_DEMO_FACTS.map((f) => (
                   <div key={f.label} style={{ display: "flex", flexDirection: "column", gap: px(0.6), borderBottom: `1px solid ${look.dark ? "rgba(255,255,255,0.18)" : "rgba(13,14,33,0.18)"}`, paddingBottom: px(2.4) }}>
                     <span style={{ fontSize: px(2.2), letterSpacing: "0.18em", opacity: 0.7 }}>{f.label.toUpperCase()}</span>
                     <span style={{ fontSize: px(4.4), fontWeight: 600, lineHeight: 1.2 }}>{f.value}</span>
@@ -132,7 +132,7 @@ function DemoPageFrame({
           padding: `${px(0.9)} ${px(2)}`,
           borderRadius: px(0.6),
           backgroundColor: look.accent,
-          color: look.dark ? look.base : look.base,
+          color: look.badgeInk,
           fontSize: px(2.2),
           fontWeight: 700,
           letterSpacing: "0.14em",

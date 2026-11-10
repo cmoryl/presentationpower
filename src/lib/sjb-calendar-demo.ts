@@ -37,6 +37,8 @@ export interface SjbDemoLook {
   glow: string;
   ink: string;
   accent: string;
+  /** Badge lettering — navy holds AA contrast on both gold and sky. */
+  badgeInk: string;
   /** Dark grounds carry the white-outline badge; light grounds the colour one. */
   dark: boolean;
 }
