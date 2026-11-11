@@ -23,6 +23,8 @@ import '@fontsource/barlow-condensed/700-italic.css';
 import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS, sjbBroadcastMark } from '@/lib/sjb-calendar-style';
 import { SjbFittedCallout } from './SjbFittedCallout';
 import { SJB_SEQUENCE_BACKGROUNDS } from '@/lib/sjb-sequence-backgrounds';
+import ticketeraWhite from '@/assets/sjb-calendar/partners/ticketera-white.png.asset.json';
+import ticketeraColour from '@/assets/sjb-calendar/partners/ticketera-colour.png.asset.json';
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
 import type { SjbCalendarMode, SjbCalendarPost } from "@/lib/sjb-social-calendar";
 import type { SjbCalendarFormat, SjbCalendarFormatSpec } from "@/lib/sjb-calendar-formats";
@@ -131,7 +133,10 @@ function DemoPageFrame({
                 <SjbFittedCallout lines={[SJB_DEMO_SITE]} width={width * 0.86} height={s * 0.14} maxSize={s * 0.14} style={{ color: look.accent }} />
                 <div style={{ fontSize: px(2.8), opacity: 0.8 }}>{SJB_DEMO_FACTS[0].value} · {SJB_DEMO_FACTS[1].value}</div>
               </div>
-              <img src={logo.svg} alt="" style={{ height: px(16), width: "auto", alignSelf: "center", marginBottom: px(6) }} />
+              <div data-bowl-ticket-partners style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: px(6), height: px(16), flexShrink: 0, marginBottom: px(6) }}>
+                <img src={logo.svg} alt="San Juan Bowl" style={{ height: px(16), width: px(16), objectFit: 'contain' }} />
+                <img data-bowl-ticketera src={look.dark ? ticketeraWhite.url : ticketeraColour.url} alt="Ticketera" style={{ width: px(32), height: px(8), objectFit: 'contain' }} />
+              </div>
             </>
           )}
         </div>
