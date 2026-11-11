@@ -116,12 +116,30 @@
     ],
     "next": "14 (calendar refresh pending Canva daily export reset)",
     "saved_pending_refresh": [
-      "14", "15", "16", "17", "18", "19",
-      "20", "21", "22", "23", "24", "25"
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20",
+      "21",
+      "22",
+      "23",
+      "24",
+      "25",
+      "27",
+      "28",
+      "29"
     ],
-    "next_canva": "27",
-    "remaining_canva_posts": ["27", "28", "29"],
+    "next_canva": null,
+    "remaining_canva_posts": [
+      "27",
+      "28",
+      "29"
+    ],
     "refresh_blocker": "Too many daily export requests for user; no calendar pictures replaced in this continuation",
-    "registered_post_26": false
+    "registered_post_26": false,
+    "note": "All 84 Set 3 Canva files saved; posts 14-29 pictures await Canva export-limit reset."
   }
 }
