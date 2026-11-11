@@ -227,7 +227,7 @@ function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarP
         </> : <SjbFittedCallout lines={post.headline} width={copyWidth} height={calloutHeight} maxSize={width * 0.36} italic={style.italic} />}
       </div>
     </div>
-      <div data-bowl-footer style={{ position: 'absolute', top: footerTop, left: width * (spotlight ? 0.07 : 0.05), width: copyWidth, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: unit * 3.7, lineHeight: 1.2, color: look.ink }}>
+      <div data-bowl-footer style={{ position: 'absolute', top: footerTop, left: width * (spotlight ? 0.07 : 0.05), width: copyWidth, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontStyle: 'italic', fontSize: unit * 3.7, lineHeight: 1.2, color: look.ink }}>
         <div>{SJB_DEMO_FACTS[0].value.toUpperCase()} · {SJB_DEMO_FACTS[1].value.toUpperCase()}</div>
         <div style={{ marginTop: unit }}>{SJB_DEMO_SITE}</div>
       </div>
