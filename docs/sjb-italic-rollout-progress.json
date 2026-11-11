@@ -1,0 +1,7 @@
+{
+  "task": "Light-style italic callout on every saved Canva original (Set 2, Set 3, Set 4, Dark)",
+  "method": "format_text font_style italic on headline text; export JPG 100; strip APP1-APP15/COM; new pointer",
+  "saved_and_refreshed": ["DAHaiI04YUs (Dark 27 Feed)", "DAHajorAXmg (Set2 01 Feed)", "DAHajrcD2GU (Set2 01 Square)", "DAHajp4nf6Q (Set2 01 Story)", "DAHai_eitCA (Set2 02 Feed)"],
+  "next": "Set2 02 Square DAHai3nOSIc, then remaining Set2 in registry order, then Set3, Set4, Dark",
+  "open_transactions": []
+}
