@@ -75,9 +75,9 @@ function DemoPageFrame({
   const broadcasterWidth = broadcaster ? Math.min(width * 0.86, height * 0.18 * broadcaster.ratio) : 0;
 
   // Saved artwork is the entire frame, not a plate under demo labels or logos.
-  if (page.role === "cover" && page.photoUrl) {
+  if (page.role === "headline" && page.photoUrl) {
     return (
-      <div ref={frameRef} data-kit-asset-frame data-bowl-look={mode} data-bowl-role="cover" data-bowl-artwork="canva" style={{ position: "relative", width, height, overflow: "hidden", backgroundColor: look.base }}>
+      <div ref={frameRef} data-kit-asset-frame data-bowl-look={mode} data-bowl-role="headline" data-bowl-artwork="canva" style={{ position: "relative", width, height, overflow: "hidden", backgroundColor: look.base }}>
         <img src={page.photoUrl} alt={`${post.title}, saved Canva artwork`} style={{ display: "block", width: "100%", height: "100%", objectFit: "contain" }} />
       </div>
     );
@@ -112,12 +112,14 @@ function DemoPageFrame({
         }}
       />
 
-      {page.role === "cover" && page.photoUrl ? (
+      {page.role === "headline" && page.photoUrl ? (
         <img src={page.photoUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }} />
       ) : (
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", padding: pad, boxSizing: "border-box" }}>
           {page.role === "cover" && (
-            <CampaignCover post={post} mode={mode} width={width} height={height} logo={logo.svg} />
+            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <img data-bowl-logo src={logo.svg} alt="San Juan Bowl" style={{ width: Math.min(width, height) * 0.62, height: Math.min(width, height) * 0.62, objectFit: "contain" }} />
+            </div>
           )}
 
           {page.role === "headline" && (

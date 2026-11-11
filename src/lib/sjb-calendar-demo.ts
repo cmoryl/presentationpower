@@ -132,7 +132,7 @@ export function sjbCalendarCover(post: string, mode: SjbCalendarMode, format: Sj
 
 export const SJB_DEMO_PAGE_ROLES: { role: SjbDemoRole; label: string }[] = [
   { role: "cover", label: "Cover" },
-  { role: "headline", label: "Headline" },
+  { role: "headline", label: "Headline + subheadline" },
   { role: "details", label: "The details" },
   { role: "tickets", label: "Tickets" },
 ];
@@ -156,8 +156,9 @@ export function sjbCalendarDemo(
     pages: SJB_DEMO_PAGE_ROLES.map(({ role, label }) => ({
       role,
       label,
-      photoUrl: role === "cover" ? photoUrl : null,
-      photoKind: role === "cover" && photoUrl ? "approved" : "none",
+      // Page order rule: logo-only cover, then the saved headline ad (headline + subheadline).
+      photoUrl: role === "headline" ? photoUrl : null,
+      photoKind: role === "headline" && photoUrl ? "approved" : "none",
     })),
   };
 }
