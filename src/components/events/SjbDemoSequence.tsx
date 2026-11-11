@@ -5,21 +5,28 @@
 // LinkedIn carousels) or a zip of pictures (Instagram carousel / Story
 // sequence) through the shared asset exporter. Every page carries the DEMO
 // badge, so a download can never be mistaken for approved artwork.
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/design-system/element";
 import {
   assetFileSlug,
+  captureAssetCanvas,
   downloadAssetBlob,
   exportAssetImage,
   exportAssetsPdf,
   exportAssetsZip,
   type AssetCaptureTarget,
 } from "@/lib/asset-export";
-import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarDemo, type SjbDemoPage, type SjbDemoLook } from "@/lib/sjb-calendar-demo";
+import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarDemo, type SjbCalendarDemo, type SjbDemoPage, type SjbDemoLook } from "@/lib/sjb-calendar-demo";
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
 import type { SjbCalendarMode, SjbCalendarPost } from "@/lib/sjb-social-calendar";
-import type { SjbCalendarFormat } from "@/lib/sjb-calendar-formats";
+import type { SjbCalendarFormat, SjbCalendarFormatSpec } from "@/lib/sjb-calendar-formats";
+import {
+  renderSequenceVideo,
+  sjbSequenceMotion,
+  transitionFrame,
+  type SjbSequenceMotion,
+} from "@/lib/sjb-sequence-motion";
 
 const FONT = '"Geist Variable", system-ui, sans-serif';
 
@@ -191,14 +198,153 @@ function ScaledPage(props: {
   width: number;
   height: number;
   displayHeight: number;
+  /** Drop the own frame so a parent stage can supply border and clipping. */
+  plain?: boolean;
   frameRef: (node: HTMLDivElement | null) => void;
 }) {
-  const { displayHeight, width, height, ...rest } = props;
+  const { displayHeight, width, height, plain, ...rest } = props;
   const k = displayHeight / height;
   return (
-    <div style={{ position: "relative", width: width * k, height: displayHeight, overflow: "hidden", borderRadius: 4, border: "1px solid var(--color-border)" }}>
+    <div style={{ position: "relative", width: width * k, height: displayHeight, overflow: "hidden", borderRadius: plain ? 0 : 4, border: plain ? "none" : "1px solid var(--color-border)" }}>
       <div style={{ position: "absolute", left: 0, top: 0, transform: `scale(${k})`, transformOrigin: "top left" }}>
         <DemoPageFrame page={rest.page} index={rest.index} total={rest.total} post={rest.post} mode={rest.mode} width={width} height={height} frameRef={rest.frameRef} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The preview's transition, derived from the very numbers the MP4 recorder
+ * paints with, so what you watch in the calendar is what the file will do.
+ */
+function stageKeyframes(motion: SjbSequenceMotion) {
+  const a = transitionFrame(motion.style, 0);
+  const b = transitionFrame(motion.style, 1);
+  const at = (x: number, y: number) => `translate(${x * 100}%, ${y * 100}%)`;
+  return {
+    in: [
+      { transform: at(a.toX, a.toY), opacity: a.toAlpha },
+      { transform: at(b.toX, b.toY), opacity: b.toAlpha },
+    ],
+    out: [
+      { transform: at(a.fromX, a.fromY), opacity: a.fromAlpha },
+      { transform: at(b.fromX, b.fromY), opacity: b.fromAlpha },
+    ],
+  };
+}
+
+/** A hand-off in flight: which page is leaving, which has arrived. */
+interface SjbHandoff {
+  from: number;
+  to: number;
+}
+
+function prefersReducedMotion(): boolean {
+  return typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+}
+
+/**
+ * The big page view. Pages swap with the format's own transition: a carousel
+ * pushes sideways, a Story fades up, a LinkedIn carousel rises into place.
+ * Nothing animates for anyone who has asked the system to reduce motion.
+ */
+function SequenceStage({
+  post,
+  mode,
+  demo,
+  spec,
+  active,
+  motion,
+  displayHeight = 380,
+}: {
+  post: SjbCalendarPost;
+  mode: SjbCalendarMode;
+  demo: SjbCalendarDemo;
+  spec: SjbCalendarFormatSpec;
+  active: number;
+  motion: SjbSequenceMotion;
+  displayHeight?: number;
+}) {
+  const inRef = useRef<HTMLDivElement>(null);
+  const outRef = useRef<HTMLDivElement>(null);
+  const lastIndex = useRef<number | null>(null);
+  const [handoff, setHandoff] = useState<SjbHandoff | null>(null);
+
+  useEffect(() => {
+    const from = lastIndex.current;
+    lastIndex.current = active;
+    if (from === null || from === active || prefersReducedMotion()) return;
+    setHandoff({ from, to: active });
+  }, [active]);
+
+  useEffect(() => {
+    if (!handoff) return;
+    const kf = stageKeyframes(motion);
+    const opts: KeyframeAnimationOptions = { duration: motion.moveMs, easing: motion.easing, fill: "both" };
+    const runs: Animation[] = [];
+    if (inRef.current) runs.push(inRef.current.animate(kf.in, opts));
+    if (outRef.current) runs.push(outRef.current.animate(kf.out, opts));
+    const clear = () => setHandoff(null);
+    const last = runs[runs.length - 1];
+    if (last) {
+      last.onfinish = clear;
+      last.oncancel = clear;
+    } else {
+      clear();
+    }
+    return () => {
+      for (const r of runs) {
+        try {
+          r.cancel();
+        } catch {
+          /* already over */
+        }
+      }
+    };
+  }, [handoff, motion]);
+
+  const k = displayHeight / spec.height;
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: spec.width * k,
+        height: displayHeight,
+        overflow: "hidden",
+        borderRadius: 4,
+        border: "1px solid var(--color-border)",
+        backgroundColor: SJB_DEMO_LOOKS[mode].base,
+      }}
+    >
+      {handoff && (
+        <div ref={outRef} style={{ position: "absolute", inset: 0 }}>
+          <ScaledPage
+            page={demo.pages[handoff.from]}
+            index={handoff.from}
+            total={demo.pages.length}
+            post={post}
+            mode={mode}
+            width={spec.width}
+            height={spec.height}
+            displayHeight={displayHeight}
+            plain
+            frameRef={() => {}}
+          />
+        </div>
+      )}
+      <div ref={inRef} style={{ position: "absolute", inset: 0 }}>
+        <ScaledPage
+          page={demo.pages[active]}
+          index={active}
+          total={demo.pages.length}
+          post={post}
+          mode={mode}
+          width={spec.width}
+          height={spec.height}
+          displayHeight={displayHeight}
+          plain
+          frameRef={() => {}}
+        />
       </div>
     </div>
   );
