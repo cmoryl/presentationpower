@@ -1,0 +1,3368 @@
+{
+  "scope": "All registered calendar single images; demos checked separately in browser",
+  "total": 420,
+  "cleaned_exports": 150,
+  "missing_exports": 270,
+  "versions": [
+    {
+      "post": "01",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaiGQdxVA",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaiGbeRGk",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaiG407DY",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaiD9--pY",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiJz7NmQ",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaiNCeUWE",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajorAXmg",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajrcD2GU",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajp4nf6Q",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajiCdMLs",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajhQXGS0",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajn7djic",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajl-BGig",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajr3ydI4",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "01",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajm8xwuA",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaiBIldNY",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaiEXenLg",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaiIozlPo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaiMJBh9g",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiDDShZs",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaiP2LCmM",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHais2R8co",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHailawSAs",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHaisNRcgo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHainfGaUM",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHaiiM1NBQ",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHairX-TNc",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHai_eitCA",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHai3nOSIc",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "02",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHai7lhwMk",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaiGQJHGE",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaiLdB01s",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaiOLiflI",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaiDpGAvk",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiMAu5xg",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaiJVO5JA",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHaikZ8IT8",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHaipP_nnI",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHaijdOAw4",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHaiq3AMXE",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHairDgr8U",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHaimLrz1c",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHaiy-8QoI",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHai6X7who",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "03",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHai9nhLdA",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHajoCytZU",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaiJbODIo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHajiytABc",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHajnld4P8",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiB8HX6U",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHajnUr3cQ",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHai4nSCtc",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHaixyeXHc",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHai6-QuJc",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHai6cDjm0",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHai-86c4M",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHai8-IvYU",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHai-4B8c4",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHai8069Kw",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "04",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHaizbjnds",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaiNNnSWo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaiL73Vl8",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaiOEyuqI",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaiG21XYo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiO4wVNo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaiGv9z_Q",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajUiIw2Q",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajVsOsEo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajQkV5VE",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajbejgIA",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajcp9yaU",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajXFSS0A",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajcQp6ss",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajTKuMX0",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "05",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajbXl9HE",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaiNEWqzw",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaiLhPjGg",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaiIm1Vq4",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaiMLESgI",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiMaWfi8",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaiOHrw78",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajcucDqk",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajZZ_Mqk",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajUM3gew",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajbFLb1Q",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajXHipPI",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajVs2fAY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajU6sr6Q",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajb3FU80",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "06",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajbzYi_s",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaipuXmyk",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaiuL53UQ",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHairfOIWo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiis6Oes",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaiuIZc90",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaivcofGc",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajQIheyY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajTqd5Q0",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajUCtkqo",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajXSEogs",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajYKQ3Qs",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHaje2MuRY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajXJ2Mvc",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajZZVMLA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "07",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajbB-0Y8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaiD3thaA",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj9iIMEU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHajxXKJmg",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiCTqaP4",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaj6QsuSo",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHajy6OfzA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajVwk5do",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajapmW-s",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajXJSMBw",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajamXzuU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajV6B4RM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajfZU5kU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajaEyyZI",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajUvHuB4",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "08",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajcUiY5M",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaiB6Uh-U",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaj997_Q4",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj41NecM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiIwqC6s",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHajw93TEU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaj_wZiHs",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajSs129g",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajdjVFvY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajRDGV24",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajf1k624",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajWrjgaQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajYKDyhk",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajY9oz8M",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajU5VTZU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "09",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajSOi6ew",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaieaahhI",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaiRdA1rU",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaieRPSAo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaiV4gDaM",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiT6G6yM",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaifdIkc4",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajbwLans",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajfIz-W8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajQNJCoc",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajYpfEFg",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajdOBpi8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajbJp2c8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajSM5cjM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajZptH3g",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "10",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajbB4fOU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaihTXt3w",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaikKLA9U",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaim4VyzY",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaioSUYMI",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaipLj51w",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaivQ3NFU",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajQXU1io",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajaj1vhc",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajbS9R7Q",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajWwvbpA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajZ0cjKA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajRKNENA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajWCzB1s",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajXGjG_w",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "11",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajQO1QD8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaieDLauU",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaiQt-8A0",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaiRpelVY",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaiUGeKFs",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiWnWtOM",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaiSW92MI",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajYMwyNQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajTMvzso",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajREkC8g",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajStuUH0",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajehX34o",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajYASqso",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajY390Sc",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajfqMQR0",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "12",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajUjePbk",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHailyGsNY",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHainkgPsU",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaisg4cIE",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHairba2tY",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaisuV2d0",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaiuflo7s",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajXAkZ6c",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajby3OWo",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajWb9WpE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajW57ef8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajT0Bx00",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajdW0Ikg",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajUVmGuA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajTRdE7c",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "13",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajd1E_34",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaiZp4U1c",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaiQrBGW4",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaiW9-sq0",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaicSCoGs",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaibsePz4",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaiUeCwww",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajT-eGxs",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajeR1f1E",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajcUURIA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajRsy1eY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajeluz64",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajSb7j1g",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajSllUk4",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajQcpxug",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "14",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajWsl0EM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaigCxQAQ",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaiupKOUk",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaimm_AQ8",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHailHFTxM",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaiqDommM",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaij16698",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajahHK80",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajbxU5ho",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajUItvXM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajTqGcSo",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajUTPKQU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajQhcjYY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajSid4kI",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHaja1fSm4",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "15",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajalZ5I0",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaiI04YUs",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaj7r59K4",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj3Zi7Pk",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiOk55vE",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaj4W683s",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHajxZAXGE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHaiktOY8o",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHaioTK4Mg",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHaip2dmXU",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHaihWqANo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHaiqX-IuA",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHaiha6rsA",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHai9LjMKQ",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHai0mKrKo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "27",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHai6z-QLU",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaiFyK7qw",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaj8nqGSs",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj-WJ0jY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaiAdEHsU",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaj0a-9BI",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHajw7YRWc",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajrx4H2A",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajpeOJ8M",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajnoPPcc",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajuZw_lw",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajnpvslQ",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajjYriro",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajjgAsqA",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajrV5fZo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "29",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajgifcAo",
+      "cleaned_export": true,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajZGvijo",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHaje5TGps",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajcpcxjw",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajXgqHxE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajcIPkd8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajc0advQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajdBgb1g",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajehrJNs",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajUC_9yA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaj1vVEy0",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHajxzrHVI",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj1ukBDU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaj4jYUNg",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaj9Na050",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "16",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaj9515Ow",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHaja0JmjY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajcnn0Ok",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajSGIvZc",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajZiZWFU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajZhO7Us",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajQLO4AU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajTAhJ6U",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajd3r1EQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajZS3TvE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaj0wvrQY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaj8ErCNA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj1Or5cE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaj1A6RHI",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaj3k0hmU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "17",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaj4tvdsw",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajbQZk6U",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajT22lmA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajchzjKw",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajUxHnMU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajRF4yRg",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajQ5hDGM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajfo2v54",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajUMZJOE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajbgj_LM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaj6AkJ5I",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaj9LrRyI",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj8zrY_A",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHajyIaY54",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaj1qjeUI",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "18",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHajwUykFA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajXEyG7k",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajVzP9YM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajbSO284",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajUZ16FE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajTrdeCY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajSwqu9c",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajd07CwQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajbjq94Q",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajdHrl74",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaj8h4-AY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHajx7PdD0",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj7cNE7M",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHajxOMsVU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaj9iToSg",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "19",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHajxFnQHA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajTF-4qM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHaje1J_Y8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajaFIeHY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajcV5UTA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajTImWjI",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajWzrW3o",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajdv4SiM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajUohVLw",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajbNkN-c",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHajyFMy5o",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaj9I6dHo",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj8l0H_Q",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHajzG1SHE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHajyLHih0",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "20",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaj-8CfQM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajfYZ45s",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajcgPF60",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajZv5Moo",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajeB-ivQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajdzhGjI",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajX5HZEY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajSz2e10",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajfrnWWA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajUaJaz8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaj1hoxFE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaj1-_9CA",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj7fwF14",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHajzFMGhU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaj0VZXws",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "21",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaj2Bqkv4",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajXTK5IQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajdpoVI8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajaLK4_I",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajampqzE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHaje9UJAQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajRBQO5k",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajeJwoO4",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajU5zWj0",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajV5nYQQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaj-D_KF0",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaj6PGJoE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj6uG1bQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaj-6FGvw",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaj7fOyW8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "22",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaj-jYO00",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajZqOkbc",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajQYoZgs",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajS2C1c0",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajV1uBDQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajf3o_WQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajQ8xO1c",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajfJQNc4",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajR3Hf3A",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajYWR9sE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaj_VAYoU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaj4IWgCw",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj1M2g48",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaj07k0l0",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaj_LkY-0",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "23",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaj286k0Y",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajUkMMoQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajYrJKFc",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajRo0-Ws",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajTKBrrw",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajWmCId8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajfBv_Wg",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajZvajLM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajU7mi0o",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajY6HqBo",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaj97Atkw",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHaj2m4RGU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj0SzrVE",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaj9A8fiY",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHajyddp58",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "24",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaj82g6Wk",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajcA98bg",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajTFVMAI",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajU4mWq8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajWQuDVo",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajWW8cjw",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajUfnBio",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajaBdnlg",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajYnitbc",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajXnI0ts",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaj9W561E",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHajzb-rFc",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj82D5RQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaj0EBhno",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHajyrHbug",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "25",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaj9EozUk",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "set2",
+      "size": "1350",
+      "canva": "DAHajXIAuXQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "set2",
+      "size": "1080",
+      "canva": "DAHajVcxO0U",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "set2",
+      "size": "1920",
+      "canva": "DAHajQ20e7E",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "set3",
+      "size": "1350",
+      "canva": "DAHajcBgkDM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "set3",
+      "size": "1080",
+      "canva": "DAHajYCcEXU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "set3",
+      "size": "1920",
+      "canva": "DAHajc-daLQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "set4",
+      "size": "1350",
+      "canva": "DAHajXDbhb8",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "set4",
+      "size": "1080",
+      "canva": "DAHajQZ11KU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "set4",
+      "size": "1920",
+      "canva": "DAHajcltAMQ",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "dark",
+      "size": "1350",
+      "canva": "DAHaj1WpRLc",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "dark",
+      "size": "1080",
+      "canva": "DAHajxrYIlo",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "dark",
+      "size": "1920",
+      "canva": "DAHaj-LZeRk",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "light",
+      "size": "1350",
+      "canva": "DAHaj5cbhTU",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "light",
+      "size": "1080",
+      "canva": "DAHaj3IqGMM",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    },
+    {
+      "post": "28",
+      "style": "light",
+      "size": "1920",
+      "canva": "DAHaj_H8Zhc",
+      "cleaned_export": false,
+      "visual_canva_audit": "unverified"
+    }
+  ]
+}
