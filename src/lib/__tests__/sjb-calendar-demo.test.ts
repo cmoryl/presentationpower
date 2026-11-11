@@ -61,16 +61,17 @@ describe("Bowl calendar demo sequences", () => {
     }
   });
 
-  it("uses the approved single image as the cover only where a cleaned export exists", () => {
+  it("uses the approved single image on the headline page (page 2) only where a cleaned export exists", () => {
     const post = SJB_CALENDAR_POSTS.find((p) => p.n === "04")!;
-    const built = sjbCalendarDemo(post, "dark", "linkedin-portrait")!;
-    expect(built.pages[0].photoKind).toBe("approved");
-    expect(built.pages[0].photoUrl).toBeTruthy();
+    const built = sjbCalendarDemo(post, "light", "linkedin-portrait")!;
+    expect(built.pages[0].photoKind).toBe("none");
+    expect(built.pages[1].photoKind).toBe("approved");
+    expect(built.pages[1].photoUrl).toBeTruthy();
 
     // A post with no registered export must draw its cover, never borrow one.
-    const pending = sjbCalendarDemo({ ...post, n: "99" }, "dark", "linkedin-portrait")!;
-    expect(pending.pages[0].photoKind).toBe("none");
-    expect(pending.pages[0].photoUrl).toBeNull();
+    const pending = sjbCalendarDemo({ ...post, n: "99" }, "light", "linkedin-portrait")!;
+    expect(pending.pages[1].photoKind).toBe("none");
+    expect(pending.pages[1].photoUrl).toBeNull();
 
     // The borrow rule holds for every post, look and multi-page format: the
     // cover is approved artwork exactly when that format's source size has a
@@ -80,8 +81,9 @@ describe("Bowl calendar demo sequences", () => {
         for (const format of MULTI) {
           const demo = sjbCalendarDemo(p, mode.id, format)!;
           const exportUrl = sjbCalendarDesign(p.n, mode.id, SJB_DEMO_SOURCE_SIZE[format])?.previewUrl ?? null;
-          expect(demo.pages[0].photoKind, `${p.n}/${mode.id}/${format}`).toBe(exportUrl ? "approved" : "none");
-          expect(demo.pages[0].photoUrl, `${p.n}/${mode.id}/${format}`).toBe(exportUrl);
+          expect(demo.pages[0].photoKind).toBe("none");
+          expect(demo.pages[1].photoKind, `${p.n}/${mode.id}/${format}`).toBe(exportUrl ? "approved" : "none");
+          expect(demo.pages[1].photoUrl, `${p.n}/${mode.id}/${format}`).toBe(exportUrl);
         }
       }
     }
