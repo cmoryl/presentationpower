@@ -1,6 +1,6 @@
 {
-  "status": "partial",
-  "completed": 56,
+  "status": "complete",
+  "completed": 80,
   "total": 80,
   "receipts": [
     {
@@ -562,130 +562,249 @@
       "pixels_unchanged": true,
       "metadata_cleaned": true,
       "sha256": "b8dffbe4a6b827da534338dbf20fa382d3f5347b48f50adeaa725ea54e99706c"
+    },
+    {
+      "id": "DAHajfYZ45s",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "2b6458838fa19868350fad71015b48862d95fb301f66c958ccace76eed3b9989"
+    },
+    {
+      "id": "DAHajcgPF60",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "638584a5b521d796548d3c740ede3b5eb94789a89bcc3bd67b180199a0f81ab5"
+    },
+    {
+      "id": "DAHajTF-4qM",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "03ce310a342c8f4884458882e91061c8c2300e1ba16f5306a81dbf438f359a21"
+    },
+    {
+      "id": "DAHajaFIeHY",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "06054fb93c5473b5c23689582225906dde6ec4151ca7b79e545b6a9150d30d66"
+    },
+    {
+      "id": "DAHajZv5Moo",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "999f0cc1a5f1fee8318e1c0b006d9014a9dba31ef60d18c6026535c09f37f87a"
+    },
+    {
+      "id": "DAHaje1J_Y8",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "5dbd6c9293ff4a03428e505ab59f510196f01c6a05b0e8ca30ca9b1daccc66f3"
+    },
+    {
+      "id": "DAHajdpoVI8",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "b0eb6199bc98886c0066033c1f7e077dba8e24283a82ae82cf07a562865432a6"
+    },
+    {
+      "id": "DAHajXTK5IQ",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "9a795776862e1040c1fb62518d752605fa04580079805a460db8fb6adff63d5e"
+    },
+    {
+      "id": "DAHajS2C1c0",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "6c9ce93e9bc4d93c4b2a5ae6809403aaf95646b4b3f8da24a9e843e9f8c6a2b3"
+    },
+    {
+      "id": "DAHajQYoZgs",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "7b61a405504d60c1d3c1bf2f2d42b1adc8fab5109b73edb89641f27b8b77c936"
+    },
+    {
+      "id": "DAHajZqOkbc",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "471e0a556df23f1393cab32b601033c2cdf1bc1e2634212b520311e67e8334ae"
+    },
+    {
+      "id": "DAHajaLK4_I",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "05e4f22f108ed658cead3cb46cd865a66f67a0df48c3fd057128d08e64623593"
+    },
+    {
+      "id": "DAHajTFVMAI",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "2a486a0d6b191b43d76c525009b792eb8c87571adc0578ac5516186f5d665ea2"
+    },
+    {
+      "id": "DAHajU4mWq8",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "a9354219ccb53d872df64eea2f82fd31cfbd1d22d1bd84e8700ad05b343a02b2"
+    },
+    {
+      "id": "DAHajRo0-Ws",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "9e66cb89f5b6e921f8e067107f16a0cbcda91a57be889b39706e43e38368736c"
+    },
+    {
+      "id": "DAHajYrJKFc",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "6cba68a57b58da2bccdfb0fef718a7ca7b094af1ffc5dd245249893cc0dffc2d"
+    },
+    {
+      "id": "DAHajcA98bg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "531bfa64c60552d67c887d9de00c0e90320028af69bfddd97bb47871c6ac246a"
+    },
+    {
+      "id": "DAHajUkMMoQ",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "ff444ba077ec6e0caf006b1c91f0c764ddbbf9a3220c2371a081cc5825825ab1"
+    },
+    {
+      "id": "DAHajXIAuXQ",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "e9fc517d6c425ba99d10ffcc66f10d88d52ee77d1b0669f8efeca3683bc2302e"
+    },
+    {
+      "id": "DAHajVcxO0U",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "14891a5073e0fd331f613cb3fdf4ffa50cb8d787e154e3b034f3ac2c71a071b4"
+    },
+    {
+      "id": "DAHajQ20e7E",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "0b78e14265f578792495b664a8ea7458b5d7813ce3f214136b9fe41ebed0e9ab"
+    },
+    {
+      "id": "DAHai6z-QLU",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "5940943d1b00240d0dceeced36cedf80a306e82765e29c23144d28d408bed042"
+    },
+    {
+      "id": "DAHai9LjMKQ",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "e4c83617e38410b853b7821f6c74c8d50f5dfbbb842e5edafbc7d6f09877e07c"
+    },
+    {
+      "id": "DAHai0mKrKo",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "b5d439991308981f070252f9a03727e0c8af565151e23710c29c23772a3ff75e"
     }
   ],
-  "remaining": [
-    {
-      "post": "27",
-      "size": "1350",
-      "id": "DAHai9LjMKQ"
-    },
-    {
-      "post": "27",
-      "size": "1080",
-      "id": "DAHai0mKrKo"
-    },
-    {
-      "post": "27",
-      "size": "1920",
-      "id": "DAHai6z-QLU"
-    },
-    {
-      "post": "20",
-      "size": "1350",
-      "id": "DAHajTF-4qM"
-    },
-    {
-      "post": "20",
-      "size": "1080",
-      "id": "DAHaje1J_Y8"
-    },
-    {
-      "post": "20",
-      "size": "1920",
-      "id": "DAHajaFIeHY"
-    },
-    {
-      "post": "21",
-      "size": "1350",
-      "id": "DAHajfYZ45s"
-    },
-    {
-      "post": "21",
-      "size": "1080",
-      "id": "DAHajcgPF60"
-    },
-    {
-      "post": "21",
-      "size": "1920",
-      "id": "DAHajZv5Moo"
-    },
-    {
-      "post": "22",
-      "size": "1350",
-      "id": "DAHajXTK5IQ"
-    },
-    {
-      "post": "22",
-      "size": "1080",
-      "id": "DAHajdpoVI8"
-    },
-    {
-      "post": "22",
-      "size": "1920",
-      "id": "DAHajaLK4_I"
-    },
-    {
-      "post": "23",
-      "size": "1350",
-      "id": "DAHajZqOkbc"
-    },
-    {
-      "post": "23",
-      "size": "1080",
-      "id": "DAHajQYoZgs"
-    },
-    {
-      "post": "23",
-      "size": "1920",
-      "id": "DAHajS2C1c0"
-    },
-    {
-      "post": "24",
-      "size": "1350",
-      "id": "DAHajUkMMoQ"
-    },
-    {
-      "post": "24",
-      "size": "1080",
-      "id": "DAHajYrJKFc"
-    },
-    {
-      "post": "24",
-      "size": "1920",
-      "id": "DAHajRo0-Ws"
-    },
-    {
-      "post": "25",
-      "size": "1350",
-      "id": "DAHajcA98bg"
-    },
-    {
-      "post": "25",
-      "size": "1080",
-      "id": "DAHajTFVMAI"
-    },
-    {
-      "post": "25",
-      "size": "1920",
-      "id": "DAHajU4mWq8"
-    },
-    {
-      "post": "28",
-      "size": "1350",
-      "id": "DAHajXIAuXQ"
-    },
-    {
-      "post": "28",
-      "size": "1080",
-      "id": "DAHajVcxO0U"
-    },
-    {
-      "post": "28",
-      "size": "1920",
-      "id": "DAHajQ20e7E"
-    }
-  ],
-  "verification": "Pixel-preserving metadata cleanup and native dimensions verified for all 56 refreshed exports. Live calendar verification pending.",
+  "remaining": [],
+  "verification": "All 80 corrected exports have native dimensions and pixel-preserving metadata cleanup verified. Calendar navigation timed out; not verified live.",
   "open_transactions": []
 }
