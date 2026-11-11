@@ -1,5 +1,6 @@
 # Roadmap
 ## Bowl social calendar
+- [x] Screenshot font mismatch: replaced all 63 missing Set 4 single pictures (30-day countdown onward) with cleaned existing Canva originals, preserving exact headline font and pixels in Feed/Square/Story and saved-cover downloads. All 84 Set 4 singles now have originals. Drawn companion pages still use fallback lettering.
 - [ ] Comprehensive cross-style visual audit: complete registry/export-path inspection recorded in docs/sjb-social-audit-2026-11-11.json; approved Set 2 spacing rollout complete. Remaining saved artwork and missing exports still require individual visual review, typography/alignment corrections and full calendar/download checks. Calendar navigation currently times out.
 - [x] Replace demo covers automatically wherever cleaned Canva artwork exists, shared by month calendar and sequence PDF/ZIP/video frames; individual cover downloads retain original bytes. Missing covers and unfinished companion pages remain demos.
 - [x] Current Set 2 rollout: all remaining 80 layouts saved, including the final 60 in this continuation; cleaned full-size calendar pictures published with pixel-preserving metadata cleanup and native dimensions verified. No open transactions. Receipts: docs/sjb-set2-rollout-progress.json. Calendar navigation timed out; live viewing remains unverified. Feed/Square/Story previews prepared.
