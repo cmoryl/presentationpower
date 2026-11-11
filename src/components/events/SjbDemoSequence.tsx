@@ -71,6 +71,8 @@ function DemoPageFrame({
   const s = Math.min(width, height);
   const px = (n: number) => `${(s * n) / 100}px`;
   const pad = px(7);
+  // Reserve a separate broadcaster band in every carousel/Story frame.
+  const broadcasterWidth = broadcaster ? Math.min(width * 0.86, height * 0.18 * broadcaster.ratio) : 0;
 
   // Saved artwork is the entire frame, not a plate under demo labels or logos.
   if (page.role === "cover" && page.photoUrl) {
@@ -124,7 +126,7 @@ function DemoPageFrame({
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: px(2) }}>
                 {broadcaster ? <>
                   <SjbFittedCallout lines={[broadcaster.label]} width={width * 0.86} height={height * 0.28} maxSize={s * 0.24} />
-                  <img data-bowl-broadcaster src={broadcaster.url} alt={broadcaster.alt} style={{ width: '100%', height: width * 0.86 / broadcaster.ratio, objectFit: 'contain', marginTop: px(4) }} />
+                  <img data-bowl-broadcaster src={broadcaster.url} alt={broadcaster.alt} style={{ width: broadcasterWidth, height: broadcasterWidth / broadcaster.ratio, objectFit: 'contain', alignSelf: 'center', flexShrink: 0, marginTop: px(4), marginBottom: px(4) }} />
                 </> : <>
                   <SjbFittedCallout lines={post.headline} width={width * 0.86} height={height * 0.65} maxSize={s * 0.36} italic={style.italic} />
                 </>}
