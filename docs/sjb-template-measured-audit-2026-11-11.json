@@ -11,7 +11,8 @@
     "141 native originals missing; exact source typography not certified.",
     "Drawn templates still use Barlow instead of licensed Heading Now.",
     "Live calendar, PDF/ZIP/video and Illustrator refresh unverified.",
-    "Checks do not certify all content collisions, contrast or professional composition."
+    "Checks do not certify all content collisions, contrast or professional composition.",
+    "Loop attempted nonexistent post 26 and omitted actual post 29; 60 post-29 frames unmeasured, not certified."
   ],
   "frames": [
     {
@@ -32699,5 +32700,9 @@
       "height": 1920,
       "role": "tickets"
     }
-  ]
+  ],
+  "unmeasured_actual_posts": [
+    "29"
+  ],
+  "blank_frames_reason": "Nonexistent post 26, not an application rendering failure"
 }
