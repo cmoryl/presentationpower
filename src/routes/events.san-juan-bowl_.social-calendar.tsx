@@ -9,6 +9,7 @@ import { SjbProjections } from "@/components/events/SjbProjections";
 import { SjbCalendarLookCards } from "@/components/events/SjbCalendarLookCards";
 import { SjbDemoChip, SjbDemoSequence } from "@/components/events/SjbDemoSequence";
 import { sjbCalendarCover } from "@/lib/sjb-calendar-demo";
+import { CalendarDays, List as ListIcon } from "lucide-react";
 import { SJB_CALENDAR_FORMATS, sjbCalendarSequence, type SjbCalendarFormat } from "@/lib/sjb-calendar-formats";
 import {
   SJB_CALENDAR_POSTS,
@@ -50,7 +51,7 @@ const PROJECTION_LOOK: Record<SjbCalendarMode, "dark" | "blue" | "night" | null>
 function CalendarPage() {
   const [mode, setMode] = useState<SjbCalendarMode>("light");
   const [view, setView] = useState<"list" | "calendar">("calendar");
-  const [format, setFormat] = useState<SjbCalendarFormat>("single");
+  const format: SjbCalendarFormat = "single";
   const [flash, setFlash] = useState<{ itemId: string; dayId: string } | null>(null);
 
   // Arriving from a month-grid cell: that day's area stays framed until the
@@ -89,15 +90,24 @@ function CalendarPage() {
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl social calendar</h1>
       <p className="mt-2 text-sm text-muted-foreground">November – December 2026</p>
       <SjbCalendarLookCards mode={mode} onChange={setMode} />
-      <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Social format">
-        {SJB_CALENDAR_FORMATS.map((f) => <Button key={f.id} size="sm" variant={format === f.id ? "default" : "outline"} aria-pressed={format === f.id} onClick={() => setFormat(f.id)}>{f.label}</Button>)}
-      </div>
-      <div className="mt-6 flex flex-wrap items-center gap-2" role="group" aria-label="View">
-        {(["list", "calendar"] as const).map((v) => (
-          <Button key={v} size="sm" variant={view === v ? "default" : "outline"} aria-pressed={view === v} onClick={() => setView(v)}>
-            {v === "list" ? "Day-by-day list" : "Calendar"}
-          </Button>
-        ))}
+      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:max-w-3xl" role="group" aria-label="View">
+        {([
+          { v: "calendar", title: "Calendar", sub: "Month grid with every post on its day", Icon: CalendarDays },
+          { v: "list", title: "Day-by-day list", sub: "Every day's single posts, carousels and stories", Icon: ListIcon },
+        ] as const).map(({ v, title, sub, Icon }) => {
+          const on = view === v;
+          return (
+            <button key={v} type="button" aria-pressed={on} onClick={() => setView(v)}
+              className={`group flex items-center gap-4 rounded-lg border-2 p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:hover:-translate-y-0.5 ${on ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card text-foreground hover:border-primary/60 hover:shadow-sm"}`}>
+              <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-md ${on ? "bg-primary-foreground/15" : "bg-muted text-primary"}`}><Icon className="h-6 w-6" aria-hidden /></span>
+              <span className="min-w-0">
+                <span className="block text-base font-semibold">{title}</span>
+                <span className={`block text-sm ${on ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{sub}</span>
+              </span>
+              {on && <span className="ml-auto rounded bg-primary-foreground/15 px-2 py-0.5 text-xs font-medium">Showing</span>}
+            </button>
+          );
+        })}
       </div>
 
       {view === "calendar" ? (
@@ -137,7 +147,7 @@ function PostRow({ post, mode, format }: { post: SjbCalendarPost; mode: SjbCalen
       <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{post.brief}</p>
       {post.waitingOn && <p className="mt-1 text-sm text-amber-800">Waiting on: {post.waitingOn}</p>}
 
-      {format !== "single" ? <SequenceArtwork post={post} mode={mode} format={format} /> : anyBuilt ? (
+      {anyBuilt ? (
         <ul className="mt-4 flex flex-wrap items-end gap-6">
           {sizes.map(({ s, d }) => (
             <li key={s.id} className="flex flex-col gap-2">
@@ -167,6 +177,8 @@ function PostRow({ post, mode, format }: { post: SjbCalendarPost; mode: SjbCalen
         <p className="mt-4 rounded border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">Not built in this look yet.</p>
       )}
 
+      <MultiPageFormats post={post} mode={mode} />
+
       {post.caption && (
         <div className="mt-4 border-t border-border pt-3">
           <Button size="sm" variant="ghost" onClick={() => setShowCaption((v) => !v)} aria-expanded={showCaption}>
@@ -181,6 +193,27 @@ function PostRow({ post, mode, format }: { post: SjbCalendarPost; mode: SjbCalen
         </div>
       )}
     </article>
+  );
+}
+
+function MultiPageFormats({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode }) {
+  const [open, setOpen] = useState<SjbCalendarFormat | null>(null);
+  const formats = SJB_CALENDAR_FORMATS.filter((f) => f.id !== "single");
+  return (
+    <div className="mt-4 border-t border-border pt-3">
+      <p className="text-xs font-semibold uppercase text-muted-foreground">Carousels and stories</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {formats.map((f) => {
+          const real = !!sjbCalendarSequence(post.n, mode, f.id);
+          return (
+            <Button key={f.id} size="sm" variant={open === f.id ? "default" : "outline"} aria-expanded={open === f.id} onClick={() => setOpen(open === f.id ? null : f.id)}>
+              {f.label}{!real && <span className="ml-1 opacity-70">(demo)</span>}
+            </Button>
+          );
+        })}
+      </div>
+      {open && <SequenceArtwork post={post} mode={mode} format={open} />}
+    </div>
   );
 }
 
