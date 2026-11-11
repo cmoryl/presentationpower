@@ -2,8 +2,8 @@
   "scope": "28 posts \u00d7 five looks \u00d7 three sizes \u00d7 four drawn roles",
   "method": "Isolated browser rendering of actual template source and downloaded media, not live calendar or export end-to-end.",
   "attempted_frames": 1680,
-  "measured_frames": 1620,
-  "blank_frames": 60,
+  "measured_frames": 1680,
+  "blank_frames": 0,
   "callout_overflow": 0,
   "missing_images": 0,
   "near_invisible_callouts": 0,
@@ -11,8 +11,7 @@
     "141 native originals missing; exact source typography not certified.",
     "Drawn templates still use Barlow instead of licensed Heading Now.",
     "Live calendar, PDF/ZIP/video and Illustrator refresh unverified.",
-    "Checks do not certify all content collisions, contrast or professional composition.",
-    "Loop attempted nonexistent post 26 and omitted actual post 29; 60 post-29 frames unmeasured, not certified."
+    "Checks do not certify all content collisions, contrast or professional composition."
   ],
   "frames": [
     {
@@ -1986,34 +1985,6 @@
       ],
       "imagesMissing": 0,
       "post": "25",
-      "mode": "dark",
-      "height": 1080,
-      "role": "tickets"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "dark",
-      "height": 1080,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "dark",
-      "height": 1080,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "dark",
-      "height": 1080,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
       "mode": "dark",
       "height": 1080,
       "role": "tickets"
@@ -4165,34 +4136,6 @@
       ],
       "imagesMissing": 0,
       "post": "25",
-      "mode": "dark",
-      "height": 1350,
-      "role": "tickets"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "dark",
-      "height": 1350,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "dark",
-      "height": 1350,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "dark",
-      "height": 1350,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
       "mode": "dark",
       "height": 1350,
       "role": "tickets"
@@ -6349,34 +6292,6 @@
       "role": "tickets"
     },
     {
-      "error": "blank",
-      "post": "26",
-      "mode": "dark",
-      "height": 1920,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "dark",
-      "height": 1920,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "dark",
-      "height": 1920,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "dark",
-      "height": 1920,
-      "role": "tickets"
-    },
-    {
       "calls": [
         {
           "font": "\"Barlow Condensed\", sans-serif",
@@ -8528,34 +8443,6 @@
       "role": "tickets"
     },
     {
-      "error": "blank",
-      "post": "26",
-      "mode": "light",
-      "height": 1080,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "light",
-      "height": 1080,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "light",
-      "height": 1080,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "light",
-      "height": 1080,
-      "role": "tickets"
-    },
-    {
       "calls": [
         {
           "font": "\"Barlow Condensed\", sans-serif",
@@ -10702,34 +10589,6 @@
       ],
       "imagesMissing": 0,
       "post": "25",
-      "mode": "light",
-      "height": 1350,
-      "role": "tickets"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "light",
-      "height": 1350,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "light",
-      "height": 1350,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "light",
-      "height": 1350,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
       "mode": "light",
       "height": 1350,
       "role": "tickets"
@@ -12886,34 +12745,6 @@
       "role": "tickets"
     },
     {
-      "error": "blank",
-      "post": "26",
-      "mode": "light",
-      "height": 1920,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "light",
-      "height": 1920,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "light",
-      "height": 1920,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "light",
-      "height": 1920,
-      "role": "tickets"
-    },
-    {
       "calls": [
         {
           "font": "\"Barlow Condensed\", sans-serif",
@@ -15060,34 +14891,6 @@
       ],
       "imagesMissing": 0,
       "post": "25",
-      "mode": "set2",
-      "height": 1080,
-      "role": "tickets"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set2",
-      "height": 1080,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set2",
-      "height": 1080,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set2",
-      "height": 1080,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
       "mode": "set2",
       "height": 1080,
       "role": "tickets"
@@ -17244,34 +17047,6 @@
       "role": "tickets"
     },
     {
-      "error": "blank",
-      "post": "26",
-      "mode": "set2",
-      "height": 1350,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set2",
-      "height": 1350,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set2",
-      "height": 1350,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set2",
-      "height": 1350,
-      "role": "tickets"
-    },
-    {
       "calls": [
         {
           "font": "\"Barlow Condensed\", sans-serif",
@@ -19418,34 +19193,6 @@
       ],
       "imagesMissing": 0,
       "post": "25",
-      "mode": "set2",
-      "height": 1920,
-      "role": "tickets"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set2",
-      "height": 1920,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set2",
-      "height": 1920,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set2",
-      "height": 1920,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
       "mode": "set2",
       "height": 1920,
       "role": "tickets"
@@ -21602,34 +21349,6 @@
       "role": "tickets"
     },
     {
-      "error": "blank",
-      "post": "26",
-      "mode": "set3",
-      "height": 1080,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set3",
-      "height": 1080,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set3",
-      "height": 1080,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set3",
-      "height": 1080,
-      "role": "tickets"
-    },
-    {
       "calls": [
         {
           "font": "\"Barlow Condensed\", sans-serif",
@@ -23776,34 +23495,6 @@
       ],
       "imagesMissing": 0,
       "post": "25",
-      "mode": "set3",
-      "height": 1350,
-      "role": "tickets"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set3",
-      "height": 1350,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set3",
-      "height": 1350,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set3",
-      "height": 1350,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
       "mode": "set3",
       "height": 1350,
       "role": "tickets"
@@ -25960,34 +25651,6 @@
       "role": "tickets"
     },
     {
-      "error": "blank",
-      "post": "26",
-      "mode": "set3",
-      "height": 1920,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set3",
-      "height": 1920,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set3",
-      "height": 1920,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set3",
-      "height": 1920,
-      "role": "tickets"
-    },
-    {
       "calls": [
         {
           "font": "\"Barlow Condensed\", sans-serif",
@@ -28134,34 +27797,6 @@
       ],
       "imagesMissing": 0,
       "post": "25",
-      "mode": "set4",
-      "height": 1080,
-      "role": "tickets"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set4",
-      "height": 1080,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set4",
-      "height": 1080,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set4",
-      "height": 1080,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
       "mode": "set4",
       "height": 1080,
       "role": "tickets"
@@ -30318,34 +29953,6 @@
       "role": "tickets"
     },
     {
-      "error": "blank",
-      "post": "26",
-      "mode": "set4",
-      "height": 1350,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set4",
-      "height": 1350,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set4",
-      "height": 1350,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set4",
-      "height": 1350,
-      "role": "tickets"
-    },
-    {
       "calls": [
         {
           "font": "\"Barlow Condensed\", sans-serif",
@@ -32497,34 +32104,6 @@
       "role": "tickets"
     },
     {
-      "error": "blank",
-      "post": "26",
-      "mode": "set4",
-      "height": 1920,
-      "role": "cover"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set4",
-      "height": 1920,
-      "role": "headline"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set4",
-      "height": 1920,
-      "role": "details"
-    },
-    {
-      "error": "blank",
-      "post": "26",
-      "mode": "set4",
-      "height": 1920,
-      "role": "tickets"
-    },
-    {
       "calls": [
         {
           "font": "\"Barlow Condensed\", sans-serif",
@@ -32699,10 +32278,1192 @@
       "mode": "set4",
       "height": 1920,
       "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 111,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "dark",
+      "height": 1080,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 326,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "dark",
+      "height": 1080,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "dark",
+      "height": 1080,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 248,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 130,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "dark",
+      "height": 1080,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 190,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "dark",
+      "height": 1350,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 326,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "dark",
+      "height": 1350,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "dark",
+      "height": 1350,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 269,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 130,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "dark",
+      "height": 1350,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 341,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "dark",
+      "height": 1920,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 326,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "dark",
+      "height": 1920,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "dark",
+      "height": 1920,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 269,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 130,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "dark",
+      "height": 1920,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "italic",
+          "size": 111,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "light",
+      "height": 1080,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "italic",
+          "size": 336,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "light",
+      "height": 1080,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "light",
+      "height": 1080,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "italic",
+          "size": 248,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "italic",
+          "size": 134,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "light",
+      "height": 1080,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "italic",
+          "size": 190,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "light",
+      "height": 1350,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "italic",
+          "size": 336,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "light",
+      "height": 1350,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "light",
+      "height": 1350,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "italic",
+          "size": 278,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "italic",
+          "size": 134,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "light",
+      "height": 1350,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "italic",
+          "size": 352,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "light",
+      "height": 1920,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "italic",
+          "size": 336,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "light",
+      "height": 1920,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "light",
+      "height": 1920,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "italic",
+          "size": 278,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "italic",
+          "size": 134,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "light",
+      "height": 1920,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 117,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set2",
+      "height": 1080,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 326,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set2",
+      "height": 1080,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set2",
+      "height": 1080,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 248,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 130,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set2",
+      "height": 1080,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 177,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set2",
+      "height": 1350,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 326,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set2",
+      "height": 1350,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set2",
+      "height": 1350,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 269,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 130,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set2",
+      "height": 1350,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 338,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set2",
+      "height": 1920,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 326,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set2",
+      "height": 1920,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set2",
+      "height": 1920,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 269,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 130,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set2",
+      "height": 1920,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 111,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set3",
+      "height": 1080,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 326,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set3",
+      "height": 1080,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set3",
+      "height": 1080,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 248,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 130,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set3",
+      "height": 1080,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 190,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set3",
+      "height": 1350,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 326,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set3",
+      "height": 1350,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set3",
+      "height": 1350,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 269,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 130,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set3",
+      "height": 1350,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 243,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set3",
+      "height": 1920,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 326,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set3",
+      "height": 1920,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set3",
+      "height": 1920,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 269,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 130,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set3",
+      "height": 1920,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 111,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set4",
+      "height": 1080,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 326,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set4",
+      "height": 1080,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set4",
+      "height": 1080,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 248,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 130,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1080
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set4",
+      "height": 1080,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 190,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set4",
+      "height": 1350,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 326,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set4",
+      "height": 1350,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set4",
+      "height": 1350,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 269,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 130,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1350
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set4",
+      "height": 1350,
+      "role": "tickets"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 341,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set4",
+      "height": 1920,
+      "role": "cover"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 326,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set4",
+      "height": 1920,
+      "role": "headline"
+    },
+    {
+      "calls": [],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set4",
+      "height": 1920,
+      "role": "details"
+    },
+    {
+      "calls": [
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 269,
+          "overflow": false
+        },
+        {
+          "font": "\"Barlow Condensed\", sans-serif",
+          "italic": "normal",
+          "size": 130,
+          "overflow": false
+        }
+      ],
+      "marks": [],
+      "frame": [
+        1080,
+        1920
+      ],
+      "imagesMissing": 0,
+      "post": "29",
+      "mode": "set4",
+      "height": 1920,
+      "role": "tickets"
     }
   ],
-  "unmeasured_actual_posts": [
-    "29"
-  ],
-  "blank_frames_reason": "Nonexistent post 26, not an application rendering failure"
+  "unmeasured_actual_posts": []
 }
