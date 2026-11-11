@@ -1,10 +1,11 @@
 import { BrandApplicationGallery } from "./BrandApplicationExamples";
 import { SJB_CANVA_GALLERY, SJB_CANVA_COLLECTIONS } from "@/lib/sjb-canva-gallery";
 import { SJB_COLORS, SJB_EVENT, SJB_LOGOS } from "@/lib/san-juan-bowl";
+import { SjbApplicationTemplates } from "./SjbApplicationTemplates";
 
 export interface SjbApplicationGalleryProps { className?: string }
 export function SjbApplicationGallery({ className }: SjbApplicationGalleryProps) {
-  return <BrandApplicationGallery id="applications" socialPosts={SJB_SOCIAL_POSTS} className={className} artwork={{ name: SJB_EVENT.name, color: SJB_LOGOS[0].svg, white: SJB_LOGOS[1].svg, dark: SJB_COLORS[0].hex, accent: SJB_COLORS[2].hex }} />;
+  return <BrandApplicationGallery id="applications" socialPosts={SJB_SOCIAL_POSTS} className={className} surfaceContent={{ signage: <SjbApplicationTemplates surface="signage" />, motion: <SjbApplicationTemplates surface="motion" />, documents: <SjbApplicationTemplates surface="documents" /> }} artwork={{ name: SJB_EVENT.name, color: SJB_LOGOS[0].svg, white: SJB_LOGOS[1].svg, dark: SJB_COLORS[0].hex, accent: SJB_COLORS[2].hex }} />;
 }
 /** One saved, non-email Canva post per displayed campaign; originals remain in the registry. */
 const SJB_SOCIAL_POSTS = SJB_CANVA_COLLECTIONS.filter((c) => c.id !== "bold-graphic" && c.id !== "light-cinematic").flatMap((c) => {
