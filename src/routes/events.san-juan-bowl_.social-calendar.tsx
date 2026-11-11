@@ -197,7 +197,7 @@ function PostRow({ post, mode, format }: { post: SjbCalendarPost; mode: SjbCalen
 }
 
 function MultiPageFormats({ post, mode }: { post: SjbCalendarPost; mode: SjbCalendarMode }) {
-  const [open, setOpen] = useState<SjbCalendarFormat | null>(null);
+  const [open, setOpen] = useState<SjbCalendarFormat | null>("linkedin-portrait");
   const formats = SJB_CALENDAR_FORMATS.filter((f) => f.id !== "single");
   return (
     <div className="mt-4 border-t border-border pt-3">
