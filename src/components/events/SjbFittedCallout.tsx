@@ -30,8 +30,11 @@ export function SjbFittedCallout({ lines, width, height, maxSize, italic = false
       node.style.fontSize = `${Math.floor(low)}px`;
     };
     fit();
-    void document.fonts.ready.then(fit);
-    return () => { cancelled = true; };
+    void document.fonts.load(`${italic ? 'italic ' : ''}700 100px "Barlow Condensed"`).then(fit);
+    document.fonts.addEventListener('loadingdone', fit);
+    const observer = new ResizeObserver(fit);
+    if (ref.current) observer.observe(ref.current);
+    return () => { cancelled = true; observer.disconnect(); document.fonts.removeEventListener('loadingdone', fit); };
   }, [lines.join('\n'), width, height, maxSize, italic]);
   return <div ref={ref} data-bowl-callout style={{ ...style, width, maxHeight: height, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontStyle: italic ? 'italic' : 'normal', fontSize: maxSize, lineHeight: 1, letterSpacing: 0 }}>
     {lines.map((line, index) => <div key={index} style={{ whiteSpace: 'nowrap' }}>{line}</div>)}
