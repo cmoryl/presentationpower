@@ -4,13 +4,29 @@
 // artwork, and must never carry an invented team, score or offer.
 import { describe, expect, it } from "vitest";
 import { SJB_CALENDAR_FORMATS } from "@/lib/sjb-calendar-formats";
-import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_NOTE, SJB_DEMO_SOURCE_SIZE, SJB_DEMO_SITE, sjbCalendarDemo } from "@/lib/sjb-calendar-demo";
+import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_NOTE, SJB_DEMO_SOURCE_SIZE, SJB_DEMO_SITE, sjbCalendarCover, sjbCalendarDemo } from "@/lib/sjb-calendar-demo";
 import { SJB_CALENDAR_MODES, SJB_CALENDAR_POSTS, sjbCalendarDesign } from "@/lib/sjb-social-calendar";
 import { SJB_EVENT } from "@/lib/san-juan-bowl";
 
 const MULTI = SJB_CALENDAR_FORMATS.filter((f) => f.id !== "single").map((f) => f.id);
 
 describe("Bowl calendar demo sequences", () => {
+  it("replaces calendar and downloadable covers with the exact saved size-specific artwork", () => {
+    for (const [format, size] of Object.entries(SJB_DEMO_SOURCE_SIZE)) {
+      const saved = sjbCalendarDesign("04", "set2", size);
+      expect(saved?.previewUrl).toBeTruthy();
+      expect(sjbCalendarCover("04", "set2", format as keyof typeof SJB_DEMO_SOURCE_SIZE)).toEqual({
+        previewUrl: saved?.previewUrl,
+        downloadUrl: saved?.downloadUrl,
+        downloadName: saved?.downloadName,
+      });
+    }
+  });
+
+  it("keeps a missing cover pending instead of borrowing another post or size", () => {
+    expect(sjbCalendarCover("99", "set2", "story-sequence")).toBeNull();
+  });
+
   it("covers every post, look and multi-page format with four pages in role order", () => {
     for (const post of SJB_CALENDAR_POSTS) {
       for (const mode of SJB_CALENDAR_MODES) {

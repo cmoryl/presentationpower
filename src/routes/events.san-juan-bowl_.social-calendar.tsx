@@ -8,6 +8,7 @@ import { Button } from "@/design-system/element";
 import { SjbProjections } from "@/components/events/SjbProjections";
 import { SjbCalendarLookCards } from "@/components/events/SjbCalendarLookCards";
 import { SjbDemoChip, SjbDemoSequence } from "@/components/events/SjbDemoSequence";
+import { sjbCalendarCover } from "@/lib/sjb-calendar-demo";
 import { SJB_CALENDAR_FORMATS, sjbCalendarSequence, type SjbCalendarFormat } from "@/lib/sjb-calendar-formats";
 import {
   SJB_CALENDAR_POSTS,
@@ -225,7 +226,7 @@ function CalendarGrid({ mode, format, onOpen, undated }: { mode: SjbCalendarMode
     return m;
   }, []);
   const chip = (p: SjbCalendarPost) => {
-    const preview = format === "single" ? sjbCalendarDesign(p.n, mode, "1350")?.previewUrl : sjbCalendarSequence(p.n, mode, format)?.pages[0]?.previewUrl;
+    const preview = sjbCalendarCover(p.n, mode, format)?.previewUrl;
     return (
       <Button
         key={p.itemId}

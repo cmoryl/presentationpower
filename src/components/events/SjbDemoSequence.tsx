@@ -17,7 +17,7 @@ import {
   exportAssetsZip,
   type AssetCaptureTarget,
 } from "@/lib/asset-export";
-import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarDemo, type SjbCalendarDemo, type SjbDemoPage, type SjbDemoLook } from "@/lib/sjb-calendar-demo";
+import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarCover, sjbCalendarDemo, type SjbCalendarDemo, type SjbDemoPage, type SjbDemoLook } from "@/lib/sjb-calendar-demo";
 import '@fontsource/barlow-condensed/700.css';
 import '@fontsource/barlow-condensed/700-italic.css';
 import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS, sjbBroadcastMark } from '@/lib/sjb-calendar-style';
@@ -71,6 +71,15 @@ function DemoPageFrame({
   const s = Math.min(width, height);
   const px = (n: number) => `${(s * n) / 100}px`;
   const pad = px(7);
+
+  // Saved artwork is the entire frame, not a plate under demo labels or logos.
+  if (page.role === "cover" && page.photoUrl) {
+    return (
+      <div ref={frameRef} data-kit-asset-frame data-bowl-look={mode} data-bowl-role="cover" data-bowl-artwork="canva" style={{ position: "relative", width, height, overflow: "hidden", backgroundColor: look.base }}>
+        <img src={page.photoUrl} alt={`${post.title}, saved Canva artwork`} style={{ display: "block", width: "100%", height: "100%", objectFit: "contain" }} />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -160,25 +169,6 @@ function DemoPageFrame({
       >
         {SJB_DEMO_BADGE}
       </div>
-      {page.photoKind === "approved" && (
-        <div
-          style={{
-            position: "absolute",
-            top: pad,
-            right: pad,
-            padding: `${px(0.9)} ${px(2)}`,
-            borderRadius: px(0.6),
-            backgroundColor: "rgba(0, 0, 0, 0.62)",
-            color: "#FFFFFF",
-            fontSize: px(2.2),
-            fontWeight: 600,
-            letterSpacing: "0.1em",
-            fontFamily: FONT,
-          }}
-        >
-          APPROVED SINGLE IMAGE
-        </div>
-      )}
       {/* Drawn pages carry the site line; the approved-image cover is left untouched. */}
       {page.photoKind === "none" && page.role !== 'cover' && (
         <div
@@ -432,7 +422,7 @@ export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
     (demo?.pages ?? [])
       .map((p, i) => ({ node: frames.current[i], i }))
       .filter((e): e is { node: HTMLDivElement; i: number } => !!e.node)
-      .map(({ node, i }) => ({ node, width: spec!.width, height: spec!.height, label: `${slug}-page-${i + 1}` }));
+      .map(({ node, i }) => ({ node, width: demo?.spec.width ?? 1080, height: demo?.spec.height ?? 1350, label: `${slug}-page-${i + 1}` }));
 
   if (!demo || !spec) return null;
 
@@ -444,6 +434,13 @@ export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
     }
     setBusy(kind);
     try {
+      const cover = sjbCalendarCover(post.n, mode, format);
+      if (kind === "page" && active === 0 && cover) {
+        const response = await fetch(cover.downloadUrl);
+        if (!response.ok) throw new Error("Saved cover could not be downloaded.");
+        downloadAssetBlob(await response.blob(), cover.downloadName);
+        return;
+      }
       if (kind === "pdf") downloadAssetBlob(await exportAssetsPdf(t, { background: look.base }), `${slug}.pdf`);
       else if (kind === "zip") downloadAssetBlob(await exportAssetsZip(t, { format: "jpg", bundleName: slug, background: look.base }), `${slug}.zip`);
       else downloadAssetBlob(await exportAssetImage(t[active], { format: "jpg", background: look.base }), `${slug}-page-${active + 1}.jpg`);
