@@ -18,11 +18,9 @@ import {
   type AssetCaptureTarget,
 } from "@/lib/asset-export";
 import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarDemo, type SjbCalendarDemo, type SjbDemoPage, type SjbDemoLook } from "@/lib/sjb-calendar-demo";
-import groundDark from "@/assets/sjb-card-covers/set-1.jpg";
-import groundSet2 from "@/assets/sjb-card-covers/set-2.jpg";
-import groundSet3 from "@/assets/sjb-card-covers/set-3.jpg";
-import groundSet4 from "@/assets/sjb-card-covers/set-4.jpg";
-import groundLight from "@/assets/sjb-card-covers/set-5.jpg";
+import '@fontsource/barlow-condensed/700.css';
+import '@fontsource/barlow-condensed/700-italic.css';
+import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS } from '@/lib/sjb-calendar-style';
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
 import type { SjbCalendarMode, SjbCalendarPost } from "@/lib/sjb-social-calendar";
 import type { SjbCalendarFormat, SjbCalendarFormatSpec } from "@/lib/sjb-calendar-formats";
@@ -33,15 +31,6 @@ import {
   transitionFrame,
   type SjbSequenceMotion,
 } from "@/lib/sjb-sequence-motion";
-
-/** Each look's own textless ground — the same plates its campaign card shows. */
-const LOOK_GROUND: Record<SjbCalendarMode, string> = {
-  dark: groundDark,
-  light: groundLight,
-  set2: groundSet2,
-  set3: groundSet3,
-  set4: groundSet4,
-};
 
 const FONT = '"Geist Variable", system-ui, sans-serif';
 
@@ -69,7 +58,9 @@ function DemoPageFrame({
   frameRef: (node: HTMLDivElement | null) => void;
 }) {
   const look = SJB_DEMO_LOOKS[mode];
-  const logo = SJB_LOGOS.find((l) => l.id === (look.dark ? "dark" : "color"))!;
+  const style = SJB_CALENDAR_STYLE[mode];
+  const logo = SJB_LOGOS.find((l) => l.id === (look.dark ? "dark" : "color"));
+  if (!logo) return null;
   // Every size below is a share of the short edge, so the same page reads the
   // same way at 1080×1080, 1080×1350 and 1080×1920.
   const s = Math.min(width, height);
@@ -80,6 +71,8 @@ function DemoPageFrame({
     <div
       ref={frameRef}
       data-kit-asset-frame
+      data-bowl-look={mode}
+      data-bowl-role={page.role}
       style={{
         position: "relative",
         width,
@@ -90,42 +83,33 @@ function DemoPageFrame({
         fontFamily: FONT,
       }}
     >
-      <img src={LOOK_GROUND[mode]} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      <img src={style.ground} alt="" data-bowl-ground style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      {mode === 'set3' && <img src={SJB_CALENDAR_MARKS.player} alt="" style={{ position: 'absolute', right: '-2%', bottom: '4%', height: '78%', width: '48%', objectFit: 'contain', objectPosition: 'right bottom', opacity: page.role === 'cover' ? 1 : 0.3 }} />}
       {/* Scrim keeps every line of copy readable over the look's ground. */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background: look.dark
+          background: page.role === 'cover' ? 'none' : look.dark
             ? "linear-gradient(180deg, rgba(3,6,28,0.45) 0%, rgba(3,6,28,0.72) 45%, rgba(3,6,28,0.86) 100%)"
             : "linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.8) 45%, rgba(255,255,255,0.9) 100%)",
         }}
       />
-      <div style={{ position: "absolute", inset: 0, background: look.glow }} />
 
       {page.role === "cover" && page.photoUrl ? (
-        <img src={page.photoUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+        <img src={page.photoUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }} />
       ) : (
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", padding: pad, boxSizing: "border-box" }}>
           {page.role === "cover" && (
-            <>
-              <img src={logo.svg} alt="" style={{ height: px(26), width: "auto", alignSelf: "center", marginTop: px(6) }} />
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", gap: px(2) }}>
-                <div style={{ fontSize: px(9), fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.02em" }}>{post.headline[0]}</div>
-                <div style={{ fontSize: px(9), fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.02em", color: look.accent }}>{post.headline[1]}</div>
-              </div>
-              <div style={{ fontSize: px(2.8), letterSpacing: "0.16em", textAlign: "center", opacity: 0.85, marginBottom: px(5) }}>
-                {SJB_DEMO_FACTS[0].value.toUpperCase()} · {SJB_DEMO_FACTS[1].value.toUpperCase()}
-              </div>
-            </>
+            <CampaignCover post={post} mode={mode} width={width} height={height} logo={logo.svg} />
           )}
 
           {page.role === "headline" && (
             <>
               <div style={{ marginTop: px(9), fontSize: px(2.6), letterSpacing: "0.2em", opacity: 0.75 }}>{post.phase.toUpperCase()} · {SJB_DEMO_FACTS[0].value.toUpperCase()}</div>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: px(2) }}>
-                <div style={{ fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: "-0.02em" }}>{post.headline[0]}</div>
-                <div style={{ fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: "-0.02em", color: look.accent }}>{post.headline[1]}</div>
+                <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: 0, fontStyle: style.italic ? 'italic' : 'normal', overflowWrap: 'anywhere' }}>{post.headline[0]}</div>
+                <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: 0, color: look.accent, overflowWrap: 'anywhere' }}>{post.headline[1]}</div>
                 <div style={{ width: px(22), height: px(0.7), backgroundColor: look.accent, marginTop: px(4) }} />
               </div>
             </>
@@ -184,7 +168,7 @@ function DemoPageFrame({
         </div>
       )}
       {/* Drawn pages carry the site line; the approved-image cover is left untouched. */}
-      {page.photoKind === "none" && (
+      {page.photoKind === "none" && page.role !== 'cover' && (
         <div
           style={{
             position: "absolute",

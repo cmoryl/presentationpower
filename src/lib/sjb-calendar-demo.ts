@@ -64,7 +64,7 @@ export const SJB_DEMO_LOOKS: Record<SjbCalendarMode, SjbDemoLook> = {
     base: hex("navy"),
     glow: `radial-gradient(130% 80% at 50% 100%, ${rgba("sky", 0.28)} 0%, rgba(0, 0, 0, 0) 62%), radial-gradient(90% 60% at 12% 6%, ${rgba("sky", 0.12)} 0%, rgba(0, 0, 0, 0) 50%)`,
     ink: hex("white"),
-    accent: hex("sky"),
+    accent: hex("gold"),
     badgeInk: hex("navy"),
     dark: true,
   },

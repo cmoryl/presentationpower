@@ -21,6 +21,7 @@
 - Rules for the supplied-file splitter scripts live in `scripts/AGENTS.md`.
 - Bowl announced event facts live in `SJB_EVENT`; event registry readiness carries source links rendered by the shared event home — why: directory and overview must agree without duplicating dates or losing provenance.
 - Social-calendar campaign selectors read saved artwork from the existing calendar registry — why: navigation previews must match actual calendar files, not invented examples.
+- Bowl calendar demo imagery reads `sjb-calendar-style`, recovered unchanged from the actual Canva originals; never use campaign-menu illustrations as social grounds — why: missing exports must retain their campaign identity in every size and download.
 - Bowl event brand navigation lives in the existing event registry and links to the shared kit/guide bodies; event-home logo guidance reads `SJB_LOGO_RULES` — why: discoverability must not create a second brand authority.
 
 - Every html-to-image capture passes `includeQueryParams: true` — why: proxied images differ only by `?path=`, and without it every download reused the first image fetched.
