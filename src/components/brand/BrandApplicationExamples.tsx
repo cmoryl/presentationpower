@@ -1,4 +1,4 @@
-import { forwardRef, type CSSProperties, type HTMLAttributes } from "react";
+import { forwardRef, type CSSProperties, type HTMLAttributes, type ReactNode } from "react";
 import { BRAND } from "@/lib/brand-colors";
 
 export type BrandApplicationSurface = "social" | "signage" | "motion" | "documents";
@@ -168,10 +168,10 @@ export const BrandApplicationExamples = forwardRef<HTMLDivElement, BrandApplicat
   },
 );
 
-export interface BrandApplicationGalleryProps extends HTMLAttributes<HTMLElement> { artwork: BrandApplicationArtwork; socialPosts?: BrandSocialPost[] }
-export const BrandApplicationGallery = forwardRef<HTMLElement, BrandApplicationGalleryProps>(function BrandApplicationGallery({ artwork, socialPosts = [], className = "", ...props }, ref) {
+export interface BrandApplicationGalleryProps extends HTMLAttributes<HTMLElement> { artwork: BrandApplicationArtwork; socialPosts?: BrandSocialPost[]; surfaceContent?: Partial<Record<BrandApplicationSurface, ReactNode>> }
+export const BrandApplicationGallery = forwardRef<HTMLElement, BrandApplicationGalleryProps>(function BrandApplicationGallery({ artwork, socialPosts = [], surfaceContent, className = "", ...props }, ref) {
   return <section ref={ref} {...props} className={`mt-12 scroll-mt-24 ${className}`}>
     <h2 className="text-2xl font-semibold">Applications</h2>
-    <div className="mt-6 grid gap-8 md:grid-cols-2">{SURFACES.map((s) => <div key={s.id} className="min-w-0 border-t border-border pt-4"><h3 className="text-lg font-semibold">{s.title}</h3><BrandApplicationExamples artwork={artwork} surface={s.id} socialPosts={socialPosts} /></div>)}</div>
+    <div className="mt-6 grid gap-8 md:grid-cols-2">{SURFACES.map((s) => <div key={s.id} className="min-w-0 border-t border-border pt-4"><h3 className="text-lg font-semibold">{s.title}</h3>{surfaceContent?.[s.id] ?? <BrandApplicationExamples artwork={artwork} surface={s.id} socialPosts={socialPosts} />}</div>)}</div>
   </section>;
 });
