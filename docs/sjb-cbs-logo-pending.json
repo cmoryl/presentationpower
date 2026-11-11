@@ -1,0 +1,38 @@
+{
+  "source": "https://www.cbssportsnetwork.com/",
+  "white_media": "MAHakFYdd68",
+  "black_media": "MAHakA8wj3Q",
+  "approval_required": true,
+  "designs": [
+    {
+      "look": "dark",
+      "design_id": "DAHaiI04YUs",
+      "transaction_id": "3213840122349500355",
+      "preview": "https://www.canva.com/d/ex7njLiTHc1o82F"
+    },
+    {
+      "look": "light",
+      "design_id": "DAHaiOk55vE",
+      "transaction_id": "3665325986632624222",
+      "preview": "https://www.canva.com/d/Yy7j0sqFaPtFkvO"
+    },
+    {
+      "look": "set2",
+      "design_id": "DAHai9LjMKQ",
+      "transaction_id": "2576580774586297729",
+      "preview": "https://www.canva.com/d/Z1n04avCD9sEzJe"
+    },
+    {
+      "look": "set3",
+      "design_id": "DAHaiktOY8o",
+      "transaction_id": "4468092618498600056",
+      "preview": "https://www.canva.com/d/ZHnQsBZB_cHGBAw"
+    },
+    {
+      "look": "set4",
+      "design_id": "DAHaihWqANo",
+      "transaction_id": "5060315969501493562",
+      "preview": "https://www.canva.com/d/jvqoxdIicnBBe5C"
+    }
+  ]
+}
