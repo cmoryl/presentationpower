@@ -1,23 +1,21 @@
-import { SJB_CANVA_COLLECTIONS, SJB_CANVA_GALLERY, type SjbCanvaGalleryDesign } from './sjb-canva-gallery';
-import { SJB_CALENDAR_POSTS, SJB_CALENDAR_SIZES, sjbCalendarDesign, type SjbCalendarMode } from './sjb-social-calendar';
-import { SJB_PROJECTION_SIZES, sjbProjection } from './sjb-projections';
+import { type SjbCanvaGalleryDesign } from './sjb-canva-gallery';
+import { SJB_CALENDAR_MODES, SJB_CALENDAR_POSTS, SJB_CALENDAR_SIZES, sjbCalendarDesign, type SjbCalendarMode } from './sjb-social-calendar';
+import { SJB_PROJECTION_SIZES, sjbProjection, type SjbProjectionLook } from './sjb-projections';
 import { SJB_CALENDAR_FORMATS, sjbCalendarSequenceCanvaUrl } from './sjb-calendar-formats';
 
 /** Social-page selection only; issued registries and calendar looks stay intact. */
-export const SJB_SOCIAL_STUDIO_COLLECTIONS = SJB_CANVA_COLLECTIONS.filter(c => c.id !== 'bold-graphic' && c.id !== 'launch');
-const CALENDAR_MODES: Partial<Record<SjbCanvaGalleryDesign['collectionId'], SjbCalendarMode>> = {
-  'stadium-night': 'set2', 'action-spotlight': 'set3', 'light-action': 'light',
-};
+export const SJB_SOCIAL_STUDIO_COLLECTIONS = SJB_CALENDAR_MODES.map(mode => ({ id: mode.id, name: mode.label, blurb: 'Feed · Square · Story · Carousels' }));
+const PROJECTION_LOOKS: Partial<Record<SjbCalendarMode, SjbProjectionLook>> = { set2: 'night', set4: 'blue' };
 
-export interface SjbSocialStudioDesign extends SjbCanvaGalleryDesign {
+export interface SjbSocialStudioDesign extends Omit<SjbCanvaGalleryDesign, 'collectionId'> {
+  collectionId: SjbCalendarMode;
   post?: string;
   mode?: SjbCalendarMode;
   waitingOn?: string;
 }
 
 export const SJB_SOCIAL_STUDIO_DESIGNS: readonly SjbSocialStudioDesign[] = SJB_SOCIAL_STUDIO_COLLECTIONS.flatMap(collection => {
-  const mode = CALENDAR_MODES[collection.id];
-  if (!mode) return SJB_CANVA_GALLERY.filter(d => d.collectionId === collection.id);
+  const mode = collection.id;
   const singles: SjbSocialStudioDesign[] = SJB_CALENDAR_POSTS.flatMap(post => SJB_CALENDAR_SIZES.flatMap(size => {
     const saved = sjbCalendarDesign(post.n, mode, size.id);
     if (!saved) return [];
@@ -25,9 +23,10 @@ export const SJB_SOCIAL_STUDIO_DESIGNS: readonly SjbSocialStudioDesign[] = SJB_S
       previewUrl: saved.previewUrl ?? '', canvaUrl: saved.canvaUrl, status: 'saved' as const,
       provenance: 'artistic-render' as const, post: post.n, mode, waitingOn: post.waitingOn }];
   }));
-  if (collection.id === 'stadium-night') {
+  const projectionLook = PROJECTION_LOOKS[mode];
+  if (projectionLook) {
     for (const size of SJB_PROJECTION_SIZES) {
-      const saved = sjbProjection('night', size.id);
+      const saved = sjbProjection(projectionLook, size.id);
       singles.push({ id: saved.id, collectionId: collection.id, name: 'Bowl projections', width: 1080,
         height: Number(size.id), previewUrl: saved.jpg ?? saved.png ?? '', canvaUrl: saved.canvaUrl,
         status: 'saved', provenance: 'artistic-render', waitingOn: 'Projected teams are placeholders, not an announced matchup' });

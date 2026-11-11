@@ -6,10 +6,6 @@ import { SjbLink, SjbShell } from '@/components/events/SjbShare';
 import { SJB_EVENT } from '@/lib/san-juan-bowl';
 import { sjbCanvaSize } from '@/lib/sjb-canva-gallery';
 import { SJB_SOCIAL_STUDIO_COLLECTIONS, SJB_SOCIAL_STUDIO_DESIGNS, sjbSocialStudioSequences, type SjbSocialStudioDesign } from '@/lib/sjb-social-studio';
-import coverSet2 from '@/assets/sjb-card-covers/set-2.jpg';
-import coverSet3 from '@/assets/sjb-card-covers/set-3.jpg';
-import coverSet5 from '@/assets/sjb-card-covers/set-5.jpg';
-import coverSet6 from '@/assets/sjb-card-covers/set-6.jpg';
 import coverAll from '@/assets/sjb-card-covers/all.jpg';
 
 async function saveSocialImage(d: SjbSocialStudioDesign) {
@@ -27,10 +23,6 @@ async function saveSocialImage(d: SjbSocialStudioDesign) {
 
 const SET_COVERS: Record<string, string> = {
   all: coverAll,
-  'stadium-night': coverSet2,
-  'action-spotlight': coverSet3,
-  'light-action': coverSet5,
-  'light-cinematic': coverSet6,
 };
 
 export function SjbSocialStudio() {
@@ -84,8 +76,8 @@ export function SjbSocialStudio() {
         const designs = visible.filter(d => d.collectionId === collection.id);
         if (!designs.length) return null;
         return <section key={collection.id} aria-labelledby={`collection-${collection.id}`} className="mt-10">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3"><h2 id={`collection-${collection.id}`} className="scroll-mt-24 text-xl font-bold">{collection.name}</h2><div className="flex flex-wrap items-center gap-2">{collection.id === 'light-action' && <Button asChild variant="outline" size="sm"><SjbLink page="set5assets"><FolderOpen />View design assets</SjbLink></Button>}<Button asChild variant="link" size="sm"><a href={collection.id === "light-cinematic" ? `https://www.canva.com/folder/${collection.folderId}` : "https://www.canva.com/folder/FAHapVESyK8"} target="_blank" rel="noreferrer">Open campaign folder<ExternalLink /></a></Button></div></div>
-          {collection.id !== 'light-cinematic' && <p className="mb-5 text-sm text-muted-foreground">Saved calendar artwork · Feed, Square and Story. Pictures reflect the latest available cleaned exports; Canva may contain newer edits.</p>}
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3"><h2 id={`collection-${collection.id}`} className="scroll-mt-24 text-xl font-bold">{collection.name}</h2><div className="flex flex-wrap items-center gap-2">{collection.id === 'light' && <Button asChild variant="outline" size="sm"><SjbLink page="set5assets"><FolderOpen />View design assets</SjbLink></Button>}<Button asChild variant="link" size="sm"><a href="https://www.canva.com/folder/FAHapVESyK8" target="_blank" rel="noreferrer">Open campaign folder<ExternalLink /></a></Button></div></div>
+          <p className="mb-5 text-sm text-muted-foreground">Saved calendar artwork · Feed, Square and Story. Pictures reflect the latest available cleaned exports; Canva may contain newer edits.</p>
           {designs.some(d => d.format) && <p className="mb-5 text-sm text-muted-foreground">Heroes 1200×600 · Headers 1200×300 · Signature banners 1200×200. Intended display width: 600 px. Email artwork is saved in Canva; email sending and ticket links are not configured.</p>}
           <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {designs.map(d => <article key={d.id} className="min-w-0 overflow-hidden rounded-lg border border-border bg-background" data-canva-design={d.id}>

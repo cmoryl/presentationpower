@@ -1,4 +1,6 @@
 # Roadmap
+## Calendar/social style parity correction
+- [x] Socials now derives exact styles, labels and order from the calendar (Light, Set 2, Set 3, Set 4), with all 336 saved singles and available multi-page links. Removed legacy Set 5/6 identities; six matching Set 2/4 projection files retain additional 1080×1440 sizing. No old wide/email artwork substituted as current campaign artwork. Public four-style selection, extra-size filtering, Set 4 enlargement/live link and desktop/mobile layout verified; 13 tests pass and build OK. Additional current-style wide/email files still require real Canva creation, not invented links.
 ## Current Illustrator rollout
 - [ ] Build editable Illustrator packages from saved Canva exports for the updated socials singles, projections, and registered multi-page files; link verified packages on socials and calendar. BLOCKED Nov 11 21:46 UTC: Canva confirms PPTX support but the first Set 2 export returns “Too many daily export requests for user.” No new packages created or stale packages relabelled. Existing process produces layered SVG + embedded pictures in ZIP, editable in Illustrator, not a native cloud-synced .ai file; exact campaign fonts must be installed.
 ## Current Bowl social page update
