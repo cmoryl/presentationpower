@@ -1,0 +1,102 @@
+[
+  {
+    "id": "DAHaiJbODIo",
+    "dimensions": [
+      1080,
+      1350
+    ],
+    "metadata_removed": true,
+    "unchanged_pixels": true,
+    "pointer": {
+      "version": 1,
+      "asset_id": "ec69487c-30fd-4d05-94dc-d5a3a6cdfd4e",
+      "project_id": "c88f7719-c0c5-420f-915f-a154f8270b06",
+      "url": "/__l5e/assets-v1/ec69487c-30fd-4d05-94dc-d5a3a6cdfd4e/DAHaiJbODIo-large-callout.jpg",
+      "r2_key": "a/v1/c88f7719-c0c5-420f-915f-a154f8270b06/ec69487c-30fd-4d05-94dc-d5a3a6cdfd4e/DAHaiJbODIo-large-callout.jpg",
+      "original_filename": "DAHaiJbODIo-large-callout.jpg",
+      "size": 1686563,
+      "content_type": "image/jpeg",
+      "created_at": "2026-11-11T03:23:42Z"
+    }
+  },
+  {
+    "id": "DAHaiB8HX6U",
+    "dimensions": [
+      1080,
+      1350
+    ],
+    "metadata_removed": true,
+    "unchanged_pixels": true,
+    "pointer": {
+      "version": 1,
+      "asset_id": "101e1bf3-2c9a-4ee0-8b16-bfafe0edac3d",
+      "project_id": "c88f7719-c0c5-420f-915f-a154f8270b06",
+      "url": "/__l5e/assets-v1/101e1bf3-2c9a-4ee0-8b16-bfafe0edac3d/DAHaiB8HX6U-large-callout.jpg",
+      "r2_key": "a/v1/c88f7719-c0c5-420f-915f-a154f8270b06/101e1bf3-2c9a-4ee0-8b16-bfafe0edac3d/DAHaiB8HX6U-large-callout.jpg",
+      "original_filename": "DAHaiB8HX6U-large-callout.jpg",
+      "size": 1428884,
+      "content_type": "image/jpeg",
+      "created_at": "2026-11-11T03:23:42Z"
+    }
+  },
+  {
+    "id": "DAHai4nSCtc",
+    "dimensions": [
+      1080,
+      1350
+    ],
+    "metadata_removed": true,
+    "unchanged_pixels": true,
+    "pointer": {
+      "version": 1,
+      "asset_id": "d591e390-d410-43d7-8a55-9e360d02f2d6",
+      "project_id": "c88f7719-c0c5-420f-915f-a154f8270b06",
+      "url": "/__l5e/assets-v1/d591e390-d410-43d7-8a55-9e360d02f2d6/DAHai4nSCtc-large-callout.jpg",
+      "r2_key": "a/v1/c88f7719-c0c5-420f-915f-a154f8270b06/d591e390-d410-43d7-8a55-9e360d02f2d6/DAHai4nSCtc-large-callout.jpg",
+      "original_filename": "DAHai4nSCtc-large-callout.jpg",
+      "size": 1098996,
+      "content_type": "image/jpeg",
+      "created_at": "2026-11-11T03:23:42Z"
+    }
+  },
+  {
+    "id": "DAHai6cDjm0",
+    "dimensions": [
+      1080,
+      1350
+    ],
+    "metadata_removed": true,
+    "unchanged_pixels": true,
+    "pointer": {
+      "version": 1,
+      "asset_id": "f323f68a-156c-4c07-b6ec-974dad4d6440",
+      "project_id": "c88f7719-c0c5-420f-915f-a154f8270b06",
+      "url": "/__l5e/assets-v1/f323f68a-156c-4c07-b6ec-974dad4d6440/DAHai6cDjm0-large-callout.jpg",
+      "r2_key": "a/v1/c88f7719-c0c5-420f-915f-a154f8270b06/f323f68a-156c-4c07-b6ec-974dad4d6440/DAHai6cDjm0-large-callout.jpg",
+      "original_filename": "DAHai6cDjm0-large-callout.jpg",
+      "size": 1386850,
+      "content_type": "image/jpeg",
+      "created_at": "2026-11-11T03:23:42Z"
+    }
+  },
+  {
+    "id": "DAHai-4B8c4",
+    "dimensions": [
+      1080,
+      1350
+    ],
+    "metadata_removed": true,
+    "unchanged_pixels": true,
+    "pointer": {
+      "version": 1,
+      "asset_id": "815ff32e-c81e-4fd9-831d-8f265a9d14b4",
+      "project_id": "c88f7719-c0c5-420f-915f-a154f8270b06",
+      "url": "/__l5e/assets-v1/815ff32e-c81e-4fd9-831d-8f265a9d14b4/DAHai-4B8c4-large-callout.jpg",
+      "r2_key": "a/v1/c88f7719-c0c5-420f-915f-a154f8270b06/815ff32e-c81e-4fd9-831d-8f265a9d14b4/DAHai-4B8c4-large-callout.jpg",
+      "original_filename": "DAHai-4B8c4-large-callout.jpg",
+      "size": 1569474,
+      "content_type": "image/jpeg",
+      "created_at": "2026-11-11T03:23:42Z"
+    }
+  }
+]
