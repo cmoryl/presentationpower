@@ -1,5 +1,6 @@
 # Roadmap
 ## Bowl social calendar
+- [ ] Enlarge main callouts across all Bowl calendar posts × five styles × all single/multi-page sizes; preserve source artwork, fit text to available space, retain readable details and separated logos; Canva previews require approval before saving and refreshed exports.
 - [x] CBS TV announcement: approved and saved all 15 Canva revisions (five styles × Feed/Square/Story) with official one-color CBS Sports Network artwork; cleaned exports preserve pixels and now supply calendar pictures/downloads. Demo covers/headlines use the same official logo. Receipts: docs/sjb-cbs-logo-refresh.json.
 - [x] Corrected mismatched demo imagery across all five calendar styles from exact media extracted from Canva originals; 270 missing-export single frames checked live with zero logo/conference/copy overlaps. Details JPG download verified. Inventory recorded in docs/sjb-social-audit-2026-11-11.json.
 - [ ] Full Canva artwork visual audit remains incomplete: all 420 links inventoried, five original Feed compositions inspected, 150 cleaned exports present and 270 still missing. Exact Heading Now font is not supplied locally (demos use condensed Barlow); source typography, source-logo fixes, refreshed exports and full mobile sequence framing remain unverified.
