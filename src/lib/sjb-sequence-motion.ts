@@ -62,6 +62,11 @@ export interface SjbTransitionFrame {
   toAlpha: number;
 }
 
+/** Negating zero hands back `-0`; the frame numbers stay plain zeros. */
+function nz(n: number): number {
+  return n === 0 ? 0 : n;
+}
+
 /**
  * Where the two pages sit at progress `t` (0 = handover not started,
  * 1 = the new page has fully arrived). Pure, so the calendar and the video
@@ -70,26 +75,26 @@ export interface SjbTransitionFrame {
 export function transitionFrame(style: SjbSequenceTransition, t: number): SjbTransitionFrame {
   const p = Math.min(1, Math.max(0, t));
   if (style === "push") {
-    return { fromX: -p, fromY: 0, fromAlpha: 1, toX: 1 - p, toY: 0, toAlpha: 1 };
+    return { fromX: nz(-p), fromY: 0, fromAlpha: 1, toX: nz(1 - p), toY: 0, toAlpha: 1 };
   }
   if (style === "slide-up") {
     // LinkedIn: the new page rises from well below while the old one drops out.
     return {
       fromX: 0,
-      fromY: -0.06 * p,
-      fromAlpha: 1 - p,
+      fromY: nz(-0.06 * p),
+      fromAlpha: nz(1 - p),
       toX: 0,
-      toY: 0.18 * (1 - p),
+      toY: nz(0.18 * (1 - p)),
       toAlpha: Math.min(1, p * 1.15),
     };
   }
   // fade-up: a Story dissolves, drifting only slightly so it stays calm.
   return {
     fromX: 0,
-    fromY: -0.03 * p,
-    fromAlpha: 1 - p,
+    fromY: nz(-0.03 * p),
+    fromAlpha: nz(1 - p),
     toX: 0,
-    toY: 0.08 * (1 - p),
+    toY: nz(0.08 * (1 - p)),
     toAlpha: Math.min(1, p * 1.4),
   };
 }
