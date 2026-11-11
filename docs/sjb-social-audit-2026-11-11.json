@@ -3364,5 +3364,13 @@
       "cleaned_export": false,
       "visual_canva_audit": "unverified"
     }
-  ]
+  ],
+  "demo_audit": {
+    "checked_single_frames": 270,
+    "campaigns": 5,
+    "logo_text_overlap_failures": 0,
+    "details_download": "Verified 1080x1350 JPG",
+    "mobile_page_overflow": false,
+    "source_font_limit": "Heading Now is not supplied locally; demos use Barlow Condensed. Exact Canva typography is preserved in originals, not certified in demos."
+  }
 }
