@@ -113,7 +113,7 @@ export interface SjbCalendarDemo {
 }
 
 /** Which single-image size each format's cover borrows from. */
-const SOURCE_SIZE: Record<SjbCalendarFormat, SjbCalendarSize> = {
+export const SJB_DEMO_SOURCE_SIZE: Record<SjbCalendarFormat, SjbCalendarSize> = {
   single: "1350",
   "linkedin-portrait": "1350",
   "linkedin-square": "1080",
@@ -139,7 +139,7 @@ export function sjbCalendarDemo(
 ): SjbCalendarDemo | null {
   const spec = SJB_CALENDAR_FORMATS.find((f) => f.id === format);
   if (!spec || format === "single") return null;
-  const photoUrl = sjbCalendarDesign(post.n, mode, SOURCE_SIZE[format])?.previewUrl ?? null;
+  const photoUrl = sjbCalendarDesign(post.n, mode, SJB_DEMO_SOURCE_SIZE[format])?.previewUrl ?? null;
   return {
     spec,
     facts: SJB_DEMO_FACTS,

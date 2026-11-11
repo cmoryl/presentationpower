@@ -4,8 +4,8 @@
 // artwork, and must never carry an invented team, score or offer.
 import { describe, expect, it } from "vitest";
 import { SJB_CALENDAR_FORMATS } from "@/lib/sjb-calendar-formats";
-import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarDemo } from "@/lib/sjb-calendar-demo";
-import { SJB_CALENDAR_MODES, SJB_CALENDAR_POSTS } from "@/lib/sjb-social-calendar";
+import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_NOTE, SJB_DEMO_SOURCE_SIZE, SJB_DEMO_SITE, sjbCalendarDemo } from "@/lib/sjb-calendar-demo";
+import { SJB_CALENDAR_MODES, SJB_CALENDAR_POSTS, sjbCalendarDesign } from "@/lib/sjb-social-calendar";
 import { SJB_EVENT } from "@/lib/san-juan-bowl";
 
 const MULTI = SJB_CALENDAR_FORMATS.filter((f) => f.id !== "single").map((f) => f.id);
@@ -51,11 +51,24 @@ describe("Bowl calendar demo sequences", () => {
     expect(built.pages[0].photoKind).toBe("approved");
     expect(built.pages[0].photoUrl).toBeTruthy();
 
-    // Post 05 has a saved Set 2 design but no cleaned picture registered yet,
-    // so its demo cover must be drawn, not borrowed.
-    const pending = sjbCalendarDemo(SJB_CALENDAR_POSTS.find((p) => p.n === "05")!, "set2", "linkedin-portrait")!;
+    // A post with no registered export must draw its cover, never borrow one.
+    const pending = sjbCalendarDemo({ ...post, n: "99" }, "dark", "linkedin-portrait")!;
     expect(pending.pages[0].photoKind).toBe("none");
     expect(pending.pages[0].photoUrl).toBeNull();
+
+    // The borrow rule holds for every post, look and multi-page format: the
+    // cover is approved artwork exactly when that format's source size has a
+    // cleaned export registered, and it is that exact file.
+    for (const p of SJB_CALENDAR_POSTS) {
+      for (const mode of SJB_CALENDAR_MODES) {
+        for (const format of MULTI) {
+          const demo = sjbCalendarDemo(p, mode.id, format)!;
+          const exportUrl = sjbCalendarDesign(p.n, mode.id, SJB_DEMO_SOURCE_SIZE[format])?.previewUrl ?? null;
+          expect(demo.pages[0].photoKind, `${p.n}/${mode.id}/${format}`).toBe(exportUrl ? "approved" : "none");
+          expect(demo.pages[0].photoUrl, `${p.n}/${mode.id}/${format}`).toBe(exportUrl);
+        }
+      }
+    }
   });
 
   it("shows only the announced facts on the details page", () => {

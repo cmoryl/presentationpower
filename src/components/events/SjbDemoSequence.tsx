@@ -55,8 +55,6 @@ const SJB_STYLE_LABEL: Record<SjbSequenceMotion["style"], string> = {
 /** One page at its native pixels; the caller scales it down for display. */
 function DemoPageFrame({
   page,
-  index,
-  total,
   post,
   mode,
   width,
@@ -64,8 +62,6 @@ function DemoPageFrame({
   frameRef,
 }: {
   page: SjbDemoPage;
-  index: number;
-  total: number;
   post: SjbCalendarPost;
   mode: SjbCalendarMode;
   width: number;
@@ -204,19 +200,6 @@ function DemoPageFrame({
           {SJB_DEMO_SITE}
         </div>
       )}
-      <div
-        style={{
-          position: "absolute",
-          bottom: pad,
-          right: pad,
-          fontSize: px(2.2),
-          letterSpacing: "0.12em",
-          opacity: 0.8,
-          fontFamily: FONT,
-        }}
-      >
-        PAGE {index + 1} / {total}
-      </div>
     </div>
   );
 }
@@ -224,8 +207,6 @@ function DemoPageFrame({
 /** Native-size page shown at a display height, via a CSS scale. */
 function ScaledPage(props: {
   page: SjbDemoPage;
-  index: number;
-  total: number;
   post: SjbCalendarPost;
   mode: SjbCalendarMode;
   width: number;
@@ -240,7 +221,7 @@ function ScaledPage(props: {
   return (
     <div style={{ position: "relative", width: width * k, height: displayHeight, overflow: "hidden", borderRadius: plain ? 0 : 4, border: plain ? "none" : "1px solid var(--color-border)" }}>
       <div style={{ position: "absolute", left: 0, top: 0, transform: `scale(${k})`, transformOrigin: "top left" }}>
-        <DemoPageFrame page={rest.page} index={rest.index} total={rest.total} post={rest.post} mode={rest.mode} width={width} height={height} frameRef={rest.frameRef} />
+        <DemoPageFrame page={rest.page} post={rest.post} mode={rest.mode} width={width} height={height} frameRef={rest.frameRef} />
       </div>
     </div>
   );
@@ -353,8 +334,6 @@ function SequenceStage({
         <div ref={outRef} style={{ position: "absolute", inset: 0 }}>
           <ScaledPage
             page={demo.pages[handoff.from]}
-            index={handoff.from}
-            total={demo.pages.length}
             post={post}
             mode={mode}
             width={spec.width}
@@ -368,8 +347,6 @@ function SequenceStage({
       <div ref={inRef} style={{ position: "absolute", inset: 0 }}>
         <ScaledPage
           page={demo.pages[active]}
-          index={active}
-          total={demo.pages.length}
           post={post}
           mode={mode}
           width={spec.width}
@@ -509,8 +486,6 @@ export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
               >
                 <ScaledPage
                   page={p}
-                  index={i}
-                  total={demo.pages.length}
                   post={post}
                   mode={mode}
                   width={spec.width}
@@ -574,8 +549,6 @@ export function SjbDemoChip({ post, mode, format, displayHeight = 96 }: SjbDemoS
   return (
     <ScaledPage
       page={demo.pages[0]}
-      index={0}
-      total={demo.pages.length}
       post={post}
       mode={mode}
       width={demo.spec.width}
