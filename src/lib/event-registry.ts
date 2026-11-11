@@ -532,12 +532,11 @@ export const SJB_EVENT_AREAS: EventAreaGroup[] = [
   {
     id: "marketing",
     title: "Marketing & campaigns",
-    summary: "Ready-made social posts, billboards and background art.",
+    summary: "Ready-made social posts, campaign calendar and billboards.",
     tools: [
       { label: "Social posts", detail: "Every campaign set, with picture and Illustrator downloads.", link: { to: "/events/san-juan-bowl/social" } },
       { label: "Social calendar", detail: "Every planned post by date, with dark and light Canva and Illustrator files.", link: { to: "/events/san-juan-bowl/social-calendar" } },
       { label: "Digital billboards", detail: "English and Spanish roadside boards with examples.", link: { to: "/events/san-juan-bowl/billboards" } },
-      { label: "Set 5 design assets", detail: "High-resolution backgrounds and layers for large prints.", link: { to: "/events/san-juan-bowl/set-5-assets" } },
     ],
   },
   {
