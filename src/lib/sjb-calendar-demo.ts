@@ -10,7 +10,7 @@
 // A demo is never presented as approved artwork: every page carries a DEMO
 // badge, and the panel that shows it says in words that this is a placeholder.
 import { SJB_COLORS, SJB_EVENT } from "@/lib/san-juan-bowl";
-import { SJB_CALENDAR_FORMATS, type SjbCalendarFormat, type SjbCalendarFormatSpec } from "@/lib/sjb-calendar-formats";
+import { SJB_CALENDAR_FORMATS, sjbCalendarSequence, type SjbCalendarFormat, type SjbCalendarFormatSpec } from "@/lib/sjb-calendar-formats";
 import { sjbCalendarDesign, type SjbCalendarMode, type SjbCalendarPost, type SjbCalendarSize } from "@/lib/sjb-social-calendar";
 
 export const SJB_DEMO_BADGE = "DEMO LAYOUT";
@@ -121,6 +121,15 @@ export const SJB_DEMO_SOURCE_SIZE: Record<SjbCalendarFormat, SjbCalendarSize> = 
   "story-sequence": "1920",
 };
 
+/** Real sequence cover first, then the cleaned single artwork at the exact size. */
+export function sjbCalendarCover(post: string, mode: SjbCalendarMode, format: SjbCalendarFormat) {
+  const sequenceCover = sjbCalendarSequence(post, mode, format)?.pages[0];
+  if (sequenceCover) return sequenceCover;
+  const single = sjbCalendarDesign(post, mode, SJB_DEMO_SOURCE_SIZE[format]);
+  if (!single?.previewUrl || !single.downloadUrl) return null;
+  return { previewUrl: single.previewUrl, downloadUrl: single.downloadUrl, downloadName: single.downloadName };
+}
+
 export const SJB_DEMO_PAGE_ROLES: { role: SjbDemoRole; label: string }[] = [
   { role: "cover", label: "Cover" },
   { role: "headline", label: "Headline" },
@@ -139,7 +148,7 @@ export function sjbCalendarDemo(
 ): SjbCalendarDemo | null {
   const spec = SJB_CALENDAR_FORMATS.find((f) => f.id === format);
   if (!spec || format === "single") return null;
-  const photoUrl = sjbCalendarDesign(post.n, mode, SJB_DEMO_SOURCE_SIZE[format])?.previewUrl ?? null;
+  const photoUrl = sjbCalendarCover(post.n, mode, format)?.previewUrl ?? null;
   return {
     spec,
     facts: SJB_DEMO_FACTS,

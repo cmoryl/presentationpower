@@ -1,5 +1,6 @@
 # Roadmap
 ## Bowl social calendar
+- [x] Replace demo covers automatically wherever cleaned Canva artwork exists, shared by month calendar and sequence PDF/ZIP/video frames; individual cover downloads retain original bytes. Missing covers and unfinished companion pages remain demos.
 - [ ] Current rollout: 20 of the remaining 80 Set 2 Canva layouts saved with approved spacing and cleaned full-size calendar pictures published. Remaining 60 originals still need correction and exports. No editing transactions left open. Receipts and exact remaining inventory: docs/sjb-set2-rollout-progress.json. 15 calendar tests passed; live page verification pending.
 - [x] Upgrade all 15 sequence companion backgrounds with more cinematic lighting, dimensional textures and deliberate campaign-specific edges, preserving clear text areas and unchanged original covers/Canva files. Saved as v2 immutable assets; earlier backgrounds preserved.
 - [x] Add existing Ticketera artwork to every drawn multi-page ticket page across five looks and all carousel/Story formats, white on dark and colour on light, with separate reserved Bowl/Ticketera logo slots; shared PDF/ZIP/video captures inherit it. Saved Canva artwork unchanged.
