@@ -1,4 +1,4 @@
-import { type SjbCanvaGalleryDesign } from './sjb-canva-gallery';
+import { sjbCanvaSize, type SjbCanvaGalleryDesign } from './sjb-canva-gallery';
 import { SJB_CALENDAR_MODES, SJB_CALENDAR_POSTS, SJB_CALENDAR_SIZES, sjbCalendarDesign, type SjbCalendarMode } from './sjb-social-calendar';
 import { SJB_PROJECTION_SIZES, sjbProjection, type SjbProjectionLook } from './sjb-projections';
 import { SJB_CALENDAR_FORMATS, sjbCalendarSequenceCanvaUrl } from './sjb-calendar-formats';
@@ -41,5 +41,17 @@ export function sjbSocialStudioSequences(design: SjbSocialStudioDesign) {
   return SJB_CALENDAR_FORMATS.filter(f => f.id !== 'single').flatMap(format => {
     const url = sjbCalendarSequenceCanvaUrl(post, mode, format.id);
     return url ? [{ label: format.label, url }] : [];
+  });
+}
+
+export function filterSjbSocialStudio(collection: string, size: string, adType: string, search: string) {
+  const terms = search.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+  return SJB_SOCIAL_STUDIO_DESIGNS.filter(design => {
+    const style = SJB_SOCIAL_STUDIO_COLLECTIONS.find(c => c.id === design.collectionId)?.name ?? '';
+    const searchable = `${design.name} ${style} ${design.post ?? ''} ${sjbCanvaSize(design)}`.toLocaleLowerCase();
+    return (collection === 'all' || design.collectionId === collection)
+      && (size === 'all' || sjbCanvaSize(design) === size)
+      && (adType === 'all' || design.name === adType)
+      && terms.every(term => searchable.includes(term));
   });
 }

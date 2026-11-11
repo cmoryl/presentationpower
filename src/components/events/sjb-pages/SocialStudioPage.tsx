@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Download, ExternalLink, FolderOpen, Layers, Maximize2, X } from 'lucide-react';
+import { ArrowLeft, Check, Download, ExternalLink, FolderOpen, Layers, Maximize2, Search, X } from 'lucide-react';
 import { sjbIllustratorMaster, sjbIllustratorFileName } from '@/lib/sjb-illustrator-masters';
-import { Button } from '@/design-system/element';
+import { Button, Input } from '@/design-system/element';
 import { SjbLink, SjbShell } from '@/components/events/SjbShare';
 import { SJB_EVENT } from '@/lib/san-juan-bowl';
 import { sjbCanvaSize } from '@/lib/sjb-canva-gallery';
-import { SJB_SOCIAL_STUDIO_COLLECTIONS, SJB_SOCIAL_STUDIO_DESIGNS, sjbSocialStudioSequences, type SjbSocialStudioDesign } from '@/lib/sjb-social-studio';
+import { SJB_SOCIAL_STUDIO_COLLECTIONS, SJB_SOCIAL_STUDIO_DESIGNS, sjbSocialStudioSequences, filterSjbSocialStudio, type SjbSocialStudioDesign } from '@/lib/sjb-social-studio';
+import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS } from '@/lib/sjb-calendar-style';
 import coverAll from '@/assets/sjb-card-covers/all.jpg';
 
 async function saveSocialImage(d: SjbSocialStudioDesign) {
@@ -29,6 +30,7 @@ export function SjbSocialStudio() {
   const [collectionId, setCollectionId] = useState('all');
   const [size, setSize] = useState('all');
   const [adType, setAdType] = useState('all');
+  const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<SjbSocialStudioDesign | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const results = useRef<HTMLDivElement>(null);
@@ -36,7 +38,7 @@ export function SjbSocialStudio() {
   const [selectionCount, setSelectionCount] = useState(0);
   const sizes = [...new Set(SJB_SOCIAL_STUDIO_DESIGNS.map(sjbCanvaSize))];
   const types = [...new Set(SJB_SOCIAL_STUDIO_DESIGNS.map(d => d.name))];
-  const visible = SJB_SOCIAL_STUDIO_DESIGNS.filter(d => (collectionId === 'all' || d.collectionId === collectionId) && (size === 'all' || sjbCanvaSize(d) === size) && (adType === 'all' || d.name === adType));
+  const visible = filterSjbSocialStudio(collectionId, size, adType, search);
   useEffect(() => { if (selected) dialog.current?.showModal(); else dialog.current?.close(); }, [selected]);
   useEffect(() => {
     if (!pendingScroll.current) return;
@@ -52,14 +54,16 @@ export function SjbSocialStudio() {
         <div><p className="text-sm text-muted-foreground">{SJB_EVENT.name}</p><h1 className="mt-1 text-3xl font-bold">Social designs</h1><p className="mt-2 text-sm text-muted-foreground">Calendar artwork · Live Canva files</p></div>
         <Button asChild variant="outline"><a href="https://www.canva.com/folder/FAHapVESyK8" target="_blank" rel="noreferrer"><ExternalLink />Canva folder</a></Button>
       </header>
-      <nav aria-label="Design campaigns" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <nav aria-label="Design campaigns" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {[{ id: 'all', name: 'All campaigns', blurb: 'All active social designs' }, ...SJB_SOCIAL_STUDIO_COLLECTIONS].map(c => {
           const active = collectionId === c.id;
-          const cover = SJB_SOCIAL_STUDIO_DESIGNS.find(d => d.collectionId === c.id && d.post === '04' && d.height === 1350)?.previewUrl || SET_COVERS[c.id];
+          const campaign = SJB_SOCIAL_STUDIO_COLLECTIONS.find(style => style.id === c.id);
+          const cover = campaign ? SJB_CALENDAR_STYLE[campaign.id].ground : SET_COVERS[c.id];
           return <Button variant="outline" key={c.id} aria-pressed={active} onClick={() => { pendingScroll.current = true; setCollectionId(c.id); setSelectionCount(count => count + 1); }} className={`group block h-auto overflow-hidden p-0 whitespace-normal rounded-lg border bg-background text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active ? 'border-primary ring-2 ring-primary' : 'border-border hover:border-foreground/40'}`}>
-            <span className="relative block h-28 overflow-hidden bg-muted">
-              <img src={cover} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-              <span aria-hidden className="absolute inset-x-0 bottom-0 h-1 bg-primary" />
+            <span className="relative block aspect-[16/10] overflow-hidden bg-muted">
+              <img src={cover} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100" />
+              {c.id === 'set3' && <img src={SJB_CALENDAR_MARKS.player} alt="" className="absolute inset-y-0 right-3 h-full w-auto object-contain" />}
+              {active && <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground"><Check className="size-4" aria-hidden /></span>}
             </span>
             <span className="block p-3"><span className="block text-sm font-semibold">{c.name}</span><span className="mt-0.5 block text-xs text-muted-foreground">{c.blurb}</span></span>
           </Button>;
@@ -67,11 +71,12 @@ export function SjbSocialStudio() {
       </nav>
       <div ref={results} className="mt-5 flex scroll-mt-24 flex-wrap items-end gap-4">
         <label className="grid gap-1.5 text-sm font-medium" htmlFor="sjb-size">Size<select id="sjb-size" value={size} onChange={e => setSize(e.target.value)} className="h-10 rounded-md border border-input bg-background px-3 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option value="all">All sizes</option>{sizes.map(s => <option key={s}>{s}</option>)}</select></label>
-        <label className="grid gap-1.5 text-sm font-medium" htmlFor="sjb-type">Ad type<select id="sjb-type" value={adType} onChange={e => setAdType(e.target.value)} className="h-10 max-w-full rounded-md border border-input bg-background px-3 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option value="all">All ad types</option>{types.map(t => <option key={t}>{t}</option>)}</select></label>
+        <label className="grid min-w-0 max-w-full gap-1.5 text-sm font-medium" htmlFor="sjb-type">Ad type<select id="sjb-type" value={adType} onChange={e => setAdType(e.target.value)} className="h-10 max-w-full rounded-md border border-input bg-background px-3 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><option value="all">All ad types</option>{types.map(t => <option key={t}>{t}</option>)}</select></label>
+        <div className="grid w-full min-w-0 gap-1.5 sm:w-auto sm:min-w-64 sm:flex-1"><label htmlFor="sjb-search" className="text-sm font-medium">Search</label><div className="relative"><Search aria-hidden className="pointer-events-none absolute left-3 top-3 size-4 text-muted-foreground" /><Input id="sjb-search" type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search designs…" className="h-10 pl-9 pr-10" />{search && <Button variant="ghost" size="icon" aria-label="Clear search" className="absolute right-0 top-0 size-10" onClick={() => setSearch('')}><X /></Button>}</div></div>
       </div>
       <p className="mt-5 border-l-2 border-border pl-3 text-sm text-muted-foreground">Draft labels identify unsaved Canva revisions. Saved labels identify Canva snapshots, not campaign approval. Preview images are not full-resolution downloads.</p>
       <p className="mt-2 border-l-2 border-border pl-3 text-sm text-muted-foreground">Illustrator files open in Adobe Illustrator with every Canva object on its own layer, live editable text and the vector Bowl shield. Photos and backgrounds stay embedded pictures at Canva's export size, and the named fonts must be installed (listed in each file's README). Rebuilt from the saved Canva designs; refresh manually after Canva edits.</p>
-      {visible.length === 0 && <div className="py-20 text-center"><p>No designs in this selection.</p><Button variant="link" onClick={() => { setSize('all'); setAdType('all'); setCollectionId('all'); }}>Reset filters</Button></div>}
+      {visible.length === 0 && <div className="py-20 text-center"><p>No designs in this selection.</p><Button variant="link" onClick={() => { setSize('all'); setAdType('all'); setSearch(''); setCollectionId('all'); }}>Reset filters</Button></div>}
       {SJB_SOCIAL_STUDIO_COLLECTIONS.map(collection => {
         const designs = visible.filter(d => d.collectionId === collection.id);
         if (!designs.length) return null;
