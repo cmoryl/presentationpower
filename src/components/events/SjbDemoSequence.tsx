@@ -5,23 +5,38 @@
 // LinkedIn carousels) or a zip of pictures (Instagram carousel / Story
 // sequence) through the shared asset exporter. Every page carries the DEMO
 // badge, so a download can never be mistaken for approved artwork.
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/design-system/element";
 import {
   assetFileSlug,
+  captureAssetCanvas,
   downloadAssetBlob,
   exportAssetImage,
   exportAssetsPdf,
   exportAssetsZip,
   type AssetCaptureTarget,
 } from "@/lib/asset-export";
-import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarDemo, type SjbDemoPage, type SjbDemoLook } from "@/lib/sjb-calendar-demo";
+import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarDemo, type SjbCalendarDemo, type SjbDemoPage, type SjbDemoLook } from "@/lib/sjb-calendar-demo";
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
 import type { SjbCalendarMode, SjbCalendarPost } from "@/lib/sjb-social-calendar";
-import type { SjbCalendarFormat } from "@/lib/sjb-calendar-formats";
+import type { SjbCalendarFormat, SjbCalendarFormatSpec } from "@/lib/sjb-calendar-formats";
+import {
+  renderSequenceVideo,
+  sjbSequenceDuration,
+  sjbSequenceMotion,
+  transitionFrame,
+  type SjbSequenceMotion,
+} from "@/lib/sjb-sequence-motion";
 
 const FONT = '"Geist Variable", system-ui, sans-serif';
+
+/** Plain words for each handover, so the controls say what the clip will do. */
+const SJB_STYLE_LABEL: Record<SjbSequenceMotion["style"], string> = {
+  push: "pushes sideways",
+  "fade-up": "fades upward",
+  "slide-up": "rises into place",
+};
 
 /** One page at its native pixels; the caller scales it down for display. */
 function DemoPageFrame({
@@ -191,14 +206,153 @@ function ScaledPage(props: {
   width: number;
   height: number;
   displayHeight: number;
+  /** Drop the own frame so a parent stage can supply border and clipping. */
+  plain?: boolean;
   frameRef: (node: HTMLDivElement | null) => void;
 }) {
-  const { displayHeight, width, height, ...rest } = props;
+  const { displayHeight, width, height, plain, ...rest } = props;
   const k = displayHeight / height;
   return (
-    <div style={{ position: "relative", width: width * k, height: displayHeight, overflow: "hidden", borderRadius: 4, border: "1px solid var(--color-border)" }}>
+    <div style={{ position: "relative", width: width * k, height: displayHeight, overflow: "hidden", borderRadius: plain ? 0 : 4, border: plain ? "none" : "1px solid var(--color-border)" }}>
       <div style={{ position: "absolute", left: 0, top: 0, transform: `scale(${k})`, transformOrigin: "top left" }}>
         <DemoPageFrame page={rest.page} index={rest.index} total={rest.total} post={rest.post} mode={rest.mode} width={width} height={height} frameRef={rest.frameRef} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The preview's transition, derived from the very numbers the MP4 recorder
+ * paints with, so what you watch in the calendar is what the file will do.
+ */
+function stageKeyframes(motion: SjbSequenceMotion) {
+  const a = transitionFrame(motion.style, 0);
+  const b = transitionFrame(motion.style, 1);
+  const at = (x: number, y: number) => `translate(${x * 100}%, ${y * 100}%)`;
+  return {
+    in: [
+      { transform: at(a.toX, a.toY), opacity: a.toAlpha },
+      { transform: at(b.toX, b.toY), opacity: b.toAlpha },
+    ],
+    out: [
+      { transform: at(a.fromX, a.fromY), opacity: a.fromAlpha },
+      { transform: at(b.fromX, b.fromY), opacity: b.fromAlpha },
+    ],
+  };
+}
+
+/** A hand-off in flight: which page is leaving, which has arrived. */
+interface SjbHandoff {
+  from: number;
+  to: number;
+}
+
+function prefersReducedMotion(): boolean {
+  return typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+}
+
+/**
+ * The big page view. Pages swap with the format's own transition: a carousel
+ * pushes sideways, a Story fades up, a LinkedIn carousel rises into place.
+ * Nothing animates for anyone who has asked the system to reduce motion.
+ */
+function SequenceStage({
+  post,
+  mode,
+  demo,
+  spec,
+  active,
+  motion,
+  displayHeight = 380,
+}: {
+  post: SjbCalendarPost;
+  mode: SjbCalendarMode;
+  demo: SjbCalendarDemo;
+  spec: SjbCalendarFormatSpec;
+  active: number;
+  motion: SjbSequenceMotion;
+  displayHeight?: number;
+}) {
+  const inRef = useRef<HTMLDivElement>(null);
+  const outRef = useRef<HTMLDivElement>(null);
+  const lastIndex = useRef<number | null>(null);
+  const [handoff, setHandoff] = useState<SjbHandoff | null>(null);
+
+  useEffect(() => {
+    const from = lastIndex.current;
+    lastIndex.current = active;
+    if (from === null || from === active || prefersReducedMotion()) return;
+    setHandoff({ from, to: active });
+  }, [active]);
+
+  useEffect(() => {
+    if (!handoff) return;
+    const kf = stageKeyframes(motion);
+    const opts: KeyframeAnimationOptions = { duration: motion.moveMs, easing: motion.easing, fill: "both" };
+    const runs: Animation[] = [];
+    if (inRef.current) runs.push(inRef.current.animate(kf.in, opts));
+    if (outRef.current) runs.push(outRef.current.animate(kf.out, opts));
+    const clear = () => setHandoff(null);
+    const last = runs[runs.length - 1];
+    if (last) {
+      last.onfinish = clear;
+      last.oncancel = clear;
+    } else {
+      clear();
+    }
+    return () => {
+      for (const r of runs) {
+        try {
+          r.cancel();
+        } catch {
+          /* already over */
+        }
+      }
+    };
+  }, [handoff, motion]);
+
+  const k = displayHeight / spec.height;
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: spec.width * k,
+        height: displayHeight,
+        overflow: "hidden",
+        borderRadius: 4,
+        border: "1px solid var(--color-border)",
+        backgroundColor: SJB_DEMO_LOOKS[mode].base,
+      }}
+    >
+      {handoff && (
+        <div ref={outRef} style={{ position: "absolute", inset: 0 }}>
+          <ScaledPage
+            page={demo.pages[handoff.from]}
+            index={handoff.from}
+            total={demo.pages.length}
+            post={post}
+            mode={mode}
+            width={spec.width}
+            height={spec.height}
+            displayHeight={displayHeight}
+            plain
+            frameRef={() => {}}
+          />
+        </div>
+      )}
+      <div ref={inRef} style={{ position: "absolute", inset: 0 }}>
+        <ScaledPage
+          page={demo.pages[active]}
+          index={active}
+          total={demo.pages.length}
+          post={post}
+          mode={mode}
+          width={spec.width}
+          height={spec.height}
+          displayHeight={displayHeight}
+          plain
+          frameRef={() => {}}
+        />
       </div>
     </div>
   );
@@ -213,12 +367,27 @@ export type SjbDemoSequenceProps = {
 export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
   const demo = useMemo(() => sjbCalendarDemo(post, mode, format), [post, mode, format]);
   const [active, setActive] = useState(0);
-  const [busy, setBusy] = useState<"pdf" | "zip" | "page" | null>(null);
+  const [busy, setBusy] = useState<"pdf" | "zip" | "page" | "video" | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [videoPage, setVideoPage] = useState(0);
   const frames = useRef<Array<HTMLDivElement | null>>([]);
 
   const spec = demo?.spec;
   const look = SJB_DEMO_LOOKS[mode];
+  const motion = sjbSequenceMotion(format);
   const slug = `san-juan-bowl-${post.n}-${mode}-${format}-demo`;
+
+  // The preview advances at the same pace the exported clip runs at, so the
+  // play-through and the downloaded video are the same piece of motion.
+  useEffect(() => {
+    if (!playing || !demo) return;
+    if (active >= demo.pages.length - 1) {
+      setPlaying(false);
+      return;
+    }
+    const t = setTimeout(() => setActive((a) => Math.min(demo.pages.length - 1, a + 1)), motion.holdMs + motion.moveMs);
+    return () => clearTimeout(t);
+  }, [playing, active, demo, motion]);
 
   const targets = (): AssetCaptureTarget[] =>
     (demo?.pages ?? [])
@@ -246,6 +415,38 @@ export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
     }
   };
 
+  // Records the same four pages, at the format's exact pixels, with the
+  // format's transition between them. Real time: the clip is as long as the
+  // holds and handovers add up to.
+  const runVideo = async () => {
+    const t = targets();
+    if (t.length !== demo.pages.length) {
+      toast.error("This demo isn't ready to export yet.");
+      return;
+    }
+    setBusy("video");
+    setVideoPage(0);
+    try {
+      const canvases: HTMLCanvasElement[] = [];
+      for (const target of t) canvases.push(await captureAssetCanvas(target, { background: look.base }));
+      const out = await renderSequenceVideo({
+        pages: canvases,
+        width: spec.width,
+        height: spec.height,
+        motion,
+        background: look.base,
+        onProgress: (done) => setVideoPage(done),
+      });
+      downloadAssetBlob(out.blob, `${slug}.${out.ext}`);
+      if (out.ext !== "mp4") toast.message("This browser can't write MP4, so the clip saved as WebM instead.");
+    } catch (e) {
+      toast.error(`Video export failed: ${e instanceof Error ? e.message : "unknown error"}`);
+    } finally {
+      setBusy(null);
+      setVideoPage(0);
+    }
+  };
+
   const isPdf = spec.delivery === "pdf";
 
   return (
@@ -262,16 +463,14 @@ export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
       {demo.placeholderCopy && <p className="mt-1 text-xs text-amber-800">Team names in this post are still placeholders.</p>}
 
       <div className="mt-3 flex flex-wrap items-end gap-4">
-        <ScaledPage
-          page={demo.pages[active]}
-          index={active}
-          total={demo.pages.length}
+        <SequenceStage
           post={post}
           mode={mode}
-          width={spec.width}
-          height={spec.height}
+          demo={demo}
+          spec={spec}
+          active={active}
+          motion={motion}
           displayHeight={380}
-          frameRef={() => {}}
         />
         <ol className="flex gap-2 overflow-x-auto pb-1" aria-label="Demo pages">
           {demo.pages.map((p, i) => (
@@ -304,6 +503,20 @@ export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            if (!playing && active >= demo.pages.length - 1) setActive(0);
+            setPlaying((p) => !p);
+          }}
+          disabled={!!busy}
+        >
+          {playing ? "Stop preview" : active >= demo.pages.length - 1 ? "Play again" : "Play sequence"}
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => void runVideo()} disabled={!!busy}>
+          {busy === "video" ? `Rendering… page ${videoPage} of ${demo.pages.length}` : "Download demo video (MP4)"}
+        </Button>
         <Button size="sm" variant="outline" onClick={() => void run("page")} disabled={!!busy}>
           {busy === "page" ? "Saving…" : `Download page ${active + 1}`}
         </Button>
@@ -317,6 +530,10 @@ export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
           </Button>
         )}
       </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Pages hand over the way the exported clip does: the sequence {SJB_STYLE_LABEL[motion.style]} ·{" "}
+        {(sjbSequenceDuration(motion, demo.pages.length) / 1000).toFixed(1)} s at {spec.width}×{spec.height}.
+      </p>
     </section>
   );
 }
