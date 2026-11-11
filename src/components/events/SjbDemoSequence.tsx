@@ -18,6 +18,11 @@ import {
   type AssetCaptureTarget,
 } from "@/lib/asset-export";
 import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarDemo, type SjbCalendarDemo, type SjbDemoPage, type SjbDemoLook } from "@/lib/sjb-calendar-demo";
+import groundDark from "@/assets/sjb-card-covers/set-1.jpg";
+import groundSet2 from "@/assets/sjb-card-covers/set-2.jpg";
+import groundSet3 from "@/assets/sjb-card-covers/set-3.jpg";
+import groundSet4 from "@/assets/sjb-card-covers/set-4.jpg";
+import groundLight from "@/assets/sjb-card-covers/set-5.jpg";
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
 import type { SjbCalendarMode, SjbCalendarPost } from "@/lib/sjb-social-calendar";
 import type { SjbCalendarFormat, SjbCalendarFormatSpec } from "@/lib/sjb-calendar-formats";
@@ -28,6 +33,15 @@ import {
   transitionFrame,
   type SjbSequenceMotion,
 } from "@/lib/sjb-sequence-motion";
+
+/** Each look's own textless ground — the same plates its campaign card shows. */
+const LOOK_GROUND: Record<SjbCalendarMode, string> = {
+  dark: groundDark,
+  light: groundLight,
+  set2: groundSet2,
+  set3: groundSet3,
+  set4: groundSet4,
+};
 
 const FONT = '"Geist Variable", system-ui, sans-serif';
 
@@ -80,6 +94,17 @@ function DemoPageFrame({
         fontFamily: FONT,
       }}
     >
+      <img src={LOOK_GROUND[mode]} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      {/* Scrim keeps every line of copy readable over the look's ground. */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: look.dark
+            ? "linear-gradient(180deg, rgba(3,6,28,0.45) 0%, rgba(3,6,28,0.72) 45%, rgba(3,6,28,0.86) 100%)"
+            : "linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.8) 45%, rgba(255,255,255,0.9) 100%)",
+        }}
+      />
       <div style={{ position: "absolute", inset: 0, background: look.glow }} />
 
       {page.role === "cover" && page.photoUrl ? (
