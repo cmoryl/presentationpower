@@ -6,6 +6,7 @@ import { SjbLink, SjbShell } from '@/components/events/SjbShare';
 import { SJB_EVENT } from '@/lib/san-juan-bowl';
 import { sjbCanvaSize } from '@/lib/sjb-canva-gallery';
 import { SJB_SOCIAL_STUDIO_COLLECTIONS, SJB_SOCIAL_STUDIO_DESIGNS, sjbSocialStudioSequences, filterSjbSocialStudio, type SjbSocialStudioDesign } from '@/lib/sjb-social-studio';
+import { SjbCampaignAssets } from './SjbCampaignAssets';
 import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS } from '@/lib/sjb-calendar-style';
 import coverAll from '@/assets/sjb-card-covers/all.jpg';
 import shieldDark from '@/assets/san-juan-bowl/sjb-logo-dark.svg.asset.json';
@@ -33,6 +34,7 @@ export function SjbSocialStudio() {
   const [size, setSize] = useState('all');
   const [adType, setAdType] = useState('all');
   const [search, setSearch] = useState('');
+  const [assetsOpen, setAssetsOpen] = useState<string | null>(null);
   const [selected, setSelected] = useState<SjbSocialStudioDesign | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const results = useRef<HTMLDivElement>(null);
@@ -85,7 +87,8 @@ export function SjbSocialStudio() {
         const designs = visible.filter(d => d.collectionId === collection.id);
         if (!designs.length) return null;
         return <section key={collection.id} aria-labelledby={`collection-${collection.id}`} className="mt-10">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3"><h2 id={`collection-${collection.id}`} className="scroll-mt-24 text-xl font-bold">{collection.name}</h2><div className="flex flex-wrap items-center gap-2">{collection.id === 'light' && <Button asChild variant="outline" size="sm"><SjbLink page="set5assets"><FolderOpen />View design assets</SjbLink></Button>}<Button asChild variant="link" size="sm"><a href="https://www.canva.com/folder/FAHapVESyK8" target="_blank" rel="noreferrer">Open campaign folder<ExternalLink /></a></Button></div></div>
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3"><h2 id={`collection-${collection.id}`} className="scroll-mt-24 text-xl font-bold">{collection.name}</h2><div className="flex flex-wrap items-center gap-2">{collection.id === 'light' ? <Button asChild variant="outline" size="sm"><SjbLink page="set5assets"><FolderOpen />View design assets</SjbLink></Button> : <Button variant="outline" size="sm" aria-expanded={assetsOpen === collection.id} onClick={() => setAssetsOpen(o => o === collection.id ? null : collection.id)}><FolderOpen />{assetsOpen === collection.id ? 'Hide design assets' : 'View design assets'}</Button>}<Button asChild variant="link" size="sm"><a href="https://www.canva.com/folder/FAHapVESyK8" target="_blank" rel="noreferrer">Open campaign folder<ExternalLink /></a></Button></div></div>
+          {assetsOpen === collection.id && collection.id !== 'light' && <SjbCampaignAssets mode={collection.id as 'set2' | 'set3' | 'set4'} label={collection.name} />}
           <p className="mb-5 text-sm text-muted-foreground">Calendar artwork and reusable advertising sizes. New Canva adaptations await layout review and cleaned exports; originals remain unchanged.</p>
           {designs.some(d => d.format) && <p className="mb-5 text-sm text-muted-foreground">Heroes 1200×600 · Headers 1200×300 · Signature banners 1200×200. Intended display width: 600 px. Email artwork is saved in Canva; email sending and ticket links are not configured.</p>}
           <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
