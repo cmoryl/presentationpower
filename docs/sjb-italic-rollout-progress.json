@@ -95,5 +95,14 @@
     "DAHaisNRcgo (Set3 02 Story)"
   ],
   "next": "Set3 post 03 onward (see registry set3)",
-  "open_transactions": []
+  "open_transactions": [],
+  "set3_white_acc": {
+    "canva_asset": "MAHaobUhiZ0",
+    "method": "delete blue ACC, insert_fill white at same box (update_fill crops)",
+    "done": [
+      "01",
+      "02"
+    ],
+    "next": "03"
+  }
 }
