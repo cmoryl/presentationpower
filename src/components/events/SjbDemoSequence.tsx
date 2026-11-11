@@ -63,7 +63,7 @@ function DemoPageFrame({
 }) {
   const look = SJB_DEMO_LOOKS[mode];
   const style = SJB_CALENDAR_STYLE[mode];
-  const broadcaster = sjbBroadcastMark(post.headline, mode);
+  const broadcaster = sjbBroadcastMark(post.headline, mode, height > width);
   const logo = SJB_LOGOS.find((l) => l.id === (look.dark ? "dark" : "color"));
   if (!logo) return null;
   // Every size below is a share of the short edge, so the same page reads the
@@ -124,9 +124,9 @@ function DemoPageFrame({
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: px(2) }}>
                 {broadcaster ? <>
                   <SjbFittedCallout lines={[broadcaster.label]} width={width * 0.86} height={height * 0.28} maxSize={s * 0.24} />
-                  <img data-bowl-broadcaster src={broadcaster.url} alt={broadcaster.alt} style={{ width: '100%', height: 'auto', marginTop: px(4) }} />
+                  <img data-bowl-broadcaster src={broadcaster.url} alt={broadcaster.alt} style={{ width: '100%', height: width * 0.86 / broadcaster.ratio, objectFit: 'contain', marginTop: px(4) }} />
                 </> : <>
-                  <SjbFittedCallout lines={post.headline} width={width * 0.86} height={height * 0.55} maxSize={s * 0.24} italic={style.italic} />
+                  <SjbFittedCallout lines={post.headline} width={width * 0.86} height={height * 0.65} maxSize={s * 0.36} italic={style.italic} />
                 </>}
                 <div style={{ width: px(22), height: px(0.7), backgroundColor: look.accent, marginTop: px(4) }} />
               </div>
@@ -138,7 +138,7 @@ function DemoPageFrame({
           {page.role === "tickets" && (
             <>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", gap: px(3) }}>
-                <SjbFittedCallout lines={['GET YOUR', 'TICKETS']} width={width * 0.86} height={height * 0.38} maxSize={s * 0.23} />
+                <SjbFittedCallout lines={['GET YOUR', 'TICKETS']} width={width * 0.86} height={height * 0.46} maxSize={s * 0.34} />
                 <SjbFittedCallout lines={[SJB_DEMO_SITE]} width={width * 0.86} height={s * 0.14} maxSize={s * 0.14} style={{ color: look.accent }} />
                 <div style={{ fontSize: px(2.8), opacity: 0.8 }}>{SJB_DEMO_FACTS[0].value} · {SJB_DEMO_FACTS[1].value}</div>
               </div>
@@ -194,7 +194,7 @@ function DemoPageFrame({
 function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarPost; mode: SjbCalendarMode; width: number; height: number; logo: string }) {
   const look = SJB_DEMO_LOOKS[mode];
   const style = SJB_CALENDAR_STYLE[mode];
-  const broadcaster = sjbBroadcastMark(post.headline, mode);
+  const broadcaster = sjbBroadcastMark(post.headline, mode, height > width);
   const square = height === width;
   const tall = height / width > 1.6;
   const spotlight = mode === 'set3';
@@ -205,7 +205,8 @@ function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarP
   const groupBottom = markTop + markSize + width * 0.08;
   const copyTop = balanced ? Math.max(markTop + markSize + width * 0.055, height * (square ? 615 / 1080 : tall ? 0.53 : 770 / 1350)) : Math.max(groupBottom + width * 0.035, height * (square ? 0.57 : tall ? 0.48 : 0.55));
   const copyWidth = width * (spotlight ? 0.64 : 0.90);
-  const calloutHeight = height - copyTop - width * 0.19;
+  const footerTop = height - width * 0.14;
+  const calloutHeight = footerTop - copyTop - width * 0.04;
   const markLeft = spotlight ? width * 0.07 : (width - markSize) / 2;
   return <div style={{ position: 'absolute', inset: 0, textAlign: spotlight ? 'left' : 'center', letterSpacing: 0 }}>
     <img data-bowl-logo src={logo} alt="San Juan Bowl" style={{ position: 'absolute', top: markTop, left: markLeft, width: markSize, height: markSize, objectFit: 'contain' }} />
@@ -219,15 +220,15 @@ function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarP
     <div data-bowl-copy style={{ position: 'absolute', top: copyTop, left: width * (spotlight ? 0.07 : 0.05), width: copyWidth }}>
       <div style={{ color: mode === 'light' ? look.ink : spotlight ? look.ink : look.accent }}>
         {broadcaster ? <>
-          <SjbFittedCallout lines={[broadcaster.label]} width={copyWidth} height={Math.max(width * 0.08, calloutHeight - copyWidth * 0.065 - unit * 4)} maxSize={width * 0.22} italic={style.italic} />
-          <img data-bowl-broadcaster src={broadcaster.url} alt={broadcaster.alt} style={{ width: '100%', height: 'auto', marginTop: unit * 4 }} />
-        </> : <SjbFittedCallout lines={post.headline} width={copyWidth} height={calloutHeight} maxSize={width * 0.22} italic={style.italic} />}
+          <SjbFittedCallout lines={[broadcaster.label]} width={copyWidth} height={Math.max(width * 0.08, calloutHeight - copyWidth / broadcaster.ratio - unit * 4)} maxSize={width * 0.36} italic={style.italic} />
+          <img data-bowl-broadcaster src={broadcaster.url} alt={broadcaster.alt} style={{ width: '100%', height: copyWidth / broadcaster.ratio, objectFit: 'contain', marginTop: unit * 4 }} />
+        </> : <SjbFittedCallout lines={post.headline} width={copyWidth} height={calloutHeight} maxSize={width * 0.36} italic={style.italic} />}
       </div>
-      <div data-bowl-footer style={{ marginTop: unit * 2.7, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: unit * (spotlight ? 2.6 : 2.8), lineHeight: 1.3, color: look.ink }}>
+    </div>
+      <div data-bowl-footer style={{ position: 'absolute', top: footerTop, left: width * (spotlight ? 0.07 : 0.05), width: copyWidth, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: unit * (spotlight ? 2.6 : 2.8), lineHeight: 1.3, color: look.ink }}>
         <div>{SJB_DEMO_FACTS[0].value.toUpperCase()} · {SJB_DEMO_FACTS[1].value.toUpperCase()}</div>
         <div style={{ marginTop: unit }}>{SJB_DEMO_SITE}</div>
       </div>
-    </div>
   </div>;
 }
 
