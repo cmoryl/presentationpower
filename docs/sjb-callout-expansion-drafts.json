@@ -1,26 +1,34 @@
 {
-  "status": "awaiting_preview_approval",
-  "drafts": [
+  "status": "approved_rollout_partial",
+  "footer_font_size": 40,
+  "saved_and_refreshed": [
     {
       "design": "DAHajU6sr6Q",
-      "transaction": "2287224556561808711",
-      "callout_font_size": 180,
+      "callout_font_size": 200,
       "callout_top": 730,
       "footer_top": 1200
     },
     {
       "design": "DAHaiha6rsA",
-      "transaction": "2206159761538779727",
-      "callout_font_size": 200,
+      "callout_font_size": 220,
       "footer_top": 1700,
       "cbs_asset": "MAHanbs5Hvo",
       "cbs_box": [
         115,
-        1380,
+        1410,
         850,
         219.281538
       ]
-    }
+    },
+    { "design": "DAHai6z-QLU", "callout_font_size": 220, "callout_top": 1018, "footer_top": 1700 },
+    { "design": "DAHaip2dmXU", "callout_font_size": 220, "callout_top": 900.9057, "footer_top": 1680 },
+    { "design": "DAHaj3Zi7Pk", "callout_font_size": 220, "callout_top": 700, "footer_top": 1370 },
+    { "design": "DAHaihWqANo", "callout_font_size": 180, "callout_top": 730, "footer_top": 1200 },
+    { "design": "DAHai9LjMKQ", "callout_font_size": 160, "callout_top": 770, "footer_top": 1220 },
+    { "design": "DAHaiktOY8o", "callout_font_size": 190, "callout_top": 640, "footer_top": 1235 },
+    { "design": "DAHaiI04YUs", "callout_font_size": 150, "callout_top": 630, "footer_top": 1170 }
   ],
-  "remaining": "Full 420-design rollout and cleaned calendar refresh not performed; shared drawn templates updated, live browser layout unverified."
+  "open_transactions": [],
+  "verification": { "native_dimensions": true, "cleaned_pixels_unchanged": true, "canva_previews_reviewed": true, "tests_passed": 14, "live_calendar": "Root navigation timed out after 30 seconds; not verified." },
+  "remaining": "411 of the 420 original Canva designs remain in this approved enlargement rollout. Shared drawn footer is approximately 40px at 1080px and reserves additional lower space; existing saved image covers are never overlaid. Full visual audit and live calendar verification remain incomplete."
 }
