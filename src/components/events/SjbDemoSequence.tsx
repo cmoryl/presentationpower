@@ -125,7 +125,7 @@ function DemoPageFrame({
               <div style={{ marginTop: px(9), fontSize: px(2.6), letterSpacing: "0.2em", opacity: 0.75 }}>{post.phase.toUpperCase()} · {SJB_DEMO_FACTS[0].value.toUpperCase()}</div>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: px(2) }}>
                 {broadcaster ? <>
-                  <SjbFittedCallout lines={[broadcaster.label]} width={width * 0.86} height={height * 0.28} maxSize={s * 0.24} />
+                  <SjbFittedCallout lines={[broadcaster.label]} width={width * 0.86} height={height * 0.28} maxSize={s * 0.24} italic={style.italic} />
                   <img data-bowl-broadcaster src={broadcaster.url} alt={broadcaster.alt} style={{ width: broadcasterWidth, height: broadcasterWidth / broadcaster.ratio, objectFit: 'contain', alignSelf: 'center', flexShrink: 0, marginTop: px(4), marginBottom: px(4) }} />
                 </> : <>
                   <SjbFittedCallout lines={post.headline} width={width * 0.86} height={height * 0.65} maxSize={s * 0.36} italic={style.italic} />
@@ -140,8 +140,8 @@ function DemoPageFrame({
           {page.role === "tickets" && (
             <>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", gap: px(3) }}>
-                <SjbFittedCallout lines={['GET YOUR', 'TICKETS']} width={width * 0.86} height={height * 0.46} maxSize={s * 0.34} />
-                <SjbFittedCallout lines={[SJB_DEMO_SITE]} width={width * 0.86} height={s * 0.14} maxSize={s * 0.14} style={{ color: look.accent }} />
+                <SjbFittedCallout lines={['GET YOUR', 'TICKETS']} width={width * 0.86} height={height * 0.46} maxSize={s * 0.34} italic={style.italic} />
+                <SjbFittedCallout lines={[SJB_DEMO_SITE]} width={width * 0.86} height={s * 0.14} maxSize={s * 0.14} italic={style.italic} style={{ color: look.accent }} />
                 <div style={{ fontSize: px(3.7), lineHeight: 1.2 }}>{SJB_DEMO_FACTS[0].value} · {SJB_DEMO_FACTS[1].value}</div>
               </div>
               <div data-bowl-ticket-partners style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: px(6), height: px(16), flexShrink: 0, marginBottom: px(6) }}>

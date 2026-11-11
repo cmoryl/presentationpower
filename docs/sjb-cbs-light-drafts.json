@@ -1,11 +1,15 @@
 {
-  "status": "awaiting_preview_approval",
+  "status": "approved_saved_and_refreshed_with_larger_callouts",
   "asset": "MAHanqC-5aE",
   "drafts": [
     { "design": "DAHaiOk55vE", "size": "Feed", "transaction": "6206482133681107849", "box": [115, 760, 850, 219.281538], "footer_top": 1070 },
     { "design": "DAHaj4W683s", "size": "Square", "transaction": "668180494868422313", "box": [190, 595, 700, 180.584796], "footer_top": 865 },
     { "design": "DAHajxZAXGE", "size": "Story", "transaction": "6960835073449722039", "box": [115, 1040, 850, 219.281538], "footer_top": 1360 }
   ],
-  "saved": false,
-  "calendar_pictures_refreshed": false
+  "saved": true,
+  "calendar_pictures_refreshed": true,
+  "callout_font_sizes": { "Feed": 240, "Square": 220, "Story": 300 },
+  "support_font_size": 40,
+  "metadata_cleaned_without_pixel_changes": true,
+  "open_transactions": []
 }
