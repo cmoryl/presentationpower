@@ -408,6 +408,38 @@ export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
     }
   };
 
+  // Records the same four pages, at the format's exact pixels, with the
+  // format's transition between them. Real time: the clip is as long as the
+  // holds and handovers add up to.
+  const runVideo = async () => {
+    const t = targets();
+    if (t.length !== demo.pages.length) {
+      toast.error("This demo isn't ready to export yet.");
+      return;
+    }
+    setBusy("video");
+    setVideoPage(0);
+    try {
+      const canvases: HTMLCanvasElement[] = [];
+      for (const target of t) canvases.push(await captureAssetCanvas(target, { background: look.base }));
+      const out = await renderSequenceVideo({
+        pages: canvases,
+        width: spec.width,
+        height: spec.height,
+        motion,
+        background: look.base,
+        onProgress: (done) => setVideoPage(done),
+      });
+      downloadAssetBlob(out.blob, `${slug}.${out.ext}`);
+      if (out.ext !== "mp4") toast.message("This browser can't write MP4, so the clip saved as WebM instead.");
+    } catch (e) {
+      toast.error(`Video export failed: ${e instanceof Error ? e.message : "unknown error"}`);
+    } finally {
+      setBusy(null);
+      setVideoPage(0);
+    }
+  };
+
   const isPdf = spec.delivery === "pdf";
 
   return (
@@ -424,16 +456,14 @@ export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
       {demo.placeholderCopy && <p className="mt-1 text-xs text-amber-800">Team names in this post are still placeholders.</p>}
 
       <div className="mt-3 flex flex-wrap items-end gap-4">
-        <ScaledPage
-          page={demo.pages[active]}
-          index={active}
-          total={demo.pages.length}
+        <SequenceStage
           post={post}
           mode={mode}
-          width={spec.width}
-          height={spec.height}
+          demo={demo}
+          spec={spec}
+          active={active}
+          motion={motion}
           displayHeight={380}
-          frameRef={() => {}}
         />
         <ol className="flex gap-2 overflow-x-auto pb-1" aria-label="Demo pages">
           {demo.pages.map((p, i) => (
