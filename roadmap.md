@@ -1,4 +1,6 @@
 # Roadmap
+## Current Illustrator rollout
+- [ ] Build editable Illustrator packages from saved Canva exports for the updated socials singles, projections, and registered multi-page files; link verified packages on socials and calendar. BLOCKED Nov 11 21:46 UTC: Canva confirms PPTX support but the first Set 2 export returns “Too many daily export requests for user.” No new packages created or stale packages relabelled. Existing process produces layered SVG + embedded pictures in ZIP, editable in Illustrator, not a native cloud-synced .ai file; exact campaign fonts must be installed.
 ## Current Bowl social page update
 - [x] Remove legacy Design Sets 1 and 4 from the social page only; Set 2 projections now appear as individual designs in Set 2. Sets 2, 3 and 5 read all 252 calendar singles and available multi-page links; Set 6 retains issued files because no matching calendar look exists. Originals and calendar Set 4 preserved. Public desktop/mobile selection, enlargement and JPG download verified, no page errors or mobile overflow; 14 tests pass.
 ## Bowl social calendar
