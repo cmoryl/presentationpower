@@ -18,11 +18,9 @@ import {
   type AssetCaptureTarget,
 } from "@/lib/asset-export";
 import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarDemo, type SjbCalendarDemo, type SjbDemoPage, type SjbDemoLook } from "@/lib/sjb-calendar-demo";
-import groundDark from "@/assets/sjb-card-covers/set-1.jpg";
-import groundSet2 from "@/assets/sjb-card-covers/set-2.jpg";
-import groundSet3 from "@/assets/sjb-card-covers/set-3.jpg";
-import groundSet4 from "@/assets/sjb-card-covers/set-4.jpg";
-import groundLight from "@/assets/sjb-card-covers/set-5.jpg";
+import '@fontsource/barlow-condensed/700.css';
+import '@fontsource/barlow-condensed/700-italic.css';
+import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS } from '@/lib/sjb-calendar-style';
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
 import type { SjbCalendarMode, SjbCalendarPost } from "@/lib/sjb-social-calendar";
 import type { SjbCalendarFormat, SjbCalendarFormatSpec } from "@/lib/sjb-calendar-formats";
@@ -33,15 +31,6 @@ import {
   transitionFrame,
   type SjbSequenceMotion,
 } from "@/lib/sjb-sequence-motion";
-
-/** Each look's own textless ground — the same plates its campaign card shows. */
-const LOOK_GROUND: Record<SjbCalendarMode, string> = {
-  dark: groundDark,
-  light: groundLight,
-  set2: groundSet2,
-  set3: groundSet3,
-  set4: groundSet4,
-};
 
 const FONT = '"Geist Variable", system-ui, sans-serif';
 
@@ -69,7 +58,9 @@ function DemoPageFrame({
   frameRef: (node: HTMLDivElement | null) => void;
 }) {
   const look = SJB_DEMO_LOOKS[mode];
-  const logo = SJB_LOGOS.find((l) => l.id === (look.dark ? "dark" : "color"))!;
+  const style = SJB_CALENDAR_STYLE[mode];
+  const logo = SJB_LOGOS.find((l) => l.id === (look.dark ? "dark" : "color"));
+  if (!logo) return null;
   // Every size below is a share of the short edge, so the same page reads the
   // same way at 1080×1080, 1080×1350 and 1080×1920.
   const s = Math.min(width, height);
@@ -80,6 +71,8 @@ function DemoPageFrame({
     <div
       ref={frameRef}
       data-kit-asset-frame
+      data-bowl-look={mode}
+      data-bowl-role={page.role}
       style={{
         position: "relative",
         width,
@@ -90,42 +83,33 @@ function DemoPageFrame({
         fontFamily: FONT,
       }}
     >
-      <img src={LOOK_GROUND[mode]} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      <img src={style.ground} alt="" data-bowl-ground style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      {mode === 'set3' && <img src={SJB_CALENDAR_MARKS.player} alt="" style={{ position: 'absolute', right: '-2%', bottom: '4%', height: '78%', width: '48%', objectFit: 'contain', objectPosition: 'right bottom', opacity: page.role === 'cover' ? 1 : 0.3 }} />}
       {/* Scrim keeps every line of copy readable over the look's ground. */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background: look.dark
+          background: page.role === 'cover' ? 'none' : look.dark
             ? "linear-gradient(180deg, rgba(3,6,28,0.45) 0%, rgba(3,6,28,0.72) 45%, rgba(3,6,28,0.86) 100%)"
             : "linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.8) 45%, rgba(255,255,255,0.9) 100%)",
         }}
       />
-      <div style={{ position: "absolute", inset: 0, background: look.glow }} />
 
       {page.role === "cover" && page.photoUrl ? (
-        <img src={page.photoUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+        <img src={page.photoUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }} />
       ) : (
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", padding: pad, boxSizing: "border-box" }}>
           {page.role === "cover" && (
-            <>
-              <img src={logo.svg} alt="" style={{ height: px(26), width: "auto", alignSelf: "center", marginTop: px(6) }} />
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", gap: px(2) }}>
-                <div style={{ fontSize: px(9), fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.02em" }}>{post.headline[0]}</div>
-                <div style={{ fontSize: px(9), fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.02em", color: look.accent }}>{post.headline[1]}</div>
-              </div>
-              <div style={{ fontSize: px(2.8), letterSpacing: "0.16em", textAlign: "center", opacity: 0.85, marginBottom: px(5) }}>
-                {SJB_DEMO_FACTS[0].value.toUpperCase()} · {SJB_DEMO_FACTS[1].value.toUpperCase()}
-              </div>
-            </>
+            <CampaignCover post={post} mode={mode} width={width} height={height} logo={logo.svg} />
           )}
 
           {page.role === "headline" && (
             <>
               <div style={{ marginTop: px(9), fontSize: px(2.6), letterSpacing: "0.2em", opacity: 0.75 }}>{post.phase.toUpperCase()} · {SJB_DEMO_FACTS[0].value.toUpperCase()}</div>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: px(2) }}>
-                <div style={{ fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: "-0.02em" }}>{post.headline[0]}</div>
-                <div style={{ fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: "-0.02em", color: look.accent }}>{post.headline[1]}</div>
+                <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: 0, fontStyle: style.italic ? 'italic' : 'normal', overflowWrap: 'anywhere' }}>{post.headline[0]}</div>
+                <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: 0, color: look.accent, overflowWrap: 'anywhere' }}>{post.headline[1]}</div>
                 <div style={{ width: px(22), height: px(0.7), backgroundColor: look.accent, marginTop: px(4) }} />
               </div>
             </>
@@ -184,7 +168,7 @@ function DemoPageFrame({
         </div>
       )}
       {/* Drawn pages carry the site line; the approved-image cover is left untouched. */}
-      {page.photoKind === "none" && (
+      {page.photoKind === "none" && page.role !== 'cover' && (
         <div
           style={{
             position: "absolute",
@@ -202,6 +186,40 @@ function DemoPageFrame({
       )}
     </div>
   );
+}
+
+/** A composition reflow, never a different campaign or a stretched finished picture. */
+function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarPost; mode: SjbCalendarMode; width: number; height: number; logo: string }) {
+  const look = SJB_DEMO_LOOKS[mode];
+  const style = SJB_CALENDAR_STYLE[mode];
+  const square = height === width;
+  const tall = height / width > 1.6;
+  const spotlight = mode === 'set3';
+  const unit = width / 100;
+  const markSize = width * (square ? 0.40 : 0.48);
+  const markTop = height * 0.07;
+  const groupBottom = markTop + markSize + width * 0.08;
+  const copyTop = Math.max(groupBottom + width * 0.035, height * (square ? 0.57 : tall ? 0.48 : 0.55));
+  const copyWidth = width * (spotlight ? 0.64 : 0.90);
+  const maxChars = Math.max(...post.headline.map(h => h.length));
+  const headlineSize = Math.min(width * (tall ? 0.105 : 0.105), copyWidth / (maxChars * 0.46));
+  const markLeft = spotlight ? width * 0.07 : (width - markSize) / 2;
+  return <div style={{ position: 'absolute', inset: 0, textAlign: spotlight ? 'left' : 'center', letterSpacing: 0 }}>
+    <img data-bowl-logo src={logo} alt="San Juan Bowl" style={{ position: 'absolute', top: markTop, left: markLeft, width: markSize, height: markSize, objectFit: 'contain' }} />
+    <div data-bowl-conferences style={{ position: 'absolute', top: markTop + markSize + unit * 2, left: spotlight ? width * 0.09 : width * 0.30, width: spotlight ? width * 0.42 : width * 0.40, height: unit * 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <img src={look.dark ? SJB_CALENDAR_MARKS.accWhite : SJB_CALENDAR_MARKS.accColor} alt="ACC" style={{ width: unit * 10, height: unit * 5.5, objectFit: 'contain' }} />
+      <img src={SJB_CALENDAR_MARKS.sunBelt} alt="Sun Belt Conference" style={{ width: unit * 10, height: unit * 5.5, objectFit: 'contain' }} />
+    </div>
+    <div data-bowl-copy style={{ position: 'absolute', top: copyTop, left: width * (spotlight ? 0.07 : 0.05), width: copyWidth }}>
+      <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: headlineSize, lineHeight: 1.05, color: mode === 'light' ? look.ink : spotlight ? look.ink : look.accent, fontStyle: style.italic ? 'italic' : 'normal' }}>
+        {post.headline.map((h, i) => <div key={i} style={{ overflowWrap: 'anywhere' }}>{h}</div>)}
+      </div>
+      <div data-bowl-footer style={{ marginTop: unit * 2.7, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: unit * (spotlight ? 2.6 : 2.8), lineHeight: 1.3, color: look.ink }}>
+        <div>{SJB_DEMO_FACTS[0].value.toUpperCase()} · {SJB_DEMO_FACTS[1].value.toUpperCase()}</div>
+        <div style={{ marginTop: unit }}>{SJB_DEMO_SITE}</div>
+      </div>
+    </div>
+  </div>;
 }
 
 /** Native-size page shown at a display height, via a CSS scale. */
@@ -580,7 +598,7 @@ function DetailsPage({ look, px, wide, tall }: { look: SjbDemoLook; px: (n: numb
     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", lineHeight: 0.9 }}>
       <span style={label}>SAVE THE DATE</span>
       <span style={{ fontSize: px(wide ? 9 : 10), fontWeight: 800, letterSpacing: "0.04em", marginTop: px(2.4) }}>{d.month}</span>
-      <span style={{ fontSize: px(wide ? 27 : tall ? 34 : 30), fontWeight: 800, letterSpacing: "-0.04em", color: look.accent, lineHeight: 0.82 }}>{d.day}</span>
+      <span style={{ fontSize: px(wide ? 27 : tall ? 30 : 24), fontWeight: 800, letterSpacing: 0, color: look.accent, lineHeight: 0.9 }}>{d.day}</span>
       <span style={{ fontSize: px(wide ? 6 : 6.6), fontWeight: 600, letterSpacing: "0.12em", opacity: 0.9, marginTop: px(1.6) }}>{d.year}</span>
     </div>
   ) : (
@@ -596,11 +614,11 @@ function DetailsPage({ look, px, wide, tall }: { look: SjbDemoLook; px: (n: numb
   const facts = (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "center", textAlign: "left" }}>
       {rows.map((r, i) => (
-        <div key={r.k} style={{ display: "flex", gap: px(3), alignItems: "flex-start", padding: `${px(tall ? 3.6 : 2.6)} 0`, borderTop: i ? `1px solid ${rule}` : "none" }}>
+        <div key={r.k} style={{ display: "flex", gap: px(3), alignItems: "flex-start", padding: `${px(tall ? 3.6 : 1.8)} 0`, borderTop: i ? `1px solid ${rule}` : "none" }}>
           <div style={{ width: px(0.9), alignSelf: "stretch", backgroundColor: look.accent, borderRadius: px(0.4) }} />
           <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
             <div style={{ ...label, color: look.ink, opacity: 0.72, lineHeight: 1.2 }}>{r.k.toUpperCase()}</div>
-            <div style={{ fontSize: px(wide ? 4.6 : 5.2), fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.01em", marginTop: px(1) }}>{r.main}</div>
+            <div style={{ fontSize: px(wide ? 4.6 : 4.8), fontWeight: 700, lineHeight: 1.15, letterSpacing: 0, marginTop: px(1) }}>{r.main}</div>
             {r.sub && <div style={{ fontSize: px(wide ? 3 : 3.3), fontWeight: 500, lineHeight: 1.3, opacity: 0.85, marginTop: px(0.8) }}>{r.sub}</div>}
           </div>
         </div>
@@ -609,7 +627,7 @@ function DetailsPage({ look, px, wide, tall }: { look: SjbDemoLook; px: (n: numb
   );
 
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: wide ? "row" : "column", gap: px(wide ? 6 : tall ? 8 : 5), marginTop: px(9), marginBottom: px(8), alignItems: wide ? "center" : "stretch", textAlign: "left" }}>
+    <div data-bowl-details style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: wide ? "row" : "column", gap: px(wide ? 6 : tall ? 8 : 3), marginTop: px(9), marginBottom: px(10), alignItems: wide ? "center" : "stretch", textAlign: "left" }}>
       <div style={{ flex: wide ? "0 0 38%" : "0 0 auto", paddingRight: wide ? px(5) : 0, borderRight: wide ? `1px solid ${rule}` : "none" }}>{dateBlock}</div>
       {facts}
     </div>

@@ -1,5 +1,7 @@
 # Roadmap
 ## Bowl social calendar
+- [x] Corrected mismatched demo imagery across all five calendar styles from exact media extracted from Canva originals; 270 missing-export single frames checked live with zero logo/conference/copy overlaps. Details JPG download verified. Inventory recorded in docs/sjb-social-audit-2026-11-11.json.
+- [ ] Full Canva artwork visual audit remains incomplete: all 420 links inventoried, five original Feed compositions inspected, 150 cleaned exports present and 270 still missing. Exact Heading Now font is not supplied locally (demos use condensed Barlow); source typography, source-logo fixes, refreshed exports and full mobile sequence framing remain unverified.
 - [x] Demo multi-page sequences for every post, look and format awaiting artwork: four labelled pages (cover, headline, details, tickets) drawn from the post's approved headline and announced event facts only, viewable in the calendar and downloadable as a LinkedIn PDF or a ZIP of 1080-px pictures with the DEMO LAYOUT badge on every page. Real Canva multi-page artwork still has to replace them.
 - [x] Built and linked all 82 missing Dark/Light Feed/Square/Story Canva versions; all 28 posts now have five looks × three sizes (420 links), existing originals preserved.
 - [ ] New 82 versions: inspect layouts and export cleaned full-size pictures/downloads. Canva links are available; new image previews remain pending, not substituted with thumbnails.
