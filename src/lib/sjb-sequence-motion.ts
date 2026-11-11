@@ -144,7 +144,7 @@ export interface SjbSequenceVideoResult {
 
 function pickVideoMime(): string {
   if (typeof MediaRecorder === "undefined") return "";
-  for (const m of VIDEO_MIMES()) {
+  for (const m of VIDEO_MIME_CANDIDATES) {
     try {
       if (MediaRecorder.isTypeSupported(m)) return m;
     } catch {
@@ -152,10 +152,6 @@ function pickVideoMime(): string {
     }
   }
   return "";
-}
-
-function VIDEO_MIMES(): string[] {
-  return VIDEO_MIME_CANDIDATES;
 }
 
 function paintComposite(
