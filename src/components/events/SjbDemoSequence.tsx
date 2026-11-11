@@ -31,6 +31,13 @@ import {
 
 const FONT = '"Geist Variable", system-ui, sans-serif';
 
+/** Plain words for each handover, so the controls say what the clip will do. */
+const SJB_STYLE_LABEL: Record<SjbSequenceMotion["style"], string> = {
+  push: "pushes sideways",
+  "fade-up": "fades upward",
+  "slide-up": "rises into place",
+};
+
 /** One page at its native pixels; the caller scales it down for display. */
 function DemoPageFrame({
   page,
@@ -496,6 +503,20 @@ export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            if (!playing && active >= demo.pages.length - 1) setActive(0);
+            setPlaying((p) => !p);
+          }}
+          disabled={!!busy}
+        >
+          {playing ? "Stop preview" : active >= demo.pages.length - 1 ? "Play again" : "Play sequence"}
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => void runVideo()} disabled={!!busy}>
+          {busy === "video" ? `Rendering… page ${videoPage} of ${demo.pages.length}` : "Download demo video (MP4)"}
+        </Button>
         <Button size="sm" variant="outline" onClick={() => void run("page")} disabled={!!busy}>
           {busy === "page" ? "Saving…" : `Download page ${active + 1}`}
         </Button>
@@ -509,6 +530,10 @@ export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
           </Button>
         )}
       </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Pages hand over the way the exported clip does: the sequence {SJB_STYLE_LABEL[motion.style]} ·{" "}
+        {(sjbSequenceDuration(motion, demo.pages.length) / 1000).toFixed(1)} s at {spec.width}×{spec.height}.
+      </p>
     </section>
   );
 }
