@@ -2,7 +2,8 @@
   "source": "https://www.cbssportsnetwork.com/",
   "white_media": "MAHakFYdd68",
   "black_media": "MAHakA8wj3Q",
-  "approval_required": true,
+  "approval_required": false,
+  "status": "All 15 revisions approved, committed, exported, cleaned and linked; full receipts in sjb-cbs-logo-refresh.json",
   "designs": [
     {
       "look": "dark",
