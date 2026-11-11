@@ -1,0 +1,636 @@
+{
+  "scope": "Replace missing Set 4 single-cover demos from post 06 onward with existing Canva originals; no source artwork edits",
+  "receipts": [
+    {
+      "id": "DAHajU6sr6Q",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "01388fefaaa0d6e9ce0b5778833a37503ac5409f057454ca224a3e306bfe9eb5"
+    },
+    {
+      "id": "DAHajb3FU80",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "db90512616d2013c44a7b8c02e4e3ea68b7dd2bd8b586346bbaafa544abf914b"
+    },
+    {
+      "id": "DAHajbzYi_s",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "c7a51667313cc818baa030d77549e31b8feee14dccd0129d93ecae4279b70672"
+    },
+    {
+      "id": "DAHajXJ2Mvc",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "0f858e8b54ec2efd8006d9446b755fe5e862a6b11ebbb0588cf96fe23441b61e"
+    },
+    {
+      "id": "DAHajZZVMLA",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "f533229331487113a06427918667b0ff44492076329bbc2020c7aeddca510af8"
+    },
+    {
+      "id": "DAHajbB-0Y8",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "6682c4dd645092a0d118b8726ea577f3158618abb8bf03139699dae955d4838b"
+    },
+    {
+      "id": "DAHajaEyyZI",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "c47dc3bd4f1082930fb50683ceadcc323949c4c68ce694e85cc8dd52429de6de"
+    },
+    {
+      "id": "DAHajUvHuB4",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "32efcdbb18d6a94eedb003dbde8b71b1108806b99a0748410d9427cb1396a8b2"
+    },
+    {
+      "id": "DAHajcUiY5M",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "fb92bdc43328834eb7b158ab96c93e897bf29d22d804ed05fb9b423f2409b539"
+    },
+    {
+      "id": "DAHajY9oz8M",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "c14ef473bfdabb8a99d97189d1e1696a8923f3099f5274cc602d451392193274"
+    },
+    {
+      "id": "DAHajU5VTZU",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "810dc8541ce0dd65d60dfa0ac5dc7b908befc9d90a4c37b4bdc56ef0d90f0991"
+    },
+    {
+      "id": "DAHajSOi6ew",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "4c939b73008058365bc3e2769cd1439463ff96fe3c02107dae2582ad2f5c4fed"
+    },
+    {
+      "id": "DAHajSM5cjM",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "9dd472e4eb19974701c8185d1764524be0da55a049198bb8b988192a928f3186"
+    },
+    {
+      "id": "DAHajZptH3g",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "c741b75a991da0f2fb81e3f252fb1244cc996030bc4d82582052790c622eaa04"
+    },
+    {
+      "id": "DAHajbB4fOU",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "09d7ce4ee24b506c0b59db0a29282df84c0ec1b846a75729f1103096ea3aa41e"
+    },
+    {
+      "id": "DAHajWCzB1s",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "16142315224b125b853905aeaeb569b91a325223abc583cd9608067562add1bf"
+    },
+    {
+      "id": "DAHajXGjG_w",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "da8e619cecd450811642b76e44cd82c3f505d7cfba93a5352a4bd4008b53b1b3"
+    },
+    {
+      "id": "DAHajQO1QD8",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "c69c55069954d9b093619abd96296e81b2ba95a7f9c23c366d4b08a44b8d5c88"
+    },
+    {
+      "id": "DAHajY390Sc",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "ba7bdd82f592d6a24b4b9e9db660db8e2050a37698a7252f33afd182e309596d"
+    },
+    {
+      "id": "DAHajfqMQR0",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "832a05d0e6feddcf248e44552bc8d9ce1f73e043ef00a12d26f82404bf9b03b9"
+    },
+    {
+      "id": "DAHajUjePbk",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "7e3160d21e8871277ff5673ff799ebc10b93f5e570f7c2315b2cef2a901e2d5d"
+    },
+    {
+      "id": "DAHajUVmGuA",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "676244dd93cb288da86fe8510deb71fe8bde6cf7d63bfd39c70b430e9acb4b75"
+    },
+    {
+      "id": "DAHajTRdE7c",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "c0b791849b510ac5fc2c28fdb8162fc3223a94567cfbcba59f128e6398b5afc0"
+    },
+    {
+      "id": "DAHajd1E_34",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "fb4426f89c7bf82705fb8c35788eca4f5131f5d8d766a8ad6ce8e9c5c9cc4d34"
+    },
+    {
+      "id": "DAHajSllUk4",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "9df5f8967623e6ee9d3e458b8fdad49d40c583123ca2fc2d1af54c073069b390"
+    },
+    {
+      "id": "DAHajQcpxug",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "d36bf78053962f789fc7450a0044d797e3d0b4788dadbd81f6d11edcccc1fdce"
+    },
+    {
+      "id": "DAHajWsl0EM",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "d688af1778d5700dd39358467aa464674de81713c02a6c53e8b42c3774037e84"
+    },
+    {
+      "id": "DAHajSid4kI",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "9bf6e35514f9cfe183fc6756f7c375545981d28a992e7d32cb6223105b376f73"
+    },
+    {
+      "id": "DAHaja1fSm4",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "345751442e3a047b665697a8fc346743a22d33cbfeb29a359837201843324914"
+    },
+    {
+      "id": "DAHajalZ5I0",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "f1db1659c9ebe9d45c76a32f86abfa73cf87db7fe98ae0c0ed528cbbd1807502"
+    },
+    {
+      "id": "DAHajdBgb1g",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "e799471b6e2d507c69551590632840ab03eff4612b3eeea8c65695ae5cffd5c3"
+    },
+    {
+      "id": "DAHajehrJNs",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "a5606537f5eab61a89c2e0970c8bc337712d37cffed2ca261950ea7610bb9041"
+    },
+    {
+      "id": "DAHajUC_9yA",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "43fef8509fa19765c95ed9e15663cef1c7f5a39631766528f11ace6c8dfdce4b"
+    },
+    {
+      "id": "DAHajTAhJ6U",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "e2507c4d5876a8772fd761e3c92c0b2833113a0ef00acde286ce506829fdf50f"
+    },
+    {
+      "id": "DAHajd3r1EQ",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "dd549e3e1d51e486aa24bd84a2c7f1373d23afa4277bd591a6ae69c211db80d2"
+    },
+    {
+      "id": "DAHajZS3TvE",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "02d79718dc583dd3f9b3be72e4c4d8eabc076201a20a77cbbc5bbf8e837680f3"
+    },
+    {
+      "id": "DAHajfo2v54",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "c12b21a095ac59b43eab10f2885d9c5f3e40d119c1d6ebd08e38c05ac0927328"
+    },
+    {
+      "id": "DAHajUMZJOE",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "1232aee3e31983e33994f937ddfaf9a567b040034e54112fcfc062f2d4e62cf0"
+    },
+    {
+      "id": "DAHajbgj_LM",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "38682a7c5726f032c101f8153b017bdebe94faec017983e7ae70591ade5b608d"
+    },
+    {
+      "id": "DAHajd07CwQ",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "f892a94bda9e3d1b627507e5d9de0f90fc64399e886c4fd1973b63cc8b7ddeeb"
+    },
+    {
+      "id": "DAHajbjq94Q",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "fe3c11dc5deafae3316a5c942c99b2c29ac0a21584c3500489bbddaaa99ef4fe"
+    },
+    {
+      "id": "DAHajdHrl74",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "38a9ddacadec7a4475e3878753071329f581b59c3c7d8b9df082c5493559c046"
+    },
+    {
+      "id": "DAHajdv4SiM",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "f899ec3b018ad5f33fc836b9847779a5c4b030bed7d4964b037a467d2a9407ad"
+    },
+    {
+      "id": "DAHajUohVLw",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "98c4859c199e16463d9ec782e0c4757f001decf0f336105e0c420638bad976e5"
+    },
+    {
+      "id": "DAHajbNkN-c",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "6f7db001676e07b440f24b8fd602c234aef951cda3b6753872ce8a482bf08b4f"
+    },
+    {
+      "id": "DAHajSz2e10",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "31c7fc75bb0af601ea178f9768bdbf1060078bc2237a9c2bdbfba5bfa1494fbf"
+    },
+    {
+      "id": "DAHajfrnWWA",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "e6bf25c67a722981e7d0d2395ecafe56794407754bade9490550d2635f77637c"
+    },
+    {
+      "id": "DAHajUaJaz8",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "1a82e9a776c037bcf6840f5ef29cb31cfa1d52c1a6def00582c9c4b6fb99c02f"
+    },
+    {
+      "id": "DAHajeJwoO4",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "2a51f723ad00c5c05ec26ed9522afb43e2205d1d59d95aea9ac29d90b78ff426"
+    },
+    {
+      "id": "DAHajU5zWj0",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "7c37eb4cac21307fbf20cd9cb95ec7322674d17d92047dbe19623a5b4fd05d6d"
+    },
+    {
+      "id": "DAHajV5nYQQ",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "818d9f722121a4adbdbf9a4332ecb443fc58f82e13872803c9f6c26178d1215c"
+    },
+    {
+      "id": "DAHajfJQNc4",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "a9836d532c3fdad223388f63b371f889cc884835920d0c514a637acdfd837acf"
+    },
+    {
+      "id": "DAHajR3Hf3A",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "c7fcd97420318e5d175d139ab0f42ff2b67ed950311cef278ac3d1466fbf5579"
+    },
+    {
+      "id": "DAHajYWR9sE",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "75d23ab9a26357e73300bf04864dd979955b59af9dc57bec67850020ebd4132c"
+    },
+    {
+      "id": "DAHajZvajLM",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "4c5b1ea45a8fdeef2371603ed5bb3bc5b5a9301d7afd4b2039a3b9b7f01673e7"
+    },
+    {
+      "id": "DAHajU7mi0o",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "e569f1adb9bfddf9622fcde408daecb118dacd2e862434c730b81116c090d476"
+    },
+    {
+      "id": "DAHajY6HqBo",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "439994b3c3bf670e63a8addd07e673b92229ee956afbc2fbe9f2aa3926a7e9fc"
+    },
+    {
+      "id": "DAHajaBdnlg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "231c4c30e55e14247274dc8e21239d652d2b475a21c1da206cff821741d3e842"
+    },
+    {
+      "id": "DAHajYnitbc",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "ff2a7f3ed6f93fa583dbbc3ff873c5356ddafad4b9be0bd7aab1e14cd0d11295"
+    },
+    {
+      "id": "DAHajXnI0ts",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "334a894a067cbae7da718543a694f60b93f96a45144b00775a838670210ea7c9"
+    },
+    {
+      "id": "DAHajXDbhb8",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "8a65fa8edf0cfb03f2bd9067f0141459bdbcfb5471f54bed226d9f564cb4c0c6"
+    },
+    {
+      "id": "DAHajQZ11KU",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "144ed40d175a9b9a3f5232d67b6da79e1dd609d7eaa25a9d137fd92745d29184"
+    },
+    {
+      "id": "DAHajcltAMQ",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "59eb5cc54e7075772fcd557eb33b0ed1d4b86ffd1e5f50a87e67e9960a3f4bc2"
+    }
+  ],
+  "limitations": "Drawn companion sequence pages still use Barlow fallback; source layout issues are outside this font refresh."
+}
