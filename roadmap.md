@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl campaign multi-page asset masters
+- [ ] Build and register real four-page Canva asset masters for Sets 2, 3 and 4 in portrait Feed, Square and Story sizes; show them inside each campaign's design-asset panel, preserving single-page originals.
 ## Bowl editable application templates
 - [x] Create 34 Bowl-only downloadable editable sources (PowerPoint, Word, layered SVG ZIPs) and replace the three illustrative application areas with real previews/downloads. Office schema validation passed; every source page inspected, portrait clipping and packaging errors corrected. Supplier approval remains required for fabrication.
 - [ ] Save live Canva versions: generated presentation/document/signage/AV candidates await user selection and preview approval before saving and adapting. Animated timelines/rendered video remain pending the Canva master choice; current AV downloads are explicitly static sources.
