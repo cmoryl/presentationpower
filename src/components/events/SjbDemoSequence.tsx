@@ -140,7 +140,7 @@ function DemoPageFrame({
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", gap: px(3) }}>
                 <SjbFittedCallout lines={['GET YOUR', 'TICKETS']} width={width * 0.86} height={height * 0.46} maxSize={s * 0.34} />
                 <SjbFittedCallout lines={[SJB_DEMO_SITE]} width={width * 0.86} height={s * 0.14} maxSize={s * 0.14} style={{ color: look.accent }} />
-                <div style={{ fontSize: px(2.8), opacity: 0.8 }}>{SJB_DEMO_FACTS[0].value} · {SJB_DEMO_FACTS[1].value}</div>
+                <div style={{ fontSize: px(3.7), lineHeight: 1.2 }}>{SJB_DEMO_FACTS[0].value} · {SJB_DEMO_FACTS[1].value}</div>
               </div>
               <div data-bowl-ticket-partners style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: px(6), height: px(16), flexShrink: 0, marginBottom: px(6) }}>
                 <img src={logo.svg} alt="San Juan Bowl" style={{ height: px(16), width: px(16), objectFit: 'contain' }} />
@@ -205,7 +205,7 @@ function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarP
   const groupBottom = markTop + markSize + width * 0.08;
   const copyTop = balanced ? Math.max(markTop + markSize + width * 0.055, height * (square ? 615 / 1080 : tall ? 0.53 : 770 / 1350)) : Math.max(groupBottom + width * 0.035, height * (square ? 0.57 : tall ? 0.48 : 0.55));
   const copyWidth = width * (spotlight ? 0.64 : 0.90);
-  const footerTop = height - width * 0.14;
+  const footerTop = height - width * 0.17;
   const calloutHeight = footerTop - copyTop - width * 0.04;
   const markLeft = spotlight ? width * 0.07 : (width - markSize) / 2;
   return <div style={{ position: 'absolute', inset: 0, textAlign: spotlight ? 'left' : 'center', letterSpacing: 0 }}>
@@ -225,7 +225,7 @@ function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarP
         </> : <SjbFittedCallout lines={post.headline} width={copyWidth} height={calloutHeight} maxSize={width * 0.36} italic={style.italic} />}
       </div>
     </div>
-      <div data-bowl-footer style={{ position: 'absolute', top: footerTop, left: width * (spotlight ? 0.07 : 0.05), width: copyWidth, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: unit * (spotlight ? 2.6 : 2.8), lineHeight: 1.3, color: look.ink }}>
+      <div data-bowl-footer style={{ position: 'absolute', top: footerTop, left: width * (spotlight ? 0.07 : 0.05), width: copyWidth, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: unit * 3.7, lineHeight: 1.2, color: look.ink }}>
         <div>{SJB_DEMO_FACTS[0].value.toUpperCase()} · {SJB_DEMO_FACTS[1].value.toUpperCase()}</div>
         <div style={{ marginTop: unit }}>{SJB_DEMO_SITE}</div>
       </div>
