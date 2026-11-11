@@ -2,9 +2,10 @@ import { sjbCanvaSize, type SjbCanvaGalleryDesign } from './sjb-canva-gallery';
 import { SJB_CALENDAR_MODES, SJB_CALENDAR_POSTS, SJB_CALENDAR_SIZES, sjbCalendarDesign, type SjbCalendarMode } from './sjb-social-calendar';
 import { SJB_PROJECTION_SIZES, sjbProjection, type SjbProjectionLook } from './sjb-projections';
 import { SJB_CALENDAR_FORMATS, sjbCalendarSequenceCanvaUrl } from './sjb-calendar-formats';
+import { SJB_ADVERTISING_FORMATS } from './sjb-advertising-designs';
 
 /** Social-page selection only; issued registries and calendar looks stay intact. */
-export const SJB_SOCIAL_STUDIO_COLLECTIONS = SJB_CALENDAR_MODES.map(mode => ({ id: mode.id, name: mode.label, blurb: 'Feed · Square · Story · Carousels' }));
+export const SJB_SOCIAL_STUDIO_COLLECTIONS = SJB_CALENDAR_MODES.map(mode => ({ id: mode.id, name: mode.label, blurb: 'Social · Carousels · Web banners' }));
 const PROJECTION_LOOKS: Partial<Record<SjbCalendarMode, SjbProjectionLook>> = { set2: 'night', set4: 'blue' };
 
 export interface SjbSocialStudioDesign extends Omit<SjbCanvaGalleryDesign, 'collectionId'> {
@@ -12,6 +13,7 @@ export interface SjbSocialStudioDesign extends Omit<SjbCanvaGalleryDesign, 'coll
   post?: string;
   mode?: SjbCalendarMode;
   waitingOn?: string;
+  advertising?: boolean;
 }
 
 export const SJB_SOCIAL_STUDIO_DESIGNS: readonly SjbSocialStudioDesign[] = SJB_SOCIAL_STUDIO_COLLECTIONS.flatMap(collection => {
@@ -32,7 +34,15 @@ export const SJB_SOCIAL_STUDIO_DESIGNS: readonly SjbSocialStudioDesign[] = SJB_S
         status: 'saved', provenance: 'artistic-render', waitingOn: 'Projected teams are placeholders, not an announced matchup' });
     }
   }
-  return singles;
+  const styleIndex = ['light', 'set2', 'set3', 'set4'].indexOf(mode);
+  const banners: SjbSocialStudioDesign[] = SJB_ADVERTISING_FORMATS.map(format => {
+    const id = format.ids[styleIndex];
+    return { id, collectionId: mode, name: format.name, width: format.width, height: format.height,
+      previewUrl: '', canvaUrl: `https://www.canva.com/design/${id}/edit`, status: 'saved',
+      provenance: 'artistic-render', advertising: true,
+      waitingOn: 'Reusable Canva adaptation · Layout review and cleaned full-size exports pending' };
+  });
+  return [...singles, ...banners];
 });
 
 export function sjbSocialStudioSequences(design: SjbSocialStudioDesign) {

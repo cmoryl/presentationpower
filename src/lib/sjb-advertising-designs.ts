@@ -1,0 +1,22 @@
+/** Real Canva adaptations of calendar post 04; originals remain unchanged. */
+export const SJB_ADVERTISING_FORMATS = [
+  { width: 1200, height: 628, name: 'Facebook / LinkedIn link ad', ids: ['DAHapoW79Is', 'DAHapvyMJX8', 'DAHaph43pxU', 'DAHaptZPt0U'] },
+  { width: 160, height: 600, name: 'Wide skyscraper', ids: ['DAHapkpjnYQ', 'DAHapr1b7XI', 'DAHapgWkCuc', 'DAHapgfUC3Y'] },
+  { width: 600, height: 160, name: 'Custom social banner', ids: ['DAHapseVRhk', 'DAHapsDxSxI', 'DAHapt74JkQ', 'DAHapozapBk'] },
+  { width: 300, height: 250, name: 'Medium rectangle', ids: ['DAHapnbmQo0', 'DAHapsNNY64', 'DAHapgUApjE', 'DAHaptQXyY4'] },
+  { width: 728, height: 90, name: 'Leaderboard', ids: ['DAHappRov8Y', 'DAHaph4L3BE', 'DAHapryg2qM', 'DAHapnUqozw'] },
+  { width: 300, height: 600, name: 'Half page', ids: ['DAHapg5ApLE', 'DAHapidxpwM', 'DAHapkAuhdc', 'DAHapvxYBlk'] },
+  { width: 970, height: 250, name: 'Web billboard', ids: ['DAHapvAlG6A', 'DAHapt5vmDU', 'DAHappzPAvc', 'DAHaph0_J68'] },
+  { width: 336, height: 280, name: 'Large rectangle', ids: ['DAHaphUWFpQ', 'DAHapoML_og', 'DAHapn3F12s', 'DAHaphN-c1I'] },
+  { width: 320, height: 50, name: 'Mobile leaderboard', ids: ['DAHapuWL5tI', 'DAHapnx9HuY', 'DAHapv0nOHc', 'DAHaptFdPGI'] },
+  { width: 320, height: 100, name: 'Large mobile banner', ids: ['DAHapiu3Z6s', 'DAHaph4YEk0', 'DAHapgF-GL0', 'DAHapjMxzSA'] },
+  { width: 970, height: 90, name: 'Large leaderboard', ids: ['DAHaptiuon0', 'DAHapuPM6Yg', 'DAHapve8EI0', 'DAHappj-sdo'] },
+  { width: 1200, height: 600, name: 'Social / website hero', ids: ['DAHapnIfucw', 'DAHapnWiwwM', 'DAHapokVM50', 'DAHapqhS2fQ'] },
+  { width: 1640, height: 624, name: 'Facebook cover', ids: ['DAHapiFK2KA', 'DAHapiGm3xA', 'DAHapqbQiUA', 'DAHapsePnvQ'] },
+  { width: 1600, height: 900, name: 'X landscape post', ids: ['DAHapr31oRI', 'DAHappI9HYM', 'DAHapjcRgrk', 'DAHapmSLkto'] },
+  { width: 1584, height: 396, name: 'LinkedIn profile banner', ids: ['DAHapnbUFsA', 'DAHaprvO-do', 'DAHaph_RFW4', 'DAHapjlmrvM'] },
+  { width: 468, height: 60, name: 'Standard banner', ids: ['DAHaphfkZPc', 'DAHapvzSDfg', 'DAHapiW0KXM', 'DAHapnjkGPU'] },
+  { width: 120, height: 600, name: 'Skyscraper', ids: ['DAHapuwUfaE', 'DAHapntu6wc', 'DAHapqyd0uM', 'DAHapuaO5OI'] },
+  { width: 1500, height: 500, name: 'X header', ids: ['DAHaprbExA0', 'DAHaprQvNOU', 'DAHapv3W3C0', 'DAHapmrJMuo'] },
+  { width: 1200, height: 300, name: 'Website / email header', ids: ['DAHaprtKNOI', 'DAHapj51DGA', 'DAHapl1SYb0', 'DAHapo3-jlw'] },
+] as const;
