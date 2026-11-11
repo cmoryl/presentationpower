@@ -31,7 +31,7 @@
 - [ ] Re-export older calendar pictures at full size (current ones are 720 px wide previews)
 - [ ] Bowl projections: dark + blue, 3 sizes built (Canva + PNG/JPG/ZIP). Illustrator files not made yet.
 
-- [ ] Set 4: conference logos clear of shield — done Feed 01–13 (shield 680@200,10; ACC 140w@90,610; SBC 120w@880,620); remaining 24 Feed + all Square/Story; then re-export cleaned pictures
+- [ ] Set 4: conference logos clear of shield — done Feed 01–13 (shield 680@200,10; ACC 140w@90,610; SBC 120w@880,620); remaining 15 Feed (14–25, 27, 28, 29) + all Square/Story; then re-export cleaned pictures
 - [ ] Set 3: ACC logo switched to white on all dark-background ads
 - [ ] Calendar pictures: 280 Canva versions had no cleaned picture; 10 done (pipeline /tmp/cal/ingest.py: export jpg → strip AI metadata → lovable-assets → src/assets/sjb-calendar/<id>.jpg.asset.json). Remaining 270 in /tmp/missing.json order.
 - [ ] Dark (gold player) rebuild: post 04 Feed pilot DAHajRThRh8 approved & saved (Set 2 hero type, gold player bg MAHZ_dMKbag, headline top 700, date top 960, new logo spacing); roll out to all Dark posts × 3 sizes.
