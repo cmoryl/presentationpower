@@ -21,6 +21,7 @@ import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO
 import '@fontsource/barlow-condensed/700.css';
 import '@fontsource/barlow-condensed/700-italic.css';
 import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS, sjbBroadcastMark } from '@/lib/sjb-calendar-style';
+import { SjbFittedCallout } from './SjbFittedCallout';
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
 import type { SjbCalendarMode, SjbCalendarPost } from "@/lib/sjb-social-calendar";
 import type { SjbCalendarFormat, SjbCalendarFormatSpec } from "@/lib/sjb-calendar-formats";
@@ -110,11 +111,10 @@ function DemoPageFrame({
               <div style={{ marginTop: px(9), fontSize: px(2.6), letterSpacing: "0.2em", opacity: 0.75 }}>{post.phase.toUpperCase()} · {SJB_DEMO_FACTS[0].value.toUpperCase()}</div>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: px(2) }}>
                 {broadcaster ? <>
-                  <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06 }}>{broadcaster.label}</div>
+                  <SjbFittedCallout lines={[broadcaster.label]} width={width * 0.86} height={height * 0.28} maxSize={s * 0.24} />
                   <img data-bowl-broadcaster src={broadcaster.url} alt={broadcaster.alt} style={{ width: '100%', height: 'auto', marginTop: px(4) }} />
                 </> : <>
-                  <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: 0, fontStyle: style.italic ? 'italic' : 'normal', overflowWrap: 'anywhere' }}>{post.headline[0]}</div>
-                  <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: 0, color: look.accent, overflowWrap: 'anywhere' }}>{post.headline[1]}</div>
+                  <SjbFittedCallout lines={post.headline} width={width * 0.86} height={height * 0.55} maxSize={s * 0.24} italic={style.italic} />
                 </>}
                 <div style={{ width: px(22), height: px(0.7), backgroundColor: look.accent, marginTop: px(4) }} />
               </div>
@@ -126,8 +126,8 @@ function DemoPageFrame({
           {page.role === "tickets" && (
             <>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", gap: px(3) }}>
-                <div style={{ fontSize: px(4), letterSpacing: "0.16em", opacity: 0.8 }}>GET YOUR TICKETS</div>
-                <div style={{ fontSize: px(8.5), fontWeight: 700, letterSpacing: "-0.01em", color: look.accent }}>{SJB_DEMO_SITE}</div>
+                <SjbFittedCallout lines={['GET YOUR', 'TICKETS']} width={width * 0.86} height={height * 0.38} maxSize={s * 0.23} />
+                <SjbFittedCallout lines={[SJB_DEMO_SITE]} width={width * 0.86} height={s * 0.14} maxSize={s * 0.14} style={{ color: look.accent }} />
                 <div style={{ fontSize: px(2.8), opacity: 0.8 }}>{SJB_DEMO_FACTS[0].value} · {SJB_DEMO_FACTS[1].value}</div>
               </div>
               <img src={logo.svg} alt="" style={{ height: px(16), width: "auto", alignSelf: "center", marginBottom: px(6) }} />
@@ -208,8 +208,7 @@ function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarP
   const groupBottom = markTop + markSize + width * 0.08;
   const copyTop = Math.max(groupBottom + width * 0.035, height * (square ? 0.57 : tall ? 0.48 : 0.55));
   const copyWidth = width * (spotlight ? 0.64 : 0.90);
-  const maxChars = Math.max(...post.headline.map(h => h.length));
-  const headlineSize = Math.min(width * (tall ? 0.105 : 0.105), copyWidth / (maxChars * 0.46));
+  const calloutHeight = height - copyTop - width * 0.19;
   const markLeft = spotlight ? width * 0.07 : (width - markSize) / 2;
   return <div style={{ position: 'absolute', inset: 0, textAlign: spotlight ? 'left' : 'center', letterSpacing: 0 }}>
     <img data-bowl-logo src={logo} alt="San Juan Bowl" style={{ position: 'absolute', top: markTop, left: markLeft, width: markSize, height: markSize, objectFit: 'contain' }} />
@@ -218,11 +217,11 @@ function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarP
       <img src={SJB_CALENDAR_MARKS.sunBelt} alt="Sun Belt Conference" style={{ width: unit * 10, height: unit * 5.5, objectFit: 'contain' }} />
     </div>
     <div data-bowl-copy style={{ position: 'absolute', top: copyTop, left: width * (spotlight ? 0.07 : 0.05), width: copyWidth }}>
-      <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: headlineSize, lineHeight: 1.05, color: mode === 'light' ? look.ink : spotlight ? look.ink : look.accent, fontStyle: style.italic ? 'italic' : 'normal' }}>
+      <div style={{ color: mode === 'light' ? look.ink : spotlight ? look.ink : look.accent }}>
         {broadcaster ? <>
-          <div>{broadcaster.label}</div>
+          <SjbFittedCallout lines={[broadcaster.label]} width={copyWidth} height={Math.max(width * 0.08, calloutHeight - copyWidth * 0.065 - unit * 4)} maxSize={width * 0.22} italic={style.italic} />
           <img data-bowl-broadcaster src={broadcaster.url} alt={broadcaster.alt} style={{ width: '100%', height: 'auto', marginTop: unit * 4 }} />
-        </> : post.headline.map((h, i) => <div key={i} style={{ overflowWrap: 'anywhere' }}>{h}</div>)}
+        </> : <SjbFittedCallout lines={post.headline} width={copyWidth} height={calloutHeight} maxSize={width * 0.22} italic={style.italic} />}
       </div>
       <div data-bowl-footer style={{ marginTop: unit * 2.7, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: unit * (spotlight ? 2.6 : 2.8), lineHeight: 1.3, color: look.ink }}>
         <div>{SJB_DEMO_FACTS[0].value.toUpperCase()} · {SJB_DEMO_FACTS[1].value.toUpperCase()}</div>

@@ -1,5 +1,7 @@
 # San Juan Bowl event pages and assets
 
+- Drawn Bowl social callouts use SjbFittedCallout to measure the loaded campaign font against their reserved width and height; saved Canva images remain untouched — why: large headlines must fit actual lettering without stretching or overwriting approved originals.
+
 - Bowl calendar multi-page formats (LinkedIn 4:5 and square carousels, Instagram carousel, Story sequence) show a labelled demo sequence until real Canva pages exist: `src/lib/sjb-calendar-demo.ts` + `src/components/events/SjbDemoSequence.tsx` draw four pages (cover, headline, details, tickets) per post × look × format from the post's own headline and `SJB_EVENT` facts only, exported through the shared asset exporter as a PDF or a ZIP at the format's exact pixels — why: the calendar must read as planned work without passing a placeholder off as approved artwork, so every page keeps its DEMO LAYOUT badge and the cover only borrows a cleaned single image when one is registered.
 - San Juan Bowl micro extracts clone unchanged source shapes with inherited styles and coordinates; its client-loaded Three.js viewer orbits the stack midpoint — why: fused silhouettes must not be invented, and layer spread must not move the camera target.
 - San Juan Bowl major-piece exports wrap unchanged detail paths in one named group per piece; viewer lettering assets and exports use the same original shape indices, and micro view is optional — why: grouping and separate lettering selection must preserve approved geometry without duplicating ribbon details.
