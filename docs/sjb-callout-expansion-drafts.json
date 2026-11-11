@@ -1,0 +1,26 @@
+{
+  "status": "awaiting_preview_approval",
+  "drafts": [
+    {
+      "design": "DAHajU6sr6Q",
+      "transaction": "2287224556561808711",
+      "callout_font_size": 180,
+      "callout_top": 730,
+      "footer_top": 1200
+    },
+    {
+      "design": "DAHaiha6rsA",
+      "transaction": "2206159761538779727",
+      "callout_font_size": 200,
+      "footer_top": 1700,
+      "cbs_asset": "MAHanbs5Hvo",
+      "cbs_box": [
+        115,
+        1380,
+        850,
+        219.281538
+      ]
+    }
+  ],
+  "remaining": "Full 420-design rollout and cleaned calendar refresh not performed; shared drawn templates updated, live browser layout unverified."
+}

@@ -9,6 +9,7 @@ import accColor from '@/assets/sjb-calendar-style/acc-color.png.asset.json';
 import sunBelt from '@/assets/sjb-calendar-style/sun-belt.png.asset.json';
 import cbsWhite from '@/assets/sjb-calendar-style/cbs-white.svg.asset.json';
 import cbsBlack from '@/assets/sjb-calendar-style/cbs-black.svg.asset.json';
+import cbsVerticalWhite from '@/assets/sjb-calendar-style/cbs-vertical-white.svg.asset.json';
 import type { SjbCalendarMode } from './sjb-social-calendar';
 
 /** Unchanged media recovered from the actual post 04 Canva originals, not menu cover art. */
@@ -23,9 +24,10 @@ export const SJB_CALENDAR_STYLE = {
 export const SJB_CALENDAR_MARKS = { player: player.url, accWhite: accWhite.url, accColor: accColor.url, sunBelt: sunBelt.url };
 
 /** Official broadcaster artwork sourced from cbssportsnetwork.com, never typeset. */
-export function sjbBroadcastMark(headline: readonly string[], mode: SjbCalendarMode) {
+export function sjbBroadcastMark(headline: readonly string[], mode: SjbCalendarMode, vertical = false) {
   return /\bCBS\b/i.test(headline.join(' ')) ? {
-    url: mode === 'light' ? cbsBlack.url : cbsWhite.url,
+    url: mode === 'light' ? cbsBlack.url : vertical ? cbsVerticalWhite.url : cbsWhite.url,
+    ratio: mode !== 'light' && vertical ? 1000 / 257.97828 : 900 / 58.273,
     alt: 'CBS Sports Network',
     label: 'LIVE ON',
   } : null;
