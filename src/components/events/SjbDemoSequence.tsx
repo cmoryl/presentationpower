@@ -598,7 +598,7 @@ function DetailsPage({ look, px, wide, tall }: { look: SjbDemoLook; px: (n: numb
     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", lineHeight: 0.9 }}>
       <span style={label}>SAVE THE DATE</span>
       <span style={{ fontSize: px(wide ? 9 : 10), fontWeight: 800, letterSpacing: "0.04em", marginTop: px(2.4) }}>{d.month}</span>
-      <span style={{ fontSize: px(wide ? 27 : tall ? 34 : 30), fontWeight: 800, letterSpacing: "-0.04em", color: look.accent, lineHeight: 0.82 }}>{d.day}</span>
+      <span style={{ fontSize: px(wide ? 27 : tall ? 30 : 24), fontWeight: 800, letterSpacing: 0, color: look.accent, lineHeight: 0.9 }}>{d.day}</span>
       <span style={{ fontSize: px(wide ? 6 : 6.6), fontWeight: 600, letterSpacing: "0.12em", opacity: 0.9, marginTop: px(1.6) }}>{d.year}</span>
     </div>
   ) : (
@@ -614,11 +614,11 @@ function DetailsPage({ look, px, wide, tall }: { look: SjbDemoLook; px: (n: numb
   const facts = (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "center", textAlign: "left" }}>
       {rows.map((r, i) => (
-        <div key={r.k} style={{ display: "flex", gap: px(3), alignItems: "flex-start", padding: `${px(tall ? 3.6 : 2.6)} 0`, borderTop: i ? `1px solid ${rule}` : "none" }}>
+        <div key={r.k} style={{ display: "flex", gap: px(3), alignItems: "flex-start", padding: `${px(tall ? 3.6 : 1.8)} 0`, borderTop: i ? `1px solid ${rule}` : "none" }}>
           <div style={{ width: px(0.9), alignSelf: "stretch", backgroundColor: look.accent, borderRadius: px(0.4) }} />
           <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
             <div style={{ ...label, color: look.ink, opacity: 0.72, lineHeight: 1.2 }}>{r.k.toUpperCase()}</div>
-            <div style={{ fontSize: px(wide ? 4.6 : 5.2), fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.01em", marginTop: px(1) }}>{r.main}</div>
+            <div style={{ fontSize: px(wide ? 4.6 : 4.8), fontWeight: 700, lineHeight: 1.15, letterSpacing: 0, marginTop: px(1) }}>{r.main}</div>
             {r.sub && <div style={{ fontSize: px(wide ? 3 : 3.3), fontWeight: 500, lineHeight: 1.3, opacity: 0.85, marginTop: px(0.8) }}>{r.sub}</div>}
           </div>
         </div>
@@ -627,7 +627,7 @@ function DetailsPage({ look, px, wide, tall }: { look: SjbDemoLook; px: (n: numb
   );
 
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: wide ? "row" : "column", gap: px(wide ? 6 : tall ? 8 : 5), marginTop: px(9), marginBottom: px(8), alignItems: wide ? "center" : "stretch", textAlign: "left" }}>
+    <div data-bowl-details style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: wide ? "row" : "column", gap: px(wide ? 6 : tall ? 8 : 3), marginTop: px(9), marginBottom: px(10), alignItems: wide ? "center" : "stretch", textAlign: "left" }}>
       <div style={{ flex: wide ? "0 0 38%" : "0 0 auto", paddingRight: wide ? px(5) : 0, borderRight: wide ? `1px solid ${rule}` : "none" }}>{dateBlock}</div>
       {facts}
     </div>
