@@ -5,23 +5,23 @@ import { SJB_COLORS } from '../san-juan-bowl';
 import { SJB_CALENDAR_FORMATS } from '../sjb-calendar-formats';
 
 describe('Bowl campaign identity across sizes', () => {
-  it('uses the taller white CBS master for every dark portrait multi-frame format, retaining other approved logos', () => {
+  it('uses the approved taller white CBS master for every dark multi-frame format, retaining black on Light', () => {
     for (const format of SJB_CALENDAR_FORMATS.filter(f => f.id !== 'single')) {
       for (const mode of ['dark', 'set2', 'set3', 'set4'] as const) {
         const mark = sjbBroadcastMark(['LIVE ON CBS', 'SPORTS NETWORK'], mode, format.height > format.width);
-        expect(mark?.url).toContain(format.height > format.width ? 'cbs-sports-network-vertical-white.svg' : 'cbs-sports-network-official-white.svg');
-        expect(mark?.ratio).toBe(format.height > format.width ? 1000 / 257.97828 : 900 / 58.273);
+        expect(mark?.url).toContain('cbs-sports-network-vertical-white.svg');
+        expect(mark?.ratio).toBe(1000 / 257.97828);
       }
       expect(sjbBroadcastMark(['LIVE ON CBS'], 'light', format.height > format.width)?.url).toContain('official-black');
     }
   });
-  it('uses the supplied white CBS logo on dark vertical artwork only', () => {
+  it('uses the supplied white CBS logo on dark vertical and square artwork', () => {
     for (const mode of ['dark', 'set2', 'set3', 'set4'] as const) {
       expect(sjbBroadcastMark(['LIVE ON CBS'], mode, true)?.url).toContain('cbs-sports-network-vertical-white.svg');
       expect(sjbBroadcastMark(['LIVE ON CBS'], mode, true)?.ratio).toBe(1000 / 257.97828);
     }
     expect(sjbBroadcastMark(['LIVE ON CBS'], 'light', true)?.url).toContain('official-black');
-    expect(sjbBroadcastMark(['LIVE ON CBS'], 'dark', false)?.url).toContain('official-white');
+    expect(sjbBroadcastMark(['LIVE ON CBS'], 'dark', false)?.url).toContain('vertical-white');
   });
   it('binds all five looks to their original Canva media, not menu illustrations', () => {
     expect(Object.values(SJB_CALENDAR_STYLE).map(s => s.source)).toEqual(['DAHaiJbODIo', 'DAHaiB8HX6U', 'DAHai4nSCtc', 'DAHai6cDjm0', 'DAHai-4B8c4']);
@@ -35,7 +35,7 @@ describe('Bowl campaign identity across sizes', () => {
   });
   it('selects official single-color CBS artwork for every dark look and contrasting black for Light', () => {
     for (const mode of ['dark', 'set2', 'set3', 'set4'] as const) {
-      expect(sjbBroadcastMark(['LIVE ON CBS', 'SPORTS NETWORK'], mode)?.url).toContain('cbs-sports-network-official-white.svg');
+      expect(sjbBroadcastMark(['LIVE ON CBS', 'SPORTS NETWORK'], mode)?.url).toContain('cbs-sports-network-vertical-white.svg');
     }
     expect(sjbBroadcastMark(['LIVE ON CBS', 'SPORTS NETWORK'], 'light')?.url).toContain('cbs-sports-network-official-black.svg');
     expect(sjbBroadcastMark(['TICKETS', 'ON SALE'], 'dark')).toBeNull();
