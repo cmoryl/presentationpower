@@ -1,6 +1,6 @@
 import { describe, it } from "vitest";
 import { SJB_CALENDAR_POSTS } from "@/lib/sjb-social-calendar";
-import { sjbCalendarDesign } from "@/lib/sjb-social-calendar-designs";
+import { sjbCalendarDesign } from "@/lib/sjb-social-calendar";
 const MODES = ["dark","light","set2","set3","set4"] as const;
 const SIZES: Record<string,string> = { "linkedin-portrait":"1350", "linkedin-square":"1080", "instagram-carousel":"1350", "story-sequence":"1920" };
 describe("count", () => {
