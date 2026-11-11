@@ -2,7 +2,7 @@
 // list and approved templates, review every sign, and download the ready ones.
 
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, CheckCircle2, CircleDashed, Download, Hammer, Pencil } from "lucide-react";
@@ -28,6 +28,11 @@ import { signPrintChecks, signSetZip } from "@/lib/sign-set-export";
 
 export const Route = createFileRoute("/events/next_/signs/$eventId")({
   ssr: false,
+  beforeLoad: ({ params }) => {
+    if (params.eventId === "san-juan-bowl") {
+      throw redirect({ to: "/events/$eventId", params: { eventId: params.eventId }, replace: true });
+    }
+  },
   head: ({ params }) => {
     const title = `Sign set · ${eventDisplayName(params.eventId)}`;
     const description = "Build every sign for this event from the venue's sign list and approved templates, review them and download the ready ones.";

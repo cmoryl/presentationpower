@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl event link isolation
+- [x] Remove all NEXT destinations from Bowl area cards and built-in tabs; leave unbuilt signs, maps, badges, pillars and knowledge unavailable, retaining existing Bowl artwork. Redirect the legacy Bowl sign URL home; regression tests cover both navigation registries.
 ## Reusable Bowl advertising sizes
 - [x] Created and filed 76 real reusable Canva adaptations (19 new dimensions × four current styles), including 160×600 and 600×160, Facebook link/cover, X post/header, LinkedIn profile banner and major rectangle/leaderboard/skyscraper/mobile web sizes. Registered in socials under matching styles; seven tests pass, public exact-size/Facebook filtering verified and build OK. Existing square/4:5/story originals remain available.
 - [ ] Clean full-size pictures/downloads and Illustrator packages for the 76 adaptations: BLOCKED by Canva daily export limit, confirmed Nov 11 22:41 UTC. Layout certification remains unverified beyond the inspected Set 2 Facebook thumbnail; do not label these approved production artwork. No placeholder images or invented downloadable files published.

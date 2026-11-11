@@ -355,33 +355,17 @@ function sanJuanBowlEntry(): EventEntry {
             detail: "Hiram Bithorn Stadium, San Juan — the interactive BoothHUB stadium and field.",
             link: { to: "/events/san-juan-bowl/stadium" },
           },
-          {
-            label: "Venue checklist and research",
-            detail: "What the venue and organisers still need to send, and what the web search found.",
-            link: { to: "/events/next/intake/$eventId", params: { eventId: SJB_EVENT.id } },
-          },
         ],
       },
       {
         id: "maps",
-        tools: [
-          {
-            label: "Venue maps",
-            detail: "Load each floor's plan as SVG, colour rooms and download.",
-            link: { to: "/events/next/maps/$eventId", params: { eventId: SJB_EVENT.id } },
-          },
-        ],
+        tools: [],
         waitingOn: "the venue's floor plans",
       },
       { id: "schedule", tools: [], waitingOn: "the issued programme with rooms and times" },
       {
         id: "signage",
         tools: [
-          {
-            label: "Sign set",
-            detail: "Build every sign on the venue's sign list from approved templates, review and download them.",
-            link: { to: "/events/next/signs/$eventId", params: { eventId: SJB_EVENT.id } },
-          },
           {
             label: "Digital billboards",
             detail: "Roadside billboards in English and Spanish (840 × 400, 1,728 × 512): editable Canva files, downloads and in-scene examples.",
@@ -397,12 +381,10 @@ function sanJuanBowlEntry(): EventEntry {
       },
       {
         id: "badges",
-        tools: [
-          { label: "Name badges", detail: "The approved badge family.", link: { to: "/events/next/badges" } },
-          { label: "Pillars", detail: "The approved pillar faces.", link: { to: "/events/next/pillars" } },
-        ],
+        tools: [],
+        waitingOn: "Bowl-specific name badges and pillars",
       },
-      knowledge,
+      { id: "knowledge", tools: [], waitingOn: "Bowl-specific event knowledge" },
     ],
     readiness: [
       {
@@ -546,17 +528,13 @@ export const SJB_EVENT_AREAS: EventAreaGroup[] = [
     tools: [
       { label: "Stadium 3D view", detail: "Hiram Bithorn Stadium and field in 3D.", link: { to: "/events/san-juan-bowl/stadium" } },
       { label: "Stadium policies", detail: "Prohibited items, bag and smoking rules — English and Spanish.", link: { to: "/events/san-juan-bowl/stadium-policies" } },
-      { label: "Venue maps", detail: "Floor plans, once the venue sends them.", link: { to: "/events/next/maps/$eventId", params: { eventId: SJB_EVENT.id } } },
-      { label: "Venue checklist", detail: "What's still needed from the venue and organisers.", link: { to: "/events/next/intake/$eventId", params: { eventId: SJB_EVENT.id } } },
     ],
   },
   {
     id: "production",
     title: "Signs & print",
     summary: "On-site signs.",
-    tools: [
-      { label: "Sign set", detail: "Build and download every venue sign.", link: { to: "/events/next/signs/$eventId", params: { eventId: SJB_EVENT.id } } },
-    ],
+    tools: [],
   },
   {
     id: "share",

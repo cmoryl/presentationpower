@@ -381,3 +381,9 @@ Source: `next-london-2026-design-audit-in-depth_v4.pdf`. Grades and blocking fig
 **What happened:** Different coloured and text-branded lanyards were used effectively to identify attendees by division, track ('Legal NEXT', 'LearnNEXT'), or role ('Speaker').
 **Rule now:** Continue the strategy of using distinct, colour-coded lanyards to segment attendees by track, division, and role.
 **Enforced by:** judgement only.
+
+### 2026-11 — Audit every Bowl navigation authority
+**Context:** Bowl signs still opened NEXT tools after individual area-card links were removed.
+**What happened:** Built-in tabs retained duplicate NEXT links, and the old sign URL remained reachable.
+**Rule now:** Check both area cards and built-in event tabs; unbuilt Bowl tools stay unavailable rather than linking to NEXT.
+**Enforced by:** `sjb-event-links.test.ts` and the legacy sign-route redirect.
