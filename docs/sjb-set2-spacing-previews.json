@@ -1,11 +1,11 @@
 {
-  "status": "previewed; awaiting approval before saving and refreshing calendar images",
+  "status": "approved, restored expired drafts, saved four Canva originals and refreshed cleaned pictures; remaining Set 2 originals pending; matching drawn demos adjusted",
   "scope": "Lower top-heavy Set 2 compositions and enlarge square conference logos across the template set",
   "previews": [
-    { "post": "02", "size": "1350", "design_id": "DAHai_eitCA", "transaction_id": "8067594633810965433" },
-    { "post": "02", "size": "1080", "design_id": "DAHai3nOSIc", "transaction_id": "3437894218164763525" },
-    { "post": "03", "size": "1350", "design_id": "DAHaiy-8QoI", "transaction_id": "3900639079963552221" },
-    { "post": "03", "size": "1080", "design_id": "DAHai6X7who", "transaction_id": "7117335112074448655" }
+    { "post": "02", "size": "1350", "design_id": "DAHai_eitCA", "transaction_id": "3137278982113287686" },
+    { "post": "02", "size": "1080", "design_id": "DAHai3nOSIc", "transaction_id": "2274839653330810057" },
+    { "post": "03", "size": "1350", "design_id": "DAHaiy-8QoI", "transaction_id": "4845269138415465585" },
+    { "post": "03", "size": "1080", "design_id": "DAHai6X7who", "transaction_id": "4414049476648632996" }
   ],
   "checks": {
     "feed_logo_top": 100,
@@ -16,7 +16,7 @@
     "square_sbc_width_after": 170,
     "square_logo_conference_horizontal_gap": 45,
     "preserved_logo_proportions": true,
-    "saved_originals_changed": false,
-    "live_calendar_refreshed": false
+    "saved_originals_changed": true,
+    "live_calendar_refreshed": true
   }
 }

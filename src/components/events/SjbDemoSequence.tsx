@@ -202,20 +202,24 @@ function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarP
   const square = height === width;
   const tall = height / width > 1.6;
   const spotlight = mode === 'set3';
+  const balanced = mode === 'set2';
   const unit = width / 100;
-  const markSize = width * (square ? 0.40 : 0.48);
-  const markTop = height * 0.07;
+  const markSize = balanced ? width * (square ? 460 / 1080 : 600 / 1080) : width * (square ? 0.40 : 0.48);
+  const markTop = balanced ? height * (tall ? 0.14 : square ? 100 / 1080 : 100 / 1350) : height * 0.07;
   const groupBottom = markTop + markSize + width * 0.08;
-  const copyTop = Math.max(groupBottom + width * 0.035, height * (square ? 0.57 : tall ? 0.48 : 0.55));
+  const copyTop = balanced ? Math.max(markTop + markSize + width * 0.055, height * (square ? 615 / 1080 : tall ? 0.53 : 770 / 1350)) : Math.max(groupBottom + width * 0.035, height * (square ? 0.57 : tall ? 0.48 : 0.55));
   const copyWidth = width * (spotlight ? 0.64 : 0.90);
   const calloutHeight = height - copyTop - width * 0.19;
   const markLeft = spotlight ? width * 0.07 : (width - markSize) / 2;
   return <div style={{ position: 'absolute', inset: 0, textAlign: spotlight ? 'left' : 'center', letterSpacing: 0 }}>
     <img data-bowl-logo src={logo} alt="San Juan Bowl" style={{ position: 'absolute', top: markTop, left: markLeft, width: markSize, height: markSize, objectFit: 'contain' }} />
-    <div data-bowl-conferences style={{ position: 'absolute', top: markTop + markSize + unit * 2, left: spotlight ? width * 0.09 : width * 0.30, width: spotlight ? width * 0.42 : width * 0.40, height: unit * 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    {balanced ? <div data-bowl-conferences style={{ position: 'absolute', top: markTop + markSize - width * (square ? 120 / 1080 : 70 / 1080), left: width * (square ? 75 / 1080 : 55 / 1080), width: width * (square ? 910 / 1080 : 940 / 1080), height: width * (square ? 106.4 / 1080 : 83.42 / 1080), display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <img src={SJB_CALENDAR_MARKS.accWhite} alt="ACC" style={{ width: width * (square ? 190 / 1080 : 149 / 1080), height: '100%', objectFit: 'contain' }} />
+      <img src={SJB_CALENDAR_MARKS.sunBelt} alt="Sun Belt Conference" style={{ width: width * (square ? 170 / 1080 : 110 / 1080), height: '100%', objectFit: 'contain' }} />
+    </div> : <div data-bowl-conferences style={{ position: 'absolute', top: markTop + markSize + unit * 2, left: spotlight ? width * 0.09 : width * 0.30, width: spotlight ? width * 0.42 : width * 0.40, height: unit * 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <img src={look.dark ? SJB_CALENDAR_MARKS.accWhite : SJB_CALENDAR_MARKS.accColor} alt="ACC" style={{ width: unit * 10, height: unit * 5.5, objectFit: 'contain' }} />
       <img src={SJB_CALENDAR_MARKS.sunBelt} alt="Sun Belt Conference" style={{ width: unit * 10, height: unit * 5.5, objectFit: 'contain' }} />
-    </div>
+    </div>}
     <div data-bowl-copy style={{ position: 'absolute', top: copyTop, left: width * (spotlight ? 0.07 : 0.05), width: copyWidth }}>
       <div style={{ color: mode === 'light' ? look.ink : spotlight ? look.ink : look.accent }}>
         {broadcaster ? <>
