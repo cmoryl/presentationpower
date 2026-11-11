@@ -12,7 +12,8 @@ describe('Bowl campaign identity across sizes', () => {
         expect(mark?.url).toContain('cbs-sports-network-vertical-white.svg');
         expect(mark?.ratio).toBe(1000 / 257.97828);
       }
-      expect(sjbBroadcastMark(['LIVE ON CBS'], 'light', format.height > format.width)?.url).toContain('official-black');
+      expect(sjbBroadcastMark(['LIVE ON CBS'], 'light', format.height > format.width)?.url).toContain('supplied-black');
+      expect(sjbBroadcastMark(['LIVE ON CBS'], 'light', format.height > format.width)?.ratio).toBe(1000 / 257.97828);
     }
   });
   it('uses the supplied white CBS logo on dark vertical and square artwork', () => {
@@ -20,7 +21,7 @@ describe('Bowl campaign identity across sizes', () => {
       expect(sjbBroadcastMark(['LIVE ON CBS'], mode, true)?.url).toContain('cbs-sports-network-vertical-white.svg');
       expect(sjbBroadcastMark(['LIVE ON CBS'], mode, true)?.ratio).toBe(1000 / 257.97828);
     }
-    expect(sjbBroadcastMark(['LIVE ON CBS'], 'light', true)?.url).toContain('official-black');
+    expect(sjbBroadcastMark(['LIVE ON CBS'], 'light', true)?.url).toContain('supplied-black');
     expect(sjbBroadcastMark(['LIVE ON CBS'], 'dark', false)?.url).toContain('vertical-white');
   });
   it('binds all five looks to their original Canva media, not menu illustrations', () => {
@@ -37,7 +38,7 @@ describe('Bowl campaign identity across sizes', () => {
     for (const mode of ['dark', 'set2', 'set3', 'set4'] as const) {
       expect(sjbBroadcastMark(['LIVE ON CBS', 'SPORTS NETWORK'], mode)?.url).toContain('cbs-sports-network-vertical-white.svg');
     }
-    expect(sjbBroadcastMark(['LIVE ON CBS', 'SPORTS NETWORK'], 'light')?.url).toContain('cbs-sports-network-official-black.svg');
+    expect(sjbBroadcastMark(['LIVE ON CBS', 'SPORTS NETWORK'], 'light')?.url).toContain('cbs-sports-network-supplied-black.svg');
     expect(sjbBroadcastMark(['TICKETS', 'ON SALE'], 'dark')).toBeNull();
   });
 });

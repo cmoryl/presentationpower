@@ -23,7 +23,11 @@ export function SjbFittedCallout({ lines, width, height, maxSize, italic = false
       for (let i = 0; i < 14; i++) {
         const candidate = (low + high) / 2;
         node.style.fontSize = `${candidate}px`;
-        const fits = node.scrollWidth <= width && node.scrollHeight <= height;
+        // Measure the lines, not rounded scroll dimensions of a constrained box.
+        // Fractional reserved heights otherwise reject every candidate down to 1px.
+        const bounds = Array.from(node.children).map(child => child.getBoundingClientRect());
+        const contentHeight = bounds.length ? Math.max(...bounds.map(b => b.bottom)) - Math.min(...bounds.map(b => b.top)) : 0;
+        const fits = node.scrollWidth <= width + 1 && contentHeight <= height + 1;
         if (fits) low = candidate;
         else high = candidate;
       }
