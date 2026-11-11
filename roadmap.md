@@ -1,4 +1,6 @@
 # Roadmap
+## Current Bowl social page update
+- [ ] Remove legacy Design Sets 1 and 4 from the social page only, move projections into matching sections, and source remaining matching sets from the calendar's saved artwork and live links; preserve Canva originals and the calendar's Set 4.
 ## Bowl social calendar
 - [ ] Set 3 posts 14–29: Canva edits saved in all sizes; refresh cleaned calendar pictures after Canva daily export limit resets.
 - [ ] Set 4 user-edited picture refresh: 78 of 84 exported, metadata-cleaned without pixel changes, calendar/download pointers updated and served bytes/native dimensions verified; nine calendar selection tests pass. Remaining six: posts 25 (Gracias) and 28 (Top Things to Do), Feed/Square/Story — blocked by Canva daily export limit. Originals unchanged. Receipt: docs/sjb-set4-user-refresh-2026-11-11.json. Signed-in calendar interaction unverified: session mint found no matching requester account.
