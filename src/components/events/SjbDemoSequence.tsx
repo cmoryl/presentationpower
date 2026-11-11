@@ -200,7 +200,6 @@ function DemoPageFrame({
           {SJB_DEMO_SITE}
         </div>
       )}
-      <div style={{ position: "absolute", bottom: pad, right: pad, fontSize: px(2.2), fontFamily: FONT }}>PAGE 1 / 4</div>
     </div>
   );
 }
