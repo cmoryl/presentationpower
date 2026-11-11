@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS } from '../sjb-calendar-style';
+import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS, sjbBroadcastMark } from '../sjb-calendar-style';
 import { SJB_DEMO_LOOKS } from '../sjb-calendar-demo';
 import { SJB_COLORS } from '../san-juan-bowl';
 
@@ -13,5 +13,12 @@ describe('Bowl campaign identity across sizes', () => {
   });
   it('keeps the white and colour conference masters distinct for dark and light grounds', () => {
     expect(SJB_CALENDAR_MARKS.accWhite).not.toBe(SJB_CALENDAR_MARKS.accColor);
+  });
+  it('selects official single-color CBS artwork for every dark look and contrasting black for Light', () => {
+    for (const mode of ['dark', 'set2', 'set3', 'set4'] as const) {
+      expect(sjbBroadcastMark(['LIVE ON CBS', 'SPORTS NETWORK'], mode)?.url).toContain('cbs-sports-network-official-white.svg');
+    }
+    expect(sjbBroadcastMark(['LIVE ON CBS', 'SPORTS NETWORK'], 'light')?.url).toContain('cbs-sports-network-official-black.svg');
+    expect(sjbBroadcastMark(['TICKETS', 'ON SALE'], 'dark')).toBeNull();
   });
 });
