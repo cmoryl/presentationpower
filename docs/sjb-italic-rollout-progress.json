@@ -62,8 +62,17 @@
     "DAHajSGIvZc (Set2 17 Story)",
     "DAHajbQZk6U (Set2 18 Feed)",
     "DAHajT22lmA (Set2 18 Square)",
-    "DAHajchzjKw (Set2 18 Story)"
+    "DAHajchzjKw (Set2 18 Story)",
+    "DAHajXEyG7k (Set2 19 Feed)",
+    "DAHajVzP9YM (Set2 19 Square)",
+    "DAHajbSO284 (Set2 19 Story)",
+    "DAHajTF-4qM (Set2 20 Feed)",
+    "DAHaje1J_Y8 (Set2 20 Square)",
+    "DAHajaFIeHY (Set2 20 Story)",
+    "DAHajfYZ45s (Set2 21 Feed)",
+    "DAHajcgPF60 (Set2 21 Square)",
+    "DAHajZv5Moo (Set2 21 Story)"
   ],
-  "next": "Set2 19 Feed DAHajXEyG7k onward in registry order, then Set3, Set4, Dark",
+  "next": "Set2 22 Feed DAHajXTK5IQ onward (22-25, 28), then Set3, Set4, Dark",
   "open_transactions": []
 }
