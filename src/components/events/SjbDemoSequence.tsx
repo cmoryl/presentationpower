@@ -20,7 +20,7 @@ import {
 import { SJB_DEMO_BADGE, SJB_DEMO_FACTS, SJB_DEMO_LOOKS, SJB_DEMO_NOTE, SJB_DEMO_SITE, sjbCalendarDemo, type SjbCalendarDemo, type SjbDemoPage, type SjbDemoLook } from "@/lib/sjb-calendar-demo";
 import '@fontsource/barlow-condensed/700.css';
 import '@fontsource/barlow-condensed/700-italic.css';
-import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS } from '@/lib/sjb-calendar-style';
+import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS, sjbBroadcastMark } from '@/lib/sjb-calendar-style';
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
 import type { SjbCalendarMode, SjbCalendarPost } from "@/lib/sjb-social-calendar";
 import type { SjbCalendarFormat, SjbCalendarFormatSpec } from "@/lib/sjb-calendar-formats";
@@ -59,6 +59,7 @@ function DemoPageFrame({
 }) {
   const look = SJB_DEMO_LOOKS[mode];
   const style = SJB_CALENDAR_STYLE[mode];
+  const broadcaster = sjbBroadcastMark(post.headline, mode);
   const logo = SJB_LOGOS.find((l) => l.id === (look.dark ? "dark" : "color"));
   if (!logo) return null;
   // Every size below is a share of the short edge, so the same page reads the
@@ -108,8 +109,13 @@ function DemoPageFrame({
             <>
               <div style={{ marginTop: px(9), fontSize: px(2.6), letterSpacing: "0.2em", opacity: 0.75 }}>{post.phase.toUpperCase()} · {SJB_DEMO_FACTS[0].value.toUpperCase()}</div>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: px(2) }}>
-                <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: 0, fontStyle: style.italic ? 'italic' : 'normal', overflowWrap: 'anywhere' }}>{post.headline[0]}</div>
-                <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: 0, color: look.accent, overflowWrap: 'anywhere' }}>{post.headline[1]}</div>
+                {broadcaster ? <>
+                  <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06 }}>{broadcaster.label}</div>
+                  <img data-bowl-broadcaster src={broadcaster.url} alt={broadcaster.alt} style={{ width: '100%', height: 'auto', marginTop: px(4) }} />
+                </> : <>
+                  <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: 0, fontStyle: style.italic ? 'italic' : 'normal', overflowWrap: 'anywhere' }}>{post.headline[0]}</div>
+                  <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: px(10.5), fontWeight: 700, lineHeight: 1.06, letterSpacing: 0, color: look.accent, overflowWrap: 'anywhere' }}>{post.headline[1]}</div>
+                </>}
                 <div style={{ width: px(22), height: px(0.7), backgroundColor: look.accent, marginTop: px(4) }} />
               </div>
             </>
@@ -192,6 +198,7 @@ function DemoPageFrame({
 function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarPost; mode: SjbCalendarMode; width: number; height: number; logo: string }) {
   const look = SJB_DEMO_LOOKS[mode];
   const style = SJB_CALENDAR_STYLE[mode];
+  const broadcaster = sjbBroadcastMark(post.headline, mode);
   const square = height === width;
   const tall = height / width > 1.6;
   const spotlight = mode === 'set3';
@@ -212,7 +219,10 @@ function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarP
     </div>
     <div data-bowl-copy style={{ position: 'absolute', top: copyTop, left: width * (spotlight ? 0.07 : 0.05), width: copyWidth }}>
       <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: headlineSize, lineHeight: 1.05, color: mode === 'light' ? look.ink : spotlight ? look.ink : look.accent, fontStyle: style.italic ? 'italic' : 'normal' }}>
-        {post.headline.map((h, i) => <div key={i} style={{ overflowWrap: 'anywhere' }}>{h}</div>)}
+        {broadcaster ? <>
+          <div>{broadcaster.label}</div>
+          <img data-bowl-broadcaster src={broadcaster.url} alt={broadcaster.alt} style={{ width: '100%', height: 'auto', marginTop: unit * 4 }} />
+        </> : post.headline.map((h, i) => <div key={i} style={{ overflowWrap: 'anywhere' }}>{h}</div>)}
       </div>
       <div data-bowl-footer style={{ marginTop: unit * 2.7, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: unit * (spotlight ? 2.6 : 2.8), lineHeight: 1.3, color: look.ink }}>
         <div>{SJB_DEMO_FACTS[0].value.toUpperCase()} · {SJB_DEMO_FACTS[1].value.toUpperCase()}</div>
