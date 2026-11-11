@@ -1,0 +1,11 @@
+{
+  "status": "awaiting preview approval; no Canva originals saved or refreshed",
+  "post": "04",
+  "designs": [
+    { "look": "dark", "design_id": "DAHaiJbODIo", "transaction_id": "3844344078544555991" },
+    { "look": "light", "design_id": "DAHaiB8HX6U", "transaction_id": "2264706511514528894" },
+    { "look": "set2", "design_id": "DAHai4nSCtc", "transaction_id": "5009650485258906778" },
+    { "look": "set3", "design_id": "DAHai6cDjm0", "transaction_id": "3667577794647331587" },
+    { "look": "set4", "design_id": "DAHai-4B8c4", "transaction_id": "3870239777309120641" }
+  ]
+}
