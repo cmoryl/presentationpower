@@ -1,6 +1,6 @@
 {
   "status": "partial",
-  "completed": 20,
+  "completed": 56,
   "total": 80,
   "receipts": [
     {
@@ -202,114 +202,369 @@
       "pixels_unchanged": true,
       "metadata_cleaned": true,
       "sha256": "285d69dcd019150003706cdb7415cf11d6d1c50f1ff2bb6562dbf59801155181"
+    },
+    {
+      "id": "DAHajfIz-W8",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "9c8aa1308dbc32f5d36174c83a2be2b3d62536eb0ee4c1b31e141a063c7ffa36"
+    },
+    {
+      "id": "DAHajSs129g",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "cffbb71b0257a86c36d3288a912fd0b56a3bc31dc727edee9c04f97b7673d39f"
+    },
+    {
+      "id": "DAHajdjVFvY",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "4e2b159289d7adf51bec6c4b7463dec3b3e5c5021b2e90cd51aa4bce218cd9e9"
+    },
+    {
+      "id": "DAHajbwLans",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "dfee3f5bba75f095ca9b439f2b5a9fd149754282b27220d6746c3b0c9b49fb50"
+    },
+    {
+      "id": "DAHajRDGV24",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "5f57fd549c90ec6eea14d78303c543589b0f0a776d178b5d1adb4f2e36d64294"
+    },
+    {
+      "id": "DAHajQNJCoc",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "1e54f4d4d7810bebccd4fcae987ea0c3ebedc382398a68b2f3626c401741e88f"
+    },
+    {
+      "id": "DAHajaj1vhc",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "28007e819b03d8038b019bd959fcb77540aaeb33df62591706aebec7e43745e0"
+    },
+    {
+      "id": "DAHajTMvzso",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "3c75eacb36551a354b0a2a9384490f34292a97ff76c8ef5951ce356700ff6636"
+    },
+    {
+      "id": "DAHajQXU1io",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "f708f952cbb254647848ac4fe1db8acb84376534ce630c36356df232a1b3e4ed"
+    },
+    {
+      "id": "DAHajYMwyNQ",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "71a24f5e3799b1131c71b9041443d98e86ae92b6e9085ced140e65304ae68ab9"
+    },
+    {
+      "id": "DAHajREkC8g",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "55e969f0b6d0232d1b7b54eb10c39023f6285f247f678fad2a1a1f81a902f53a"
+    },
+    {
+      "id": "DAHajbS9R7Q",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "3adcb3c92287bd5f181b6972ffe681bf6bbf17626ce0ae2acc93ce6c9e2cfc24"
+    },
+    {
+      "id": "DAHajeR1f1E",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "ef11de4ff25f132c3b393b8a195cb1a4cbc606beb694a95eae8f9522b526c09b"
+    },
+    {
+      "id": "DAHajby3OWo",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "5afb2fd7f5fb4e53748c09ecc12c119debf0ac471d64858cd8945aca03a68893"
+    },
+    {
+      "id": "DAHajcUURIA",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "fda570946f8ae875a5ecf2fabc29adb01992a5e6ab03fdcc1df52afd1c3ca88c"
+    },
+    {
+      "id": "DAHajT-eGxs",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "45234bba1f13eefdc56f85b05db853aeaf6ddf743ba65ffca5d648d3a3d5dbd5"
+    },
+    {
+      "id": "DAHajXAkZ6c",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "f86930d3d48b5366ab74acb4aa0b19b82157bc1adc379a6c44d4890c341a5f01"
+    },
+    {
+      "id": "DAHajWb9WpE",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "337e7ae7aa78c2832af2e1c575f7afae52ff7156c55a71c3b22633fb25601c8a"
+    },
+    {
+      "id": "DAHajahHK80",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "3bd29fdb822885e1fba346cb11c034e5a14378f692e95d725561b0bb304b90c5"
+    },
+    {
+      "id": "DAHajbxU5ho",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "ee76437aec243a91b5aded6ccc2cd4981da1ff11b35e557891056c8ee54a5f2d"
+    },
+    {
+      "id": "DAHajUItvXM",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "05677f9bba5801bad08e466ae8aae33e961c3961acaabdede7072da73d2d22b1"
+    },
+    {
+      "id": "DAHajrx4H2A",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "ed53a80d2658608d285de03091ce9334e060aa9222410d13268ab2f92898d9c8"
+    },
+    {
+      "id": "DAHaje5TGps",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "889fe62927bc74d98667452f46ca12ffd4c0c154ee233b9998ba733cff6e8160"
+    },
+    {
+      "id": "DAHajcpcxjw",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "1ad0f41d178ac732ad69d1b10ec10980d559cd748c8d9631794928ea7fe7276e"
+    },
+    {
+      "id": "DAHajpeOJ8M",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "2008a42231b88c54fd5a9e48a23884eb6706fe3f49620301afcec1e35fbdfcb7"
+    },
+    {
+      "id": "DAHajZGvijo",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "1cca16824dbf902e42499a650e0406c42dfbde08e8ae6601e50765349cb52d44"
+    },
+    {
+      "id": "DAHajnoPPcc",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "088b075e8d9580d307f16f9cdaf8c952a8fa5f2a2c4458b4d14925e591558506"
+    },
+    {
+      "id": "DAHajcnn0Ok",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "ad21b3c48753a2e3a16bc7daca4c30f4f5840647006e9a71033c8e180938e9f7"
+    },
+    {
+      "id": "DAHaja0JmjY",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "031055cf072906493303c04ce67c994c76637e4678c68de619bee886179a2a3b"
+    },
+    {
+      "id": "DAHajSGIvZc",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "9c009f394678ace6e58b85c7cf402c80aa18640627c463b210e79fb0ebc2b932"
+    },
+    {
+      "id": "DAHajbQZk6U",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "bb7cdfc8d87fd7b2d45e49cd2da3126ee4ba8154de97b5fea6a96b37d927835e"
+    },
+    {
+      "id": "DAHajchzjKw",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "3646400664cbeb6cfac4a1bebd89cdcce702416658c53899f0f13730864bc94d"
+    },
+    {
+      "id": "DAHajT22lmA",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "aeed4fee333fdb2f8bf2a97a8adb557bb63f4d92f13e6eb7c5701538b9dbbdc3"
+    },
+    {
+      "id": "DAHajbSO284",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "b937742ff28201a7dbc0670b721e8bb823192eeaf52f70cf0b20e21fbe6dbeb3"
+    },
+    {
+      "id": "DAHajXEyG7k",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "d23d9695d6bb52610bd226aeaf7070f62b9d59eecb32d9489dbd51aa85ae9c0b"
+    },
+    {
+      "id": "DAHajVzP9YM",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "b8dffbe4a6b827da534338dbf20fa382d3f5347b48f50adeaa725ea54e99706c"
     }
   ],
   "remaining": [
-    {
-      "post": "09",
-      "size": "1350",
-      "id": "DAHajSs129g"
-    },
-    {
-      "post": "09",
-      "size": "1080",
-      "id": "DAHajdjVFvY"
-    },
-    {
-      "post": "09",
-      "size": "1920",
-      "id": "DAHajRDGV24"
-    },
-    {
-      "post": "10",
-      "size": "1350",
-      "id": "DAHajbwLans"
-    },
-    {
-      "post": "10",
-      "size": "1080",
-      "id": "DAHajfIz-W8"
-    },
-    {
-      "post": "10",
-      "size": "1920",
-      "id": "DAHajQNJCoc"
-    },
-    {
-      "post": "11",
-      "size": "1350",
-      "id": "DAHajQXU1io"
-    },
-    {
-      "post": "11",
-      "size": "1080",
-      "id": "DAHajaj1vhc"
-    },
-    {
-      "post": "11",
-      "size": "1920",
-      "id": "DAHajbS9R7Q"
-    },
-    {
-      "post": "12",
-      "size": "1350",
-      "id": "DAHajYMwyNQ"
-    },
-    {
-      "post": "12",
-      "size": "1080",
-      "id": "DAHajTMvzso"
-    },
-    {
-      "post": "12",
-      "size": "1920",
-      "id": "DAHajREkC8g"
-    },
-    {
-      "post": "13",
-      "size": "1350",
-      "id": "DAHajXAkZ6c"
-    },
-    {
-      "post": "13",
-      "size": "1080",
-      "id": "DAHajby3OWo"
-    },
-    {
-      "post": "13",
-      "size": "1920",
-      "id": "DAHajWb9WpE"
-    },
-    {
-      "post": "14",
-      "size": "1350",
-      "id": "DAHajT-eGxs"
-    },
-    {
-      "post": "14",
-      "size": "1080",
-      "id": "DAHajeR1f1E"
-    },
-    {
-      "post": "14",
-      "size": "1920",
-      "id": "DAHajcUURIA"
-    },
-    {
-      "post": "15",
-      "size": "1350",
-      "id": "DAHajahHK80"
-    },
-    {
-      "post": "15",
-      "size": "1080",
-      "id": "DAHajbxU5ho"
-    },
-    {
-      "post": "15",
-      "size": "1920",
-      "id": "DAHajUItvXM"
-    },
     {
       "post": "27",
       "size": "1350",
@@ -324,81 +579,6 @@
       "post": "27",
       "size": "1920",
       "id": "DAHai6z-QLU"
-    },
-    {
-      "post": "29",
-      "size": "1350",
-      "id": "DAHajrx4H2A"
-    },
-    {
-      "post": "29",
-      "size": "1080",
-      "id": "DAHajpeOJ8M"
-    },
-    {
-      "post": "29",
-      "size": "1920",
-      "id": "DAHajnoPPcc"
-    },
-    {
-      "post": "16",
-      "size": "1350",
-      "id": "DAHajZGvijo"
-    },
-    {
-      "post": "16",
-      "size": "1080",
-      "id": "DAHaje5TGps"
-    },
-    {
-      "post": "16",
-      "size": "1920",
-      "id": "DAHajcpcxjw"
-    },
-    {
-      "post": "17",
-      "size": "1350",
-      "id": "DAHaja0JmjY"
-    },
-    {
-      "post": "17",
-      "size": "1080",
-      "id": "DAHajcnn0Ok"
-    },
-    {
-      "post": "17",
-      "size": "1920",
-      "id": "DAHajSGIvZc"
-    },
-    {
-      "post": "18",
-      "size": "1350",
-      "id": "DAHajbQZk6U"
-    },
-    {
-      "post": "18",
-      "size": "1080",
-      "id": "DAHajT22lmA"
-    },
-    {
-      "post": "18",
-      "size": "1920",
-      "id": "DAHajchzjKw"
-    },
-    {
-      "post": "19",
-      "size": "1350",
-      "id": "DAHajXEyG7k"
-    },
-    {
-      "post": "19",
-      "size": "1080",
-      "id": "DAHajVzP9YM"
-    },
-    {
-      "post": "19",
-      "size": "1920",
-      "id": "DAHajbSO284"
     },
     {
       "post": "20",
@@ -506,5 +686,6 @@
       "id": "DAHajQ20e7E"
     }
   ],
-  "verification": "15 calendar tests passed; live calendar check pending"
+  "verification": "Pixel-preserving metadata cleanup and native dimensions verified for all 56 refreshed exports. Live calendar verification pending.",
+  "open_transactions": []
 }
