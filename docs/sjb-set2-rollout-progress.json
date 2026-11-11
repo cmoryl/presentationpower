@@ -1,0 +1,510 @@
+{
+  "status": "partial",
+  "completed": 20,
+  "total": 80,
+  "receipts": [
+    {
+      "id": "DAHajrcD2GU",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "0fddadaf83f70ad22262c74e952117acb934d32e0f0bd9936df0b09bd95b2e2b"
+    },
+    {
+      "id": "DAHajp4nf6Q",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "3f06026c71f55b54ec31899350ca7b92c70c7726083541d68ee049cc0570b671"
+    },
+    {
+      "id": "DAHai7lhwMk",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "62b9e63e09cef8a74457b99d4411c0be79483cded21c936ebe5482823580f7e3"
+    },
+    {
+      "id": "DAHajorAXmg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "11d3ba704168a30a9fe8854502384604fde06d6a634c50c0736f0419d171fa9b"
+    },
+    {
+      "id": "DAHaixyeXHc",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "5b2b37ee52bcd33c931f48dfbe523db35ceaf473a78f5b836c329a3a388a938e"
+    },
+    {
+      "id": "DAHai4nSCtc",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "1cd9096e21eef4fc2ba693c09b006266814f731f935eb9f63d105ba5c633501c"
+    },
+    {
+      "id": "DAHai9nhLdA",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "594d8d1d75f4c91752086b40a0987ffebc903a7960cbe7be876374efe5c81270"
+    },
+    {
+      "id": "DAHai6-QuJc",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "fc452ad9df68b9dad533445169ee7a2a2775b8c1a304c490689adbdb10e49d7f"
+    },
+    {
+      "id": "DAHajUiIw2Q",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "2f3d0ac4664674443d71a5251ea86345b5476b91fa44aebfd7939bebadd2d7b2"
+    },
+    {
+      "id": "DAHajQkV5VE",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "f811676aee81be923a6b7d9702fb3c99653f63a462bdb6a3f4f0032f8691ae7b"
+    },
+    {
+      "id": "DAHajVsOsEo",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "f64885a881d6de2ab3b5aaa5118b33e69bda82626f63cc960ad92fb8f598c6c8"
+    },
+    {
+      "id": "DAHajTqd5Q0",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "0c6a3de679e3a4f50c23250758d96a08c10141f761ebb73a335d091e6dc185f5"
+    },
+    {
+      "id": "DAHajUM3gew",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "bd489284f0775cc4939ce58a3415bc4bc74bd1586ccdbea73cda23508fb91b1b"
+    },
+    {
+      "id": "DAHajQIheyY",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "94fb35ebcfd526acdaf42ed9ebcf0589cebc8582893332d8592441ec83c97bfe"
+    },
+    {
+      "id": "DAHajcucDqk",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "a9e42cd3387fa3c9d338068fb55d854fd649b8569848db8c3b1c39ef77846278"
+    },
+    {
+      "id": "DAHajZZ_Mqk",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "91d7adfc436f34d4ae908b13e96495e8acba20b5161ca76ecf8e64af31c240f3"
+    },
+    {
+      "id": "DAHajUCtkqo",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "62156e34e38f9cddcb15d2ed70cad40629af8f70b3835ff4ce11442b717b9b17"
+    },
+    {
+      "id": "DAHajXJSMBw",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "45ad02da0bfa394300f16922ec02ea4f4af016a05877027ced6c8f05fb549635"
+    },
+    {
+      "id": "DAHajVwk5do",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "15a38673263893fec7a11e4ed58ee67c5fd57c95aff790fcba05928cb75a185a"
+    },
+    {
+      "id": "DAHajapmW-s",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "metadata_cleaned": true,
+      "sha256": "285d69dcd019150003706cdb7415cf11d6d1c50f1ff2bb6562dbf59801155181"
+    }
+  ],
+  "remaining": [
+    {
+      "post": "09",
+      "size": "1350",
+      "id": "DAHajSs129g"
+    },
+    {
+      "post": "09",
+      "size": "1080",
+      "id": "DAHajdjVFvY"
+    },
+    {
+      "post": "09",
+      "size": "1920",
+      "id": "DAHajRDGV24"
+    },
+    {
+      "post": "10",
+      "size": "1350",
+      "id": "DAHajbwLans"
+    },
+    {
+      "post": "10",
+      "size": "1080",
+      "id": "DAHajfIz-W8"
+    },
+    {
+      "post": "10",
+      "size": "1920",
+      "id": "DAHajQNJCoc"
+    },
+    {
+      "post": "11",
+      "size": "1350",
+      "id": "DAHajQXU1io"
+    },
+    {
+      "post": "11",
+      "size": "1080",
+      "id": "DAHajaj1vhc"
+    },
+    {
+      "post": "11",
+      "size": "1920",
+      "id": "DAHajbS9R7Q"
+    },
+    {
+      "post": "12",
+      "size": "1350",
+      "id": "DAHajYMwyNQ"
+    },
+    {
+      "post": "12",
+      "size": "1080",
+      "id": "DAHajTMvzso"
+    },
+    {
+      "post": "12",
+      "size": "1920",
+      "id": "DAHajREkC8g"
+    },
+    {
+      "post": "13",
+      "size": "1350",
+      "id": "DAHajXAkZ6c"
+    },
+    {
+      "post": "13",
+      "size": "1080",
+      "id": "DAHajby3OWo"
+    },
+    {
+      "post": "13",
+      "size": "1920",
+      "id": "DAHajWb9WpE"
+    },
+    {
+      "post": "14",
+      "size": "1350",
+      "id": "DAHajT-eGxs"
+    },
+    {
+      "post": "14",
+      "size": "1080",
+      "id": "DAHajeR1f1E"
+    },
+    {
+      "post": "14",
+      "size": "1920",
+      "id": "DAHajcUURIA"
+    },
+    {
+      "post": "15",
+      "size": "1350",
+      "id": "DAHajahHK80"
+    },
+    {
+      "post": "15",
+      "size": "1080",
+      "id": "DAHajbxU5ho"
+    },
+    {
+      "post": "15",
+      "size": "1920",
+      "id": "DAHajUItvXM"
+    },
+    {
+      "post": "27",
+      "size": "1350",
+      "id": "DAHai9LjMKQ"
+    },
+    {
+      "post": "27",
+      "size": "1080",
+      "id": "DAHai0mKrKo"
+    },
+    {
+      "post": "27",
+      "size": "1920",
+      "id": "DAHai6z-QLU"
+    },
+    {
+      "post": "29",
+      "size": "1350",
+      "id": "DAHajrx4H2A"
+    },
+    {
+      "post": "29",
+      "size": "1080",
+      "id": "DAHajpeOJ8M"
+    },
+    {
+      "post": "29",
+      "size": "1920",
+      "id": "DAHajnoPPcc"
+    },
+    {
+      "post": "16",
+      "size": "1350",
+      "id": "DAHajZGvijo"
+    },
+    {
+      "post": "16",
+      "size": "1080",
+      "id": "DAHaje5TGps"
+    },
+    {
+      "post": "16",
+      "size": "1920",
+      "id": "DAHajcpcxjw"
+    },
+    {
+      "post": "17",
+      "size": "1350",
+      "id": "DAHaja0JmjY"
+    },
+    {
+      "post": "17",
+      "size": "1080",
+      "id": "DAHajcnn0Ok"
+    },
+    {
+      "post": "17",
+      "size": "1920",
+      "id": "DAHajSGIvZc"
+    },
+    {
+      "post": "18",
+      "size": "1350",
+      "id": "DAHajbQZk6U"
+    },
+    {
+      "post": "18",
+      "size": "1080",
+      "id": "DAHajT22lmA"
+    },
+    {
+      "post": "18",
+      "size": "1920",
+      "id": "DAHajchzjKw"
+    },
+    {
+      "post": "19",
+      "size": "1350",
+      "id": "DAHajXEyG7k"
+    },
+    {
+      "post": "19",
+      "size": "1080",
+      "id": "DAHajVzP9YM"
+    },
+    {
+      "post": "19",
+      "size": "1920",
+      "id": "DAHajbSO284"
+    },
+    {
+      "post": "20",
+      "size": "1350",
+      "id": "DAHajTF-4qM"
+    },
+    {
+      "post": "20",
+      "size": "1080",
+      "id": "DAHaje1J_Y8"
+    },
+    {
+      "post": "20",
+      "size": "1920",
+      "id": "DAHajaFIeHY"
+    },
+    {
+      "post": "21",
+      "size": "1350",
+      "id": "DAHajfYZ45s"
+    },
+    {
+      "post": "21",
+      "size": "1080",
+      "id": "DAHajcgPF60"
+    },
+    {
+      "post": "21",
+      "size": "1920",
+      "id": "DAHajZv5Moo"
+    },
+    {
+      "post": "22",
+      "size": "1350",
+      "id": "DAHajXTK5IQ"
+    },
+    {
+      "post": "22",
+      "size": "1080",
+      "id": "DAHajdpoVI8"
+    },
+    {
+      "post": "22",
+      "size": "1920",
+      "id": "DAHajaLK4_I"
+    },
+    {
+      "post": "23",
+      "size": "1350",
+      "id": "DAHajZqOkbc"
+    },
+    {
+      "post": "23",
+      "size": "1080",
+      "id": "DAHajQYoZgs"
+    },
+    {
+      "post": "23",
+      "size": "1920",
+      "id": "DAHajS2C1c0"
+    },
+    {
+      "post": "24",
+      "size": "1350",
+      "id": "DAHajUkMMoQ"
+    },
+    {
+      "post": "24",
+      "size": "1080",
+      "id": "DAHajYrJKFc"
+    },
+    {
+      "post": "24",
+      "size": "1920",
+      "id": "DAHajRo0-Ws"
+    },
+    {
+      "post": "25",
+      "size": "1350",
+      "id": "DAHajcA98bg"
+    },
+    {
+      "post": "25",
+      "size": "1080",
+      "id": "DAHajTFVMAI"
+    },
+    {
+      "post": "25",
+      "size": "1920",
+      "id": "DAHajU4mWq8"
+    },
+    {
+      "post": "28",
+      "size": "1350",
+      "id": "DAHajXIAuXQ"
+    },
+    {
+      "post": "28",
+      "size": "1080",
+      "id": "DAHajVcxO0U"
+    },
+    {
+      "post": "28",
+      "size": "1920",
+      "id": "DAHajQ20e7E"
+    }
+  ],
+  "verification": "15 calendar tests passed; live calendar check pending"
+}
