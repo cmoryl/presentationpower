@@ -1,0 +1,13 @@
+{
+  "status": "awaiting_preview_approval",
+  "asset": "MAHanbs5Hvo",
+  "scope": "Four dark square TV-announcement originals; portrait originals already updated; Light unchanged",
+  "drafts": [
+    { "style": "dark", "design": "DAHaj7r59K4", "transaction": "842694981326352615", "box": [190, 660, 700, 180.584796], "footer_top": 885 },
+    { "style": "set2", "design": "DAHai0mKrKo", "transaction": "3865736228596517027", "box": [215, 765, 650, 167.685882], "footer_top": 975 },
+    { "style": "set3", "design": "DAHaioTK4Mg", "transaction": "6095018043998188554", "box": [55, 675, 650, 167.685882] },
+    { "style": "set4", "design": "DAHaiqX-IuA", "transaction": "981180669985567846", "box": [190, 695, 700, 180.584796], "footer_top": 930 }
+  ],
+  "saved": false,
+  "calendar_pictures_refreshed": false
+}
