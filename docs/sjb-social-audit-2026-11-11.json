@@ -1,8 +1,8 @@
 {
   "scope": "All registered calendar single images; demos checked separately in browser",
   "total": 420,
-  "cleaned_exports": 150,
-  "missing_exports": 270,
+  "cleaned_exports": 216,
+  "missing_exports": 204,
   "versions": [
     {
       "post": "01",
@@ -665,7 +665,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajZZ_Mqk",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -673,7 +673,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajUM3gew",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -777,7 +777,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajQIheyY",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -785,7 +785,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajTqd5Q0",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -793,7 +793,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajUCtkqo",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -897,7 +897,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajVwk5do",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -905,7 +905,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajapmW-s",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -913,7 +913,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajXJSMBw",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1017,7 +1017,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajSs129g",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1025,7 +1025,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajdjVFvY",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1033,7 +1033,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajRDGV24",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1137,7 +1137,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajbwLans",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1145,7 +1145,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajfIz-W8",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1153,7 +1153,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajQNJCoc",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1257,7 +1257,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajQXU1io",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1265,7 +1265,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajaj1vhc",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1273,7 +1273,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajbS9R7Q",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1377,7 +1377,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajYMwyNQ",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1385,7 +1385,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajTMvzso",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1393,7 +1393,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajREkC8g",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1497,7 +1497,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajXAkZ6c",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1505,7 +1505,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajby3OWo",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1513,7 +1513,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajWb9WpE",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1617,7 +1617,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajT-eGxs",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1625,7 +1625,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajeR1f1E",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1633,7 +1633,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajcUURIA",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1737,7 +1737,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajahHK80",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1745,7 +1745,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajbxU5ho",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1753,7 +1753,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajUItvXM",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1817,7 +1817,7 @@
       "style": "dark",
       "size": "1080",
       "canva": "DAHaj7r59K4",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1825,7 +1825,7 @@
       "style": "dark",
       "size": "1920",
       "canva": "DAHaj3Zi7Pk",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1841,7 +1841,7 @@
       "style": "light",
       "size": "1080",
       "canva": "DAHaj4W683s",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -1849,7 +1849,7 @@
       "style": "light",
       "size": "1920",
       "canva": "DAHajxZAXGE",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2049,7 +2049,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajZGvijo",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2057,7 +2057,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHaje5TGps",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2065,7 +2065,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajcpcxjw",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2169,7 +2169,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHaja0JmjY",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2177,7 +2177,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajcnn0Ok",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2185,7 +2185,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajSGIvZc",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2289,7 +2289,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajbQZk6U",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2297,7 +2297,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajT22lmA",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2305,7 +2305,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajchzjKw",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2409,7 +2409,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajXEyG7k",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2417,7 +2417,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajVzP9YM",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2425,7 +2425,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajbSO284",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2529,7 +2529,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajTF-4qM",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2537,7 +2537,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHaje1J_Y8",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2545,7 +2545,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajaFIeHY",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2649,7 +2649,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajfYZ45s",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2657,7 +2657,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajcgPF60",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2665,7 +2665,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajZv5Moo",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2769,7 +2769,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajXTK5IQ",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2777,7 +2777,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajdpoVI8",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2785,7 +2785,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajaLK4_I",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2889,7 +2889,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajZqOkbc",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2897,7 +2897,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajQYoZgs",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -2905,7 +2905,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajS2C1c0",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -3009,7 +3009,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajUkMMoQ",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -3017,7 +3017,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajYrJKFc",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -3025,7 +3025,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajRo0-Ws",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -3129,7 +3129,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajcA98bg",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -3137,7 +3137,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajTFVMAI",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -3145,7 +3145,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajU4mWq8",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -3249,7 +3249,7 @@
       "style": "set2",
       "size": "1350",
       "canva": "DAHajXIAuXQ",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -3257,7 +3257,7 @@
       "style": "set2",
       "size": "1080",
       "canva": "DAHajVcxO0U",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -3265,7 +3265,7 @@
       "style": "set2",
       "size": "1920",
       "canva": "DAHajQ20e7E",
-      "cleaned_export": false,
+      "cleaned_export": true,
       "visual_canva_audit": "unverified"
     },
     {
@@ -3371,6 +3371,27 @@
     "logo_text_overlap_failures": 0,
     "details_download": "Verified 1080x1350 JPG",
     "mobile_page_overflow": false,
-    "source_font_limit": "Heading Now is not supplied locally; demos use Barlow Condensed. Exact Canva typography is preserved in originals, not certified in demos."
+    "source_font_limit": "Heading Now is not supplied locally; demos use Barlow Condensed. Exact Canva typography is preserved in originals, not certified in demos.",
+    "scope_note": "Historical check of 270 single demo frames, not certification of current sequences or all Canva artwork."
+  },
+  "current_audit": {
+    "status": "incomplete",
+    "method": "Complete registry and export-path inspection; approved Set 2 transaction geometry and previews reviewed. Full cross-style visual inspection not completed.",
+    "saved_by_style": {
+      "dark": 45,
+      "light": 45,
+      "set2": 84,
+      "set3": 21,
+      "set4": 21
+    },
+    "findings": [
+      "All 420 unique single-image Canva links registered; remaining exports still missing.",
+      "Zero saved multipage sequences; all four sequence formats remain demos.",
+      "Saved originals are intentionally unbadged; drawn companion pages retain demo labels. A saved image does not establish approval.",
+      "Demos substitute Barlow Condensed for unavailable Heading Now; exact typography continuity is not certified.",
+      "Companion callout alignment and Light italic treatment are inconsistent by page role; correction pending visual review.",
+      "No every-page Bowl-logo rule was established; logo omission on companion pages is not certified as a violation."
+    ],
+    "live_check": "Calendar navigation timed out at 45 seconds; no authenticated end-to-end verification."
   }
 }
