@@ -101,8 +101,10 @@
     "method": "delete blue ACC, insert_fill white at same box (update_fill crops)",
     "done": [
       "01",
-      "02"
+      "02",
+      "03",
+      "04"
     ],
-    "next": "03"
+    "next": "05"
   }
 }
