@@ -146,8 +146,8 @@ function PostRow({ post, mode, format }: { post: SjbCalendarPost; mode: SjbCalen
                     <img src={d.previewUrl} alt={`${post.title}, ${s.label.toLowerCase()} post`} className="h-56 w-auto rounded border border-border object-cover shadow-sm" style={{ aspectRatio: `${s.w} / ${s.h}` }} loading="lazy" />
                   </a>
                 ) : (
-                  <div className="flex h-56 items-center justify-center rounded border border-dashed border-border bg-muted/40 px-3 text-center text-xs text-muted-foreground" style={{ aspectRatio: `${s.w} / ${s.h}` }}>
-                    {d ? "Picture coming" : "Not built yet"}
+                  <div className="overflow-hidden rounded border border-dashed border-border shadow-sm" title="Demo layout until the Canva picture is exported">
+                    <SjbDemoChip post={post} mode={mode} format={s.h === 1920 ? "story-sequence" : s.h === 1080 ? "linkedin-square" : "linkedin-portrait"} displayHeight={224} />
                   </div>
                 )}
               </div>
