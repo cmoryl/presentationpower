@@ -31,3 +31,14 @@ const SEQUENCES: Record<string, SjbCalendarSequence> = {};
 export function sjbCalendarSequence(post: string, mode: string, format: SjbCalendarFormat): SjbCalendarSequence | null {
   return SEQUENCES[`${post}:${mode}:${format}`] ?? null;
 }
+// Live multi-page Canva files (page 1 = the post's saved single ad, then the
+// shared details + tickets pages). Exported pictures may still be pending.
+import CANVA_SEQUENCES from "./sjb-calendar-canva-sequences.json";
+const FORMAT_SIZE: Record<SjbCalendarFormat, string> = {
+  single: "1350", "linkedin-portrait": "1350", "instagram-carousel": "1350", "linkedin-square": "1080", "story-sequence": "1920",
+};
+export function sjbCalendarSequenceCanvaUrl(post: string, mode: string, format: SjbCalendarFormat): string | null {
+  if (format === "single") return null;
+  const id = (CANVA_SEQUENCES as Record<string, Record<string, Record<string, string>>>)[mode]?.[post]?.[FORMAT_SIZE[format]];
+  return id ? `https://www.canva.com/design/${id}/edit` : null;
+}

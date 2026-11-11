@@ -10,7 +10,7 @@ import { SjbCalendarLookCards } from "@/components/events/SjbCalendarLookCards";
 import { SjbDemoChip, SjbDemoSequence } from "@/components/events/SjbDemoSequence";
 import { sjbCalendarCover } from "@/lib/sjb-calendar-demo";
 import { CalendarDays, List as ListIcon } from "lucide-react";
-import { SJB_CALENDAR_FORMATS, sjbCalendarSequence, type SjbCalendarFormat } from "@/lib/sjb-calendar-formats";
+import { SJB_CALENDAR_FORMATS, sjbCalendarSequence, sjbCalendarSequenceCanvaUrl, type SjbCalendarFormat } from "@/lib/sjb-calendar-formats";
 import {
   SJB_CALENDAR_POSTS,
   SJB_CALENDAR_SIZES,
@@ -207,7 +207,7 @@ function MultiPageFormats({ post, mode }: { post: SjbCalendarPost; mode: SjbCale
           const real = !!sjbCalendarSequence(post.n, mode, f.id);
           return (
             <Button key={f.id} size="sm" variant={open === f.id ? "default" : "outline"} aria-expanded={open === f.id} onClick={() => setOpen(open === f.id ? null : f.id)}>
-              {f.label}{!real && <span className="ml-1 opacity-70">(demo)</span>}
+              {f.label}{!real && !sjbCalendarSequenceCanvaUrl(post.n, mode, f.id) && <span className="ml-1 opacity-70">(demo)</span>}
             </Button>
           );
         })}
@@ -220,6 +220,7 @@ function MultiPageFormats({ post, mode }: { post: SjbCalendarPost; mode: SjbCale
 function SequenceArtwork({ post, mode, format }: { post: SjbCalendarPost; mode: SjbCalendarMode; format: SjbCalendarFormat }) {
   const sequence = sjbCalendarSequence(post.n, mode, format);
   const spec = SJB_CALENDAR_FORMATS.find((f) => f.id === format);
+  const canvaUrl = sjbCalendarSequenceCanvaUrl(post.n, mode, format);
   return (
     <section className="mt-4 border-t border-border pt-4" aria-label={spec?.label}>
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -240,7 +241,13 @@ function SequenceArtwork({ post, mode, format }: { post: SjbCalendarPost; mode: 
           {sequence.zipUrl && <Button asChild size="sm" variant="outline"><a href={sequence.zipUrl} download>All pictures</a></Button>}
           {sequence.illustratorUrl && <Button asChild size="sm" variant="outline"><a href={sequence.illustratorUrl} download>Illustrator</a></Button>}
         </div>
-      </> : <SjbDemoSequence post={post} mode={mode} format={format} />}
+      </> : <>
+        {canvaUrl && <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Button asChild size="sm"><a href={canvaUrl} target="_blank" rel="noreferrer">Open live Canva file</a></Button>
+          <span className="text-xs text-muted-foreground">Cover, details and tickets pages. The pictures below are a preview layout until the Canva pages are exported.</span>
+        </div>}
+        <SjbDemoSequence post={post} mode={mode} format={format} />
+      </>}
     </section>
   );
 }
