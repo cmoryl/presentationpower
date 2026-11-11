@@ -12,7 +12,7 @@
 - [ ] Complete coverage for all 28 calendar posts × five styles × Feed/Square/Story (420 versions): 18 missing Set 2/3/4 Canva designs for posts 01/29 saved and linked; fill the remaining 82 missing Canva designs, audit every version, and publish cleaned full-size pictures/downloads in the existing five calendars. Preserve user-edited feed originals; approval is required before saving any Canva editing transactions.
 - [x] Posts 05–25 and 28: all 198 Set 2/3/4 Canva designs saved and their size-specific links registered in the calendar; existing dark/light links preserved.
 - [ ] Current request remaining: inspect all 198 saved designs for alignment, wrapping and logo/content separation, correct exceptions, export full-size pictures, clean metadata and upload previews/downloads. No new pictures or Illustrator files uploaded yet; older artwork remains unaudited.
-- [ ] Dark (gold player) font match: rebuild from Set 2 layouts with gold-player background. Pilot post 04 feed copy DAHajRThRh8 (transaction 7751216736737611556) previewed; awaiting approval, then roll out to 01–15, 27, 29 × 3 sizes, export, clean, and wire in.
+- [x] Dark font match pilot approved (see below)
 - [x] Calendar-first landing page with visual campaign selectors, larger artwork in month grids and preserved day navigation; campaign switching and highlighted day navigation verified.
 - [ ] Refresh scheduled Light action posts from user-edited feed masters: existing feed pictures refreshed and cleaned; resized square/story drafts created, with overlap corrections in progress. New size previews require approval before committing/exporting and updating calendar links. Posts 01/07 still need resizing.
 - [ ] Set 2 balanced spacing (posts 02, 03, 04, 27 × 3 sizes) previewed; awaiting approval, then save, clean exports and refresh.
@@ -33,3 +33,5 @@
 
 - [ ] Set 4: conference logos clear of shield — done Feed 01–13 (shield 680@200,10; ACC 140w@90,610; SBC 120w@880,620); remaining 24 Feed + all Square/Story; then re-export cleaned pictures
 - [ ] Set 3: ACC logo switched to white on all dark-background ads
+- [ ] Calendar pictures: 280 Canva versions had no cleaned picture; 10 done (pipeline /tmp/cal/ingest.py: export jpg → strip AI metadata → lovable-assets → src/assets/sjb-calendar/<id>.jpg.asset.json). Remaining 270 in /tmp/missing.json order.
+- [ ] Dark (gold player) rebuild: post 04 Feed pilot DAHajRThRh8 approved & saved (Set 2 hero type, gold player bg MAHZ_dMKbag, headline top 700, date top 960, new logo spacing); roll out to all Dark posts × 3 sizes.
