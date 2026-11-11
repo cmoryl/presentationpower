@@ -1,18 +1,18 @@
-import darkHeadline from '@/assets/sjb-sequence/dark-headline.jpg.asset.json';
-import darkDetails from '@/assets/sjb-sequence/dark-details.jpg.asset.json';
-import darkTickets from '@/assets/sjb-sequence/dark-tickets.jpg.asset.json';
-import lightHeadline from '@/assets/sjb-sequence/light-headline.jpg.asset.json';
-import lightDetails from '@/assets/sjb-sequence/light-details.jpg.asset.json';
-import lightTickets from '@/assets/sjb-sequence/light-tickets.jpg.asset.json';
-import set2Headline from '@/assets/sjb-sequence/set2-headline.jpg.asset.json';
-import set2Details from '@/assets/sjb-sequence/set2-details.jpg.asset.json';
-import set2Tickets from '@/assets/sjb-sequence/set2-tickets.jpg.asset.json';
-import set3Headline from '@/assets/sjb-sequence/set3-headline.jpg.asset.json';
-import set3Details from '@/assets/sjb-sequence/set3-details.jpg.asset.json';
-import set3Tickets from '@/assets/sjb-sequence/set3-tickets.jpg.asset.json';
-import set4Headline from '@/assets/sjb-sequence/set4-headline.jpg.asset.json';
-import set4Details from '@/assets/sjb-sequence/set4-details.jpg.asset.json';
-import set4Tickets from '@/assets/sjb-sequence/set4-tickets.jpg.asset.json';
+import darkHeadline from '@/assets/sjb-sequence/dark-headline-v2.jpg.asset.json';
+import darkDetails from '@/assets/sjb-sequence/dark-details-v2.jpg.asset.json';
+import darkTickets from '@/assets/sjb-sequence/dark-tickets-v2.jpg.asset.json';
+import lightHeadline from '@/assets/sjb-sequence/light-headline-v2.jpg.asset.json';
+import lightDetails from '@/assets/sjb-sequence/light-details-v2.jpg.asset.json';
+import lightTickets from '@/assets/sjb-sequence/light-tickets-v2.jpg.asset.json';
+import set2Headline from '@/assets/sjb-sequence/set2-headline-v2.jpg.asset.json';
+import set2Details from '@/assets/sjb-sequence/set2-details-v2.jpg.asset.json';
+import set2Tickets from '@/assets/sjb-sequence/set2-tickets-v2.jpg.asset.json';
+import set3Headline from '@/assets/sjb-sequence/set3-headline-v2.jpg.asset.json';
+import set3Details from '@/assets/sjb-sequence/set3-details-v2.jpg.asset.json';
+import set3Tickets from '@/assets/sjb-sequence/set3-tickets-v2.jpg.asset.json';
+import set4Headline from '@/assets/sjb-sequence/set4-headline-v2.jpg.asset.json';
+import set4Details from '@/assets/sjb-sequence/set4-details-v2.jpg.asset.json';
+import set4Tickets from '@/assets/sjb-sequence/set4-tickets-v2.jpg.asset.json';
 import type { SjbCalendarMode } from './sjb-social-calendar';
 
 /** AI-edited companion grounds; original covers and saved Canva artwork are unchanged. */
