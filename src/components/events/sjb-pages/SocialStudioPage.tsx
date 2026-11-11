@@ -8,6 +8,8 @@ import { sjbCanvaSize } from '@/lib/sjb-canva-gallery';
 import { SJB_SOCIAL_STUDIO_COLLECTIONS, SJB_SOCIAL_STUDIO_DESIGNS, sjbSocialStudioSequences, filterSjbSocialStudio, type SjbSocialStudioDesign } from '@/lib/sjb-social-studio';
 import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS } from '@/lib/sjb-calendar-style';
 import coverAll from '@/assets/sjb-card-covers/all.jpg';
+import shieldDark from '@/assets/san-juan-bowl/sjb-logo-dark.svg.asset.json';
+import shieldLight from '@/assets/san-juan-bowl/sjb-logo-color.svg.asset.json';
 
 async function saveSocialImage(d: SjbSocialStudioDesign) {
   const name = `san-juan-bowl-${d.collectionId}-${d.name}-${sjbCanvaSize(d)}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
@@ -62,7 +64,9 @@ export function SjbSocialStudio() {
           return <Button variant="outline" key={c.id} aria-pressed={active} onClick={() => { pendingScroll.current = true; setCollectionId(c.id); setSelectionCount(count => count + 1); }} className={`group block h-auto overflow-hidden p-0 whitespace-normal rounded-lg border bg-background text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active ? 'border-primary ring-2 ring-primary' : 'border-border hover:border-foreground/40'}`}>
             <span className="relative block aspect-[16/10] overflow-hidden bg-muted">
               <img src={cover} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100" />
+              {c.id === 'all' && <span className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-0.5 bg-border">{SJB_SOCIAL_STUDIO_COLLECTIONS.map(style => <span key={style.id} className="relative overflow-hidden"><img src={SJB_CALENDAR_STYLE[style.id].ground} alt="" className="size-full object-cover" /><img src={style.id === 'light' ? shieldLight.url : shieldDark.url} alt="" className="absolute inset-0 m-auto h-[82%] w-[82%] object-contain" /></span>)}</span>}
               {c.id === 'set3' && <img src={SJB_CALENDAR_MARKS.player} alt="" className="absolute inset-y-0 right-3 h-full w-auto object-contain" />}
+              {campaign && <img src={c.id === 'light' ? shieldLight.url : shieldDark.url} alt="" className={`absolute inset-y-0 m-auto h-[82%] object-contain transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100 ${c.id === 'set3' ? 'left-[8%] w-[56%]' : 'inset-x-0 w-[76%]'}`} />}
               {active && <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground"><Check className="size-4" aria-hidden /></span>}
             </span>
             <span className="block p-3"><span className="block text-sm font-semibold">{c.name}</span><span className="mt-0.5 block text-xs text-muted-foreground">{c.blurb}</span></span>

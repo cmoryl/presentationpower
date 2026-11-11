@@ -1,5 +1,6 @@
 # Roadmap
 ## Social cards and search
+- [x] Enriched the style selectors with untouched approved Bowl shields, campaign-specific compositions and an all-campaign mosaic. Fresh public screenshot confirms all 18 card images loaded; search verification passed and build OK.
 - [x] Style selector cards use original campaign grounds without cropped logos/headlines, retain the Set 3 player silhouette, and align in one desktop row. Search sits beside Size/Ad type with clear/reset and case-insensitive multi-term matching. Six tests pass; public combined filtering, empty state/reset, style search and clearing verified; desktop/mobile screenshots reviewed with no overflow or page errors.
 ## Calendar/social style parity correction
 - [x] Socials now derives exact styles, labels and order from the calendar (Light, Set 2, Set 3, Set 4), with all 336 saved singles and available multi-page links. Removed legacy Set 5/6 identities; six matching Set 2/4 projection files retain additional 1080×1440 sizing. No old wide/email artwork substituted as current campaign artwork. Public four-style selection, extra-size filtering, Set 4 enlargement/live link and desktop/mobile layout verified; 13 tests pass and build OK. Additional current-style wide/email files still require real Canva creation, not invented links.
