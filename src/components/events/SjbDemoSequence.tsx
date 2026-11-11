@@ -188,6 +188,40 @@ function DemoPageFrame({
   );
 }
 
+/** A composition reflow, never a different campaign or a stretched finished picture. */
+function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarPost; mode: SjbCalendarMode; width: number; height: number; logo: string }) {
+  const look = SJB_DEMO_LOOKS[mode];
+  const style = SJB_CALENDAR_STYLE[mode];
+  const square = height === width;
+  const tall = height / width > 1.6;
+  const spotlight = mode === 'set3';
+  const unit = width / 100;
+  const markSize = width * (square ? 0.40 : 0.48);
+  const markTop = height * 0.07;
+  const groupBottom = markTop + markSize + width * 0.08;
+  const copyTop = Math.max(groupBottom + width * 0.035, height * (square ? 0.57 : tall ? 0.48 : 0.55));
+  const copyWidth = width * (spotlight ? 0.64 : 0.90);
+  const maxChars = Math.max(...post.headline.map(h => h.length));
+  const headlineSize = Math.min(width * (tall ? 0.105 : 0.105), copyWidth / (maxChars * 0.46));
+  const markLeft = spotlight ? width * 0.07 : (width - markSize) / 2;
+  return <div style={{ position: 'absolute', inset: 0, textAlign: spotlight ? 'left' : 'center', letterSpacing: 0 }}>
+    <img data-bowl-logo src={logo} alt="San Juan Bowl" style={{ position: 'absolute', top: markTop, left: markLeft, width: markSize, height: markSize, objectFit: 'contain' }} />
+    <div data-bowl-conferences style={{ position: 'absolute', top: markTop + markSize + unit * 2, left: spotlight ? width * 0.09 : width * 0.30, width: spotlight ? width * 0.42 : width * 0.40, height: unit * 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <img src={look.dark ? SJB_CALENDAR_MARKS.accWhite : SJB_CALENDAR_MARKS.accColor} alt="ACC" style={{ width: unit * 10, height: unit * 5.5, objectFit: 'contain' }} />
+      <img src={SJB_CALENDAR_MARKS.sunBelt} alt="Sun Belt Conference" style={{ width: unit * 10, height: unit * 5.5, objectFit: 'contain' }} />
+    </div>
+    <div data-bowl-copy style={{ position: 'absolute', top: copyTop, left: width * (spotlight ? 0.07 : 0.05), width: copyWidth }}>
+      <div style={{ fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: headlineSize, lineHeight: 1.05, color: mode === 'light' ? look.ink : spotlight ? look.ink : look.accent, fontStyle: style.italic ? 'italic' : 'normal' }}>
+        {post.headline.map((h, i) => <div key={i} style={{ overflowWrap: 'anywhere' }}>{h}</div>)}
+      </div>
+      <div data-bowl-footer style={{ marginTop: unit * 2.7, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontSize: unit * (spotlight ? 2.6 : 2.8), lineHeight: 1.3, color: look.ink }}>
+        <div>{SJB_DEMO_FACTS[0].value.toUpperCase()} · {SJB_DEMO_FACTS[1].value.toUpperCase()}</div>
+        <div style={{ marginTop: unit }}>{SJB_DEMO_SITE}</div>
+      </div>
+    </div>
+  </div>;
+}
+
 /** Native-size page shown at a display height, via a CSS scale. */
 function ScaledPage(props: {
   page: SjbDemoPage;
