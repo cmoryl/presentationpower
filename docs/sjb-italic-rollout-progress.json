@@ -32,8 +32,14 @@
     "DAHajRDGV24 (Set2 09 Story)",
     "DAHajbwLans (Set2 10 Feed)",
     "DAHajfIz-W8 (Set2 10 Square)",
-    "DAHajQNJCoc (Set2 10 Story)"
+    "DAHajQNJCoc (Set2 10 Story)",
+    "DAHajQXU1io (Set2 11 Feed)",
+    "DAHajaj1vhc (Set2 11 Square)",
+    "DAHajbS9R7Q (Set2 11 Story)",
+    "DAHajYMwyNQ (Set2 12 Feed)",
+    "DAHajTMvzso (Set2 12 Square)",
+    "DAHajREkC8g (Set2 12 Story)"
   ],
-  "next": "Set2 11 Feed DAHajQXU1io onward in registry order, then Set3, Set4, Dark",
+  "next": "Set2 13 Feed DAHajXAkZ6c onward in registry order, then Set3, Set4, Dark",
   "open_transactions": []
 }
