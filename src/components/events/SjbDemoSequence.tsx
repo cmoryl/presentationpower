@@ -23,6 +23,7 @@ import type { SjbCalendarMode, SjbCalendarPost } from "@/lib/sjb-social-calendar
 import type { SjbCalendarFormat, SjbCalendarFormatSpec } from "@/lib/sjb-calendar-formats";
 import {
   renderSequenceVideo,
+  sjbSequenceDuration,
   sjbSequenceMotion,
   transitionFrame,
   type SjbSequenceMotion,
@@ -359,12 +360,27 @@ export type SjbDemoSequenceProps = {
 export function SjbDemoSequence({ post, mode, format }: SjbDemoSequenceProps) {
   const demo = useMemo(() => sjbCalendarDemo(post, mode, format), [post, mode, format]);
   const [active, setActive] = useState(0);
-  const [busy, setBusy] = useState<"pdf" | "zip" | "page" | null>(null);
+  const [busy, setBusy] = useState<"pdf" | "zip" | "page" | "video" | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [videoPage, setVideoPage] = useState(0);
   const frames = useRef<Array<HTMLDivElement | null>>([]);
 
   const spec = demo?.spec;
   const look = SJB_DEMO_LOOKS[mode];
+  const motion = sjbSequenceMotion(format);
   const slug = `san-juan-bowl-${post.n}-${mode}-${format}-demo`;
+
+  // The preview advances at the same pace the exported clip runs at, so the
+  // play-through and the downloaded video are the same piece of motion.
+  useEffect(() => {
+    if (!playing || !demo) return;
+    if (active >= demo.pages.length - 1) {
+      setPlaying(false);
+      return;
+    }
+    const t = setTimeout(() => setActive((a) => Math.min(demo.pages.length - 1, a + 1)), motion.holdMs + motion.moveMs);
+    return () => clearTimeout(t);
+  }, [playing, active, demo, motion]);
 
   const targets = (): AssetCaptureTarget[] =>
     (demo?.pages ?? [])
