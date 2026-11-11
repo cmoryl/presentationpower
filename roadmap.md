@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl editable application templates
+- [ ] Create Bowl-only live Canva templates and downloadable editable sources for presentations/documents, signage/fabrication and AV/motion; replace illustrative application studies with linked real templates. Standard sheet/screen sizes are defaults; fabrication sizes and print clearance remain vendor-dependent. User selected Canva and downloadable files, not an Element editor.
 ## Bowl event link isolation
 - [x] Remove all NEXT destinations from Bowl area cards and built-in tabs; leave unbuilt signs, maps, badges, pillars and knowledge unavailable, retaining existing Bowl artwork. Redirect the legacy Bowl sign URL home; regression tests cover both navigation registries.
 ## Reusable Bowl advertising sizes
