@@ -22,6 +22,7 @@ import '@fontsource/barlow-condensed/700.css';
 import '@fontsource/barlow-condensed/700-italic.css';
 import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS, sjbBroadcastMark } from '@/lib/sjb-calendar-style';
 import { SjbFittedCallout } from './SjbFittedCallout';
+import { SJB_SEQUENCE_BACKGROUNDS } from '@/lib/sjb-sequence-backgrounds';
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
 import type { SjbCalendarMode, SjbCalendarPost } from "@/lib/sjb-social-calendar";
 import type { SjbCalendarFormat, SjbCalendarFormatSpec } from "@/lib/sjb-calendar-formats";
@@ -85,7 +86,7 @@ function DemoPageFrame({
         fontFamily: FONT,
       }}
     >
-      <img src={style.ground} alt="" data-bowl-ground style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      <img src={page.role === 'cover' ? style.ground : SJB_SEQUENCE_BACKGROUNDS[mode][page.role]} alt="" data-bowl-ground data-bowl-background-kind={page.role === 'cover' ? 'original' : 'ai-edited-companion'} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
       {mode === 'set3' && <img src={SJB_CALENDAR_MARKS.player} alt="" style={{ position: 'absolute', right: '-2%', bottom: '4%', height: '78%', width: '48%', objectFit: 'contain', objectPosition: 'right bottom', opacity: page.role === 'cover' ? 1 : 0.3 }} />}
       {/* Scrim keeps every line of copy readable over the look's ground. */}
       <div

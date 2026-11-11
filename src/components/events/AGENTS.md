@@ -1,5 +1,7 @@
 # San Juan Bowl event pages and assets
 
+- Sequence companion grounds resolve by look and page role through `sjb-sequence-backgrounds`; only drawn headline/details/tickets pages use them, while original cover imagery and saved Canva pages remain intact — why: coordinated AI-edited grounds must not replace issued art or change campaign identity.
+
 - Drawn Bowl social callouts use SjbFittedCallout to measure the loaded campaign font against their reserved width and height; saved Canva images remain untouched — why: large headlines must fit actual lettering without stretching or overwriting approved originals.
 - Set 2 drawn cover reflows follow the approved lowered Feed/Square composition in CampaignCover, with square conference marks enlarged proportionally and separated horizontally from the shield; other looks retain their own composition — why: this correction must reach missing-export demos without changing unrelated campaigns or pretending saved Canva originals were updated.
 
