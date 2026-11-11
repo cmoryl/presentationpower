@@ -553,10 +553,9 @@ export const SJB_EVENT_AREAS: EventAreaGroup[] = [
   {
     id: "production",
     title: "Signs & print",
-    summary: "On-site signs and badges.",
+    summary: "On-site signs.",
     tools: [
       { label: "Sign set", detail: "Build and download every venue sign.", link: { to: "/events/next/signs/$eventId", params: { eventId: SJB_EVENT.id } } },
-      { label: "Name badges", detail: "The approved badge family.", link: { to: "/events/next/badges" } },
     ],
   },
   {
