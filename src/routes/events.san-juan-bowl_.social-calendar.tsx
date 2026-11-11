@@ -48,7 +48,7 @@ const STATUS_TONE: Record<string, string> = {
 const PROJECTION_LOOK: Record<SjbCalendarMode, "dark" | "blue" | "night" | null> = { dark: "dark", light: null, set2: "night", set3: "dark", set4: "blue" };
 
 function CalendarPage() {
-  const [mode, setMode] = useState<SjbCalendarMode>("dark");
+  const [mode, setMode] = useState<SjbCalendarMode>("light");
   const [view, setView] = useState<"list" | "calendar">("calendar");
   const [format, setFormat] = useState<SjbCalendarFormat>("single");
   const [flash, setFlash] = useState<{ itemId: string; dayId: string } | null>(null);

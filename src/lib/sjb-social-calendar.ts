@@ -8,7 +8,7 @@ import { sjbIllustratorMaster } from "./sjb-illustrator-masters";
 
 export type SjbCalendarMode = "dark" | "light" | "set2" | "set3" | "set4";
 export const SJB_CALENDAR_MODES: { id: SjbCalendarMode; label: string }[] = [
-  { id: "dark", label: "Dark (gold player)" },
+  // Dark (gold player) retired from the calendar Nov 2026; registry entries and Canva files are kept.
   { id: "light", label: "Light (light action)" },
   { id: "set2", label: "Set 2 (night grandstand)" },
   { id: "set3", label: "Set 3 (player spotlight)" },
