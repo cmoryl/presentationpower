@@ -142,13 +142,13 @@ function DemoPageFrame({
 
           {page.role === "tickets" && lightTickets && (
             // Copy sits in the art's clean white sky; the rising football stays clear below.
-            <div data-bowl-light-tickets style={{ flexShrink: 0, marginTop: height / width >= 1.6 ? px(14) : px(5), display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: px(2.2), color: look.ink }}>= 1.6 ? 0.46 : 0.42) - s * 0.07, display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", textAlign: "center", gap: px(2.2), color: look.ink }}>
-              <div style={{ flexShrink: 0 }}><SjbFittedCallout lines={['GET YOUR', 'TICKETS']} width={width * 0.8} height={s * 0.26} maxSize={s * 0.16} italic={style.italic} /></div>
-              <div style={{ flexShrink: 0 }}><SjbFittedCallout lines={[SJB_DEMO_SITE]} width={width * 0.7} height={s * 0.07} maxSize={s * 0.07} italic={style.italic} /></div>
-              <div style={{ fontSize: px(3.2), lineHeight: 1.2 }}>{SJB_DEMO_FACTS[0].value} · {SJB_DEMO_FACTS[1].value}</div>
-              <div data-bowl-ticket-partners style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: px(5), marginTop: px(1) }}>
-                <img src={logo.svg} alt="San Juan Bowl" style={{ height: px(12), width: px(12), objectFit: 'contain' }} />
-                <img data-bowl-ticketera src={ticketeraColour.url} alt="Ticketera" style={{ width: px(26), height: px(7), objectFit: 'contain' }} />
+            <div data-bowl-light-tickets style={{ flexShrink: 0, marginTop: height / width >= 1.6 ? px(20) : px(4), maxWidth: width * 0.86, alignSelf: 'center', display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: px(width / height >= 0.95 ? 1.4 : 1.8), color: look.ink }}>
+              <div style={{ flexShrink: 0, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontStyle: style.italic ? 'italic' : 'normal', fontSize: s * (height / width >= 1.6 ? 0.15 : width / height >= 0.95 ? 0.1 : 0.12), lineHeight: 0.92, textTransform: 'uppercase' }}><div>GET YOUR</div><div>TICKETS</div></div>
+              <div style={{ flexShrink: 0, fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 700, fontStyle: style.italic ? 'italic' : 'normal', fontSize: s * (width / height >= 0.95 ? 0.045 : 0.05), lineHeight: 1, color: look.ink }}>{SJB_DEMO_SITE}</div>
+              {width / height < 0.95 && <div style={{ fontSize: px(2.8), lineHeight: 1.25 }}>{SJB_DEMO_FACTS[0].value} · {SJB_DEMO_FACTS[1].value}</div>}
+              <div data-bowl-ticket-partners style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: px(5) }}>
+                <img src={logo.svg} alt="San Juan Bowl" style={{ height: px(8), width: px(8), objectFit: 'contain' }} />
+                <img data-bowl-ticketera src={ticketeraColour.url} alt="Ticketera" style={{ width: px(20), height: px(5.5), objectFit: 'contain' }} />
               </div>
             </div>
           )}
