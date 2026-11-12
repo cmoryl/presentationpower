@@ -10,6 +10,7 @@ import { checkCanvaUpdates, syncCanvaDesigns } from "@/lib/canva-sync.functions"
 import { CANVA_SYNC_QUERY } from "@/lib/use-canva-sync";
 import { explainSyncError } from "@/lib/canva-sync-messages";
 import { SJB_CALENDAR_PREVIEWS, sjbCalendarDesignLabel } from "@/lib/sjb-social-calendar";
+import { canvaSyncLabel } from "@/lib/canva-sync-targets";
 
 const chunk = <T,>(a: T[], n: number) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
 const when = (iso: string | null) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : "unknown");
@@ -100,7 +101,7 @@ export function SjbCanvaSyncPanel({ designIds, label }: SjbCanvaSyncPanelProps) 
               <Button size="sm" onClick={runSync} disabled={!!busy}>Update {changed.length} picture{changed.length === 1 ? "" : "s"}</Button>
             </div>
             <ul className="max-h-48 overflow-auto list-disc pl-5">
-              {changed.map((c) => <li key={c.id}>{sjbCalendarDesignLabel(c.id)} — edited in Canva {when(c.at)}</li>)}
+              {changed.map((c) => <li key={c.id}>{canvaSyncLabel(c.id)} — edited in Canva {when(c.at)}</li>)}
             </ul>
           </div>)}
 
@@ -110,11 +111,11 @@ export function SjbCanvaSyncPanel({ designIds, label }: SjbCanvaSyncPanelProps) 
         <ul className="mt-3 space-y-3">
           {updated.map((u) => (
             <li key={u.id} className="rounded-md border border-border bg-background p-3">
-              <p className="font-medium">{sjbCalendarDesignLabel(u.id)}</p>
+              <p className="font-medium">{canvaSyncLabel(u.id)}</p>
               <p className="text-muted-foreground">Edited in Canva {when(u.canvaUpdatedAt)} · updated here {when(u.syncedAt)} · {kb(u.previousBytes)} → {kb(u.bytes)}</p>
               <div className="mt-2 flex gap-3">
-                <figure className="w-28"><figcaption className="text-xs text-muted-foreground">Before</figcaption>{u.before ? <img src={u.before} alt={`Before: ${sjbCalendarDesignLabel(u.id)}`} className="mt-1 w-full rounded border border-border" /> : <div className="mt-1 text-xs">No earlier picture</div>}</figure>
-                <figure className="w-28"><figcaption className="text-xs text-muted-foreground">After</figcaption><img src={u.after} alt={`After: ${sjbCalendarDesignLabel(u.id)}`} className="mt-1 w-full rounded border border-border" /></figure>
+                <figure className="w-28"><figcaption className="text-xs text-muted-foreground">Before</figcaption>{u.before ? <img src={u.before} alt={`Before: ${canvaSyncLabel(u.id)}`} className="mt-1 w-full rounded border border-border" /> : <div className="mt-1 text-xs">No earlier picture</div>}</figure>
+                <figure className="w-28"><figcaption className="text-xs text-muted-foreground">After</figcaption><img src={u.after} alt={`After: ${canvaSyncLabel(u.id)}`} className="mt-1 w-full rounded border border-border" /></figure>
                 <ul className="flex-1 space-y-1">
                   {u.checks.map((c) => <li key={c} className="flex items-center gap-1"><CheckCircle2 size={14} aria-hidden className="text-primary" /> {c}</li>)}
                   {u.failed.map((c) => <li key={c} className="flex items-center gap-1 text-destructive"><XCircle size={14} aria-hidden /> {c}</li>)}
@@ -131,7 +132,7 @@ export function SjbCanvaSyncPanel({ designIds, label }: SjbCanvaSyncPanelProps) 
           <ul className="mt-1 max-h-72 space-y-2 overflow-auto">
             {problems.map((p, i) => { const x = explainSyncError(p.raw); return (
               <li key={i} className="rounded-md border border-destructive/40 bg-background p-2">
-                <p className="font-medium">{p.id ? sjbCalendarDesignLabel(p.id) : "Whole check"}</p>
+                <p className="font-medium">{p.id ? canvaSyncLabel(p.id) : "Whole check"}</p>
                 <p>{x.what} <span className="font-medium">Next step:</span> {x.next}</p>
                 <details className="text-xs text-muted-foreground"><summary>Technical detail</summary>{p.raw}</details>
               </li>); })}

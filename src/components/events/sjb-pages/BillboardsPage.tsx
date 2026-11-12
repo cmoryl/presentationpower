@@ -4,11 +4,14 @@ import { SjbLink, SjbShareLinkButton, SjbShell } from "@/components/events/SjbSh
 import { Button } from "@/design-system/element";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { SJB_BILLBOARD_RESEARCH } from "@/lib/sjb-billboards";
+import { useCanvaSynced } from "@/lib/use-canva-sync";
 import { SJB_SELECTED_BILLBOARDS, selectedBillboardArtwork, selectedBillboardScene } from "@/lib/sjb-selected-billboards";
 
 export function BillboardsPage() {
   const [lang, setLang] = useState("all");
   const [tod, setTod] = useState<"day" | "dusk">("day");
+  const synced = useCanvaSynced();
+  const art = (id: string) => synced(id, selectedBillboardArtwork(id));
   const boards = SJB_SELECTED_BILLBOARDS.filter(b => lang === "all" || b.lang === lang);
   return <SjbShell>
     <div className="mx-auto max-w-7xl space-y-12 px-4 py-6 sm:px-6">
@@ -27,12 +30,12 @@ export function BillboardsPage() {
         <div className="grid gap-x-8 gap-y-10 lg:grid-cols-2">
           {boards.map(b => <figure key={b.id} className="space-y-3">
             <Dialog>
-              <DialogTrigger asChild><Button variant="ghost" className="h-auto w-full p-0 hover:bg-transparent" aria-label={`Enlarge ${b.label} ${b.w} ${b.lang}`}><img src={selectedBillboardArtwork(b.id)} width={b.w} height={b.h} alt={`${b.label} · ${b.lang === "en" ? "English" : "Español"} · ${b.w} × ${b.h}`} className="h-auto w-full rounded-sm border border-border" /></Button></DialogTrigger>
-              <DialogContent className="max-w-[min(96vw,1800px)] p-3"><DialogTitle className="text-sm">{b.label} · {b.w.toLocaleString()} × {b.h}</DialogTitle><img src={selectedBillboardArtwork(b.id)} alt={b.label} className="max-h-[85vh] w-full object-contain" /></DialogContent>
+              <DialogTrigger asChild><Button variant="ghost" className="h-auto w-full p-0 hover:bg-transparent" aria-label={`Enlarge ${b.label} ${b.w} ${b.lang}`}><img src={art(b.id)} width={b.w} height={b.h} alt={`${b.label} · ${b.lang === "en" ? "English" : "Español"} · ${b.w} × ${b.h}`} className="h-auto w-full rounded-sm border border-border" /></Button></DialogTrigger>
+              <DialogContent className="max-w-[min(96vw,1800px)] p-3"><DialogTitle className="text-sm">{b.label} · {b.w.toLocaleString()} × {b.h}</DialogTitle><img src={art(b.id)} alt={b.label} className="max-h-[85vh] w-full object-contain" /></DialogContent>
             </Dialog>
             <figcaption className="flex flex-wrap items-center gap-2 text-sm">
               <span className="mr-auto"><strong>{b.label}</strong><span className="block text-xs text-muted-foreground">{b.lang === "en" ? "English" : "Español"} · {b.w.toLocaleString()} × {b.h}</span></span>
-              <Button asChild variant="outline" size="sm"><a href={selectedBillboardArtwork(b.id)} download><Download className="size-4" />PNG</a></Button>
+              <Button asChild variant="outline" size="sm"><a href={art(b.id)} download><Download className="size-4" />PNG</a></Button>
               <Button asChild variant="ghost" size="sm"><a href={b.edit} target="_blank" rel="noreferrer"><ExternalLink className="size-4" />Canva</a></Button>
             </figcaption>
           </figure>)}

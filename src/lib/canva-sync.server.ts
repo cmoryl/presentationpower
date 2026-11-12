@@ -1,8 +1,9 @@
 // Smart Canva → app picture sync. Only designs edited in Canva after their last
 // saved picture are exported, so unchanged designs never spend the export allowance.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { accessToken, designUpdatedAt, exportDesignJpg } from "@/lib/canva.server";
-import { hasAiLabel, stripJpegMetadata } from "@/lib/strip-image-metadata";
+import { accessToken, designUpdatedAt, exportDesign } from "@/lib/canva.server";
+import { hasAiLabel, isPng, stripJpegMetadata, stripPngMetadata } from "@/lib/strip-image-metadata";
+import { canvaSyncTarget, canvaSyncTargets } from "@/lib/canva-sync-targets";
 import { SJB_CALENDAR_PICTURE_SAVED_AT } from "@/lib/sjb-social-calendar";
 
 export type SyncCheck = { id: string; changed: boolean; canvaUpdatedAt: string | null; error?: string };
@@ -44,25 +45,35 @@ export async function syncDesigns(ids: string[]): Promise<SyncResult[]> {
   const prev = new Map((rows ?? []).map((r) => [r.design_id, r]));
   return pool(ids, 2, async (id): Promise<SyncResult> => {
     try {
-      const raw = await exportDesignJpg(token, id);
-      const clean = stripJpegMetadata(raw);
-      if (hasAiLabel(clean)) throw new Error("Hidden AI labels could not be removed; picture not published");
+      const t = canvaSyncTarget(id) ?? { format: "jpg" as const, allPages: false };
+      const raws = await exportDesign(token, id, t.format, t.allPages);
+      if (!raws.length) throw new Error("Canva export returned no pages");
       const now = new Date().toISOString();
-      const path = `${id}/${Date.now()}.jpg`;
-      const up = await supabaseAdmin.storage.from("canva-sync").upload(path, clean, { contentType: "image/jpeg", upsert: false });
-      if (up.error) throw new Error(up.error.message);
-      // Verify the stored copy before making it live.
-      const back = await supabaseAdmin.storage.from("canva-sync").download(path);
-      if (back.error || !back.data) throw new Error("Saved-copy verification failed: could not read it back");
-      const b = new Uint8Array(await back.data.arrayBuffer());
-      if (b.length !== clean.length) throw new Error("Saved-copy verification failed: size mismatch");
-      if (b[0] !== 0xff || b[1] !== 0xd8) throw new Error("Saved-copy verification failed: not a JPEG picture");
-      if (hasAiLabel(b)) throw new Error("Hidden AI labels could not be removed; picture not published");
+      const stamp = Date.now();
+      const paths: string[] = [];
+      let total = 0;
+      for (const [n, raw] of raws.entries()) {
+        const clean = t.format === "png" ? stripPngMetadata(raw) : stripJpegMetadata(raw);
+        if (hasAiLabel(clean)) throw new Error("Hidden AI labels could not be removed; picture not published");
+        const path = `${id}/${stamp}-p${n + 1}.${t.format}`;
+        const up = await supabaseAdmin.storage.from("canva-sync").upload(path, clean, { contentType: t.format === "png" ? "image/png" : "image/jpeg", upsert: false });
+        if (up.error) throw new Error(up.error.message);
+        // Verify the stored copy before making it live.
+        const back = await supabaseAdmin.storage.from("canva-sync").download(path);
+        if (back.error || !back.data) throw new Error("Saved-copy verification failed: could not read it back");
+        const b = new Uint8Array(await back.data.arrayBuffer());
+        if (b.length !== clean.length) throw new Error("Saved-copy verification failed: size mismatch");
+        if (t.format === "png" ? !isPng(b) : b[0] !== 0xff || b[1] !== 0xd8) throw new Error(`Saved-copy verification failed: not a ${t.format.toUpperCase()} picture`);
+        if (hasAiLabel(b)) throw new Error("Hidden AI labels could not be removed; picture not published");
+        paths.push(path); total += clean.length;
+      }
+      const clean = { length: total };
+      const path = paths[0]!;
       const p = prev.get(id);
-      const { error } = await supabaseAdmin.from("canva_asset_sync").upsert({ design_id: id, synced_at: now, storage_path: path, bytes: clean.length, last_error: null, checked_at: now });
+      const { error } = await supabaseAdmin.from("canva_asset_sync").upsert({ design_id: id, synced_at: now, storage_path: path, page_paths: paths, format: t.format, bytes: clean.length, last_error: null, checked_at: now });
       if (error) throw new Error(error.message);
       return { id, ok: true, bytes: clean.length, previousBytes: p?.bytes ?? null, previousSyncedAt: p?.synced_at ?? null, canvaUpdatedAt: p?.canva_updated_at ?? null, syncedAt: now,
-        verified: ["Saved copy read back intact", "Valid JPEG picture", "No hidden AI labels"] };
+        verified: [`${paths.length} page${paths.length > 1 ? "s" : ""} read back intact`, `Valid ${t.format.toUpperCase()} picture${paths.length > 1 ? "s" : ""}`, "No hidden AI labels"] };
     } catch (e) {
       const msg = (e as Error).message;
       await supabaseAdmin.from("canva_asset_sync").upsert({ design_id: id, last_error: msg, checked_at: new Date().toISOString() });
@@ -75,7 +86,6 @@ export async function syncDesigns(ids: string[]): Promise<SyncResult[]> {
 // Runs daily (and on demand). Re-checks designs not checked for ~20h, then exports a
 // capped number of changed ones, so a big Canva edit day spreads over several days
 // without anyone clicking. Stops early when Canva's export allowance runs out.
-import { sjbCalendarActiveDesignIds } from "@/lib/sjb-social-calendar";
 
 export const BG_CHECK_PER_RUN = 120;
 export const BG_SYNC_PER_RUN = 25;
@@ -91,7 +101,7 @@ export function pendingIds(rows: { design_id: string; canva_updated_at: string |
 const isLimit = (m: string) => /\[429\]|rate limit|quota|limit/i.test(m);
 
 export async function runBackgroundSync(trigger: "daily" | "manual") {
-  const ids = sjbCalendarActiveDesignIds();
+  const ids = canvaSyncTargets().map((t) => t.id);
   const started = new Date().toISOString();
   let checked = 0, synced = 0, failed = 0, stopped: string | null = null;
   const problems: { id: string | null; error: string }[] = [];
@@ -120,7 +130,7 @@ export async function runBackgroundSync(trigger: "daily" | "manual") {
 }
 
 export async function syncHealth() {
-  const ids = sjbCalendarActiveDesignIds();
+  const ids = canvaSyncTargets().map((t) => t.id);
   const [{ data: conn }, { data: runs }, { data: rows }] = await Promise.all([
     supabaseAdmin.from("canva_shared_connection").select("updated_at, expires_at, connected_by").eq("id", 1).maybeSingle(),
     supabaseAdmin.from("canva_sync_runs").select("*").order("started_at", { ascending: false }).limit(10),

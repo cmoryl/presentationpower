@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
 import { SjbCanvaSyncPanel } from "@/components/events/SjbCanvaSyncPanel";
+import { canvaSyncTargets } from "@/lib/canva-sync-targets";
 import { useCanvaSynced } from "@/lib/use-canva-sync";
 import { SjbProjections } from "@/components/events/SjbProjections";
 import { SjbCalendarLookCards } from "@/components/events/SjbCalendarLookCards";
@@ -96,7 +97,7 @@ function CalendarPage() {
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl social calendar</h1>
       <p className="mt-2 text-sm text-muted-foreground">November – December 2026</p>
       <SjbCalendarLookCards mode={mode} onChange={setMode} />
-      <SjbCanvaSyncPanel designIds={sjbCalendarActiveDesignIds()} label="calendar post" />
+      <SjbCanvaSyncPanel designIds={canvaSyncTargets().map((t) => t.id)} label="Bowl calendar, billboard and carousel" />
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:max-w-3xl" role="group" aria-label="View">
         {([
           { v: "calendar", title: "Calendar", sub: "Month grid with every post on its day", Icon: CalendarDays },
@@ -229,10 +230,16 @@ function MultiPageFormats({ post, mode }: { post: SjbCalendarPost; mode: SjbCale
 }
 
 function SequenceArtwork({ post, mode, format }: { post: SjbCalendarPost; mode: SjbCalendarMode; format: SjbCalendarFormat }) {
-  const sequence = sjbCalendarSequence(post.n, mode, format);
+  const synced = useCanvaSynced();
+  const rawSequence = sjbCalendarSequence(post.n, mode, format);
+  const sequence = rawSequence && rawSequence.syncSources ? { ...rawSequence, pages: rawSequence.pages.map((p, i) => {
+    const [id, page] = rawSequence.syncSources![i] ?? [null, 1];
+    return { ...p, previewUrl: synced(id, p.previewUrl, page), downloadUrl: synced(id, p.downloadUrl, page) };
+  }) } : rawSequence;
   const spec = SJB_CALENDAR_FORMATS.find((f) => f.id === format);
   const canvaUrl = sjbCalendarSequenceCanvaUrl(post.n, mode, format);
-  const master = sequence ? null : sjbCampaignMasterFor(post.n, mode, format);
+  const rawMaster = sequence ? null : sjbCampaignMasterFor(post.n, mode, format);
+  const master = rawMaster && { ...rawMaster, pages: rawMaster.pages.map((u, i) => synced(rawMaster.id, u, i + 1)) };
   return (
     <section className="mt-4 border-t border-border pt-4" aria-label={spec?.label}>
       <div className="flex flex-wrap items-center justify-between gap-2">

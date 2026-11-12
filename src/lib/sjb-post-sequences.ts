@@ -25,6 +25,7 @@ export function sjbAssembledPostSequence(post: string, mode: string, format: Sjb
   if (!cover || !headline || !details || !tickets) return null;
   return {
     provenance: 'assembled-canva-pages',
+    syncSources: [[frame, 1], [source, 1], [frame, 2], [frame, 3]],
     sourceCanvaUrls: [frame, source].map(id => `https://www.canva.com/design/${id}/edit`),
     pages: [cover, headline, details, tickets].map((url, i) => ({ previewUrl: url, downloadUrl: url, downloadName: `san-juan-bowl-${mode}-post-${post}-${size}-${roles[i]}.jpg` })),
   };

@@ -21,6 +21,8 @@ export interface SjbCalendarSequence {
   provenance?: 'assembled-canva-pages';
   sourceCanvaUrls?: string[];
   pages: { previewUrl: string; downloadUrl: string; downloadName: string }[];
+  /** Canva design + page each picture came from, so synced copies can replace them. */
+  syncSources?: [string, number][];
   pdfUrl?: string;
   zipUrl?: string;
   illustratorUrl?: string;

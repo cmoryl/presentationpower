@@ -1,0 +1,1 @@
+ALTER TABLE public.canva_asset_sync ADD COLUMN IF NOT EXISTS format text NOT NULL DEFAULT 'jpg', ADD COLUMN IF NOT EXISTS page_paths text[];

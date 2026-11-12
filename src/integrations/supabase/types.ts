@@ -1270,7 +1270,9 @@ export type Database = {
           canva_updated_at: string | null
           checked_at: string
           design_id: string
+          format: string
           last_error: string | null
+          page_paths: string[] | null
           storage_path: string | null
           synced_at: string | null
         }
@@ -1279,7 +1281,9 @@ export type Database = {
           canva_updated_at?: string | null
           checked_at?: string
           design_id: string
+          format?: string
           last_error?: string | null
+          page_paths?: string[] | null
           storage_path?: string | null
           synced_at?: string | null
         }
@@ -1288,7 +1292,9 @@ export type Database = {
           canva_updated_at?: string | null
           checked_at?: string
           design_id?: string
+          format?: string
           last_error?: string | null
+          page_paths?: string[] | null
           storage_path?: string | null
           synced_at?: string | null
         }

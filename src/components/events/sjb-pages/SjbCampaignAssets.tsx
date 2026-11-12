@@ -1,4 +1,5 @@
 import { Download, ExternalLink, Layers } from 'lucide-react';
+import { useCanvaSynced } from '@/lib/use-canva-sync';
 import { SJB_CAMPAIGN_SEQUENCE_MASTERS, SJB_SEQUENCE_PAGE_ORDER, sjbCanvaEditUrl, sjbCampaignSequencePictures } from '@/lib/sjb-campaign-sequence-masters';
 import { Button } from '@/design-system/element';
 import { SjbSequenceViewer } from '../SjbSequenceViewer';
@@ -36,6 +37,7 @@ export function sjbCampaignAssets(mode: SjbCalendarMode): Asset[] {
 }
 
 export function SjbCampaignAssets({ mode, label }: { mode: SjbCalendarMode; label: string }) {
+  const synced = useCanvaSynced();
   const masters = mode === 'set2' || mode === 'set3' || mode === 'set4' ? SJB_CAMPAIGN_SEQUENCE_MASTERS[mode] : [];
   return <div className="mb-8 rounded-lg border border-border p-5">
     <h3 className="text-base font-bold">{label} — design assets</h3>
@@ -51,7 +53,8 @@ export function SjbCampaignAssets({ mode, label }: { mode: SjbCalendarMode; labe
       <h4 id={`${mode}-multipage`} className="flex items-center gap-2 text-sm font-bold"><Layers className="size-4" />Multi-page Canva files</h4>
       <p className="mt-1 text-xs text-muted-foreground">Four pages each: {SJB_SEQUENCE_PAGE_ORDER.join(' → ')}. Swap page 2 for any post headline.</p>
       <div className="mt-3 grid gap-4 sm:grid-cols-3">{masters.map(m => {
-        const saved = sjbCampaignSequencePictures(m.id);
+        const bundled = sjbCampaignSequencePictures(m.id);
+        const saved = bundled && { ...bundled, pages: bundled.pages.map((u, i) => synced(m.id, u, i + 1)) };
         return <div key={m.id} className="min-w-0">
           <Button asChild variant="outline" className="h-auto w-full justify-between py-3"><a href={sjbCanvaEditUrl(m.id)} target="_blank" rel="noreferrer" aria-label={`Open ${label} ${m.size} four-page Canva file`}><span className="text-left"><span className="block text-sm font-semibold">{m.size}</span><span className="block text-xs text-muted-foreground">4 pages · live Canva</span></span><ExternalLink /></a></Button>
           {saved && <><div className="mt-3"><SjbSequenceViewer pages={saved.pages} labels={SJB_SEQUENCE_PAGE_ORDER} variant={m.size.startsWith('Story') ? 'story' : 'carousel'} width={1080} height={m.size.startsWith('Story') ? 1920 : m.size.startsWith('Square') ? 1080 : 1350} title={`${label} ${m.size}`} displayHeight={320} /></div>{saved.zipUrl && <Button asChild size="sm" variant="outline" className="mt-3"><a href={saved.zipUrl} download><Download />All four pictures</a></Button>}</>}

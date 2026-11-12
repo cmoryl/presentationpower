@@ -178,10 +178,15 @@ export async function designUpdatedAt(token: string, id: string): Promise<number
 
 /** Exports page 1 of a design as JPEG and returns the raw bytes (uses the export allowance). */
 export async function exportDesignJpg(token: string, id: string): Promise<Uint8Array> {
+  return (await exportDesign(token, id, "jpg", false))[0]!;
+}
+
+/** Exports a design as JPEG or PNG: page 1 only, or every page (one file per page, in order). */
+export async function exportDesign(token: string, id: string, type: "jpg" | "png", allPages: boolean): Promise<Uint8Array[]> {
   const res = await fetch(`${API}/exports`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ design_id: id, format: { type: "jpg", quality: 92, pages: [1] } }),
+    body: JSON.stringify({ design_id: id, format: type === "jpg" ? { type, quality: 92, ...(allPages ? {} : { pages: [1] }) } : { type, ...(allPages ? {} : { pages: [1] }) } }),
   });
   const text = await res.text();
   if (res.status === 403) throw new Error(`Canva refused the export [403]: ${text}. An admin may need to reconnect Canva on Admin → Canva to allow downloads.`);
@@ -195,9 +200,13 @@ export async function exportDesignJpg(token: string, id: string): Promise<Uint8A
     job = (JSON.parse(pt) as { job: ExportJob }).job;
   }
   if (job.status !== "success" || !job.urls?.[0]) throw new Error(`Canva export did not finish: ${job.error?.message ?? job.status}`);
-  const f = await fetch(job.urls[0]);
-  if (!f.ok) throw new Error(`Downloading the Canva export failed [${f.status}]`);
-  return new Uint8Array(await f.arrayBuffer());
+  const files: Uint8Array[] = [];
+  for (const u of job.urls) {
+    const f = await fetch(u);
+    if (!f.ok) throw new Error(`Downloading the Canva export failed [${f.status}]`);
+    files.push(new Uint8Array(await f.arrayBuffer()));
+  }
+  return files;
 }
 
 type ExportJob = { id: string; status: "in_progress" | "success" | "failed"; urls?: string[]; error?: { message: string } };
