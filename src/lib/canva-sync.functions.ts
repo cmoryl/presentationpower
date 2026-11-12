@@ -49,3 +49,24 @@ export const runCanvaBackgroundSync = createServerFn({ method: "POST" })
     const { runBackgroundSync } = await import("@/lib/canva-sync.server");
     return runBackgroundSync("manual");
   });
+
+/** Per design: last Canva edit (from the latest check) vs the site's saved picture date. No Canva calls. */
+export const listCanvaSyncStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { canvaSyncTargets } = await import("@/lib/canva-sync-targets");
+    const { SJB_CALENDAR_PICTURE_SAVED_AT } = await import("@/lib/sjb-social-calendar");
+    const targets = canvaSyncTargets();
+    const { data } = await supabaseAdmin.from("canva_asset_sync").select("design_id, canva_updated_at, synced_at, checked_at, last_error").in("design_id", targets.map((t) => t.id));
+    const rows = new Map((data ?? []).map((r) => [r.design_id, r]));
+    return targets.map((t) => {
+      const r = rows.get(t.id);
+      const bundled = SJB_CALENDAR_PICTURE_SAVED_AT[t.id] ?? null;
+      const saved = r?.synced_at ?? bundled;
+      const edited = r?.canva_updated_at ?? null;
+      const status = !edited ? "unchecked" : !saved || new Date(edited) > new Date(saved) ? "needs-update" : "up-to-date";
+      return { id: t.id, group: t.group, canvaEditedAt: edited, siteSavedAt: saved, savedBy: r?.synced_at ? "sync" : bundled ? "original" : null, checkedAt: r?.checked_at ?? null, error: r?.last_error ?? null, status } as const;
+    });
+  });

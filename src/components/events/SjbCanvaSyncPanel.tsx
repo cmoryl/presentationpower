@@ -11,6 +11,7 @@ import { CANVA_SYNC_QUERY } from "@/lib/use-canva-sync";
 import { explainSyncError } from "@/lib/canva-sync-messages";
 import { SJB_CALENDAR_PREVIEWS, sjbCalendarDesignLabel } from "@/lib/sjb-social-calendar";
 import { canvaSyncLabel } from "@/lib/canva-sync-targets";
+import { CanvaSyncStatusTable } from "@/components/events/CanvaSyncStatusTable";
 
 const chunk = <T,>(a: T[], n: number) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
 const when = (iso: string | null) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : "unknown");
@@ -139,6 +140,7 @@ export function SjbCanvaSyncPanel({ designIds, label }: SjbCanvaSyncPanelProps) 
           </ul>
         </div>
       )}
+      <CanvaSyncStatusTable />
     </section>
   );
 }
