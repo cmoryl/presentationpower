@@ -22,7 +22,7 @@ import '@fontsource/barlow-condensed/700.css';
 import '@fontsource/barlow-condensed/700-italic.css';
 import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS, sjbBroadcastMark } from '@/lib/sjb-calendar-style';
 import { SjbFittedCallout } from './SjbFittedCallout';
-import { SJB_SEQUENCE_BACKGROUNDS } from '@/lib/sjb-sequence-backgrounds';
+import { sjbSequenceGround } from '@/lib/sjb-sequence-backgrounds';
 import ticketeraWhite from '@/assets/sjb-calendar/partners/ticketera-white.png.asset.json';
 import ticketeraColour from '@/assets/sjb-calendar/partners/ticketera-colour.png.asset.json';
 import { SJB_LOGOS } from "@/lib/san-juan-bowl";
@@ -72,6 +72,7 @@ function DemoPageFrame({
   const px = (n: number) => `${(s * n) / 100}px`;
   const pad = px(7);
   // Reserve a separate broadcaster band in every carousel/Story frame.
+  const lightTickets = mode === 'light' && page.role === 'tickets';
   const broadcasterWidth = broadcaster ? Math.min(width * 0.86, height * 0.18 * broadcaster.ratio) : 0;
 
   // Saved artwork is the entire frame, not a plate under demo labels or logos.
@@ -99,14 +100,14 @@ function DemoPageFrame({
         fontFamily: FONT,
       }}
     >
-      <img src={page.role === 'cover' ? style.ground : SJB_SEQUENCE_BACKGROUNDS[mode][page.role]} alt="" data-bowl-ground data-bowl-background-kind={page.role === 'cover' ? 'original' : 'ai-edited-companion'} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      <img src={page.role === 'cover' ? style.ground : sjbSequenceGround(mode, page.role, height * 1080 / width)} alt="" data-bowl-ground data-bowl-background-kind={page.role === 'cover' ? 'original' : 'ai-edited-companion'} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
       {mode === 'set3' && <img src={SJB_CALENDAR_MARKS.player} alt="" style={{ position: 'absolute', right: '-2%', bottom: '4%', height: '78%', width: '48%', objectFit: 'contain', objectPosition: 'right bottom', opacity: page.role === 'cover' ? 1 : 0.3 }} />}
       {/* Scrim keeps every line of copy readable over the look's ground. */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background: page.role === 'cover' ? 'none' : look.dark
+          background: page.role === 'cover' || lightTickets ? 'none' : look.dark
             ? "linear-gradient(180deg, rgba(3,6,28,0.45) 0%, rgba(3,6,28,0.72) 45%, rgba(3,6,28,0.86) 100%)"
             : "linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.8) 45%, rgba(255,255,255,0.9) 100%)",
         }}
@@ -139,7 +140,19 @@ function DemoPageFrame({
 
           {page.role === "details" && <DetailsPage look={look} px={px} wide={width / height >= 0.95} tall={height / width >= 1.6} />}
 
-          {page.role === "tickets" && (
+          {page.role === "tickets" && lightTickets && (
+            // Copy sits in the art's clean white sky; the rising football stays clear below.
+            <div data-bowl-light-tickets style={{ flexShrink: 0, marginTop: height / width >= 1.6 ? px(14) : px(5), display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: px(2.2), color: look.ink }}>= 1.6 ? 0.46 : 0.42) - s * 0.07, display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", textAlign: "center", gap: px(2.2), color: look.ink }}>
+              <div style={{ flexShrink: 0 }}><SjbFittedCallout lines={['GET YOUR', 'TICKETS']} width={width * 0.8} height={s * 0.26} maxSize={s * 0.16} italic={style.italic} /></div>
+              <div style={{ flexShrink: 0 }}><SjbFittedCallout lines={[SJB_DEMO_SITE]} width={width * 0.7} height={s * 0.07} maxSize={s * 0.07} italic={style.italic} /></div>
+              <div style={{ fontSize: px(3.2), lineHeight: 1.2 }}>{SJB_DEMO_FACTS[0].value} · {SJB_DEMO_FACTS[1].value}</div>
+              <div data-bowl-ticket-partners style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: px(5), marginTop: px(1) }}>
+                <img src={logo.svg} alt="San Juan Bowl" style={{ height: px(12), width: px(12), objectFit: 'contain' }} />
+                <img data-bowl-ticketera src={ticketeraColour.url} alt="Ticketera" style={{ width: px(26), height: px(7), objectFit: 'contain' }} />
+              </div>
+            </div>
+          )}
+          {page.role === "tickets" && !lightTickets && (
             <>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", gap: px(3) }}>
                 <SjbFittedCallout lines={['GET YOUR', 'TICKETS']} width={width * 0.86} height={height * 0.46} maxSize={s * 0.34} italic={style.italic} />
@@ -174,7 +187,7 @@ function DemoPageFrame({
         {SJB_DEMO_BADGE}
       </div>
       {/* Drawn pages carry the site line; the approved-image cover is left untouched. */}
-      {page.photoKind === "none" && page.role !== 'cover' && (
+      {page.photoKind === "none" && page.role !== 'cover' && !lightTickets && (
         <div
           style={{
             position: "absolute",

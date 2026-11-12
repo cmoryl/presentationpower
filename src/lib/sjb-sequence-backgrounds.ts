@@ -23,3 +23,14 @@ export const SJB_SEQUENCE_BACKGROUNDS = {
   set3: { headline: set3Headline.url, details: set3Details.url, tickets: set3Tickets.url },
   set4: { headline: set4Headline.url, details: set4Details.url, tickets: set4Tickets.url },
 } satisfies Record<SjbCalendarMode, Record<'headline' | 'details' | 'tickets', string>>;
+import lightTickets1080 from '@/assets/sjb-sequence/light-tickets-v3-1080.jpg.asset.json';
+import lightTickets1350 from '@/assets/sjb-sequence/light-tickets-v3-1350.jpg.asset.json';
+import lightTickets1920 from '@/assets/sjb-sequence/light-tickets-v3-1920.jpg.asset.json';
+
+/** Light last-page ground (user-supplied rising-football art), one framing per size; metadata cleaned. */
+export const SJB_LIGHT_TICKETS_GROUNDS = { 1080: lightTickets1080.url, 1350: lightTickets1350.url, 1920: lightTickets1920.url } as const;
+
+export function sjbSequenceGround(mode: SjbCalendarMode, role: 'headline' | 'details' | 'tickets', height: number): string {
+  if (mode === 'light' && role === 'tickets') return height >= 1700 ? SJB_LIGHT_TICKETS_GROUNDS[1920] : height >= 1215 ? SJB_LIGHT_TICKETS_GROUNDS[1350] : SJB_LIGHT_TICKETS_GROUNDS[1080];
+  return SJB_SEQUENCE_BACKGROUNDS[mode][role];
+}
