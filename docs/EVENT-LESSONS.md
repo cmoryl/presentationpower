@@ -387,3 +387,7 @@ Source: `next-london-2026-design-audit-in-depth_v4.pdf`. Grades and blocking fig
 **What happened:** Built-in tabs retained duplicate NEXT links, and the old sign URL remained reachable.
 **Rule now:** Check both area cards and built-in event tabs; unbuilt Bowl tools stay unavailable rather than linking to NEXT.
 **Enforced by:** `sjb-event-links.test.ts` and the legacy sign-route redirect.
+
+## 2026-11-12 — Bowl carousel shields cropped inside their Canva frames
+- Shield image frames had been zoom-cropped, cutting the sun/base and crowding the top edge. Fix: `update_fill` with the same asset resets the crop; never use `resize_element` on images (it crops). Keep ≥44px top clearance on 1080-wide pages.
+- Canva caps daily exports; Set 4 story master DAHap9Nqgk8 is fixed in Canva but its downloaded pictures still need refreshing.
