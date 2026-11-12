@@ -1,4 +1,6 @@
 # Roadmap
+## Latest saved Canva social refresh — Nov 12
+- [ ] Inventory all active singles, projections, advertising adaptations and saved multi-page files; refresh cleaned native exports from current Canva saves, publish missing pictures and verify shared social/calendar downloads. Track every completed and blocked file in a dated receipt; preserve Canva originals and retired sets.
 ## Bowl campaign multi-page asset masters
 - [x] Built nine four-page Canva asset masters (Sets 2–4 × Feed/Square/Story; logo cover, post 01 headline, details, tickets) and linked them in each design-asset panel. Originals unchanged; cleaned page pictures await Canva export limit.
 ## Bowl editable application templates
