@@ -2,13 +2,13 @@
 // the designs changed since their last saved picture, then verifies each one is live.
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, RefreshCw, XCircle } from "lucide-react";
 import { Button } from "@/design-system/element";
 import { useIsAdmin } from "@/hooks/use-is-admin";
-import { checkCanvaUpdates, syncCanvaDesigns } from "@/lib/canva-sync.functions";
+import { checkCanvaUpdates, getCanvaSyncLastRun, syncCanvaDesigns } from "@/lib/canva-sync.functions";
 import { CANVA_SYNC_QUERY } from "@/lib/use-canva-sync";
-import { explainSyncError } from "@/lib/canva-sync-messages";
+import { describeLastRun, explainSyncError } from "@/lib/canva-sync-messages";
 import { SJB_CALENDAR_PREVIEWS, sjbCalendarDesignLabel } from "@/lib/sjb-social-calendar";
 import { canvaSyncLabel } from "@/lib/canva-sync-targets";
 import { CanvaSyncStatusTable } from "@/components/events/CanvaSyncStatusTable";
@@ -28,6 +28,9 @@ export function SjbCanvaSyncPanel({ designIds, label }: SjbCanvaSyncPanelProps) 
   const check = useServerFn(checkCanvaUpdates);
   const sync = useServerFn(syncCanvaDesigns);
   const qc = useQueryClient();
+  const lastRun = useQuery({ queryKey: ["canva-asset-sync", "last-run"], queryFn: () => getCanvaSyncLastRun() });
+  const runLine = describeLastRun(lastRun.data ?? { lastCheckedAt: null, run: null });
+  const refreshRunLine = () => qc.invalidateQueries({ queryKey: ["canva-asset-sync", "last-run"] });
   const [busy, setBusy] = useState<string | null>(null);
   const [changed, setChanged] = useState<{ id: string; at: string | null }[] | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -44,7 +47,7 @@ export function SjbCanvaSyncPanel({ designIds, label }: SjbCanvaSyncPanelProps) 
         for (const r of await check({ data: { ids: part } })) { if (r.changed) found.push({ id: r.id, at: r.canvaUpdatedAt }); if (r.error) errs.push({ id: r.id, raw: r.error }); }
       }
     } catch (e) { errs.push({ id: null, raw: (e as Error).message }); setProblems(errs); setChanged(null); setBusy(null); return; }
-    setChanged(found); setProblems(errs); setBusy(null);
+    setChanged(found); setProblems(errs); setBusy(null); refreshRunLine();
   };
 
   const runSync = async () => {
@@ -80,6 +83,7 @@ export function SjbCanvaSyncPanel({ designIds, label }: SjbCanvaSyncPanelProps) 
     for (const u of done) (stillBehind.has(u.id) ? u.failed : u.checks).push(stillBehind.has(u.id) ? "Canva was edited again during the update" : "Matches the latest Canva version");
 
     await qc.invalidateQueries({ queryKey: CANVA_SYNC_QUERY });
+    refreshRunLine();
     const verified = done.filter((d) => d.failed.length === 0).length;
     setUpdated(done); setProblems(errs); setChanged(null); setBusy(null);
     setFinal(errs.length === 0 && verified === done.length
@@ -92,6 +96,11 @@ export function SjbCanvaSyncPanel({ designIds, label }: SjbCanvaSyncPanelProps) 
       <div className="flex flex-wrap items-center gap-3">
         <Button size="sm" variant="outline" onClick={runCheck} disabled={!!busy}><RefreshCw size={14} aria-hidden /> Check Canva for updates</Button>
         <span className="text-muted-foreground" aria-live="polite">{busy ?? `${designIds.length} ${label} designs. Checking is free; only changed designs are downloaded.`}</span>
+        {runLine
+          ? <p className="w-full text-xs text-muted-foreground">{runLine}</p>
+          : lastRun.error
+            ? <p className="w-full text-xs text-destructive">Couldn't load the last run date.</p>
+            : null}
       </div>
 
       {changed && (changed.length === 0

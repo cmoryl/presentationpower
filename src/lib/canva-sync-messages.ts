@@ -1,6 +1,40 @@
 // Turns raw Canva / storage failures into a plain explanation plus the next step.
 export interface SyncProblem { what: string; next: string }
 
+/** One recorded sync run, as returned by the server. */
+export interface CanvaRunRow {
+  startedAt: string;
+  finishedAt: string | null;
+  trigger: string;
+  checked: number;
+  synced: number;
+  failed: number;
+  remaining: number;
+  stoppedReason: string | null;
+}
+
+export interface CanvaLastRun { lastCheckedAt: string | null; run: CanvaRunRow | null }
+
+const stamp = (iso: string | null | undefined) =>
+  iso ? new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : null;
+
+/** One plain line: when Canva was last checked and what the last update run did. */
+export function describeLastRun(x: CanvaLastRun): string | null {
+  const parts: string[] = [];
+  const checked = stamp(x.lastCheckedAt);
+  if (checked) parts.push(`Last check: ${checked}`);
+  const r = x.run;
+  if (r) {
+    const at = stamp(r.finishedAt ?? r.startedAt);
+    const bits = [`${r.synced} updated`, `${r.checked} checked`];
+    if (r.failed > 0) bits.push(`${r.failed} with problems`);
+    if (r.remaining > 0) bits.push(`${r.remaining} still waiting`);
+    parts.push(`Last update run: ${at ?? "unknown"} (${r.trigger === "daily" ? "automatic" : "manual"}) — ${bits.join(", ")}`);
+    if (r.stoppedReason) parts.push(`Stopped early: ${r.stoppedReason}`);
+  }
+  return parts.length ? parts.join(" · ") : null;
+}
+
 export function explainSyncError(raw: string): SyncProblem {
   const m = raw.toLowerCase();
   const code = raw.match(/\[(\d{3})\]/)?.[1];

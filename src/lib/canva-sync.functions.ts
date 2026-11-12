@@ -50,6 +50,15 @@ export const runCanvaBackgroundSync = createServerFn({ method: "POST" })
     return runBackgroundSync("manual");
   });
 
+/** When the site last checked Canva and what the last update run did. */
+export const getCanvaSyncLastRun = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context);
+    const { lastRunSummary } = await import("@/lib/canva-sync.server");
+    return lastRunSummary();
+  });
+
 /** Per design: last Canva edit (from the latest check) vs the site's saved picture date. No Canva calls. */
 export const listCanvaSyncStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

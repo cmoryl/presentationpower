@@ -129,6 +129,27 @@ export async function runBackgroundSync(trigger: "daily" | "manual") {
   return run;
 }
 
+/** When Canva was last checked, and what the most recent update run did. */
+export async function lastRunSummary(): Promise<import("@/lib/canva-sync-messages").CanvaLastRun> {
+  const ids = canvaSyncTargets().map((t) => t.id);
+  const [{ data: run }, { data: checked }] = await Promise.all([
+    supabaseAdmin.from("canva_sync_runs")
+      .select("started_at, finished_at, trigger, checked, synced, failed, remaining, stopped_reason")
+      .order("started_at", { ascending: false }).limit(1).maybeSingle(),
+    supabaseAdmin.from("canva_asset_sync")
+      .select("checked_at").in("design_id", ids)
+      .order("checked_at", { ascending: false }).limit(1).maybeSingle(),
+  ]);
+  return {
+    lastCheckedAt: checked?.checked_at ?? null,
+    run: run ? {
+      startedAt: run.started_at, finishedAt: run.finished_at, trigger: run.trigger,
+      checked: run.checked, synced: run.synced, failed: run.failed,
+      remaining: run.remaining, stoppedReason: run.stopped_reason,
+    } : null,
+  };
+}
+
 export async function syncHealth() {
   const ids = canvaSyncTargets().map((t) => t.id);
   const [{ data: conn }, { data: runs }, { data: rows }] = await Promise.all([
