@@ -176,6 +176,13 @@
       "when": 1794500226553,
       "tag": "0024_canva_sync_multipage",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1794502802017,
+      "tag": "0025_canva_check_gate",
+      "breakpoints": true
     }
   ]
 }

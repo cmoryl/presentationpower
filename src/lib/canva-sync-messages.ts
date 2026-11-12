@@ -51,6 +51,29 @@ export function describePictureStamp(x: CanvaPictureStamp): string | null {
   return checked ? `${base} · checked with Canva ${checked}` : base;
 }
 
+/** What a visitor's "check Canva" click can come back with. Counts and dates only —
+ *  never design names, owners or raw Canva failures. */
+export type PublicCheckResult =
+  | { ok: true; needsUpdate: number; checked: number; lastCheckedAt: string | null }
+  | { ok: false; reason: "throttled"; waitSeconds: number }
+  | { ok: false; reason: "error"; message: string };
+
+/** One plain line for every visitor after they press "Check Canva for updates". */
+export function describeCheckResult(x: PublicCheckResult): string {
+  if (x.ok) {
+    const base = x.needsUpdate === 0
+      ? `All ${x.checked} pictures match Canva.`
+      : `${x.needsUpdate} of ${x.checked} pictures are newer in Canva.`;
+    return `${base} The site picks them up automatically.`;
+  }
+  if (x.reason === "throttled") {
+    const m = Math.max(1, Math.ceil(x.waitSeconds / 60));
+    return `Someone just checked Canva — try again in about ${m} minute${m === 1 ? "" : "s"}.`;
+  }
+  const p = explainSyncError(x.message);
+  return `${p.what} ${p.next}`;
+}
+
 export function explainSyncError(raw: string): SyncProblem {
   const m = raw.toLowerCase();
   const code = raw.match(/\[(\d{3})\]/)?.[1];

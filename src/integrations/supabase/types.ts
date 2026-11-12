@@ -1300,6 +1300,21 @@ export type Database = {
         }
         Relationships: []
       }
+      canva_check_gate: {
+        Row: {
+          id: number
+          locked_at: string
+        }
+        Insert: {
+          id?: number
+          locked_at?: string
+        }
+        Update: {
+          id?: number
+          locked_at?: string
+        }
+        Relationships: []
+      }
       canva_oauth_states: {
         Row: {
           created_at: string

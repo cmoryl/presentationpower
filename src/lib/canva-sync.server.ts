@@ -82,6 +82,45 @@ export async function syncDesigns(ids: string[]): Promise<SyncResult[]> {
   });
 }
 
+/** Public (no sign-in): ask Canva whether the pictures shown here are current.
+ *  Reads edit times only — no exports, so the daily download allowance is untouched.
+ *  One check at a time site-wide: a visitor's click claims the gate for this long. */
+export const PUBLIC_CHECK_COOLDOWN_MIN = 15;
+
+export async function publicCheck(): Promise<import("@/lib/canva-sync-messages").PublicCheckResult> {
+  const cutoff = new Date(Date.now() - PUBLIC_CHECK_COOLDOWN_MIN * 60_000).toISOString();
+  // Atomic claim: whoever wins the row update is the only check allowed in this window.
+  const { data: claim, error: claimError } = await supabaseAdmin
+    .from("canva_check_gate")
+    .update({ locked_at: new Date().toISOString() })
+    .eq("id", 1)
+    .lt("locked_at", cutoff)
+    .select();
+  if (claimError || !claim?.length) {
+    const { data: g } = await supabaseAdmin.from("canva_check_gate").select("locked_at").eq("id", 1).maybeSingle();
+    const next = (g?.locked_at ? new Date(g.locked_at).getTime() : 0) + PUBLIC_CHECK_COOLDOWN_MIN * 60_000;
+    return { ok: false, reason: "throttled", waitSeconds: Math.max(0, Math.ceil((next - Date.now()) / 1000)) };
+  }
+  const ids = canvaSyncTargets().map((t) => t.id);
+  let results;
+  try {
+    results = await checkDesigns(ids);
+  } catch (e) {
+    return { ok: false, reason: "error", message: (e as Error).message };
+  }
+  if (!results.length) return { ok: false, reason: "error", message: "No designs to check" };
+  const errs = results.filter((r) => r.error);
+  if (errs.length === results.length) return { ok: false, reason: "error", message: errs[0]!.error! };
+  const { data: c } = await supabaseAdmin
+    .from("canva_asset_sync")
+    .select("checked_at")
+    .in("design_id", ids)
+    .order("checked_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return { ok: true, needsUpdate: results.filter((r) => r.changed).length, checked: results.length, lastCheckedAt: c?.checked_at ?? null };
+}
+
 // ── Background sync ──────────────────────────────────────────────────────────
 // Runs daily (and on demand). Re-checks designs not checked for ~20h, then exports a
 // capped number of changed ones, so a big Canva edit day spreads over several days

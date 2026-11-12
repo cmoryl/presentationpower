@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { describeLastRun, describePictureStamp, explainSyncError, type CanvaLastRun } from "./canva-sync-messages";
+import { describeCheckResult, describeLastRun, describePictureStamp, explainSyncError, type CanvaLastRun, type PublicCheckResult } from "./canva-sync-messages";
 
 const run = (over: Partial<CanvaLastRun["run"]> = {}) => ({
   startedAt: "2026-11-12T14:40:00.000Z", finishedAt: "2026-11-12T14:45:00.000Z", trigger: "daily",
@@ -41,6 +41,22 @@ describe("describePictureStamp", () => {
     const line = describePictureStamp({ picturesUpdated: "2026-11-01T10:00:00.000Z", source: "original", lastCheckedAt: "2026-11-12T20:14:00.000Z" })!;
     expect(line).toMatch(/Pictures are the original calendar set, saved /);
     expect(line).toMatch(/· checked with Canva /);
+  });
+});
+
+describe("describeCheckResult", () => {
+  it("says everything matches when nothing is newer", () =>
+    expect(describeCheckResult({ ok: true, needsUpdate: 0, checked: 358, lastCheckedAt: null })).toBe(
+      "All 358 pictures match Canva. The site picks them up automatically."));
+  it("counts the pictures that are newer in Canva", () =>
+    expect(describeCheckResult({ ok: true, needsUpdate: 3, checked: 358, lastCheckedAt: null })).toContain("3 of 358 pictures are newer in Canva"));
+  it("tells a visitor how long to wait when someone just checked", () =>
+    expect(describeCheckResult({ ok: false, reason: "throttled", waitSeconds: 240 })).toContain("try again in about 4 minutes"));
+  it("uses one minute for a short wait", () =>
+    expect(describeCheckResult({ ok: false, reason: "throttled", waitSeconds: 20 })).toContain("try again in about 1 minute"));
+  it("explains a broken Canva connection in plain words", () => {
+    const r: PublicCheckResult = { ok: false, reason: "error", message: "The shared Canva account isn't connected." };
+    expect(describeCheckResult(r)).toContain("shared Canva account isn't connected");
   });
 });
 

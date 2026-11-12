@@ -58,6 +58,14 @@ export const getCanvaSyncStamp = createServerFn({ method: "GET" })
     return publicSyncStamp();
   });
 
+/** Public (no sign-in): ask Canva whether the pictures here are current. Counts and
+ *  dates only — no design names, problems or Canva details. Throttled site-wide. */
+export const checkCanvaUpdatesPublic = createServerFn({ method: "POST" })
+  .handler(async () => {
+    const { publicCheck } = await import("@/lib/canva-sync.server");
+    return publicCheck();
+  });
+
 /** When the site last checked Canva and what the last update run did. */
 export const getCanvaSyncLastRun = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
