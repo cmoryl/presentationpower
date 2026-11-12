@@ -1,0 +1,488 @@
+{
+  "checked": 40,
+  "refreshed": 9,
+  "remaining": 0,
+  "method": "Pixel comparison: max RGB channel delta >24 on more than 0.2% of pixels. Metadata cleanup preserves decoded pixels; refreshed CDN bytes verified. Does not certify typography, facts or layout.",
+  "results": [
+    {
+      "design_id": "DAHajd1E_34",
+      "height": "1920",
+      "mode": "set4",
+      "post": "13",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHajQcpxug",
+      "height": "1080",
+      "mode": "set4",
+      "post": "14",
+      "difference_fraction": 0.07186385459533608,
+      "refreshed": true,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHajSllUk4",
+      "height": "1350",
+      "mode": "set4",
+      "post": "14",
+      "difference_fraction": 0.2701934156378601,
+      "refreshed": true,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHajWsl0EM",
+      "height": "1920",
+      "mode": "set4",
+      "post": "14",
+      "difference_fraction": 0.2558449074074074,
+      "refreshed": true,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHaja1fSm4",
+      "height": "1080",
+      "mode": "set4",
+      "post": "15",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHajSid4kI",
+      "height": "1350",
+      "mode": "set4",
+      "post": "15",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHajalZ5I0",
+      "height": "1920",
+      "mode": "set4",
+      "post": "15",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHajehrJNs",
+      "height": "1080",
+      "mode": "set4",
+      "post": "16",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHajdBgb1g",
+      "height": "1350",
+      "mode": "set4",
+      "post": "16",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHajUC_9yA",
+      "height": "1920",
+      "mode": "set4",
+      "post": "16",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHajd3r1EQ",
+      "height": "1080",
+      "mode": "set4",
+      "post": "17",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHajTAhJ6U",
+      "height": "1350",
+      "mode": "set4",
+      "post": "17",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHajZS3TvE",
+      "height": "1920",
+      "mode": "set4",
+      "post": "17",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHajUMZJOE",
+      "height": "1080",
+      "mode": "set4",
+      "post": "18",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHajfo2v54",
+      "height": "1350",
+      "mode": "set4",
+      "post": "18",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHajbgj_LM",
+      "height": "1920",
+      "mode": "set4",
+      "post": "18",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHajbjq94Q",
+      "height": "1080",
+      "mode": "set4",
+      "post": "19",
+      "difference_fraction": 0.08492884087791495,
+      "refreshed": true,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHajd07CwQ",
+      "height": "1350",
+      "mode": "set4",
+      "post": "19",
+      "difference_fraction": 0.2739684499314129,
+      "refreshed": true,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHajdHrl74",
+      "height": "1920",
+      "mode": "set4",
+      "post": "19",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHajUohVLw",
+      "height": "1080",
+      "mode": "set4",
+      "post": "20",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHajdv4SiM",
+      "height": "1350",
+      "mode": "set4",
+      "post": "20",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHajbNkN-c",
+      "height": "1920",
+      "mode": "set4",
+      "post": "20",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHajfrnWWA",
+      "height": "1080",
+      "mode": "set4",
+      "post": "21",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHajSz2e10",
+      "height": "1350",
+      "mode": "set4",
+      "post": "21",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHajUaJaz8",
+      "height": "1920",
+      "mode": "set4",
+      "post": "21",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHajU5zWj0",
+      "height": "1080",
+      "mode": "set4",
+      "post": "22",
+      "difference_fraction": 0.10252229080932784,
+      "refreshed": true,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHajeJwoO4",
+      "height": "1350",
+      "mode": "set4",
+      "post": "22",
+      "difference_fraction": 0.0702037037037037,
+      "refreshed": true,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHajV5nYQQ",
+      "height": "1920",
+      "mode": "set4",
+      "post": "22",
+      "difference_fraction": 0.06843653549382717,
+      "refreshed": true,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHajR3Hf3A",
+      "height": "1080",
+      "mode": "set4",
+      "post": "23",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHajfJQNc4",
+      "height": "1350",
+      "mode": "set4",
+      "post": "23",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHajYWR9sE",
+      "height": "1920",
+      "mode": "set4",
+      "post": "23",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHajU7mi0o",
+      "height": "1080",
+      "mode": "set4",
+      "post": "24",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHajZvajLM",
+      "height": "1350",
+      "mode": "set4",
+      "post": "24",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHajY6HqBo",
+      "height": "1920",
+      "mode": "set4",
+      "post": "24",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHaiqX-IuA",
+      "height": "1080",
+      "mode": "set4",
+      "post": "27",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHaihWqANo",
+      "height": "1350",
+      "mode": "set4",
+      "post": "27",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHaiha6rsA",
+      "height": "1920",
+      "mode": "set4",
+      "post": "27",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    },
+    {
+      "design_id": "DAHajrV5fZo",
+      "height": "1080",
+      "mode": "set4",
+      "post": "29",
+      "difference_fraction": 0.008072702331961591,
+      "refreshed": true,
+      "dimensions": [
+        1080,
+        1080
+      ]
+    },
+    {
+      "design_id": "DAHajjgAsqA",
+      "height": "1350",
+      "mode": "set4",
+      "post": "29",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1350
+      ]
+    },
+    {
+      "design_id": "DAHajgifcAo",
+      "height": "1920",
+      "mode": "set4",
+      "post": "29",
+      "difference_fraction": 0.0,
+      "refreshed": false,
+      "dimensions": [
+        1080,
+        1920
+      ]
+    }
+  ]
+}
