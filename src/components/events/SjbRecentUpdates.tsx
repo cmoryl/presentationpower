@@ -51,7 +51,8 @@ export function SjbRecentUpdates() {
       onKeyDown={(e) => { if (e.key === "ArrowRight") go(active + 1); if (e.key === "ArrowLeft") go(active - 1); }}>
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h2 id="bowl-recent" className="flex items-center gap-2 text-lg font-semibold text-foreground">
+          <h2 id="bowl-recent" className="flex items-center gap-3 text-lg font-semibold text-foreground">
+            <span aria-hidden className="h-5 w-1 rounded-full" style={{ background: gold }} />
             Recent updates
             <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={{ background: gold, color: navy }}>Live</span>
           </h2>

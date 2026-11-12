@@ -36,6 +36,14 @@ export function SjbHero() {
   ] as const;
   const logo = SJB_LOGOS.find((l) => l.id === "dark");
   const navy = hex("navy"), gold = hex("gold"), sky = hex("sky");
+  const ticker = [
+    SJB_EVENT.matchupLabel,
+    SJB_EVENT.datesLabel,
+    SJB_EVENT.venue,
+    SJB_EVENT.city,
+    SJB_EVENT.kickoffLabel,
+    "SANJUANBOWL.COM",
+  ];
 
   return (
     <section aria-label={SJB_EVENT.name} className="relative mt-4 overflow-hidden rounded-xl text-white" style={{ background: navy }}>
@@ -51,13 +59,24 @@ export function SjbHero() {
             <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 motion-reduce:animate-none" style={{ background: gold }} /><span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: gold }} /></span>
             {SJB_EVENT.matchupLabel}
           </p>
-          <h1 className="mt-3 text-4xl font-bold italic leading-none sm:text-6xl">{SJB_EVENT.shortName.toUpperCase()}</h1>
+          <h1
+            className="sjb-title-shine mt-3 text-4xl font-bold italic leading-none sm:text-6xl"
+            style={{ backgroundImage: `linear-gradient(100deg, ${gold} 20%, #ffffff 40%, ${sky} 60%, ${gold} 80%)` }}
+          >
+            {SJB_EVENT.shortName.toUpperCase()}
+          </h1>
           <p className="mt-3 text-[15px] text-white/85">{SJB_EVENT.venue} · {SJB_EVENT.city}</p>
           <p className="text-[15px] text-white/85">{SJB_EVENT.datesLabel} · {SJB_EVENT.kickoffLabel}</p>
           <div className="mt-6 flex gap-2 sm:gap-3" role="timer" aria-label="Countdown to kickoff">
             {(parts ?? [["Days", "–"], ["Hrs", "–"], ["Min", "–"], ["Sec", "–"]]).map(([label, v]) => (
-              <div key={label} className="min-w-16 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-center backdrop-blur-md">
-                <div className="font-mono text-2xl font-bold tabular-nums sm:text-3xl">{typeof v === "number" ? String(v).padStart(2, "0") : v}</div>
+              <div
+                key={label}
+                className="min-w-16 rounded-lg border bg-white/10 px-3 py-2 text-center backdrop-blur-md"
+                style={{ borderColor: `${gold}55`, boxShadow: `0 0 18px ${gold}22 inset, 0 4px 18px rgb(0 0 0 / 0.35)` }}
+              >
+                <div className="font-mono text-2xl font-bold tabular-nums sm:text-3xl" style={{ color: gold }}>
+                  {typeof v === "number" ? String(v).padStart(2, "0") : v}
+                </div>
                 <div className="text-[10px] uppercase tracking-widest text-white/70">{label}</div>
               </div>
             ))}
@@ -65,12 +84,25 @@ export function SjbHero() {
         </div>
         {logo && <img src={logo.svg} alt="San Juan Bowl logo" className="sjb-float h-36 w-auto justify-self-start sm:h-48 md:justify-self-end" />}
       </div>
-      <div className="relative flex gap-1.5 px-6 pb-5 sm:px-10">
+      <div className="relative flex gap-1.5 px-6 pb-4 sm:px-10">
         {PLATES.map((p, n) => (
           <button key={p.id} type="button" aria-label={`Show background ${n + 1}`} aria-current={n === i}
             onClick={() => setI(n)} className="h-1 w-8 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-white"
             style={{ background: n === i ? gold : "rgba(255,255,255,.3)" }} />
         ))}
+      </div>
+      <div className="relative border-t border-white/15 py-2" style={{ background: `${navy}cc` }}>
+        <p className="sr-only">{ticker.join(" · ")}</p>
+        <div aria-hidden className="overflow-hidden">
+          <div className="sjb-marquee flex w-max items-center gap-6 whitespace-nowrap px-3 text-[11px] font-semibold uppercase tracking-[0.2em]">
+            {[...ticker, ...ticker, ...ticker, ...ticker].map((t, n) => (
+              <span key={n} className="flex items-center gap-6">
+                <span style={{ color: t === "SANJUANBOWL.COM" ? gold : "rgba(255,255,255,0.8)" }}>{t}</span>
+                <span className="sjb-pulse-bar inline-block h-3 w-[3px] rounded-full" style={{ background: n % 2 ? sky : gold }} />
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
