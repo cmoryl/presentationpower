@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/design-system/element";
+import { useCanvaSynced } from "@/lib/use-canva-sync";
 import { SJB_CALENDAR_MODES, sjbCalendarDesign, type SjbCalendarMode } from "@/lib/sjb-social-calendar";
 
 export interface SjbCalendarLookCardsProps {
@@ -11,10 +12,12 @@ export interface SjbCalendarLookCardsProps {
 
 export const SjbCalendarLookCards = forwardRef<HTMLDivElement, SjbCalendarLookCardsProps>(
   function SjbCalendarLookCards({ mode, onChange, className }, ref) {
+    const synced = useCanvaSynced();
     return (
       <div ref={ref} className={`mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 ${className ?? ""}`} role="group" aria-label="Campaign look">
         {SJB_CALENDAR_MODES.map(({ id, label }) => {
-          const preview = sjbCalendarDesign("04", id, "1350")?.previewUrl;
+          const d = sjbCalendarDesign("04", id, "1350");
+          const preview = synced(d?.id, d?.previewUrl ?? null);
           const selected = id === mode;
           return (
             <Button key={id} variant="outline" aria-pressed={selected} onClick={() => onChange(id)}

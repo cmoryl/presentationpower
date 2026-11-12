@@ -5,6 +5,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
+import { SjbCanvaSyncPanel } from "@/components/events/SjbCanvaSyncPanel";
+import { useCanvaSynced } from "@/lib/use-canva-sync";
 import { SjbProjections } from "@/components/events/SjbProjections";
 import { SjbCalendarLookCards } from "@/components/events/SjbCalendarLookCards";
 import { SjbDemoChip, SjbDemoSequence } from "@/components/events/SjbDemoSequence";
@@ -19,6 +21,7 @@ import {
   SJB_CALENDAR_SIZES,
   sjbCalendarBuilt,
   sjbCalendarDesign,
+  sjbCalendarActiveDesignIds,
   SJB_CALENDAR_MODES,
   type SjbCalendarMode,
   type SjbCalendarPost,
@@ -93,6 +96,7 @@ function CalendarPage() {
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl social calendar</h1>
       <p className="mt-2 text-sm text-muted-foreground">November – December 2026</p>
       <SjbCalendarLookCards mode={mode} onChange={setMode} />
+      <SjbCanvaSyncPanel designIds={sjbCalendarActiveDesignIds()} label="calendar post" />
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:max-w-3xl" role="group" aria-label="View">
         {([
           { v: "calendar", title: "Calendar", sub: "Month grid with every post on its day", Icon: CalendarDays },
@@ -136,7 +140,11 @@ function CalendarPage() {
 
 function PostRow({ post, mode, format }: { post: SjbCalendarPost; mode: SjbCalendarMode; format: SjbCalendarFormat }) {
   const [showCaption, setShowCaption] = useState(Boolean(post.caption));
-  const sizes = SJB_CALENDAR_SIZES.map((s) => ({ s, d: sjbCalendarDesign(post.n, mode, s.id) }));
+  const synced = useCanvaSynced();
+  const sizes = SJB_CALENDAR_SIZES.map((s) => {
+    const d = sjbCalendarDesign(post.n, mode, s.id);
+    return { s, d: d && { ...d, previewUrl: synced(d.id, d.previewUrl), downloadUrl: synced(d.id, d.downloadUrl) } };
+  });
   const anyBuilt = sizes.some(({ d }) => d);
   return (
     <article className="rounded-md border border-border bg-card p-5">

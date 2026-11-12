@@ -3,7 +3,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const API = "https://api.canva.com/rest/v1";
-export const CANVA_SCOPES = "design:content:write design:meta:read asset:write";
+export const CANVA_SCOPES = "design:content:write design:content:read design:meta:read asset:write";
 
 function creds() {
   const id = process.env["CANVA_CLIENT_ID"];
@@ -106,7 +106,7 @@ export async function connectionStatus() {
   };
 }
 
-async function accessToken() {
+export async function accessToken() {
   const { data } = await supabaseAdmin.from("canva_shared_connection").select("*").eq("id", 1).maybeSingle();
   if (!data) throw new Error("The shared Canva account isn't connected yet. An admin connects it on Admin → Canva.");
   if (new Date(data.expires_at).getTime() > Date.now()) return data.access_token;
@@ -157,3 +157,39 @@ type ImportJob = {
   error?: { code: string; message: string };
   result?: { designs: Array<{ id: string; title?: string; urls?: { edit_url?: string; view_url?: string } }> };
 };
+
+/** Last-edited time of a design (metadata read — does not use the export allowance). */
+export async function designUpdatedAt(token: string, id: string): Promise<number | null> {
+  const res = await fetch(`${API}/designs/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${token}` } });
+  const text = await res.text();
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`Canva design check failed [${res.status}]: ${text}`);
+  const d = (JSON.parse(text) as { design: { updated_at: number } }).design;
+  return d.updated_at * 1000;
+}
+
+/** Exports page 1 of a design as JPEG and returns the raw bytes (uses the export allowance). */
+export async function exportDesignJpg(token: string, id: string): Promise<Uint8Array> {
+  const res = await fetch(`${API}/exports`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ design_id: id, format: { type: "jpg", quality: 92, pages: [1] } }),
+  });
+  const text = await res.text();
+  if (res.status === 403) throw new Error(`Canva refused the export [403]: ${text}. An admin may need to reconnect Canva on Admin → Canva to allow downloads.`);
+  if (!res.ok) throw new Error(`Canva export failed [${res.status}]: ${text}`);
+  let job = (JSON.parse(text) as { job: ExportJob }).job;
+  for (let i = 0; i < 40 && job.status === "in_progress"; i++) {
+    await new Promise((r) => setTimeout(r, 1500));
+    const p = await fetch(`${API}/exports/${job.id}`, { headers: { Authorization: `Bearer ${token}` } });
+    const pt = await p.text();
+    if (!p.ok) throw new Error(`Canva export check failed [${p.status}]: ${pt}`);
+    job = (JSON.parse(pt) as { job: ExportJob }).job;
+  }
+  if (job.status !== "success" || !job.urls?.[0]) throw new Error(`Canva export did not finish: ${job.error?.message ?? job.status}`);
+  const f = await fetch(job.urls[0]);
+  if (!f.ok) throw new Error(`Downloading the Canva export failed [${f.status}]`);
+  return new Uint8Array(await f.arrayBuffer());
+}
+
+type ExportJob = { id: string; status: "in_progress" | "success" | "failed"; urls?: string[]; error?: { message: string } };

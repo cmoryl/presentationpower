@@ -229,6 +229,7 @@ import { Route as ShareSanJuanBowlStadiumRouteImport } from './routes/share.san-
 import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
 import { Route as ApiPublicBoothsEventRouteImport } from './routes/api/public/booths.$event'
+import { Route as ApiPublicCanvaSyncDesignIdRouteImport } from './routes/api/public/canva-sync.$designId'
 import { Route as ApiPublicCanvaCallbackRouteImport } from './routes/api/public/canva.callback'
 import { Route as ApiPublicHooksLogoScrubRouteImport } from './routes/api/public/hooks/logo-scrub'
 import { Route as ApiPublicVenueEventRouteImport } from './routes/api/public/venue.$event'
@@ -1385,6 +1386,12 @@ const ApiPublicBoothsEventRoute = ApiPublicBoothsEventRouteImport.update({
   path: '/api/public/booths/$event',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCanvaSyncDesignIdRoute =
+  ApiPublicCanvaSyncDesignIdRouteImport.update({
+    id: '/api/public/canva-sync/$designId',
+    path: '/api/public/canva-sync/$designId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicCanvaCallbackRoute = ApiPublicCanvaCallbackRouteImport.update({
   id: '/api/public/canva/callback',
   path: '/api/public/canva/callback',
@@ -1772,6 +1779,7 @@ export interface FileRoutesByFullPath {
   '/share/san-juan-bowl/': typeof ShareSanJuanBowlIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
+  '/api/public/canva-sync/$designId': typeof ApiPublicCanvaSyncDesignIdRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
   '/api/public/hooks/logo-scrub': typeof ApiPublicHooksLogoScrubRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
@@ -2020,6 +2028,7 @@ export interface FileRoutesByTo {
   '/share/san-juan-bowl': typeof ShareSanJuanBowlIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
+  '/api/public/canva-sync/$designId': typeof ApiPublicCanvaSyncDesignIdRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
   '/api/public/hooks/logo-scrub': typeof ApiPublicHooksLogoScrubRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
@@ -2273,6 +2282,7 @@ export interface FileRoutesById {
   '/share/san-juan-bowl/': typeof ShareSanJuanBowlIndexRoute
   '/admin/modules_/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
+  '/api/public/canva-sync/$designId': typeof ApiPublicCanvaSyncDesignIdRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
   '/api/public/hooks/logo-scrub': typeof ApiPublicHooksLogoScrubRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
@@ -2527,6 +2537,7 @@ export interface FileRouteTypes {
     | '/share/san-juan-bowl/'
     | '/admin/modules/print/$moduleId'
     | '/api/public/booths/$event'
+    | '/api/public/canva-sync/$designId'
     | '/api/public/canva/callback'
     | '/api/public/hooks/logo-scrub'
     | '/api/public/venue/$event'
@@ -2775,6 +2786,7 @@ export interface FileRouteTypes {
     | '/share/san-juan-bowl'
     | '/admin/modules/print/$moduleId'
     | '/api/public/booths/$event'
+    | '/api/public/canva-sync/$designId'
     | '/api/public/canva/callback'
     | '/api/public/hooks/logo-scrub'
     | '/api/public/venue/$event'
@@ -3027,6 +3039,7 @@ export interface FileRouteTypes {
     | '/share/san-juan-bowl/'
     | '/admin/modules_/print/$moduleId'
     | '/api/public/booths/$event'
+    | '/api/public/canva-sync/$designId'
     | '/api/public/canva/callback'
     | '/api/public/hooks/logo-scrub'
     | '/api/public/venue/$event'
@@ -3180,6 +3193,7 @@ export interface RootRouteChildren {
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
   ShareSanJuanBowlIndexRoute: typeof ShareSanJuanBowlIndexRoute
   ApiPublicBoothsEventRoute: typeof ApiPublicBoothsEventRoute
+  ApiPublicCanvaSyncDesignIdRoute: typeof ApiPublicCanvaSyncDesignIdRoute
   ApiPublicCanvaCallbackRoute: typeof ApiPublicCanvaCallbackRoute
   ApiPublicHooksLogoScrubRoute: typeof ApiPublicHooksLogoScrubRoute
   ApiPublicVenueEventRoute: typeof ApiPublicVenueEventRoute
@@ -4727,6 +4741,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicBoothsEventRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/canva-sync/$designId': {
+      id: '/api/public/canva-sync/$designId'
+      path: '/api/public/canva-sync/$designId'
+      fullPath: '/api/public/canva-sync/$designId'
+      preLoaderRoute: typeof ApiPublicCanvaSyncDesignIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/canva/callback': {
       id: '/api/public/canva/callback'
       path: '/api/public/canva/callback'
@@ -5356,6 +5377,7 @@ const rootRouteChildren: RootRouteChildren = {
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
   ShareSanJuanBowlIndexRoute: ShareSanJuanBowlIndexRoute,
   ApiPublicBoothsEventRoute: ApiPublicBoothsEventRoute,
+  ApiPublicCanvaSyncDesignIdRoute: ApiPublicCanvaSyncDesignIdRoute,
   ApiPublicCanvaCallbackRoute: ApiPublicCanvaCallbackRoute,
   ApiPublicHooksLogoScrubRoute: ApiPublicHooksLogoScrubRoute,
   ApiPublicVenueEventRoute: ApiPublicVenueEventRoute,

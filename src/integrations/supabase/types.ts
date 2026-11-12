@@ -1264,6 +1264,36 @@ export type Database = {
         }
         Relationships: []
       }
+      canva_asset_sync: {
+        Row: {
+          bytes: number | null
+          canva_updated_at: string | null
+          checked_at: string
+          design_id: string
+          last_error: string | null
+          storage_path: string | null
+          synced_at: string | null
+        }
+        Insert: {
+          bytes?: number | null
+          canva_updated_at?: string | null
+          checked_at?: string
+          design_id: string
+          last_error?: string | null
+          storage_path?: string | null
+          synced_at?: string | null
+        }
+        Update: {
+          bytes?: number | null
+          canva_updated_at?: string | null
+          checked_at?: string
+          design_id?: string
+          last_error?: string | null
+          storage_path?: string | null
+          synced_at?: string | null
+        }
+        Relationships: []
+      }
       canva_oauth_states: {
         Row: {
           created_at: string

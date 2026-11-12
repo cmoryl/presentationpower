@@ -144,6 +144,11 @@ export const SJB_CALENDAR_PREVIEWS: Record<string, string> = Object.fromEntries(
   Object.entries(PREVIEW_POINTERS).map(([path, ptr]) => [path.split("/").pop()!.replace(".jpg.asset.json", ""), ptr.url]),
 );
 
+/** When each bundled picture was saved — the starting point for "has Canva changed since?". */
+export const SJB_CALENDAR_PICTURE_SAVED_AT: Record<string, string> = Object.fromEntries(
+  Object.entries(PREVIEW_POINTERS).map(([path, ptr]) => [path.split("/").pop()!.replace(".jpg.asset.json", ""), (ptr as { created_at?: string }).created_at ?? ""]),
+);
+
 type DesignMap = Record<string, Partial<Record<SjbCalendarMode, Partial<Record<SjbCalendarSize, string>>>>>;
 const DESIGNS = designs as DesignMap;
 
@@ -157,4 +162,12 @@ export function sjbCalendarDesign(n: string, mode: SjbCalendarMode, size: SjbCal
 }
 export function sjbCalendarBuilt(n: string) {
   return Boolean(DESIGNS[n] && Object.keys(DESIGNS[n]).length);
+}
+
+/** Every Canva design behind the active calendar looks (dark is retired from listings). */
+export function sjbCalendarActiveDesignIds(): string[] {
+  const ids = new Set<string>();
+  for (const byMode of Object.values(DESIGNS))
+    for (const m of SJB_CALENDAR_MODES) for (const id of Object.values(byMode[m.id] ?? {})) if (id) ids.add(id);
+  return [...ids];
 }
