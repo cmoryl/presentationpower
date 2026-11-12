@@ -87,6 +87,10 @@ export async function syncDesigns(ids: string[]): Promise<SyncResult[]> {
  *  One check at a time site-wide: a visitor's click claims the gate for this long. */
 export const PUBLIC_CHECK_COOLDOWN_MIN = 15;
 
+async function releaseCheckGate() {
+  await supabaseAdmin.from("canva_check_gate").update({ locked_at: "2000-01-01T00:00:00Z" }).eq("id", 1);
+}
+
 export async function publicCheck(): Promise<import("@/lib/canva-sync-messages").PublicCheckResult> {
   const cutoff = new Date(Date.now() - PUBLIC_CHECK_COOLDOWN_MIN * 60_000).toISOString();
   // Atomic claim: whoever wins the row update is the only check allowed in this window.
@@ -106,11 +110,19 @@ export async function publicCheck(): Promise<import("@/lib/canva-sync-messages")
   try {
     results = await checkDesigns(ids);
   } catch (e) {
+    await releaseCheckGate();
     return { ok: false, reason: "error", message: (e as Error).message };
   }
-  if (!results.length) return { ok: false, reason: "error", message: "No designs to check" };
+  if (!results.length) {
+    await releaseCheckGate();
+    return { ok: false, reason: "error", message: "No designs to check" };
+  }
   const errs = results.filter((r) => r.error);
-  if (errs.length === results.length) return { ok: false, reason: "error", message: errs[0]!.error! };
+  if (errs.length === results.length) {
+    // A failed check must not lock visitors out for the cooldown window.
+    await releaseCheckGate();
+    return { ok: false, reason: "error", message: errs[0]!.error! };
+  }
   const { data: c } = await supabaseAdmin
     .from("canva_asset_sync")
     .select("checked_at")
