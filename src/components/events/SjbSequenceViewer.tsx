@@ -37,7 +37,7 @@ export function SjbSequenceViewer({ pages, labels, variant, width, height, title
   };
 
   return (
-    <div className="flex flex-col items-start gap-2">
+    <div className="flex w-full min-w-0 flex-col items-start gap-2">
       <div
         role="region"
         aria-roledescription={variant}
@@ -45,11 +45,11 @@ export function SjbSequenceViewer({ pages, labels, variant, width, height, title
         tabIndex={0}
         onKeyDown={onKey}
         className={`relative overflow-hidden bg-black shadow-md outline-none focus-visible:ring-2 focus-visible:ring-primary ${variant === "story" ? "rounded-xl" : "rounded"}`}
-        style={{ width: w, height: displayHeight }}
+        style={{ width: w, maxWidth: '100%', aspectRatio: `${width} / ${height}` }}
       >
-        <div className="flex h-full" style={{ width: w * n, transform: `translateX(${-i * w}px)`, transition: reduce ? "none" : "transform 420ms cubic-bezier(.2,.7,.2,1)" }}>
+        <div className="flex h-full" style={{ width: `${n * 100}%`, transform: `translateX(${-i * 100 / n}%)`, transition: reduce ? "none" : "transform 420ms cubic-bezier(.2,.7,.2,1)" }}>
           {pages.map((src, k) => (
-            <img key={src} src={src} alt={`${title} — ${label(k)}`} draggable={false} className="h-full shrink-0 object-cover" style={{ width: w }} loading={k === 0 ? "eager" : "lazy"} />
+            <img key={src} src={src} alt={`${title} — ${label(k)}`} draggable={false} className="h-full shrink-0 object-contain" style={{ width: `${100 / n}%` }} loading={k === 0 ? "eager" : "lazy"} />
           ))}
         </div>
         {variant === "story" ? (
@@ -68,7 +68,7 @@ export function SjbSequenceViewer({ pages, labels, variant, width, height, title
           </>
         )}
       </div>
-      <div className="flex items-center gap-2" style={{ width: w }}>
+      <div className="flex max-w-full items-center gap-2" style={{ width: w }}>
         {variant === "story" && (
           <Button size="sm" variant="outline" aria-label={playing ? "Pause story" : "Play story"} onClick={() => { if (!playing && i >= n - 1) setI(0); setPlaying((p) => !p); }}>
             {playing ? <Pause /> : <Play />}

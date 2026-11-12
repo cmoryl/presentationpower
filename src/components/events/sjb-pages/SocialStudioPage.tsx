@@ -11,6 +11,21 @@ import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS } from '@/lib/sjb-calendar-style
 import coverAll from '@/assets/sjb-card-covers/all.jpg';
 import shieldDark from '@/assets/san-juan-bowl/sjb-logo-dark.svg.asset.json';
 import shieldLight from '@/assets/san-juan-bowl/sjb-logo-color.svg.asset.json';
+import { SjbSavedSequence } from '../SjbSavedSequence';
+import { SJB_CALENDAR_FORMATS, sjbCalendarSequence, type SjbCalendarFormat } from '@/lib/sjb-calendar-formats';
+
+function PostSequences({ design }: { design: SjbSocialStudioDesign }) {
+  const [format, setFormat] = useState<SjbCalendarFormat | null>(null);
+  if (!design.post || !design.mode) return null;
+  const available = SJB_CALENDAR_FORMATS.filter(f => f.id !== 'single' && sjbCalendarSequence(design.post ?? '', design.mode ?? '', f.id));
+  if (!available.length) return null;
+  const spec = available.find(f => f.id === format);
+  const sequence = format ? sjbCalendarSequence(design.post, design.mode, format) : null;
+  return <div className="border-t border-border p-4">
+    <div className="flex flex-wrap gap-2">{available.map(f => <Button key={f.id} variant={format === f.id ? 'default' : 'outline'} size="sm" aria-expanded={format === f.id} onClick={() => setFormat(format === f.id ? null : f.id)}>{f.label}</Button>)}</div>
+    {sequence && spec && <div className="mt-4"><SjbSavedSequence sequence={sequence} title={design.name} width={spec.width} height={spec.height} story={format === 'story-sequence'} displayHeight={320} /></div>}
+  </div>;
+}
 
 async function saveSocialImage(d: SjbSocialStudioDesign) {
   const name = `san-juan-bowl-${d.collectionId}-${d.name}-${sjbCanvaSize(d)}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
@@ -98,7 +113,8 @@ export function SjbSocialStudio() {
               </Button>
               <div className="p-4"><div className="flex flex-wrap items-start justify-between gap-2"><h3 className="font-semibold">{d.name}</h3><span className="text-xs text-muted-foreground">{d.status === 'draft' ? 'Draft · unsaved' : 'Saved in Canva'}</span></div><p className="mt-1 text-sm text-muted-foreground">{sjbCanvaSize(d)} px</p><div className="mt-4 flex flex-wrap gap-2"><Button variant="outline" size="sm" disabled={!d.previewUrl} onClick={() => saveSocialImage(d)} aria-label={`Save image: ${collection.name} ${d.name} ${sjbCanvaSize(d)}`}><Download />Save image</Button>{sjbIllustratorMaster(d.id) && <Button asChild variant="outline" size="sm"><a href={sjbIllustratorMaster(d.id) ?? undefined} download={sjbIllustratorFileName([collection.name, d.name, sjbCanvaSize(d)])} aria-label={`Download editable Illustrator file: ${collection.name} ${d.name} ${sjbCanvaSize(d)}`}><Layers />Illustrator file</a></Button>}<Button asChild variant="outline" size="sm"><a href={d.canvaUrl} target="_blank" rel="noreferrer"><ExternalLink />{d.status === 'draft' ? 'Open Canva original' : 'Edit in Canva'}</a></Button></div></div>
               {d.waitingOn && <p className="px-4 pb-4 text-xs text-muted-foreground">Awaiting: {d.waitingOn}</p>}
-              {d.post && d.height === 1350 && sjbSocialStudioSequences(d).length > 0 && <div className="border-t border-border px-4 py-3"><h4 className="mb-2 text-xs font-semibold">Multi-page Canva files</h4><div className="flex flex-wrap gap-2">{sjbSocialStudioSequences(d).map(sequence => <Button asChild variant="outline" size="sm" key={sequence.label}><a href={sequence.url} target="_blank" rel="noreferrer"><Layers />{sequence.label}</a></Button>)}</div></div>}
+              {d.post && d.height === 1350 && <PostSequences design={d} />}
+              {d.post && d.height === 1350 && d.mode !== 'set2' && d.mode !== 'set4' && sjbSocialStudioSequences(d).length > 0 && <div className="border-t border-border px-4 py-3"><h4 className="mb-2 text-xs font-semibold">Multi-page Canva files</h4><div className="flex flex-wrap gap-2">{sjbSocialStudioSequences(d).map(sequence => <Button asChild variant="outline" size="sm" key={sequence.label}><a href={sequence.url} target="_blank" rel="noreferrer"><Layers />{sequence.label}</a></Button>)}</div></div>}
             </article>)}
           </div>
         </section>;

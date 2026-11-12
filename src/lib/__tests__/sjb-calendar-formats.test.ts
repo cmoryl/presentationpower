@@ -19,6 +19,6 @@ describe("Bowl calendar multi-page formats", () => {
     expect(SJB_CALENDAR_FORMATS.find((f) => f.id === "story-sequence")?.height).toBe(1920);
   });
   it("does not claim pending multi-page files exist", () => {
-    expect(sjbCalendarSequence("04", "set2", "linkedin-portrait")).toBeNull();
+    expect(sjbCalendarSequence("04", "set3", "linkedin-portrait")).toBeNull();
   });
 });

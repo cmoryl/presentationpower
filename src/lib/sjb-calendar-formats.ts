@@ -17,7 +17,9 @@ export const SJB_CALENDAR_FORMATS: readonly SjbCalendarFormatSpec[] = [
 ];
 
 export interface SjbCalendarSequence {
-  canvaUrl: string;
+  canvaUrl?: string;
+  provenance?: 'assembled-canva-pages';
+  sourceCanvaUrls?: string[];
   pages: { previewUrl: string; downloadUrl: string; downloadName: string }[];
   pdfUrl?: string;
   zipUrl?: string;
@@ -27,9 +29,10 @@ export interface SjbCalendarSequence {
 // Only audited, cleaned exports belong here. Never substitute a single-image
 // Canva design for a carousel or invent a link for a pending sequence.
 const SEQUENCES: Record<string, SjbCalendarSequence> = {};
+import { sjbAssembledPostSequence } from './sjb-post-sequences';
 
 export function sjbCalendarSequence(post: string, mode: string, format: SjbCalendarFormat): SjbCalendarSequence | null {
-  return SEQUENCES[`${post}:${mode}:${format}`] ?? null;
+  return SEQUENCES[`${post}:${mode}:${format}`] ?? sjbAssembledPostSequence(post, mode, format);
 }
 // Live multi-page Canva files (page 1 = the post's saved single ad, then the
 // shared details + tickets pages). Exported pictures may still be pending.

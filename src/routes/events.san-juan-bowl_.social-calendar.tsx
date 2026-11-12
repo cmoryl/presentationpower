@@ -9,6 +9,7 @@ import { SjbProjections } from "@/components/events/SjbProjections";
 import { SjbCalendarLookCards } from "@/components/events/SjbCalendarLookCards";
 import { SjbDemoChip, SjbDemoSequence } from "@/components/events/SjbDemoSequence";
 import { SjbSequenceViewer } from "@/components/events/SjbSequenceViewer";
+import { SjbSavedSequence } from "@/components/events/SjbSavedSequence";
 import { sjbCampaignMasterFor, SJB_SEQUENCE_PAGE_ORDER } from "@/lib/sjb-campaign-sequence-masters";
 import { sjbCalendarCover } from "@/lib/sjb-calendar-demo";
 import { CalendarDays, List as ListIcon } from "lucide-react";
@@ -231,7 +232,7 @@ function SequenceArtwork({ post, mode, format }: { post: SjbCalendarPost; mode: 
         <span className="text-xs text-muted-foreground">{spec?.width}×{spec?.height} per {format === "story-sequence" ? "frame" : "page"}</span>
       </div>
       {sequence ? <>
-        <div className="mt-3"><SjbSequenceViewer pages={sequence.pages.map((p) => p.previewUrl)} variant={format === "story-sequence" ? "story" : "carousel"} width={spec?.width ?? 1080} height={spec?.height ?? 1350} title={post.title} /></div>
+        <div className="mt-3"><SjbSavedSequence sequence={sequence} story={format === "story-sequence"} width={spec?.width ?? 1080} height={spec?.height ?? 1350} title={post.title} /></div>
         <ol className="mt-3 flex gap-4 overflow-x-auto pb-3">
           {sequence.pages.map((page, i) => <li key={page.previewUrl} className="w-44 shrink-0">
             <a href={page.previewUrl} target="_blank" rel="noreferrer"><img src={page.previewUrl} alt={`${post.title}, page ${i + 1}`} className="max-h-72 w-full rounded border border-border object-contain" loading="lazy" /></a>
@@ -240,7 +241,7 @@ function SequenceArtwork({ post, mode, format }: { post: SjbCalendarPost; mode: 
           </li>)}
         </ol>
         <div className="mt-2 flex flex-wrap gap-2">
-          <Button asChild size="sm" variant="outline"><a href={sequence.canvaUrl} target="_blank" rel="noreferrer">Canva</a></Button>
+          {sequence.canvaUrl && <Button asChild size="sm" variant="outline"><a href={sequence.canvaUrl} target="_blank" rel="noreferrer">Canva</a></Button>}
           {sequence.pdfUrl && <Button asChild size="sm" variant="outline"><a href={sequence.pdfUrl} download>Carousel PDF</a></Button>}
           {sequence.zipUrl && <Button asChild size="sm" variant="outline"><a href={sequence.zipUrl} download>All pictures</a></Button>}
           {sequence.illustratorUrl && <Button asChild size="sm" variant="outline"><a href={sequence.illustratorUrl} download>Illustrator</a></Button>}
