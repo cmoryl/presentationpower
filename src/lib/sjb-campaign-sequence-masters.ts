@@ -6,3 +6,9 @@ export const SJB_CAMPAIGN_SEQUENCE_MASTERS = {
 } as const;
 export const SJB_SEQUENCE_PAGE_ORDER = ["Logo cover", "Headline", "Details", "Tickets"] as const;
 export const sjbCanvaEditUrl = (id: string) => `https://www.canva.com/design/${id}/edit`;
+const PICTURES = import.meta.glob<{ url: string }>("../assets/sjb-sequences/*.asset.json", { eager: true, import: "default" });
+export function sjbCampaignSequencePictures(id: string) {
+  const pages = [1, 2, 3, 4].map(page => PICTURES[`../assets/sjb-sequences/${id}-page-${page}.jpg.asset.json`]?.url);
+  if (pages.some(page => !page)) return null;
+  return { pages: pages.filter((page): page is string => Boolean(page)), zipUrl: PICTURES[`../assets/sjb-sequences/${id}.zip.asset.json`]?.url };
+}

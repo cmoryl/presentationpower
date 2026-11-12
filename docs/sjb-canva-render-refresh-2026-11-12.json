@@ -1,0 +1,4062 @@
+{
+  "checked_at": "2026-11-12T00:53:44.840147+00:00",
+  "canva_originals_changed": false,
+  "inventory": [
+    {
+      "id": "DAHaiD9--pY",
+      "post": "01",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:45:53Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiJz7NmQ",
+      "post": "01",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:45:58Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiNCeUWE",
+      "post": "01",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:46:03Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajorAXmg",
+      "post": "01",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:32:11Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajrcD2GU",
+      "post": "01",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:32:16Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajp4nf6Q",
+      "post": "01",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:32:21Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajiCdMLs",
+      "post": "01",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:45:15Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajhQXGS0",
+      "post": "01",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:45:21Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajn7djic",
+      "post": "01",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:45:26Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajl-BGig",
+      "post": "01",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:36:52Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajr3ydI4",
+      "post": "01",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:36:53Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajm8xwuA",
+      "post": "01",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:36:53Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiMJBh9g",
+      "post": "02",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T23:23:50+00:00",
+      "picture_created_at": "2026-11-11T16:46:08Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiDDShZs",
+      "post": "02",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T23:23:00+00:00",
+      "picture_created_at": "2026-11-11T16:46:14Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiP2LCmM",
+      "post": "02",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:46:19Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHai_eitCA",
+      "post": "02",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:32:25Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai3nOSIc",
+      "post": "02",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:38:02Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai7lhwMk",
+      "post": "02",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:38:07Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHais2R8co",
+      "post": "02",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:45:30Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHailawSAs",
+      "post": "02",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:45:34Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaisNRcgo",
+      "post": "02",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:45:39Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHainfGaUM",
+      "post": "02",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:36:53Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiiM1NBQ",
+      "post": "02",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:36:55Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHairX-TNc",
+      "post": "02",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:36:53Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiDpGAvk",
+      "post": "03",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:46:24Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiMAu5xg",
+      "post": "03",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:46:29Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiJVO5JA",
+      "post": "03",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T22:18:10+00:00",
+      "picture_created_at": "2026-11-11T16:46:35Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiy-8QoI",
+      "post": "03",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:38:12Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai6X7who",
+      "post": "03",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:38:16Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai9nhLdA",
+      "post": "03",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:38:21Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaikZ8IT8",
+      "post": "03",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:51:46Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaipP_nnI",
+      "post": "03",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:51:52Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaijdOAw4",
+      "post": "03",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:51:58Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiq3AMXE",
+      "post": "03",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:37:00Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHairDgr8U",
+      "post": "03",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:37:00Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaimLrz1c",
+      "post": "03",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:37:00Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajnld4P8",
+      "post": "04",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:46:40Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiB8HX6U",
+      "post": "04",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:46:45Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajnUr3cQ",
+      "post": "04",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:46:51Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai4nSCtc",
+      "post": "04",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:42:22Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaixyeXHc",
+      "post": "04",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:42:26Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai6-QuJc",
+      "post": "04",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:42:31Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai6cDjm0",
+      "post": "04",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T22:23:14+00:00",
+      "picture_created_at": "2026-11-11T17:52:03Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai-86c4M",
+      "post": "04",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T22:17:21+00:00",
+      "picture_created_at": "2026-11-11T17:52:09Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai8-IvYU",
+      "post": "04",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T22:16:08+00:00",
+      "picture_created_at": "2026-11-11T17:52:13Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai-4B8c4",
+      "post": "04",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:37:00Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai8069Kw",
+      "post": "04",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:37:01Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaizbjnds",
+      "post": "04",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:37:03Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiG21XYo",
+      "post": "05",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:48:18Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiO4wVNo",
+      "post": "05",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:48:25Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiGv9z_Q",
+      "post": "05",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:48:30Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajUiIw2Q",
+      "post": "05",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:42:35Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajVsOsEo",
+      "post": "05",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:42:40Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajQkV5VE",
+      "post": "05",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:47:47Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbejgIA",
+      "post": "05",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:57:16Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajcp9yaU",
+      "post": "05",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:57:20Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajXFSS0A",
+      "post": "05",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:57:25Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajcQp6ss",
+      "post": "05",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:38:33Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajTKuMX0",
+      "post": "05",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:38:34Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbXl9HE",
+      "post": "05",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:38:34Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiMLESgI",
+      "post": "06",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:48:36Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiMaWfi8",
+      "post": "06",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:48:46Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiOHrw78",
+      "post": "06",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:48:53Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajcucDqk",
+      "post": "06",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:47:51Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajZZ_Mqk",
+      "post": "06",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:47:55Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajUM3gew",
+      "post": "06",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:47:59Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbFLb1Q",
+      "post": "06",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:59:33Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajXHipPI",
+      "post": "06",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T22:30:52+00:00",
+      "picture_created_at": "2026-11-11T17:59:37Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajVs2fAY",
+      "post": "06",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:59:42Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajU6sr6Q",
+      "post": "06",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:38:34Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajb3FU80",
+      "post": "06",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:38:34Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbzYi_s",
+      "post": "06",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:38:33Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiis6Oes",
+      "post": "07",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:49:00Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiuIZc90",
+      "post": "07",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:49:06Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaivcofGc",
+      "post": "07",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:49:13Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajQIheyY",
+      "post": "07",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:48:03Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajTqd5Q0",
+      "post": "07",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:52:16Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajUCtkqo",
+      "post": "07",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:52:20Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajXSEogs",
+      "post": "07",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:05:07Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajYKQ3Qs",
+      "post": "07",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:05:14Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaje2MuRY",
+      "post": "07",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:05:19Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajXJ2Mvc",
+      "post": "07",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:38:43Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajZZVMLA",
+      "post": "07",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:38:43Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajbB-0Y8",
+      "post": "07",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:38:43Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiCTqaP4",
+      "post": "08",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:49:19Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaj6QsuSo",
+      "post": "08",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:49:26Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajy6OfzA",
+      "post": "08",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:49:32Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajVwk5do",
+      "post": "08",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:52:24Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajapmW-s",
+      "post": "08",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:52:28Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajXJSMBw",
+      "post": "08",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:52:33Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajamXzuU",
+      "post": "08",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:11:27Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajV6B4RM",
+      "post": "08",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:11:33Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajfZU5kU",
+      "post": "08",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:11:38Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajaEyyZI",
+      "post": "08",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:38:43Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajUvHuB4",
+      "post": "08",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:38:43Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajcUiY5M",
+      "post": "08",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:38:43Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiIwqC6s",
+      "post": "09",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:51:02Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajw93TEU",
+      "post": "09",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:51:12Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj_wZiHs",
+      "post": "09",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:51:19Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajSs129g",
+      "post": "09",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:57:00Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajdjVFvY",
+      "post": "09",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:57:05Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajRDGV24",
+      "post": "09",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:57:09Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajf1k624",
+      "post": "09",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:17:57Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajWrjgaQ",
+      "post": "09",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T22:31:42+00:00",
+      "picture_created_at": "2026-11-11T18:18:01Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajYKDyhk",
+      "post": "09",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:18:05Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajY9oz8M",
+      "post": "09",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:40:09Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajU5VTZU",
+      "post": "09",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:40:09Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajSOi6ew",
+      "post": "09",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:40:09Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiV4gDaM",
+      "post": "10",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:51:26Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiT6G6yM",
+      "post": "10",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:51:40Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaifdIkc4",
+      "post": "10",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T22:19:56+00:00",
+      "picture_created_at": "2026-11-11T16:51:50Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbwLans",
+      "post": "10",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:57:14Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajfIz-W8",
+      "post": "10",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:57:19Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajQNJCoc",
+      "post": "10",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:57:23Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajYpfEFg",
+      "post": "10",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:20:01Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajdOBpi8",
+      "post": "10",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T22:43:03+00:00",
+      "picture_created_at": "2026-11-11T18:20:05Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbJp2c8",
+      "post": "10",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:20:10Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajSM5cjM",
+      "post": "10",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:40:09Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajZptH3g",
+      "post": "10",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:40:09Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajbB4fOU",
+      "post": "10",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:40:09Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaioSUYMI",
+      "post": "11",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:52:03Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaipLj51w",
+      "post": "11",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:52:13Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaivQ3NFU",
+      "post": "11",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:52:20Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajQXU1io",
+      "post": "11",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:59:34Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajaj1vhc",
+      "post": "11",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:59:39Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbS9R7Q",
+      "post": "11",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:59:43Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajWwvbpA",
+      "post": "11",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:22:23Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajZ0cjKA",
+      "post": "11",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:22:29Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajRKNENA",
+      "post": "11",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:22:34Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajWCzB1s",
+      "post": "11",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:40:17Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajXGjG_w",
+      "post": "11",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:40:16Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajQO1QD8",
+      "post": "11",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:40:17Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiUGeKFs",
+      "post": "12",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:52:28Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiWnWtOM",
+      "post": "12",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:52:39Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiSW92MI",
+      "post": "12",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:52:49Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajYMwyNQ",
+      "post": "12",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:59:47Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajTMvzso",
+      "post": "12",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:59:51Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajREkC8g",
+      "post": "12",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T15:59:54Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajStuUH0",
+      "post": "12",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:24:23Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajehX34o",
+      "post": "12",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T22:41:37+00:00",
+      "picture_created_at": "2026-11-11T18:24:27Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajYASqso",
+      "post": "12",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:24:32Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajY390Sc",
+      "post": "12",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:40:16Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajfqMQR0",
+      "post": "12",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:40:16Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajUjePbk",
+      "post": "12",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:40:19Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHairba2tY",
+      "post": "13",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:54:19Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaisuV2d0",
+      "post": "13",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:54:26Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiuflo7s",
+      "post": "13",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:54:33Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajXAkZ6c",
+      "post": "13",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:03:58Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajby3OWo",
+      "post": "13",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:04:02Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajWb9WpE",
+      "post": "13",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:04:07Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajW57ef8",
+      "post": "13",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:26:44Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajT0Bx00",
+      "post": "13",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:26:50Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajdW0Ikg",
+      "post": "13",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:26:56Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajUVmGuA",
+      "post": "13",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:41:48Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajTRdE7c",
+      "post": "13",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:41:49Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajd1E_34",
+      "post": "13",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:41:49Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaicSCoGs",
+      "post": "14",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:54:41Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaibsePz4",
+      "post": "14",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:54:55Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiUeCwww",
+      "post": "14",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:55:06Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajT-eGxs",
+      "post": "14",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:04:12Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajeR1f1E",
+      "post": "14",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:04:17Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajcUURIA",
+      "post": "14",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:04:24Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajRsy1eY",
+      "post": "14",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:39:48Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajeluz64",
+      "post": "14",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T22:33:09+00:00",
+      "picture_created_at": "2026-11-12T00:39:48Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajSb7j1g",
+      "post": "14",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:39:48Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajSllUk4",
+      "post": "14",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:41:49Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajQcpxug",
+      "post": "14",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:41:48Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajWsl0EM",
+      "post": "14",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:41:48Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHailHFTxM",
+      "post": "15",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:55:13Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiqDommM",
+      "post": "15",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:55:20Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaij16698",
+      "post": "15",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T16:55:26Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajahHK80",
+      "post": "15",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:08:51Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbxU5ho",
+      "post": "15",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:08:56Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajUItvXM",
+      "post": "15",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:09:00Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajTqGcSo",
+      "post": "15",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:39:49Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajUTPKQU",
+      "post": "15",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T22:37:29+00:00",
+      "picture_created_at": "2026-11-12T00:39:51Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajQhcjYY",
+      "post": "15",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:39:51Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajSid4kI",
+      "post": "15",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:41:57Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaja1fSm4",
+      "post": "15",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:41:57Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajalZ5I0",
+      "post": "15",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:41:57Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHaiOk55vE",
+      "post": "27",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:55:33Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj4W683s",
+      "post": "27",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:55:40Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajxZAXGE",
+      "post": "27",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:55:45Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai9LjMKQ",
+      "post": "27",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:09:05Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai0mKrKo",
+      "post": "27",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:09:09Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHai6z-QLU",
+      "post": "27",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:09:14Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiktOY8o",
+      "post": "27",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T22:12:47+00:00",
+      "picture_created_at": "2026-11-11T14:08:34Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaioTK4Mg",
+      "post": "27",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T14:41:52Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaip2dmXU",
+      "post": "27",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T14:06:47Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaihWqANo",
+      "post": "27",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:41:57Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiqX-IuA",
+      "post": "27",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:41:57Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiha6rsA",
+      "post": "27",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:41:57Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaiAdEHsU",
+      "post": "29",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:58:02Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj0a-9BI",
+      "post": "29",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:58:12Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajw7YRWc",
+      "post": "29",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:58:24Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajrx4H2A",
+      "post": "29",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:11:25Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajpeOJ8M",
+      "post": "29",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:11:30Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajnoPPcc",
+      "post": "29",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:11:34Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajuZw_lw",
+      "post": "29",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-10T22:58:07Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajnpvslQ",
+      "post": "29",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T22:41:58+00:00",
+      "picture_created_at": "2026-11-10T22:58:08Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajjYriro",
+      "post": "29",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-10T22:58:08Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajjgAsqA",
+      "post": "29",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:43:40Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajrV5fZo",
+      "post": "29",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:43:41Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajgifcAo",
+      "post": "29",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:43:40Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj4jYUNg",
+      "post": "16",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:58:34Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj9Na050",
+      "post": "16",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:58:46Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj9515Ow",
+      "post": "16",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:58:56Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajZGvijo",
+      "post": "16",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:11:39Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaje5TGps",
+      "post": "16",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:11:44Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajcpcxjw",
+      "post": "16",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:11:49Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajXgqHxE",
+      "post": "16",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:39:51Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajcIPkd8",
+      "post": "16",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:39:51Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajc0advQ",
+      "post": "16",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:39:53Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajdBgb1g",
+      "post": "16",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:43:40Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajehrJNs",
+      "post": "16",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": null,
+      "picture_created_at": "2026-11-11T18:43:40Z",
+      "status": "not_checked_in_folder"
+    },
+    {
+      "id": "DAHajUC_9yA",
+      "post": "16",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:43:40Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj1A6RHI",
+      "post": "17",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:59:08Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj3k0hmU",
+      "post": "17",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:59:20Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj4tvdsw",
+      "post": "17",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:59:32Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaja0JmjY",
+      "post": "17",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:18:06Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajcnn0Ok",
+      "post": "17",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:18:11Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajSGIvZc",
+      "post": "17",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:18:18Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajZiZWFU",
+      "post": "17",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:41:39Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajZhO7Us",
+      "post": "17",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:41:39Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajQLO4AU",
+      "post": "17",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:41:39Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajTAhJ6U",
+      "post": "17",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:43:48Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajd3r1EQ",
+      "post": "17",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:43:48Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajZS3TvE",
+      "post": "17",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:43:48Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajyIaY54",
+      "post": "18",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:16:17Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj1qjeUI",
+      "post": "18",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:16:22Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajwUykFA",
+      "post": "18",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:16:28Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbQZk6U",
+      "post": "18",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:18:25Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajT22lmA",
+      "post": "18",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:18:31Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajchzjKw",
+      "post": "18",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:18:38Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajUxHnMU",
+      "post": "18",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:41:39Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajRF4yRg",
+      "post": "18",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:41:42Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajQ5hDGM",
+      "post": "18",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:41:42Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajfo2v54",
+      "post": "18",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:43:48Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajUMZJOE",
+      "post": "18",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:43:48Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbgj_LM",
+      "post": "18",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:43:48Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajxOMsVU",
+      "post": "19",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:01:42Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj9iToSg",
+      "post": "19",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:01:49Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajxFnQHA",
+      "post": "19",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:01:55Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajXEyG7k",
+      "post": "19",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:21:09Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajVzP9YM",
+      "post": "19",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:21:17Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbSO284",
+      "post": "19",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:21:25Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajUZ16FE",
+      "post": "19",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:41:43Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajTrdeCY",
+      "post": "19",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:41:42Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajSwqu9c",
+      "post": "19",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:41:45Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajd07CwQ",
+      "post": "19",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:45:24Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbjq94Q",
+      "post": "19",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:45:24Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajdHrl74",
+      "post": "19",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:45:24Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajzG1SHE",
+      "post": "20",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:02:03Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajyLHih0",
+      "post": "20",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:02:10Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj-8CfQM",
+      "post": "20",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:02:17Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajTF-4qM",
+      "post": "20",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:21:30Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaje1J_Y8",
+      "post": "20",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:21:37Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajaFIeHY",
+      "post": "20",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:21:45Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajcV5UTA",
+      "post": "20",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:43:21Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajTImWjI",
+      "post": "20",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:43:21Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajWzrW3o",
+      "post": "20",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:43:21Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajdv4SiM",
+      "post": "20",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:45:24Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajUohVLw",
+      "post": "20",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:45:24Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajbNkN-c",
+      "post": "20",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:45:24Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajzFMGhU",
+      "post": "21",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:02:26Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj0VZXws",
+      "post": "21",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:02:33Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj2Bqkv4",
+      "post": "21",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:02:42Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajfYZ45s",
+      "post": "21",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:23:10Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajcgPF60",
+      "post": "21",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:23:17Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajZv5Moo",
+      "post": "21",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:23:25Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajeB-ivQ",
+      "post": "21",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:43:21Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajdzhGjI",
+      "post": "21",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:43:23Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajX5HZEY",
+      "post": "21",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:43:23Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajSz2e10",
+      "post": "21",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:45:30Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajfrnWWA",
+      "post": "21",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:45:30Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajUaJaz8",
+      "post": "21",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:45:30Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj-6FGvw",
+      "post": "22",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:02:54Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj7fOyW8",
+      "post": "22",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:03:04Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj-jYO00",
+      "post": "22",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:03:14Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajXTK5IQ",
+      "post": "22",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:29:54Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajdpoVI8",
+      "post": "22",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:30:05Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajaLK4_I",
+      "post": "22",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:30:13Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajampqzE",
+      "post": "22",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:43:23Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHaje9UJAQ",
+      "post": "22",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:43:23Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajRBQO5k",
+      "post": "22",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:43:25Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajeJwoO4",
+      "post": "22",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:45:30Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajU5zWj0",
+      "post": "22",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:45:30Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajV5nYQQ",
+      "post": "22",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:45:30Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj07k0l0",
+      "post": "23",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:15:42Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj_LkY-0",
+      "post": "23",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:15:46Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj286k0Y",
+      "post": "23",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:15:52Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajZqOkbc",
+      "post": "23",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:30:22Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajQYoZgs",
+      "post": "23",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:30:29Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajS2C1c0",
+      "post": "23",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:30:39Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajV1uBDQ",
+      "post": "23",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:44:56Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajf3o_WQ",
+      "post": "23",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:44:56Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajQ8xO1c",
+      "post": "23",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:44:56Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajfJQNc4",
+      "post": "23",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:47:20Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajR3Hf3A",
+      "post": "23",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:47:20Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajYWR9sE",
+      "post": "23",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:47:20Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj9A8fiY",
+      "post": "24",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:05:26Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajyddp58",
+      "post": "24",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:05:36Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj82g6Wk",
+      "post": "24",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:05:47Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajUkMMoQ",
+      "post": "24",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:32:21Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajYrJKFc",
+      "post": "24",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:32:45Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajRo0-Ws",
+      "post": "24",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:32:52Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajTKBrrw",
+      "post": "24",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:44:56Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajWmCId8",
+      "post": "24",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:44:59Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajfBv_Wg",
+      "post": "24",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:44:59Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajZvajLM",
+      "post": "24",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:47:20Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajU7mi0o",
+      "post": "24",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:47:20Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajY6HqBo",
+      "post": "24",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T18:47:20Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj0EBhno",
+      "post": "25",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:15:57Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajyrHbug",
+      "post": "25",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:16:03Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj9EozUk",
+      "post": "25",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:16:11Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajcA98bg",
+      "post": "25",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:32:58Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajTFVMAI",
+      "post": "25",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:33:05Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajU4mWq8",
+      "post": "25",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:33:13Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajWQuDVo",
+      "post": "25",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:44:59Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajWW8cjw",
+      "post": "25",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:44:59Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajUfnBio",
+      "post": "25",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:45:02Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajaBdnlg",
+      "post": "25",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:06:31Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajYnitbc",
+      "post": "25",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:06:32Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajXnI0ts",
+      "post": "25",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:06:34Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHaj5cbhTU",
+      "post": "28",
+      "mode": "light",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:06:14Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj3IqGMM",
+      "post": "28",
+      "mode": "light",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:06:20Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHaj_H8Zhc",
+      "post": "28",
+      "mode": "light",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T17:06:27Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajXIAuXQ",
+      "post": "28",
+      "mode": "set2",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:33:48Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajVcxO0U",
+      "post": "28",
+      "mode": "set2",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:33:58Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajQ20e7E",
+      "post": "28",
+      "mode": "set2",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-11T16:34:05Z",
+      "status": "needs_refresh"
+    },
+    {
+      "id": "DAHajcBgkDM",
+      "post": "28",
+      "mode": "set3",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:46:32Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajYCcEXU",
+      "post": "28",
+      "mode": "set3",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:46:32Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajc-daLQ",
+      "post": "28",
+      "mode": "set3",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:46:32Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajXDbhb8",
+      "post": "28",
+      "mode": "set4",
+      "height": 1350,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:06:35Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajQZ11KU",
+      "post": "28",
+      "mode": "set4",
+      "height": 1080,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:06:37Z",
+      "status": "export_after_save"
+    },
+    {
+      "id": "DAHajcltAMQ",
+      "post": "28",
+      "mode": "set4",
+      "height": 1920,
+      "canva_updated_at": "2026-11-11T21:39:30+00:00",
+      "picture_created_at": "2026-11-12T00:06:38Z",
+      "status": "export_after_save"
+    }
+  ],
+  "folder_records_checked": 500,
+  "refreshed": [
+    {
+      "id": "DAHajRsy1eY",
+      "post": "14",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "d865d9b3dbabbcde440b380a82984bf2681eba1f00d3ef21b4d00c4b2e7a00da",
+      "url": "/__l5e/assets-v1/a6d22882-e2e2-4826-a7f0-4e9508025877/DAHajRsy1eY-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajeluz64",
+      "post": "14",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "703ee0df4f4573f2c7d0a48ff7df50e138245541b842150d7747466a64c77a57",
+      "url": "/__l5e/assets-v1/9df72c64-be5a-4c8a-bb8c-1bfbf055741a/DAHajeluz64-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajSb7j1g",
+      "post": "14",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "622bf1e3e05259ae0212d87c423a251b709cce4fc79720fe5805f89acba68b64",
+      "url": "/__l5e/assets-v1/7edfc810-4b09-46be-9d2f-ceaf6cea090e/DAHajSb7j1g-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajTqGcSo",
+      "post": "15",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "b8d96551686321d158f864a0394e337a2ccdb3e8a3914952ab36633f3fe8cdf1",
+      "url": "/__l5e/assets-v1/aa101830-dae0-455e-a67c-2056b95d7dd6/DAHajTqGcSo-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajUTPKQU",
+      "post": "15",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "99d53f63068cf8e6f4a135290faa451544651e1683a356e65bf4f2c65333c046",
+      "url": "/__l5e/assets-v1/8c8d3890-b649-46bd-a206-16b1ef85d0a0/DAHajUTPKQU-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajQhcjYY",
+      "post": "15",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "eeea0c55a57825b78a5295686b37ef707238e7fd55f13e02163edef9102f19ae",
+      "url": "/__l5e/assets-v1/64209498-de53-4c6a-81f1-1a3002bd0cb4/DAHajQhcjYY-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajXgqHxE",
+      "post": "16",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "ac06b0f7d0bf30bf85087bd9e6b0746dd25abc91f491ec31da8c4550bc930f74",
+      "url": "/__l5e/assets-v1/deaff95f-a768-41cb-93f3-c884d0e964bc/DAHajXgqHxE-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajcIPkd8",
+      "post": "16",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "a83e194065395590667d53757e9bdddc9f8201478ea0edd530ca76a4075f0730",
+      "url": "/__l5e/assets-v1/5dad4be0-565c-425f-a75b-2940b523870b/DAHajcIPkd8-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajc0advQ",
+      "post": "16",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "7ed10ac73b742d8c587bf8c7c86d67357ea3c5e325c3ca3c4f9a47ea2b61cd80",
+      "url": "/__l5e/assets-v1/8325b288-fa3e-40bd-ae1b-850dfba9da95/DAHajc0advQ-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajZiZWFU",
+      "post": "17",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "e4be25b6bc3b73c3b4e44a3b9859d0ca2d204c8ea802a8a8e9a4fb66fc531236",
+      "url": "/__l5e/assets-v1/f06c96a2-6ce3-4dcd-93b5-a4c55a6b4dff/DAHajZiZWFU-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajZhO7Us",
+      "post": "17",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "096b54b434ed247f275f1d3f2f0bc9b0f21833bc03b8581f2761fd08bb443b9a",
+      "url": "/__l5e/assets-v1/7e356f47-7cfd-46af-958b-06c2fcb29d29/DAHajZhO7Us-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajQLO4AU",
+      "post": "17",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "fe92a217868673ce9470c9d35ef78023fccc852260df6cba6721f3d2e7363ca6",
+      "url": "/__l5e/assets-v1/4781f661-2b71-4ed0-8c18-2cc7f5857495/DAHajQLO4AU-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajUxHnMU",
+      "post": "18",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "ae54000ca72f284309f250c144e0c5fc56dae1f2969292a3a37f15fbfe6b9f62",
+      "url": "/__l5e/assets-v1/ff8c4b3c-4873-4554-ac42-71dbeff080d0/DAHajUxHnMU-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajRF4yRg",
+      "post": "18",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "11abf70b5b0da0c10abe210a6473469053e7ed4946584a3a5becb54c8a0436b1",
+      "url": "/__l5e/assets-v1/4f0f9cea-903c-46db-8bdf-07dfee5536e3/DAHajRF4yRg-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajQ5hDGM",
+      "post": "18",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "0e4f370e4c27ff7d7c9374b5f6890837d23930e635e79d524d09f6fea98cb582",
+      "url": "/__l5e/assets-v1/c5eb0d07-b352-4f68-9179-9bd07c2e5555/DAHajQ5hDGM-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajUZ16FE",
+      "post": "19",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "0b567979b3d3b3f63177316ba11396b286efa595eef74015869575a8023cc102",
+      "url": "/__l5e/assets-v1/a2e37a61-fa50-4d35-b6fb-8ed0cc244a52/DAHajUZ16FE-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajTrdeCY",
+      "post": "19",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "ebe192a2165319735579122bbb6fdf90a74e7acc729db8f3ea8491a757727767",
+      "url": "/__l5e/assets-v1/8c76913a-0c3b-4697-a232-06a64c34ecea/DAHajTrdeCY-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajSwqu9c",
+      "post": "19",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "fcd9cbfde6329e8882f3011f64a84c23c881766ec5ec4fa02cff9852540b5924",
+      "url": "/__l5e/assets-v1/ce791867-54b0-4983-9942-f905f26d09dc/DAHajSwqu9c-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajcV5UTA",
+      "post": "20",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "9d91614df8e477d00a3ed0d0770215fe409707b79cece34e1fef1ad428a3299f",
+      "url": "/__l5e/assets-v1/9f6562be-7cf7-46d6-b0db-a8cbd9af0a1b/DAHajcV5UTA-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajTImWjI",
+      "post": "20",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "8035a082da7379c2da51326fc61c3bb8c6a951959f1fbc0cf328c008f47c1eb1",
+      "url": "/__l5e/assets-v1/86f1f505-783c-46e1-a4a9-f63caf8bd1db/DAHajTImWjI-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajWzrW3o",
+      "post": "20",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "e1a6702d8073f378404309aa5dbd0dee92b2c08391bdc0be8fecb28813eec71f",
+      "url": "/__l5e/assets-v1/96d791b7-852f-4257-8898-7600a0f8206f/DAHajWzrW3o-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajeB-ivQ",
+      "post": "21",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "4fbb417f526ea7554f798ecbc3aa694220f87be5ea53a47f1c05811490e60a3e",
+      "url": "/__l5e/assets-v1/7de70ab8-a316-4c11-8038-44b032aa8e31/DAHajeB-ivQ-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajdzhGjI",
+      "post": "21",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "d65e9c70cd0362126879d3604b40852ec8c16c9b6a0137dd27aaa5dcca92c057",
+      "url": "/__l5e/assets-v1/c81598e8-602b-4101-a8ea-23f29c3d4b7e/DAHajdzhGjI-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajX5HZEY",
+      "post": "21",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "b638a4d6e74e525d6f11d930abab6922b0557b5cacb616f9ea380802b3fd6fd1",
+      "url": "/__l5e/assets-v1/f10138d3-071c-4c74-b3c8-b1b49dd80dad/DAHajX5HZEY-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajampqzE",
+      "post": "22",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "9b64dc2dea6482eccfca9a4e7b41d117b34de959f7e5895223153e9ecfcab940",
+      "url": "/__l5e/assets-v1/d0904556-02a1-4652-9f14-ec14b872deb5/DAHajampqzE-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHaje9UJAQ",
+      "post": "22",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "cbfc2005f80cbe3d6ff9fa14fdc895ccca103fd29f2952b7214ae715798efa6f",
+      "url": "/__l5e/assets-v1/717f170a-c42c-4702-8735-42c20e115c57/DAHaje9UJAQ-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajRBQO5k",
+      "post": "22",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "aad27570417949c3aa6e2450ca5b3c6a38217fdc800d89ab80ddfbd11c525e37",
+      "url": "/__l5e/assets-v1/9069135d-5731-4378-aefb-35b27a37f325/DAHajRBQO5k-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajV1uBDQ",
+      "post": "23",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "c0ce4ab5a7a1d21730866cbed4cb0329beb245c6ad4bed00cb36bee791e81c35",
+      "url": "/__l5e/assets-v1/92174583-0305-463a-98b3-ac1ace429831/DAHajV1uBDQ-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajf3o_WQ",
+      "post": "23",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "c1bf6a8ac52ed497aeae45d5a4d412eb5d8933dc75fe07ef7ab7af2967a30697",
+      "url": "/__l5e/assets-v1/f1aebbd2-f636-4aef-b8fb-b9f5d420325d/DAHajf3o_WQ-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajQ8xO1c",
+      "post": "23",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "d65cbec4f2e7c1a60c1638cd5de0a44d1d23b9f4337bc7464f8a3091f375bac2",
+      "url": "/__l5e/assets-v1/bf9dc131-154b-4c9f-a42a-6268c983ed07/DAHajQ8xO1c-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajTKBrrw",
+      "post": "24",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "75497e01e2bea7b7cfc5c494a600656372b2a37b81c28465a51c1171ac040471",
+      "url": "/__l5e/assets-v1/dd674449-b950-4a90-a1c7-7b674f537c81/DAHajTKBrrw-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajWmCId8",
+      "post": "24",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "bd2677d1c56e69ca00c31d8ada2ca6d2dc26bdeba48a140a0118adecd10801fe",
+      "url": "/__l5e/assets-v1/dde9899c-e1ad-4d55-a103-4925554042c5/DAHajWmCId8-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajfBv_Wg",
+      "post": "24",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "1328a6f03ff9b1c3fc51603c8a126ed4859f1087bd00721f93ab3bb531a35b02",
+      "url": "/__l5e/assets-v1/71c46a4a-67ca-449e-a083-57c76c5f66e7/DAHajfBv_Wg-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajWQuDVo",
+      "post": "25",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "4a4a146b5e95af801c6b2a85af3cb6986c668ec69bf6e3317aff6307a47132ed",
+      "url": "/__l5e/assets-v1/37f44ade-0a3a-46d3-8283-9da77981df5b/DAHajWQuDVo-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajWW8cjw",
+      "post": "25",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "0a37e3b19d262c05079580035b030227fdd748ca854b724a48fe317240f71d8d",
+      "url": "/__l5e/assets-v1/c114df62-5fbb-4ecf-8127-2633dd913733/DAHajWW8cjw-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajUfnBio",
+      "post": "25",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "46373dabc99522cb69f4c911c47cd30e3e28a511133ce8c68b04e1c9d27c7873",
+      "url": "/__l5e/assets-v1/d9534a12-e2a7-43df-ab3e-30fd5faac378/DAHajUfnBio-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajcBgkDM",
+      "post": "28",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "17d97a2e16fdcc524197296b1cc689e959dfb44a472a5c4313479d0ad163c816",
+      "url": "/__l5e/assets-v1/154ef9b4-ed08-4867-857e-d1170f4bd856/DAHajcBgkDM-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajYCcEXU",
+      "post": "28",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "12ecf877c581de0ac9f5a345bbf0e2ef9a49e618a4e340397ff9c81097d04cc7",
+      "url": "/__l5e/assets-v1/82019b78-e55e-48ea-b3d2-9af11302824a/DAHajYCcEXU-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHajc-daLQ",
+      "post": "28",
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "e2dc2e85270fdfd518cf8008289d03366db417c810f2ceedda450000122746ad",
+      "url": "/__l5e/assets-v1/99bc8f9a-2e5d-49d8-beb1-0634a5418543/DAHajc-daLQ-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap8_EjYI",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "933c939178e9981137dc60dd8ec14fe709a42ebf7bd291c19f8a2acefec06f6a",
+      "url": "/__l5e/assets-v1/0ec0c483-013f-46ff-acef-aeec8bbff41b/DAHap8_EjYI-page-1-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap8_EjYI",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 2,
+      "pixels_unchanged": true,
+      "sha256": "b9281c908b8d1fafeb48bed5c032863ffb5f730671e25fbddb87b043cfafe6e1",
+      "url": "/__l5e/assets-v1/22648a0e-db08-43b5-82f0-b88cbbad7f45/DAHap8_EjYI-page-2-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap8_EjYI",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 3,
+      "pixels_unchanged": true,
+      "sha256": "be5a2896d4fb6ab36b78cef637a511a43654b7877936a830003d535862615e2f",
+      "url": "/__l5e/assets-v1/c7e50da2-904d-4dce-86ea-8882be306a16/DAHap8_EjYI-page-3-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap8_EjYI",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 4,
+      "pixels_unchanged": true,
+      "sha256": "baec8f9203ead9228052d1d8e30e9a274d3b2d163dd137e8461a4ebca94cc731",
+      "url": "/__l5e/assets-v1/183daf7a-0c7c-4b27-b36b-d15c706eb36a/DAHap8_EjYI-page-4-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap86Y_U4",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "ccbda2647f0baed80b8e00718b0731a10bf91b92517b8405da92d2404b23d77b",
+      "url": "/__l5e/assets-v1/fe234f40-932d-4951-b5f7-8729c99f9ad4/DAHap86Y_U4-page-1-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap86Y_U4",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 2,
+      "pixels_unchanged": true,
+      "sha256": "6a2d6a470c15232ee9365b21803886698d2414bf38e52ef3d8319e2ce19be13f",
+      "url": "/__l5e/assets-v1/a12beb5e-94d7-409e-aeb3-5970423bdd94/DAHap86Y_U4-page-2-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap86Y_U4",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 3,
+      "pixels_unchanged": true,
+      "sha256": "2dc13fb1027d271de4a7190a697f98ed14da44ab16a9899ae3f51f0801dcf73d",
+      "url": "/__l5e/assets-v1/270c2763-c7cd-477f-ba1d-862022513727/DAHap86Y_U4-page-3-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap86Y_U4",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 4,
+      "pixels_unchanged": true,
+      "sha256": "bde68c049325be338e900544aae4539e4ec80bbb4f558b43915f19a96d19fa2b",
+      "url": "/__l5e/assets-v1/b1bef413-2e66-4b07-b19e-861f092a056c/DAHap86Y_U4-page-4-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap62e81g",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "ced466ed4efb01853c035404a6e1cfd501fab301ee0e05ccde422474e2a191b8",
+      "url": "/__l5e/assets-v1/a0470c5f-c084-48b8-b97b-5752d0ed2b44/DAHap62e81g-page-1-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap62e81g",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 2,
+      "pixels_unchanged": true,
+      "sha256": "9f3e31cce69ba202402a5863cbc35b0168d2911703d353724f7bded8ed983bd3",
+      "url": "/__l5e/assets-v1/88aeb8ad-c75c-493f-9794-6b174119ec71/DAHap62e81g-page-2-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap62e81g",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 3,
+      "pixels_unchanged": true,
+      "sha256": "a3dd1c1190249c4a67d78b0ea9dcc37a3f5a45b1dc4debf206f058138d34c863",
+      "url": "/__l5e/assets-v1/84e5da79-0fc7-4be0-8781-c38fb6262745/DAHap62e81g-page-3-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap62e81g",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 4,
+      "pixels_unchanged": true,
+      "sha256": "1710f77bb88dce948065352eca62cdc943eb85c644a14e4aa68ea690bcc80204",
+      "url": "/__l5e/assets-v1/d504d87e-e0ea-4e5d-82de-e24bce18a2a8/DAHap62e81g-page-4-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap7JEwYw",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "fc5bca912cda32063a21b011e52d4067dc3613ea1fe6e80e4fee24d9b92a9114",
+      "url": "/__l5e/assets-v1/c7371f96-a82d-488d-9924-3882db8905af/DAHap7JEwYw-page-1-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap7JEwYw",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 2,
+      "pixels_unchanged": true,
+      "sha256": "8c03e5d956ab5df34ac2284e2282d0e04afe1eee6246528d985b95e47f9bae29",
+      "url": "/__l5e/assets-v1/f8df8705-2bfe-4dbb-a09d-d3b0f7b254cd/DAHap7JEwYw-page-2-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap7JEwYw",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 3,
+      "pixels_unchanged": true,
+      "sha256": "1b5833d9c15635e01a72f643d48c8439c4ebec54c280cba4e5649445b1a0b5f7",
+      "url": "/__l5e/assets-v1/cb8b9b48-aae2-48a8-b982-8bd705cec379/DAHap7JEwYw-page-3-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap7JEwYw",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 4,
+      "pixels_unchanged": true,
+      "sha256": "b10f50f22e95fa600130dd99d03a4486c0606af2e772aeb3e565473598a5a458",
+      "url": "/__l5e/assets-v1/b89285b9-dce4-4546-b7bb-b8634eb592be/DAHap7JEwYw-page-4-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap2bO26E",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "287a7f4ff799eae16167e25aac12eac853dde244c0f8fe775226400772870022",
+      "url": "/__l5e/assets-v1/84f70fdd-e691-45dc-983c-7c343ff0902d/DAHap2bO26E-page-1-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap2bO26E",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 2,
+      "pixels_unchanged": true,
+      "sha256": "35b4b702daf8b1181eb67e6ac2f67887b87cead91f0ce014e7d7b1c9bd2960ab",
+      "url": "/__l5e/assets-v1/f8518cf3-ffea-46ff-827e-330f2f7a1045/DAHap2bO26E-page-2-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap2bO26E",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 3,
+      "pixels_unchanged": true,
+      "sha256": "f384d1f96b0c9d1d5e991d1dcc4ae39d33f75b22b7e40e8308fac5569d803e2c",
+      "url": "/__l5e/assets-v1/2fe68078-899c-4df8-b30a-abb146284377/DAHap2bO26E-page-3-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap2bO26E",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 4,
+      "pixels_unchanged": true,
+      "sha256": "80b08a5cd1f3217a7bc92d358b6014fd5e2854bbc20cdff604276f082adc8975",
+      "url": "/__l5e/assets-v1/fe4ddb12-b414-4447-a357-2adb8a12f54f/DAHap2bO26E-page-4-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap-lVAPM",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "082301b08ed2a01d633f41da952ec15722c6ab256ca4dcaa0f64fbb08cb949d0",
+      "url": "/__l5e/assets-v1/00b222d9-ed67-4cb7-8a5b-6ebafe46550e/DAHap-lVAPM-page-1-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap-lVAPM",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 2,
+      "pixels_unchanged": true,
+      "sha256": "6cf790f1db8b14239bddc585f235eef13140af72e58d15fc48153e9dbb314780",
+      "url": "/__l5e/assets-v1/cfd973a0-e938-4b75-b4fc-cf61f0d4bad0/DAHap-lVAPM-page-2-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap-lVAPM",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 3,
+      "pixels_unchanged": true,
+      "sha256": "9cea7f1a76f3fa3c9b05d6cfeae5f4e8c781a258d3bc82e8cec826643d40316e",
+      "url": "/__l5e/assets-v1/82df3626-9b6b-41cb-8208-05edb5b1c552/DAHap-lVAPM-page-3-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap-lVAPM",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 4,
+      "pixels_unchanged": true,
+      "sha256": "3fc276a9c576a28cd167a7a92bdbe2c05a3aea293d88082449a5778d181e71c5",
+      "url": "/__l5e/assets-v1/d765d811-53a8-4a1a-9fa1-b37b7c2d65d7/DAHap-lVAPM-page-4-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap6vptvI",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "c38b81cbfbf97688174742e234991570bbd43938cb216438c9d7e5feaf1aac84",
+      "url": "/__l5e/assets-v1/7194599b-77ea-4c58-bcd8-01467f4bdfa8/DAHap6vptvI-page-1-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap6vptvI",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 2,
+      "pixels_unchanged": true,
+      "sha256": "74f62c768e289cca878189e2e5e1189332aa7041b925f77795427daf8a266524",
+      "url": "/__l5e/assets-v1/b030e268-4668-40f3-b08c-de4b81f21ba5/DAHap6vptvI-page-2-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap6vptvI",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 3,
+      "pixels_unchanged": true,
+      "sha256": "da1dece2db7403e9548da1a7df0694b385f72d77143a3f168caddca7238cc06d",
+      "url": "/__l5e/assets-v1/2458c4f1-a50f-4654-beb4-8ca80c0d8c78/DAHap6vptvI-page-3-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap6vptvI",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1350,
+      "page": 4,
+      "pixels_unchanged": true,
+      "sha256": "045109f55c45cd02d2912c99ff331cfc91cc6431ce93dd97aa39571e2cf6c9f4",
+      "url": "/__l5e/assets-v1/969df795-591b-45f9-af03-f7439a603bd4/DAHap6vptvI-page-4-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap5TI2vo",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "b4ddcda0e06c0744fdcbae575101a69340526f531a18df1faf851a20ae2cefbf",
+      "url": "/__l5e/assets-v1/9e9732f6-6b9d-4b3b-8113-b20c73a465af/DAHap5TI2vo-page-1-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap5TI2vo",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 2,
+      "pixels_unchanged": true,
+      "sha256": "538fc3409fe00ac9d9710f4375f9ad904d50a6619a58dd2b4172c560b65cca68",
+      "url": "/__l5e/assets-v1/68ab790e-2bb2-4fb2-bc19-d6cc0358574e/DAHap5TI2vo-page-2-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap5TI2vo",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 3,
+      "pixels_unchanged": true,
+      "sha256": "22ecb75830ce73ea5726727f20a144b4daed04f4c546c76388949576cc7f0b19",
+      "url": "/__l5e/assets-v1/60633f56-ab53-4670-a370-7f27b4ae53fe/DAHap5TI2vo-page-3-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap5TI2vo",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1080,
+      "page": 4,
+      "pixels_unchanged": true,
+      "sha256": "dd1f86da86fe8c5e6832f55a195e1e5e6c4a5ae0b1d31f86092eddf48f2eef4b",
+      "url": "/__l5e/assets-v1/e56d5e89-49cf-4331-a3f6-0e05494d4517/DAHap5TI2vo-page-4-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap9Nqgk8",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "3a0f82a4bea8355c122892d260850040c5b45fada911aa570520e92bc6bf590e",
+      "url": "/__l5e/assets-v1/5e9beb0e-cfab-4cb3-96bb-3e4447f6a537/DAHap9Nqgk8-page-1-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap9Nqgk8",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 2,
+      "pixels_unchanged": true,
+      "sha256": "0e295acb0774f26c75e0909b638c798912a26022d430302ec0abae627a61978a",
+      "url": "/__l5e/assets-v1/3b977c18-56a7-4f0c-942b-1cab0da70cd9/DAHap9Nqgk8-page-2-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap9Nqgk8",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 3,
+      "pixels_unchanged": true,
+      "sha256": "9b1b2bb343d7384fb03bdf2d864d3d66009e944d7d0afcfdc35ce628760ea21d",
+      "url": "/__l5e/assets-v1/a15ff007-677d-4134-b1eb-002dfe2e4e42/DAHap9Nqgk8-page-3-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHap9Nqgk8",
+      "post": null,
+      "mode": "set3",
+      "w": 1080,
+      "h": 1920,
+      "page": 4,
+      "pixels_unchanged": true,
+      "sha256": "1efc1b091d50ad2cd6e94b31e5f07ed4e5befc028d6ff049b1bd6813d2f14c1c",
+      "url": "/__l5e/assets-v1/dfba721e-b8c0-43b7-b4e6-542e617217d9/DAHap9Nqgk8-page-4-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapoW79Is",
+      "post": null,
+      "mode": "light",
+      "w": 1200,
+      "h": 628,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "80d746de032ee3a1cb99e6044ab2f365a41db1365501300ce491680eeccf1d17",
+      "url": "/__l5e/assets-v1/386d5f0b-65b0-443e-86b5-4a5a4a5de20e/DAHapoW79Is-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapvyMJX8",
+      "post": null,
+      "mode": "set2",
+      "w": 1200,
+      "h": 628,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "927fe4d80b61c803f01673dffbcbd1d2b3dcb8ae819fed7bdf77e626fe1f0d9d",
+      "url": "/__l5e/assets-v1/e0759582-aa73-46b0-af7b-69f195520930/DAHapvyMJX8-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHaph43pxU",
+      "post": null,
+      "mode": "set3",
+      "w": 1200,
+      "h": 628,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "528419550e9c7ee9bb9e3d129a01534ce82abb25fa0c65ffdf32b8418b2be043",
+      "url": "/__l5e/assets-v1/dafdce17-4b7b-44c9-ac64-898508e4326f/DAHaph43pxU-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHaptZPt0U",
+      "post": null,
+      "mode": "set4",
+      "w": 1200,
+      "h": 628,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "f0512173b22f26c36bcd66b13cf37825d3ee8b5d29e573361b18c3f6f40b1287",
+      "url": "/__l5e/assets-v1/7bf6f08a-e3c8-4c77-be0b-8f25e3dbb1b4/DAHaptZPt0U-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapkpjnYQ",
+      "post": null,
+      "mode": "light",
+      "w": 160,
+      "h": 600,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "adddf9aa649c9e88219a3b75b04b9207563174ede78ab8ceefadf718674f1ee7",
+      "url": "/__l5e/assets-v1/a87da20c-5dfc-44e9-8ef2-923e0525c0d5/DAHapkpjnYQ-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapr1b7XI",
+      "post": null,
+      "mode": "set2",
+      "w": 160,
+      "h": 600,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "633deeed8b8264113f897f5cccc39d6d52ab3e96eeaaca09616e49e638c8c942",
+      "url": "/__l5e/assets-v1/d7f76e97-1196-4d21-823f-bb22eff9d784/DAHapr1b7XI-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapgWkCuc",
+      "post": null,
+      "mode": "set3",
+      "w": 160,
+      "h": 600,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "40913be8b38e66b5156642eb5eb8dd5d3dd73af751428ad3f3872fb0828e3219",
+      "url": "/__l5e/assets-v1/84464a45-363a-43c4-bf9a-3117db51a0e9/DAHapgWkCuc-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapgfUC3Y",
+      "post": null,
+      "mode": "set4",
+      "w": 160,
+      "h": 600,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "8f56fb345c82df86c19a5176225af30b08a023f54fac01e4ea0d5c1b72a932a3",
+      "url": "/__l5e/assets-v1/ffca74c7-a610-45a0-808f-604170071057/DAHapgfUC3Y-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapseVRhk",
+      "post": null,
+      "mode": "light",
+      "w": 600,
+      "h": 160,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "b1e800886666534376326089a470d6f5c1be89048b74b534cac24d8159de6cd4",
+      "url": "/__l5e/assets-v1/e53dc954-cd38-4938-9514-2ec51b1eaa7d/DAHapseVRhk-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapsDxSxI",
+      "post": null,
+      "mode": "set2",
+      "w": 600,
+      "h": 160,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "1ba369d0836186da899ace173fb8d2409ba77c051daa7a51a33c964905f1615e",
+      "url": "/__l5e/assets-v1/6e12b81b-bafb-40dd-a63f-1e00b3d02732/DAHapsDxSxI-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapt74JkQ",
+      "post": null,
+      "mode": "set3",
+      "w": 600,
+      "h": 160,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "fae5665fbc3f504ed026799470601af8137037609aeb1fd70bd80c33089b94cd",
+      "url": "/__l5e/assets-v1/6d82af4c-d640-4c19-80a1-0d79dad481e8/DAHapt74JkQ-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapozapBk",
+      "post": null,
+      "mode": "set4",
+      "w": 600,
+      "h": 160,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "9085c1d7e5f9fc0db173c295a5323a90ddbaf9d12f3b9f17bde89fd2e67bb0de",
+      "url": "/__l5e/assets-v1/2cb47519-007d-496f-b80e-feffa93c4158/DAHapozapBk-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapnbmQo0",
+      "post": null,
+      "mode": "light",
+      "w": 300,
+      "h": 250,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "d72877e48772eb708bf955469fb407dfae908b6e395f1a68aca95733b80982e7",
+      "url": "/__l5e/assets-v1/0426d142-a271-459b-9307-8df627918f83/DAHapnbmQo0-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapsNNY64",
+      "post": null,
+      "mode": "set2",
+      "w": 300,
+      "h": 250,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "58f60951d5cf15c80d7353d5099a75c6cafd6beea5ebeb438beaad78e2773ce5",
+      "url": "/__l5e/assets-v1/60718f85-6f24-4474-a0eb-943345deaf60/DAHapsNNY64-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHapgUApjE",
+      "post": null,
+      "mode": "set3",
+      "w": 300,
+      "h": 250,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "1d64ce71e8e93d78434542c8a10bf004611e490c9d4979acc630df174b3505b1",
+      "url": "/__l5e/assets-v1/4342a493-17e8-461e-b7fa-028b7a551db4/DAHapgUApjE-saved-20261112.jpg"
+    },
+    {
+      "id": "DAHaptQXyY4",
+      "post": null,
+      "mode": "set4",
+      "w": 300,
+      "h": 250,
+      "kind": "advertising",
+      "page": 1,
+      "pixels_unchanged": true,
+      "sha256": "4fcb88b5793b54afaa4ba170dd818841afbf1f4435edb8130e64c5e6056d3bb0",
+      "url": "/__l5e/assets-v1/cd4a8954-e2b5-4053-a0d4-bc0ed00888eb/DAHaptQXyY4-saved-20261112.jpg"
+    }
+  ],
+  "remaining": {
+    "advertising_pictures": 60,
+    "calendar_sequence_files_without_exports": 114,
+    "single_audit_incomplete": 291
+  },
+  "audit_notes": [
+    "Export dates and available Canva saved timestamps checked; export time alone is not pixel-equivalence certification.",
+    "Set 3 post 15 square export has no visible matchup headline; saved original preserved, needs designer review.",
+    "Light 300x250 saved adaptation has shield/headline overlap; original preserved, needs designer review.",
+    "Set 3 Feed/Square remain left-aligned while Story is centered; no live layout changes made.",
+    "Folder pagination not yet completed; unchecked originals remain explicitly unverified."
+  ]
+}

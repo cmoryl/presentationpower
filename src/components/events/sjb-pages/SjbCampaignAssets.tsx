@@ -1,5 +1,5 @@
 import { Download, ExternalLink, Layers } from 'lucide-react';
-import { SJB_CAMPAIGN_SEQUENCE_MASTERS, SJB_SEQUENCE_PAGE_ORDER, sjbCanvaEditUrl } from '@/lib/sjb-campaign-sequence-masters';
+import { SJB_CAMPAIGN_SEQUENCE_MASTERS, SJB_SEQUENCE_PAGE_ORDER, sjbCanvaEditUrl, sjbCampaignSequencePictures } from '@/lib/sjb-campaign-sequence-masters';
 import { Button } from '@/design-system/element';
 import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS } from '@/lib/sjb-calendar-style';
 import { SJB_SEQUENCE_BACKGROUNDS } from '@/lib/sjb-sequence-backgrounds';
@@ -49,7 +49,13 @@ export function SjbCampaignAssets({ mode, label }: { mode: SjbCalendarMode; labe
     {masters.length > 0 && <section className="mt-6 border-t border-border pt-5" aria-labelledby={`${mode}-multipage`}>
       <h4 id={`${mode}-multipage`} className="flex items-center gap-2 text-sm font-bold"><Layers className="size-4" />Multi-page Canva files</h4>
       <p className="mt-1 text-xs text-muted-foreground">Four pages each: {SJB_SEQUENCE_PAGE_ORDER.join(' → ')}. Swap page 2 for any post headline.</p>
-      <div className="mt-3 grid gap-3 sm:grid-cols-3">{masters.map(m => <Button key={m.id} asChild variant="outline" className="h-auto justify-between py-3"><a href={sjbCanvaEditUrl(m.id)} target="_blank" rel="noreferrer" aria-label={`Open ${label} ${m.size} four-page Canva file`}><span className="text-left"><span className="block text-sm font-semibold">{m.size}</span><span className="block text-xs text-muted-foreground">4 pages · live Canva</span></span><ExternalLink /></a></Button>)}</div>
+      <div className="mt-3 grid gap-4 sm:grid-cols-3">{masters.map(m => {
+        const saved = sjbCampaignSequencePictures(m.id);
+        return <div key={m.id} className="min-w-0">
+          <Button asChild variant="outline" className="h-auto w-full justify-between py-3"><a href={sjbCanvaEditUrl(m.id)} target="_blank" rel="noreferrer" aria-label={`Open ${label} ${m.size} four-page Canva file`}><span className="text-left"><span className="block text-sm font-semibold">{m.size}</span><span className="block text-xs text-muted-foreground">4 pages · live Canva</span></span><ExternalLink /></a></Button>
+          {saved && <><ol className="mt-3 grid grid-cols-2 gap-2">{saved.pages.map((url, i) => <li key={url}><a href={url} target="_blank" rel="noreferrer" aria-label={`View ${m.size} ${SJB_SEQUENCE_PAGE_ORDER[i]}`}><img src={url} alt={`${m.size} — ${SJB_SEQUENCE_PAGE_ORDER[i]}`} loading="lazy" className="aspect-[4/5] w-full rounded-sm bg-muted object-contain" /></a><span className="mt-1 block text-xs text-muted-foreground">{SJB_SEQUENCE_PAGE_ORDER[i]}</span></li>)}</ol>{saved.zipUrl && <Button asChild size="sm" variant="outline" className="mt-3"><a href={saved.zipUrl} download><Download />All four pictures</a></Button>}</>}
+        </div>;
+      })}</div>
     </section>}
   </div>;
 }

@@ -1,5 +1,5 @@
 import { sjbCanvaSize, type SjbCanvaGalleryDesign } from './sjb-canva-gallery';
-import { SJB_CALENDAR_MODES, SJB_CALENDAR_POSTS, SJB_CALENDAR_SIZES, sjbCalendarDesign, type SjbCalendarMode } from './sjb-social-calendar';
+import { SJB_CALENDAR_MODES, SJB_CALENDAR_POSTS, SJB_CALENDAR_SIZES, SJB_CALENDAR_PREVIEWS, sjbCalendarDesign, type SjbCalendarMode } from './sjb-social-calendar';
 import { SJB_PROJECTION_SIZES, sjbProjection, type SjbProjectionLook } from './sjb-projections';
 import { SJB_CALENDAR_FORMATS, sjbCalendarSequenceCanvaUrl } from './sjb-calendar-formats';
 import { SJB_ADVERTISING_FORMATS } from './sjb-advertising-designs';
@@ -38,7 +38,7 @@ export const SJB_SOCIAL_STUDIO_DESIGNS: readonly SjbSocialStudioDesign[] = SJB_S
   const banners: SjbSocialStudioDesign[] = SJB_ADVERTISING_FORMATS.map(format => {
     const id = format.ids[styleIndex];
     return { id, collectionId: mode, name: format.name, width: format.width, height: format.height,
-      previewUrl: '', canvaUrl: `https://www.canva.com/design/${id}/edit`, status: 'saved',
+      previewUrl: SJB_CALENDAR_PREVIEWS[id] ?? '', canvaUrl: `https://www.canva.com/design/${id}/edit`, status: 'saved',
       provenance: 'artistic-render', advertising: true,
       waitingOn: 'Reusable Canva adaptation · Layout review and cleaned full-size exports pending' };
   });

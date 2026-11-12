@@ -1,6 +1,6 @@
 # San Juan Bowl event pages and assets
 
-- Campaign design-asset panels resolve reusable four-page Canva masters through `sjb-campaign-sequence-masters`; these are not per-post calendar sequences — why: asset masters must stay separate from finished post registries and preserve original single-page files.
+- Campaign design-asset panels resolve reusable four-page Canva masters and cleaned per-page pictures/ZIP pointers through `sjb-campaign-sequence-masters`; these are not per-post calendar sequences — why: asset masters must stay separate from finished post registries and preserve original single-page files.
 
 - Sequence companion grounds resolve by look and page role through `sjb-sequence-backgrounds`; only drawn headline/details/tickets pages use them, while original cover imagery and saved Canva pages remain intact — why: coordinated AI-edited grounds must not replace issued art or change campaign identity.
 
