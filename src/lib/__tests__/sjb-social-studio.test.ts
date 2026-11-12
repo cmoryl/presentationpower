@@ -13,7 +13,7 @@ describe('Bowl social page selection', () => {
   });
   it('searches style names and restores all designs when cleared', () => {
     expect(filterSjbSocialStudio('all', 'all', 'all', 'spotlight')).toHaveLength(103);
-    expect(filterSjbSocialStudio('all', 'all', 'all', '')).toHaveLength(418);
+    expect(filterSjbSocialStudio('all', 'all', 'all', '')).toHaveLength(421);
     expect(filterSjbSocialStudio('all', 'all', 'all', 'no-matching-post')).toHaveLength(0);
   });
   it('provides both requested custom dimensions in every active style with distinct real Canva links', () => {
@@ -46,7 +46,8 @@ describe('Bowl social page selection', () => {
     const projections = SJB_SOCIAL_STUDIO_DESIGNS.filter(d => d.name === 'Bowl projections');
     expect(projections.filter(d => d.collectionId === 'set2').map(d => d.id)).toEqual(['1350', '1440', '1920'].map(size => sjbProjection('night', size).id));
     expect(projections.filter(d => d.collectionId === 'set4').map(d => d.id)).toEqual(['1350', '1440', '1920'].map(size => sjbProjection('blue', size).id));
-    expect(projections.filter(d => d.height === 1440)).toHaveLength(2);
+    expect(projections.filter(d => d.collectionId === 'light').map(d => d.id)).toEqual(['DAHaqb6b4nw', 'DAHaqTn7K_0', 'DAHaqTaPWRc']);
+    expect(projections.filter(d => d.height === 1440)).toHaveLength(3);
     expect(projections.some(d => d.collectionId === 'dark')).toBe(false);
   });
   it('includes saved multipage files from the same calendar post', () => {

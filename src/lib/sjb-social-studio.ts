@@ -6,7 +6,7 @@ import { SJB_ADVERTISING_FORMATS } from './sjb-advertising-designs';
 
 /** Social-page selection only; issued registries and calendar looks stay intact. */
 export const SJB_SOCIAL_STUDIO_COLLECTIONS = SJB_CALENDAR_MODES.map(mode => ({ id: mode.id, name: mode.label, blurb: 'Social · Carousels · Web banners' }));
-const PROJECTION_LOOKS: Partial<Record<SjbCalendarMode, SjbProjectionLook>> = { set2: 'night', set4: 'blue' };
+const PROJECTION_LOOKS: Partial<Record<SjbCalendarMode, SjbProjectionLook>> = { light: 'light', set2: 'night', set4: 'blue' };
 
 export interface SjbSocialStudioDesign extends Omit<SjbCanvaGalleryDesign, 'collectionId'> {
   collectionId: SjbCalendarMode;

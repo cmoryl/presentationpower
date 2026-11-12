@@ -5,11 +5,12 @@
 const ptr = import.meta.glob<{ url: string }>("../assets/sjb-projections/*.asset.json", { eager: true, import: "default" });
 const url = (name: string) => ptr[`../assets/sjb-projections/${name}.asset.json`]?.url ?? null;
 
-export type SjbProjectionLook = "dark" | "blue" | "night";
+export type SjbProjectionLook = "dark" | "blue" | "night" | "light";
 export const SJB_PROJECTION_LOOKS: { id: SjbProjectionLook; label: string }[] = [
   { id: "dark", label: "Dark gold stadium" },
   { id: "blue", label: "Stadium blue + field" },
   { id: "night", label: "Night grandstand (Set 2)" },
+  { id: "light", label: "Light Action" },
 ];
 export const SJB_PROJECTION_SIZES = [
   { id: "1350", label: "Feed 1080×1350" },
@@ -19,6 +20,7 @@ export const SJB_PROJECTION_SIZES = [
 const IDS: Record<SjbProjectionLook, Record<string, string>> = {
   dark: { "1350": "DAHaijROt1I", "1440": "DAHaiuUVtKc", "1920": "DAHaihspsY4" },
   blue: { "1350": "DAHaive-p_0", "1440": "DAHaipLLilU", "1920": "DAHainYav2E" },
+  light: { "1350": "DAHaqb6b4nw", "1440": "DAHaqTn7K_0", "1920": "DAHaqTaPWRc" },
   night: { "1350": "DAHai3IaS50", "1440": "DAHai3lHjvk", "1920": "DAHai2ltn6k" },
 };
 export function sjbProjection(look: SjbProjectionLook, size: string) {
