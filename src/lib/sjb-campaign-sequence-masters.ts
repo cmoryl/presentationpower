@@ -12,3 +12,11 @@ export function sjbCampaignSequencePictures(id: string) {
   if (pages.some(page => !page)) return null;
   return { pages: pages.filter((page): page is string => Boolean(page)), zipUrl: PICTURES[`../assets/sjb-sequences/${id}.zip.asset.json`]?.url };
 }
+const MASTER_SIZE: Record<string, string> = { "linkedin-portrait": "Feed", "instagram-carousel": "Feed", "linkedin-square": "Square", "story-sequence": "Story" };
+/** The saved four-page master is real artwork only for post 01 (its page 2 carries post 01's headline). */
+export function sjbCampaignMasterFor(post: string, mode: string, format: string) {
+  if (post !== "01" || !(mode in SJB_CAMPAIGN_SEQUENCE_MASTERS) || !MASTER_SIZE[format]) return null;
+  const m = SJB_CAMPAIGN_SEQUENCE_MASTERS[mode as keyof typeof SJB_CAMPAIGN_SEQUENCE_MASTERS].find(x => x.size.startsWith(MASTER_SIZE[format]));
+  const saved = m && sjbCampaignSequencePictures(m.id);
+  return m && saved ? { id: m.id, canvaUrl: sjbCanvaEditUrl(m.id), ...saved } : null;
+}

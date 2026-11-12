@@ -1,6 +1,7 @@
 import { Download, ExternalLink, Layers } from 'lucide-react';
 import { SJB_CAMPAIGN_SEQUENCE_MASTERS, SJB_SEQUENCE_PAGE_ORDER, sjbCanvaEditUrl, sjbCampaignSequencePictures } from '@/lib/sjb-campaign-sequence-masters';
 import { Button } from '@/design-system/element';
+import { SjbSequenceViewer } from '../SjbSequenceViewer';
 import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS } from '@/lib/sjb-calendar-style';
 import { SJB_SEQUENCE_BACKGROUNDS } from '@/lib/sjb-sequence-backgrounds';
 import type { SjbCalendarMode } from '@/lib/sjb-social-calendar';
@@ -53,7 +54,7 @@ export function SjbCampaignAssets({ mode, label }: { mode: SjbCalendarMode; labe
         const saved = sjbCampaignSequencePictures(m.id);
         return <div key={m.id} className="min-w-0">
           <Button asChild variant="outline" className="h-auto w-full justify-between py-3"><a href={sjbCanvaEditUrl(m.id)} target="_blank" rel="noreferrer" aria-label={`Open ${label} ${m.size} four-page Canva file`}><span className="text-left"><span className="block text-sm font-semibold">{m.size}</span><span className="block text-xs text-muted-foreground">4 pages · live Canva</span></span><ExternalLink /></a></Button>
-          {saved && <><ol className="mt-3 grid grid-cols-2 gap-2">{saved.pages.map((url, i) => <li key={url}><a href={url} target="_blank" rel="noreferrer" aria-label={`View ${m.size} ${SJB_SEQUENCE_PAGE_ORDER[i]}`}><img src={url} alt={`${m.size} — ${SJB_SEQUENCE_PAGE_ORDER[i]}`} loading="lazy" className="aspect-[4/5] w-full rounded-sm bg-muted object-contain" /></a><span className="mt-1 block text-xs text-muted-foreground">{SJB_SEQUENCE_PAGE_ORDER[i]}</span></li>)}</ol>{saved.zipUrl && <Button asChild size="sm" variant="outline" className="mt-3"><a href={saved.zipUrl} download><Download />All four pictures</a></Button>}</>}
+          {saved && <><div className="mt-3"><SjbSequenceViewer pages={saved.pages} labels={SJB_SEQUENCE_PAGE_ORDER} variant={m.size.startsWith('Story') ? 'story' : 'carousel'} width={1080} height={m.size.startsWith('Story') ? 1920 : m.size.startsWith('Square') ? 1080 : 1350} title={`${label} ${m.size}`} displayHeight={320} /></div>{saved.zipUrl && <Button asChild size="sm" variant="outline" className="mt-3"><a href={saved.zipUrl} download><Download />All four pictures</a></Button>}</>}
         </div>;
       })}</div>
     </section>}
