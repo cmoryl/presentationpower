@@ -20,7 +20,7 @@ export const SJB_PROJECTION_SIZES = [
 const IDS: Record<SjbProjectionLook, Record<string, string>> = {
   dark: { "1350": "DAHaijROt1I", "1440": "DAHaiuUVtKc", "1920": "DAHaihspsY4" },
   blue: { "1350": "DAHaive-p_0", "1440": "DAHaipLLilU", "1920": "DAHainYav2E" },
-  light: { "1350": "DAHaqb6b4nw", "1440": "DAHaqTn7K_0", "1920": "DAHaqTaPWRc" },
+  light: { "1350": "DAHaqb6b4nw", "1440": "DAHatqsVewU", "1920": "DAHatu5Tvxk" },
   night: { "1350": "DAHai3IaS50", "1440": "DAHai3lHjvk", "1920": "DAHai2ltn6k" },
 };
 export function sjbProjection(look: SjbProjectionLook, size: string) {
