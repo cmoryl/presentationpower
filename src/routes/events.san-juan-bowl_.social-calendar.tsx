@@ -7,6 +7,7 @@ import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
 import { SjbCanvaSyncPanel } from "@/components/events/SjbCanvaSyncPanel";
 import { SjbPictureStamp } from "@/components/events/SjbPictureStamp";
+import { getCanvaSyncStamp } from "@/lib/canva-sync.functions";
 import { canvaSyncTargets } from "@/lib/canva-sync-targets";
 import { useCanvaSynced } from "@/lib/use-canva-sync";
 import { SjbProjections } from "@/components/events/SjbProjections";
@@ -40,6 +41,11 @@ export const Route = createFileRoute("/events/san-juan-bowl_/social-calendar")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  // Read on the server so the "pictures last updated" line is already in the page's
+  // HTML for visitors who aren't signed in. A failure must never take the calendar down.
+  loader: async () => ({
+    pictureStamp: await getCanvaSyncStamp().catch(() => null),
+  }),
   component: withSjbTrail(CalendarPage),
 });
 
@@ -57,6 +63,7 @@ const STATUS_TONE: Record<string, string> = {
 const PROJECTION_LOOK: Record<SjbCalendarMode, "dark" | "blue" | "night" | "light" | null> = { dark: "dark", light: "light", set2: "night", set3: "dark", set4: "blue" };
 
 function CalendarPage() {
+  const { pictureStamp } = Route.useLoaderData();
   const [mode, setMode] = useState<SjbCalendarMode>("light");
   const [view, setView] = useState<"list" | "calendar">("calendar");
   const format: SjbCalendarFormat = "single";
@@ -98,7 +105,7 @@ function CalendarPage() {
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl social calendar</h1>
       <p className="mt-2 text-sm text-muted-foreground">November – December 2026</p>
       <SjbCalendarLookCards mode={mode} onChange={setMode} />
-      <SjbPictureStamp />
+      <SjbPictureStamp stamp={pictureStamp} />
       <SjbCanvaSyncPanel designIds={canvaSyncTargets().map((t) => t.id)} label="Bowl calendar, billboard and carousel" />
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:max-w-3xl" role="group" aria-label="View">
         {([
