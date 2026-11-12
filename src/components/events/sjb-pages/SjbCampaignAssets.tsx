@@ -1,3 +1,4 @@
+import { SjbPackButton } from '../SjbPackButton';
 import { Download, ExternalLink, Layers } from 'lucide-react';
 import { useCanvaSynced } from '@/lib/use-canva-sync';
 import { SJB_CAMPAIGN_SEQUENCE_MASTERS, SJB_SEQUENCE_PAGE_ORDER, sjbCanvaEditUrl, sjbCampaignSequencePictures } from '@/lib/sjb-campaign-sequence-masters';
@@ -57,7 +58,7 @@ export function SjbCampaignAssets({ mode, label }: { mode: SjbCalendarMode; labe
         const saved = bundled && { ...bundled, pages: bundled.pages.map((u, i) => synced(m.id, u, i + 1)) };
         return <div key={m.id} className="min-w-0">
           <Button asChild variant="outline" className="h-auto w-full justify-between py-3"><a href={sjbCanvaEditUrl(m.id)} target="_blank" rel="noreferrer" aria-label={`Open ${label} ${m.size} four-page Canva file`}><span className="text-left"><span className="block text-sm font-semibold">{m.size}</span><span className="block text-xs text-muted-foreground">4 pages · live Canva</span></span><ExternalLink /></a></Button>
-          {saved && <><div className="mt-3"><SjbSequenceViewer pages={saved.pages} labels={SJB_SEQUENCE_PAGE_ORDER} variant={m.size.startsWith('Story') ? 'story' : 'carousel'} width={1080} height={m.size.startsWith('Story') ? 1920 : m.size.startsWith('Square') ? 1080 : 1350} title={`${label} ${m.size}`} displayHeight={320} /></div>{saved.zipUrl && <Button asChild size="sm" variant="outline" className="mt-3"><a href={saved.zipUrl} download><Download />All four pictures</a></Button>}</>}
+          {saved && <><div className="mt-3"><SjbSequenceViewer pages={saved.pages} labels={SJB_SEQUENCE_PAGE_ORDER} variant={m.size.startsWith('Story') ? 'story' : 'carousel'} width={1080} height={m.size.startsWith('Story') ? 1920 : m.size.startsWith('Square') ? 1080 : 1350} title={`${label} ${m.size}`} displayHeight={320} /></div><SjbPackButton kind="zip" className="mt-3" pages={saved.pages.map((u, i) => ({ url: u, name: `${m.id}-page-${i + 1}.jpg` }))} width={1080} height={m.size.startsWith('Story') ? 1920 : m.size.startsWith('Square') ? 1080 : 1350} filename={`${m.id}-pages.zip`} label="All four pictures" /></>}
         </div>;
       })}</div>
     </section>}

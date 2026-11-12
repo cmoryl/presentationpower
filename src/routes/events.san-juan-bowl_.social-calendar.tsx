@@ -15,6 +15,7 @@ import { SjbCalendarLookCards } from "@/components/events/SjbCalendarLookCards";
 import { SjbDemoChip, SjbDemoSequence } from "@/components/events/SjbDemoSequence";
 import { SjbSequenceViewer } from "@/components/events/SjbSequenceViewer";
 import { SjbSavedSequence } from "@/components/events/SjbSavedSequence";
+import { SjbPackButton } from "@/components/events/SjbPackButton";
 import { sjbCampaignMasterFor, SJB_SEQUENCE_PAGE_ORDER } from "@/lib/sjb-campaign-sequence-masters";
 import { sjbCalendarCover } from "@/lib/sjb-calendar-demo";
 import { CalendarDays, List as ListIcon } from "lucide-react";
@@ -266,8 +267,6 @@ function SequenceArtwork({ post, mode, format }: { post: SjbCalendarPost; mode: 
         </ol>
         <div className="mt-2 flex flex-wrap gap-2">
           {sequence.canvaUrl && <Button asChild size="sm" variant="outline"><a href={sequence.canvaUrl} target="_blank" rel="noreferrer">Canva</a></Button>}
-          {sequence.pdfUrl && <Button asChild size="sm" variant="outline"><a href={sequence.pdfUrl} download>Carousel PDF</a></Button>}
-          {sequence.zipUrl && <Button asChild size="sm" variant="outline"><a href={sequence.zipUrl} download>All pictures</a></Button>}
           {sequence.illustratorUrl && <Button asChild size="sm" variant="outline"><a href={sequence.illustratorUrl} download>Illustrator</a></Button>}
         </div>
       </> : master ? <>
@@ -275,7 +274,8 @@ function SequenceArtwork({ post, mode, format }: { post: SjbCalendarPost; mode: 
         <p className="mt-2 text-xs text-muted-foreground">Saved pages from the four-page Canva master.</p>
         <div className="mt-2 flex flex-wrap gap-2">
           <Button asChild size="sm" variant="outline"><a href={master.canvaUrl} target="_blank" rel="noreferrer">Canva</a></Button>
-          {master.zipUrl && <Button asChild size="sm" variant="outline"><a href={master.zipUrl} download>All pictures</a></Button>}
+          <SjbPackButton kind="zip" pages={master.pages.map((u, i) => ({ url: u, name: `${master.id}-page-${i + 1}.jpg` }))} width={spec?.width ?? 1080} height={spec?.height ?? 1350} filename={`${master.id}-pages.zip`} label="All pictures" />
+          {format !== "story-sequence" && <SjbPackButton kind="pdf" pages={master.pages.map((u, i) => ({ url: u, name: `${master.id}-page-${i + 1}.jpg` }))} width={spec?.width ?? 1080} height={spec?.height ?? 1350} filename={`${master.id}-carousel.pdf`} label="Carousel PDF" />}
         </div>
       </> : <>
         {canvaUrl && <div className="mt-3 flex flex-wrap items-center gap-2">
