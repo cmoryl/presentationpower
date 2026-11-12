@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/design-system/element";
 import { SJB_ATTENDEE_TYPES, SJB_BADGE_COMPS, SJB_BADGE_SIZE, SJB_SHIRT_COMPS } from "@/lib/sjb-merch-comps";
 import { SjbBadgeFace, SjbShirt } from "./SjbMerchArt";
+import { SJB_BADGE_STYLES, SjbStyledBadge } from "./SjbBadgeStyles";
 
 function CompNote() {
   return <p className="mt-2 max-w-3xl text-sm text-muted-foreground">These are <strong>comps</strong> — design directions to choose finals from, not print-ready files. Names are samples; every date, venue and matchup comes from the announced event facts.</p>;
@@ -29,7 +30,23 @@ export function SjbBadgesPage() {
       <div role="group" aria-label="Attendee type" className="mt-6 flex flex-wrap gap-2">
         {SJB_ATTENDEE_TYPES.map((a) => <Button key={a.id} size="sm" variant={a.id === type ? "default" : "outline"} aria-pressed={a.id === type} onClick={() => setType(a.id)}>{a.label}</Button>)}
       </div>
-      <div className="mt-8 space-y-12">
+      <section aria-labelledby="badge-styles" className="mt-10">
+        <h2 id="badge-styles" className="text-xl font-semibold text-foreground">Styles in the live layout</h2>
+        <p className="text-sm text-muted-foreground">Same layout as your live Canva badge, dressed in each campaign look. Pick an attendee type above to see every style change.</p>
+        <div className="mt-6 space-y-10">
+          {SJB_BADGE_STYLES.map((st) => (
+            <div key={st.id}>
+              <h3 className="text-lg font-semibold text-foreground">{st.name}</h3>
+              <p className="text-sm text-muted-foreground">{st.idea}</p>
+              <div className="mt-3 grid max-w-xl grid-cols-2 gap-6">
+                {(["front", "back"] as const).map((s) => <figure key={s}><SjbStyledBadge style={st} type={t} side={s} /><figcaption className="mt-2 text-sm capitalize text-muted-foreground">{s}</figcaption></figure>)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+      <h2 className="mt-12 text-xl font-semibold text-foreground">Earlier comps</h2>
+      <div className="mt-4 space-y-12">
         {SJB_BADGE_COMPS.map((c) => (
           <section key={c.id} aria-labelledby={`badge-${c.id}`}>
             <h2 id={`badge-${c.id}`} className="text-xl font-semibold text-foreground">{c.name}</h2>
