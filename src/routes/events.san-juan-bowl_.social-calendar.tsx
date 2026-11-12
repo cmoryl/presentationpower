@@ -10,6 +10,7 @@ import { SjbPictureStamp } from "@/components/events/SjbPictureStamp";
 import { getCanvaSyncStamp } from "@/lib/canva-sync.functions";
 import { canvaSyncTargets } from "@/lib/canva-sync-targets";
 import { useCanvaSynced } from "@/lib/use-canva-sync";
+import { SjbInteractiveCalendar } from "@/components/events/SjbInteractiveCalendar";
 import { SjbProjections } from "@/components/events/SjbProjections";
 import { SjbCalendarLookCards } from "@/components/events/SjbCalendarLookCards";
 import { SjbDemoChip, SjbDemoSequence } from "@/components/events/SjbDemoSequence";
@@ -129,7 +130,7 @@ function CalendarPage() {
       </div>
 
       {view === "calendar" ? (
-        <CalendarGrid mode={mode} format={format} onOpen={openPost} undated={groups.undated} />
+        <SjbInteractiveCalendar mode={mode} format={format} onOpen={openPost} undated={groups.undated} />
       ) : (
       <ol className="mt-8 space-y-8">
         {groups.dated.map(([date, posts]) => (
@@ -288,81 +289,3 @@ function SequenceArtwork({ post, mode, format }: { post: SjbCalendarPost; mode: 
   );
 }
 
-const MONTHS = [
-  { y: 2026, m: 10, label: "November 2026" },
-  { y: 2026, m: 11, label: "December 2026" },
-];
-const GAME_DAY_ISO = new Date(`${SJB_EVENT.datesLabel} UTC`).toISOString().slice(0, 10);
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-function CalendarGrid({ mode, format, onOpen, undated }: { mode: SjbCalendarMode; format: SjbCalendarFormat; onOpen: (id: string) => void; undated: SjbCalendarPost[] }) {
-  const byDate = useMemo(() => {
-    const m = new Map<string, SjbCalendarPost[]>();
-    for (const p of SJB_CALENDAR_POSTS) if (p.date) m.set(p.date, [...(m.get(p.date) ?? []), p]);
-    return m;
-  }, []);
-  const chip = (p: SjbCalendarPost) => {
-    const preview = sjbCalendarCover(p.n, mode, format)?.previewUrl;
-    return (
-      <Button
-        key={p.itemId}
-        type="button"
-        onClick={() => onOpen(p.itemId)}
-        variant="outline"
-        className="group flex h-auto w-full min-w-0 flex-col items-stretch gap-2 overflow-hidden rounded-sm border-border bg-card p-1.5 text-left text-xs whitespace-normal text-foreground transition-all duration-200 hover:border-primary hover:shadow-sm motion-reduce:transition-none"
-        aria-label={`Open ${p.title}`}
-      >
-        {preview ? (
-          <img src={preview} alt="" className="aspect-[4/5] w-full rounded-sm object-contain bg-muted" loading="lazy" />
-        ) : (
-          <span className="flex aspect-[4/5] w-full items-center justify-center overflow-hidden rounded-sm bg-muted">
-            <SjbDemoChip post={p} mode={mode} format={format} displayHeight={160} />
-          </span>
-        )}
-        <span className="line-clamp-2 leading-snug">{p.title}</span>
-      </Button>
-    );
-  };
-  return (
-    <div className="mt-8 space-y-10">
-      {MONTHS.map(({ y, m, label }) => {
-        const first = new Date(Date.UTC(y, m, 1)).getUTCDay();
-        const days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
-        const cells: (number | null)[] = [...Array(first).fill(null), ...Array.from({ length: days }, (_, i) => i + 1)];
-        while (cells.length % 7) cells.push(null);
-        return (
-          <section key={label} aria-label={label}>
-            <h2 className="mb-3 text-lg font-semibold text-foreground">{label}</h2>
-            <div className="overflow-x-auto rounded-md border border-border"><div className="grid min-w-[840px] grid-cols-7">
-              {WEEKDAYS.map((d) => (
-                <div key={d} className="border-b border-border bg-muted px-2 py-1.5 text-xs font-semibold uppercase text-muted-foreground">{d}</div>
-              ))}
-              {cells.map((d, i) => {
-                const iso = d ? `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}` : "";
-                const posts = d ? byDate.get(iso) ?? [] : [];
-                const gameDay = iso === GAME_DAY_ISO;
-                return (
-                  <div key={i} className={`min-h-32 border-b border-r border-border p-2 ${d ? "bg-background" : "bg-muted/40"} ${gameDay ? "ring-2 ring-inset ring-primary" : ""}`}>
-                    {d && (
-                      <div className="mb-1 flex items-center justify-between text-xs">
-                        <span className="font-medium text-foreground">{d}</span>
-                        {gameDay && <span className="font-semibold text-primary">Game day</span>}
-                      </div>
-                    )}
-                    <div className="space-y-1">{posts.map(chip)}</div>
-                  </div>
-                );
-              })}
-            </div></div>
-          </section>
-        );
-      })}
-      {undated.length > 0 && (
-        <section aria-label="No date yet">
-          <h2 className="mb-3 text-lg font-semibold text-foreground">No date yet</h2>
-          <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-5">{undated.map(chip)}</div>
-        </section>
-      )}
-    </div>
-  );
-}
