@@ -6,10 +6,10 @@ import { SJB_CALENDAR_POSTS } from "@/lib/sjb-social-calendar";
 
 /** Proposed Hiram Bithorn holiday backgrounds — previews awaiting approval, not yet in Canva. */
 export const SJB_HOLIDAY_GROUNDS: { post: string; theme: string; url: string }[] = [
-  { post: "09", theme: "Zigzag roof and railings strung with holiday lights", url: g09.url },
-  { post: "10", theme: "Front of the stadium at sunset", url: g10.url },
-  { post: "11", theme: "Under the roof, floodlight beams", url: g11.url },
-  { post: "13", theme: "Front washed in electric blue, lit trees", url: g13.url },
+  { post: "09", theme: "Cinematic: zigzag roof in gold lights, open navy sky for copy", url: g09.url },
+  { post: "10", theme: "Cinematic: facade under an amber Thanksgiving dusk", url: g10.url },
+  { post: "11", theme: "Cinematic: black-and-gold floodlight beams", url: g11.url },
+  { post: "13", theme: "Cinematic: electric-blue facade, neon sky", url: g13.url },
 ];
 
 export function SjbHolidayGrounds() {
