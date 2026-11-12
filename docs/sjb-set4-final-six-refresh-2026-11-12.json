@@ -1,0 +1,78 @@
+{
+  "refreshed": [
+    {
+      "post": "25",
+      "height": 1350,
+      "id": "DAHajaBdnlg",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "sha256": "231c4c30e55e14247274dc8e21239d652d2b475a21c1da206cff821741d3e842",
+      "url": "/__l5e/assets-v1/727383dc-8fca-40d9-8ec1-937a479beaae/DAHajaBdnlg-user-final-20261112.jpg"
+    },
+    {
+      "post": "25",
+      "height": 1080,
+      "id": "DAHajYnitbc",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "sha256": "ff2a7f3ed6f93fa583dbbc3ff873c5356ddafad4b9be0bd7aab1e14cd0d11295",
+      "url": "/__l5e/assets-v1/4210b423-9488-491d-b6b7-3f4d05b04e52/DAHajYnitbc-user-final-20261112.jpg"
+    },
+    {
+      "post": "25",
+      "height": 1920,
+      "id": "DAHajXnI0ts",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "sha256": "334a894a067cbae7da718543a694f60b93f96a45144b00775a838670210ea7c9",
+      "url": "/__l5e/assets-v1/4fb72dd4-0f25-483f-8142-d25ec2804022/DAHajXnI0ts-user-final-20261112.jpg"
+    },
+    {
+      "post": "28",
+      "height": 1350,
+      "id": "DAHajXDbhb8",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "pixels_unchanged": true,
+      "sha256": "8a65fa8edf0cfb03f2bd9067f0141459bdbcfb5471f54bed226d9f564cb4c0c6",
+      "url": "/__l5e/assets-v1/9a491e27-9837-401b-9715-3882159486a9/DAHajXDbhb8-user-final-20261112.jpg"
+    },
+    {
+      "post": "28",
+      "height": 1080,
+      "id": "DAHajQZ11KU",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "pixels_unchanged": true,
+      "sha256": "144ed40d175a9b9a3f5232d67b6da79e1dd609d7eaa25a9d137fd92745d29184",
+      "url": "/__l5e/assets-v1/b374edf0-063a-4c89-91c4-e463e705aad3/DAHajQZ11KU-user-final-20261112.jpg"
+    },
+    {
+      "post": "28",
+      "height": 1920,
+      "id": "DAHajcltAMQ",
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "pixels_unchanged": true,
+      "sha256": "59eb5cc54e7075772fcd557eb33b0ed1d4b86ffd1e5f50a87e67e9960a3f4bc2",
+      "url": "/__l5e/assets-v1/2ac3cc13-15a3-4419-914c-75ca655fdbea/DAHajcltAMQ-user-final-20261112.jpg"
+    }
+  ],
+  "canva_originals_changed": false,
+  "multi_page_files_changed": false
+}
