@@ -150,6 +150,23 @@ export async function lastRunSummary(): Promise<import("@/lib/canva-sync-message
   };
 }
 
+/** Public line: when the pictures shown on the Bowl pages last changed. Dates only. */
+export async function publicSyncStamp(): Promise<import("@/lib/canva-sync-messages").CanvaPictureStamp> {
+  const ids = canvaSyncTargets().map((t) => t.id);
+  const [{ data: synced }, { data: checked }] = await Promise.all([
+    supabaseAdmin.from("canva_asset_sync")
+      .select("synced_at").in("design_id", ids).order("synced_at", { ascending: false }).limit(1).maybeSingle(),
+    supabaseAdmin.from("canva_asset_sync")
+      .select("checked_at").in("design_id", ids).order("checked_at", { ascending: false }).limit(1).maybeSingle(),
+  ]);
+  const canva = synced?.synced_at ?? null;
+  const bundled = Object.values(SJB_CALENDAR_PICTURE_SAVED_AT).filter((s): s is string => !!s).sort().pop() ?? null;
+  const picturesUpdated = [canva, bundled].filter((s): s is string => !!s).sort().pop() ?? null;
+  const source: "canva" | "original" | null =
+    canva && (!bundled || new Date(canva) >= new Date(bundled)) ? "canva" : bundled ? "original" : null;
+  return { picturesUpdated, source, lastCheckedAt: checked?.checked_at ?? null };
+}
+
 export async function syncHealth() {
   const ids = canvaSyncTargets().map((t) => t.id);
   const [{ data: conn }, { data: runs }, { data: rows }] = await Promise.all([

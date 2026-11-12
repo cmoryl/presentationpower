@@ -50,6 +50,14 @@ export const runCanvaBackgroundSync = createServerFn({ method: "POST" })
     return runBackgroundSync("manual");
   });
 
+/** Public (no sign-in): when the pictures on the Bowl pages last changed. Dates only —
+ *  no design names, counts, problems or Canva calls. */
+export const getCanvaSyncStamp = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { publicSyncStamp } = await import("@/lib/canva-sync.server");
+    return publicSyncStamp();
+  });
+
 /** When the site last checked Canva and what the last update run did. */
 export const getCanvaSyncLastRun = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

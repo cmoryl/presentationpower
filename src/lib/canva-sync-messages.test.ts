@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { describeLastRun, explainSyncError, type CanvaLastRun } from "./canva-sync-messages";
+import { describeLastRun, describePictureStamp, explainSyncError, type CanvaLastRun } from "./canva-sync-messages";
 
 const run = (over: Partial<CanvaLastRun["run"]> = {}) => ({
   startedAt: "2026-11-12T14:40:00.000Z", finishedAt: "2026-11-12T14:45:00.000Z", trigger: "daily",
@@ -29,8 +29,22 @@ describe("describeLastRun", () => {
   });
 });
 
-describe("explainSyncError", () => {
-  it("403 asks to reconnect", () => expect(explainSyncError("Canva refused the export [403]: x").next).toMatch(/reconnect/i));
+describe("describePictureStamp", () => {
+  it("says nothing until a picture date exists", () =>
+    expect(describePictureStamp({ picturesUpdated: null, source: null, lastCheckedAt: null })).toBeNull());
+  it("names the date and that it came from Canva", () => {
+    const line = describePictureStamp({ picturesUpdated: "2026-11-12T20:14:00.000Z", source: "canva", lastCheckedAt: null })!;
+    expect(line).toMatch(/^Pictures last updated from Canva /);
+    expect(line).not.toMatch(/checked with Canva/);
+  });
+  it("says original set when nothing has been synced yet", () => {
+    const line = describePictureStamp({ picturesUpdated: "2026-11-01T10:00:00.000Z", source: "original", lastCheckedAt: "2026-11-12T20:14:00.000Z" })!;
+    expect(line).toMatch(/Pictures are the original calendar set, saved /);
+    expect(line).toMatch(/· checked with Canva /);
+  });
+});
+
+describe("explainSyncError", () => {  it("403 asks to reconnect", () => expect(explainSyncError("Canva refused the export [403]: x").next).toMatch(/reconnect/i));
   it("429 says daily allowance", () => expect(explainSyncError("Canva export failed [429]: too many").what).toMatch(/daily download allowance/));
   it("AI labels keep old picture", () => expect(explainSyncError("Hidden AI labels could not be removed; picture not published").what).toMatch(/wasn't published/));
   it("missing design", () => expect(explainSyncError("Not found in the shared Canva account").what).toMatch(/isn't in the shared/));

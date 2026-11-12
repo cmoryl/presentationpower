@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
 import { SjbCanvaSyncPanel } from "@/components/events/SjbCanvaSyncPanel";
+import { SjbPictureStamp } from "@/components/events/SjbPictureStamp";
 import { canvaSyncTargets } from "@/lib/canva-sync-targets";
 import { useCanvaSynced } from "@/lib/use-canva-sync";
 import { SjbProjections } from "@/components/events/SjbProjections";
@@ -97,6 +98,7 @@ function CalendarPage() {
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl social calendar</h1>
       <p className="mt-2 text-sm text-muted-foreground">November – December 2026</p>
       <SjbCalendarLookCards mode={mode} onChange={setMode} />
+      <SjbPictureStamp />
       <SjbCanvaSyncPanel designIds={canvaSyncTargets().map((t) => t.id)} label="Bowl calendar, billboard and carousel" />
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:max-w-3xl" role="group" aria-label="View">
         {([

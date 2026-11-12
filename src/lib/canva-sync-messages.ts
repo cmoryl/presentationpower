@@ -35,6 +35,22 @@ export function describeLastRun(x: CanvaLastRun): string | null {
   return parts.length ? parts.join(" · ") : null;
 }
 
+/** What the public "pictures last updated" line needs: dates and where they came from. */
+export interface CanvaPictureStamp {
+  picturesUpdated: string | null;
+  source: "canva" | "original" | null;
+  lastCheckedAt: string | null;
+}
+
+/** One plain line for every visitor: when the pictures shown here last changed. */
+export function describePictureStamp(x: CanvaPictureStamp): string | null {
+  const at = stamp(x.picturesUpdated);
+  if (!at) return null;
+  const base = x.source === "canva" ? `Pictures last updated from Canva ${at}` : `Pictures are the original calendar set, saved ${at}`;
+  const checked = stamp(x.lastCheckedAt);
+  return checked ? `${base} · checked with Canva ${checked}` : base;
+}
+
 export function explainSyncError(raw: string): SyncProblem {
   const m = raw.toLowerCase();
   const code = raw.match(/\[(\d{3})\]/)?.[1];
