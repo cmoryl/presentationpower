@@ -1,0 +1,80 @@
+{
+ "checked_at": "2026-11-12T01:12:04.123753Z",
+ "set": "set3",
+ "exported": 84,
+ "metadata_cleaned": true,
+ "changed": [
+  {
+   "id": "DAHai-86c4M",
+   "post": "04",
+   "height": 1080
+  },
+  {
+   "id": "DAHai6cDjm0",
+   "post": "04",
+   "height": 1350
+  },
+  {
+   "id": "DAHai8-IvYU",
+   "post": "04",
+   "height": 1920
+  },
+  {
+   "id": "DAHaiktOY8o",
+   "post": "27",
+   "height": 1350
+  },
+  {
+   "id": "DAHailawSAs",
+   "post": "02",
+   "height": 1080
+  },
+  {
+   "id": "DAHaioTK4Mg",
+   "post": "27",
+   "height": 1080
+  },
+  {
+   "id": "DAHaip2dmXU",
+   "post": "27",
+   "height": 1920
+  },
+  {
+   "id": "DAHajWrjgaQ",
+   "post": "09",
+   "height": 1080
+  },
+  {
+   "id": "DAHajXHipPI",
+   "post": "06",
+   "height": 1080
+  },
+  {
+   "id": "DAHajdOBpi8",
+   "post": "10",
+   "height": 1080
+  },
+  {
+   "id": "DAHajehX34o",
+   "post": "12",
+   "height": 1080
+  },
+  {
+   "id": "DAHajjYriro",
+   "post": "29",
+   "height": 1920
+  },
+  {
+   "id": "DAHajnpvslQ",
+   "post": "29",
+   "height": 1080
+  },
+  {
+   "id": "DAHajuZw_lw",
+   "post": "29",
+   "height": 1350
+  }
+ ],
+ "unchanged_since_last_picture": 70,
+ "canva_originals_changed": false
+}
