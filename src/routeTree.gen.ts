@@ -231,6 +231,7 @@ import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.mo
 import { Route as ApiPublicBoothsEventRouteImport } from './routes/api/public/booths.$event'
 import { Route as ApiPublicCanvaSyncDesignIdRouteImport } from './routes/api/public/canva-sync.$designId'
 import { Route as ApiPublicCanvaCallbackRouteImport } from './routes/api/public/canva.callback'
+import { Route as ApiPublicHooksCanvaSyncRouteImport } from './routes/api/public/hooks/canva-sync'
 import { Route as ApiPublicHooksLogoScrubRouteImport } from './routes/api/public/hooks/logo-scrub'
 import { Route as ApiPublicVenueEventRouteImport } from './routes/api/public/venue.$event'
 import { Route as EventsKitsHackathonGuideRouteImport } from './routes/events.kits.hackathon.guide'
@@ -1397,6 +1398,11 @@ const ApiPublicCanvaCallbackRoute = ApiPublicCanvaCallbackRouteImport.update({
   path: '/api/public/canva/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksCanvaSyncRoute = ApiPublicHooksCanvaSyncRouteImport.update({
+  id: '/api/public/hooks/canva-sync',
+  path: '/api/public/hooks/canva-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksLogoScrubRoute = ApiPublicHooksLogoScrubRouteImport.update({
   id: '/api/public/hooks/logo-scrub',
   path: '/api/public/hooks/logo-scrub',
@@ -1781,6 +1787,7 @@ export interface FileRoutesByFullPath {
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva-sync/$designId': typeof ApiPublicCanvaSyncDesignIdRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
+  '/api/public/hooks/canva-sync': typeof ApiPublicHooksCanvaSyncRoute
   '/api/public/hooks/logo-scrub': typeof ApiPublicHooksLogoScrubRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
   '/events/kits/hackathon/guide': typeof EventsKitsHackathonGuideRoute
@@ -2030,6 +2037,7 @@ export interface FileRoutesByTo {
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva-sync/$designId': typeof ApiPublicCanvaSyncDesignIdRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
+  '/api/public/hooks/canva-sync': typeof ApiPublicHooksCanvaSyncRoute
   '/api/public/hooks/logo-scrub': typeof ApiPublicHooksLogoScrubRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
   '/events/kits/hackathon/guide': typeof EventsKitsHackathonGuideRoute
@@ -2284,6 +2292,7 @@ export interface FileRoutesById {
   '/api/public/booths/$event': typeof ApiPublicBoothsEventRoute
   '/api/public/canva-sync/$designId': typeof ApiPublicCanvaSyncDesignIdRoute
   '/api/public/canva/callback': typeof ApiPublicCanvaCallbackRoute
+  '/api/public/hooks/canva-sync': typeof ApiPublicHooksCanvaSyncRoute
   '/api/public/hooks/logo-scrub': typeof ApiPublicHooksLogoScrubRoute
   '/api/public/venue/$event': typeof ApiPublicVenueEventRoute
   '/events/kits/hackathon/guide': typeof EventsKitsHackathonGuideRoute
@@ -2539,6 +2548,7 @@ export interface FileRouteTypes {
     | '/api/public/booths/$event'
     | '/api/public/canva-sync/$designId'
     | '/api/public/canva/callback'
+    | '/api/public/hooks/canva-sync'
     | '/api/public/hooks/logo-scrub'
     | '/api/public/venue/$event'
     | '/events/kits/hackathon/guide'
@@ -2788,6 +2798,7 @@ export interface FileRouteTypes {
     | '/api/public/booths/$event'
     | '/api/public/canva-sync/$designId'
     | '/api/public/canva/callback'
+    | '/api/public/hooks/canva-sync'
     | '/api/public/hooks/logo-scrub'
     | '/api/public/venue/$event'
     | '/events/kits/hackathon/guide'
@@ -3041,6 +3052,7 @@ export interface FileRouteTypes {
     | '/api/public/booths/$event'
     | '/api/public/canva-sync/$designId'
     | '/api/public/canva/callback'
+    | '/api/public/hooks/canva-sync'
     | '/api/public/hooks/logo-scrub'
     | '/api/public/venue/$event'
     | '/events/kits/hackathon/guide'
@@ -3195,6 +3207,7 @@ export interface RootRouteChildren {
   ApiPublicBoothsEventRoute: typeof ApiPublicBoothsEventRoute
   ApiPublicCanvaSyncDesignIdRoute: typeof ApiPublicCanvaSyncDesignIdRoute
   ApiPublicCanvaCallbackRoute: typeof ApiPublicCanvaCallbackRoute
+  ApiPublicHooksCanvaSyncRoute: typeof ApiPublicHooksCanvaSyncRoute
   ApiPublicHooksLogoScrubRoute: typeof ApiPublicHooksLogoScrubRoute
   ApiPublicVenueEventRoute: typeof ApiPublicVenueEventRoute
 }
@@ -4755,6 +4768,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCanvaCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/canva-sync': {
+      id: '/api/public/hooks/canva-sync'
+      path: '/api/public/hooks/canva-sync'
+      fullPath: '/api/public/hooks/canva-sync'
+      preLoaderRoute: typeof ApiPublicHooksCanvaSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/logo-scrub': {
       id: '/api/public/hooks/logo-scrub'
       path: '/api/public/hooks/logo-scrub'
@@ -5379,6 +5399,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicBoothsEventRoute: ApiPublicBoothsEventRoute,
   ApiPublicCanvaSyncDesignIdRoute: ApiPublicCanvaSyncDesignIdRoute,
   ApiPublicCanvaCallbackRoute: ApiPublicCanvaCallbackRoute,
+  ApiPublicHooksCanvaSyncRoute: ApiPublicHooksCanvaSyncRoute,
   ApiPublicHooksLogoScrubRoute: ApiPublicHooksLogoScrubRoute,
   ApiPublicVenueEventRoute: ApiPublicVenueEventRoute,
 }

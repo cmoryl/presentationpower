@@ -31,3 +31,21 @@ export const syncCanvaDesigns = createServerFn({ method: "POST" })
     const { syncDesigns } = await import("@/lib/canva-sync.server");
     return syncDesigns(data.ids);
   });
+
+/** Connection + sync health for Admin → Canva connection. */
+export const getCanvaSyncHealth = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context);
+    const { syncHealth } = await import("@/lib/canva-sync.server");
+    return syncHealth();
+  });
+
+/** Runs the same capped job the daily schedule runs. */
+export const runCanvaBackgroundSync = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context);
+    const { runBackgroundSync } = await import("@/lib/canva-sync.server");
+    return runBackgroundSync("manual");
+  });

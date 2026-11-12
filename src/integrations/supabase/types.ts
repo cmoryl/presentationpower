@@ -1345,6 +1345,45 @@ export type Database = {
         }
         Relationships: []
       }
+      canva_sync_runs: {
+        Row: {
+          checked: number
+          failed: number
+          finished_at: string | null
+          id: string
+          problems: Json
+          remaining: number
+          started_at: string
+          stopped_reason: string | null
+          synced: number
+          trigger: string
+        }
+        Insert: {
+          checked?: number
+          failed?: number
+          finished_at?: string | null
+          id?: string
+          problems?: Json
+          remaining?: number
+          started_at?: string
+          stopped_reason?: string | null
+          synced?: number
+          trigger: string
+        }
+        Update: {
+          checked?: number
+          failed?: number
+          finished_at?: string | null
+          id?: string
+          problems?: Json
+          remaining?: number
+          started_at?: string
+          stopped_reason?: string | null
+          synced?: number
+          trigger?: string
+        }
+        Relationships: []
+      }
       client_logos: {
         Row: {
           client_name: string

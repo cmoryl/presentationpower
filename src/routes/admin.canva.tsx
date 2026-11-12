@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
 import { Button } from "@/design-system/element";
+import { CanvaSyncHealth } from "@/components/admin/CanvaSyncHealth";
 import { getCanvaStatus, startCanvaConnect } from "@/lib/canva.functions";
 
 export const Route = createFileRoute("/admin/canva")({
@@ -65,6 +66,7 @@ function CanvaAdmin() {
             {s.connected ? "Reconnect shared Canva" : "Connect shared Canva"}
           </Button>
           {err && <p className="text-sm text-destructive">{err}</p>}
+          {s.connected && <CanvaSyncHealth />}
         </div>
       )}
     </div>

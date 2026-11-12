@@ -70,3 +70,74 @@ export async function syncDesigns(ids: string[]): Promise<SyncResult[]> {
     }
   });
 }
+
+// ── Background sync ──────────────────────────────────────────────────────────
+// Runs daily (and on demand). Re-checks designs not checked for ~20h, then exports a
+// capped number of changed ones, so a big Canva edit day spreads over several days
+// without anyone clicking. Stops early when Canva's export allowance runs out.
+import { sjbCalendarActiveDesignIds } from "@/lib/sjb-social-calendar";
+
+export const BG_CHECK_PER_RUN = 120;
+export const BG_SYNC_PER_RUN = 25;
+
+export function pendingIds(rows: { design_id: string; canva_updated_at: string | null; synced_at: string | null }[], bundled: Record<string, string>) {
+  return rows.filter((r) => {
+    if (!r.canva_updated_at) return false;
+    const base = r.synced_at ?? bundled[r.design_id] ?? null;
+    return !base || new Date(r.canva_updated_at).getTime() > new Date(base).getTime();
+  }).map((r) => r.design_id);
+}
+
+const isLimit = (m: string) => /\[429\]|rate limit|quota|limit/i.test(m);
+
+export async function runBackgroundSync(trigger: "daily" | "manual") {
+  const ids = sjbCalendarActiveDesignIds();
+  const started = new Date().toISOString();
+  let checked = 0, synced = 0, failed = 0, stopped: string | null = null;
+  const problems: { id: string | null; error: string }[] = [];
+  try {
+    const { data: rows0 } = await supabaseAdmin.from("canva_asset_sync").select("design_id, checked_at").in("design_id", ids);
+    const lastCheck = new Map((rows0 ?? []).map((r) => [r.design_id, new Date(r.checked_at).getTime()]));
+    const cutoff = Date.now() - 20 * 3600_000;
+    const due = ids.filter((id) => (lastCheck.get(id) ?? 0) < cutoff).slice(0, BG_CHECK_PER_RUN);
+    for (const r of await checkDesigns(due)) { checked++; if (r.error) problems.push({ id: r.id, error: r.error }); }
+    const { data: rows } = await supabaseAdmin.from("canva_asset_sync").select("design_id, canva_updated_at, synced_at").in("design_id", ids);
+    const pend = pendingIds(rows ?? [], SJB_CALENDAR_PICTURE_SAVED_AT);
+    for (let i = 0; i < Math.min(pend.length, BG_SYNC_PER_RUN) && !stopped; i += 5) {
+      for (const r of await syncDesigns(pend.slice(i, Math.min(i + 5, BG_SYNC_PER_RUN)))) {
+        if (r.ok) synced++;
+        else { failed++; problems.push({ id: r.id, error: r.error }); if (isLimit(r.error)) stopped = "Canva's daily download allowance ran out; the rest continue tomorrow."; }
+      }
+    }
+  } catch (e) {
+    stopped = (e as Error).message; problems.push({ id: null, error: stopped });
+  }
+  const { data: after } = await supabaseAdmin.from("canva_asset_sync").select("design_id, canva_updated_at, synced_at").in("design_id", ids);
+  const remaining = pendingIds(after ?? [], SJB_CALENDAR_PICTURE_SAVED_AT).length;
+  const run = { started_at: started, finished_at: new Date().toISOString(), trigger, checked, synced, failed, remaining, stopped_reason: stopped, problems: problems.slice(0, 50) };
+  await supabaseAdmin.from("canva_sync_runs").insert(run);
+  return run;
+}
+
+export async function syncHealth() {
+  const ids = sjbCalendarActiveDesignIds();
+  const [{ data: conn }, { data: runs }, { data: rows }] = await Promise.all([
+    supabaseAdmin.from("canva_shared_connection").select("updated_at, expires_at, connected_by").eq("id", 1).maybeSingle(),
+    supabaseAdmin.from("canva_sync_runs").select("*").order("started_at", { ascending: false }).limit(10),
+    supabaseAdmin.from("canva_asset_sync").select("design_id, canva_updated_at, synced_at, last_error, checked_at").in("design_id", ids),
+  ]);
+  let connectedBy: string | null = null;
+  if (conn?.connected_by) {
+    const u = await supabaseAdmin.auth.admin.getUserById(conn.connected_by);
+    connectedBy = u.data.user?.email ?? null;
+  }
+  const r = rows ?? [];
+  return {
+    connected: Boolean(conn), connectedBy, tokenRefreshedAt: conn?.updated_at ?? null, tokenExpiresAt: conn?.expires_at ?? null,
+    total: ids.length, neverChecked: ids.length - r.length,
+    pending: pendingIds(r, SJB_CALENDAR_PICTURE_SAVED_AT).length,
+    withErrors: r.filter((x) => x.last_error).length,
+    lastChecked: r.reduce<string | null>((m, x) => (!m || x.checked_at > m ? x.checked_at : m), null),
+    runs: runs ?? [],
+  };
+}
