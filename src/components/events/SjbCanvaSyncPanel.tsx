@@ -93,10 +93,10 @@ export function SjbCanvaSyncPanel({ designIds, label }: SjbCanvaSyncPanelProps) 
       </div>
 
       {changed && (changed.length === 0
-        ? <p className="mt-3">Everything matches Canva — nothing to download.</p>
+        ? <p className="mt-3">{problems.length > 0 ? `Nothing to download, but ${problems.length} design${problems.length === 1 ? "" : "s"} could not be checked (listed below).` : "Everything matches Canva — nothing to download."}</p>
         : <div className="mt-3 space-y-2">
             <div className="flex flex-wrap items-center gap-3">
-              <p>{changed.length} design{changed.length === 1 ? "" : "s"} changed in Canva; {designIds.length - changed.length} unchanged.</p>
+              <p>{changed.length} design{changed.length === 1 ? "" : "s"} changed in Canva; {designIds.length - changed.length - problems.length} unchanged{problems.length > 0 ? `; ${problems.length} could not be checked (listed below)` : ""}.</p>
               <Button size="sm" onClick={runSync} disabled={!!busy}>Update {changed.length} picture{changed.length === 1 ? "" : "s"}</Button>
             </div>
             <ul className="max-h-48 overflow-auto list-disc pl-5">

@@ -160,12 +160,20 @@ type ImportJob = {
 
 /** Last-edited time of a design (metadata read — does not use the export allowance). */
 export async function designUpdatedAt(token: string, id: string): Promise<number | null> {
-  const res = await fetch(`${API}/designs/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${token}` } });
-  const text = await res.text();
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`Canva design check failed [${res.status}]: ${text}`);
-  const d = (JSON.parse(text) as { design: { updated_at: number } }).design;
-  return d.updated_at * 1000;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await fetch(`${API}/designs/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${token}` } });
+    const text = await res.text();
+    if (res.status === 404) return null;
+    if (res.status === 429 && attempt < 2) {
+      const wait = Number(res.headers.get("retry-after")) || 8;
+      await new Promise((r) => setTimeout(r, Math.min(wait, 20) * 1000));
+      continue;
+    }
+    if (!res.ok) throw new Error(`Canva design check failed [${res.status}]: ${text}`);
+    const d = (JSON.parse(text) as { design: { updated_at: number } }).design;
+    return d.updated_at * 1000;
+  }
+  throw new Error("Canva design check failed [429]: rate limited");
 }
 
 /** Exports page 1 of a design as JPEG and returns the raw bytes (uses the export allowance). */

@@ -7,6 +7,7 @@ export function explainSyncError(raw: string): SyncProblem {
   if (m.includes("isn't connected")) return { what: "The shared Canva account isn't connected.", next: "An admin connects it on Admin → Canva." };
   if (m.includes("ai label")) return { what: "Hidden AI labels couldn't be removed, so the picture wasn't published.", next: "Re-export from Canva or tell the team; the old picture stays live." };
   if (m.includes("not found in the shared")) return { what: "This design isn't in the shared Canva account (deleted, or owned by someone else).", next: "Share it into the San Juan Bowl folder, or ignore it." };
+  if (m.includes("design check failed") && (code === "429" || m.includes("rate") || m.includes("limit"))) return { what: "Canva asked us to slow down while checking.", next: "Wait a few minutes, then check again; nothing was changed." };
   if (code === "429" || m.includes("rate") || m.includes("quota") || m.includes("limit")) return { what: "Canva's daily download allowance is used up.", next: "Try again tomorrow; nothing was changed." };
   if (code === "401" || m.includes("invalid_grant") || m.includes("refresh")) return { what: "Canva sign-in for the shared account has expired.", next: "An admin reconnects on Admin → Canva." };
   if (code === "403") return { what: "Canva didn't allow this download.", next: "An admin reconnects on Admin → Canva and approves picture downloads." };
