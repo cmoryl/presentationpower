@@ -171,3 +171,15 @@ export function sjbCalendarActiveDesignIds(): string[] {
     for (const m of SJB_CALENDAR_MODES) for (const id of Object.values(byMode[m.id] ?? {})) if (id) ids.add(id);
   return [...ids];
 }
+
+/** Plain name for a calendar design, e.g. "Post 01 · Light (light action) · Feed 1080×1350". */
+export function sjbCalendarDesignLabel(id: string): string {
+  for (const [post, byMode] of Object.entries(DESIGNS))
+    for (const m of SJB_CALENDAR_MODES)
+      for (const [h, d] of Object.entries(byMode[m.id] ?? {}))
+        if (d === id) {
+          const s = SJB_CALENDAR_SIZES.find((z) => z.id === h);
+          return `Post ${post} · ${m.label} · ${s ? `${s.label} ${s.w}×${s.h}` : h}`;
+        }
+  return `Canva design ${id}`;
+}
