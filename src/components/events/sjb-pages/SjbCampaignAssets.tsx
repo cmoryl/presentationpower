@@ -1,4 +1,5 @@
-import { Download } from 'lucide-react';
+import { Download, ExternalLink, Layers } from 'lucide-react';
+import { SJB_CAMPAIGN_SEQUENCE_MASTERS, SJB_SEQUENCE_PAGE_ORDER, sjbCanvaEditUrl } from '@/lib/sjb-campaign-sequence-masters';
 import { Button } from '@/design-system/element';
 import { SJB_CALENDAR_STYLE, SJB_CALENDAR_MARKS } from '@/lib/sjb-calendar-style';
 import { SJB_SEQUENCE_BACKGROUNDS } from '@/lib/sjb-sequence-backgrounds';
@@ -34,6 +35,7 @@ export function sjbCampaignAssets(mode: SjbCalendarMode): Asset[] {
 }
 
 export function SjbCampaignAssets({ mode, label }: { mode: SjbCalendarMode; label: string }) {
+  const masters = mode === 'set2' || mode === 'set3' || mode === 'set4' ? SJB_CAMPAIGN_SEQUENCE_MASTERS[mode] : [];
   return <div className="mb-8 rounded-lg border border-border p-5">
     <h3 className="text-base font-bold">{label} — design assets</h3>
     <p className="mb-4 mt-1 text-sm text-muted-foreground">Backgrounds and logos for building new pieces in this style. No finished ads; logos are the supplied files, unchanged.</p>
@@ -44,5 +46,10 @@ export function SjbCampaignAssets({ mode, label }: { mode: SjbCalendarMode; labe
           <Button asChild variant="outline" size="sm"><a href={a.url} download target="_blank" rel="noreferrer" aria-label={`Download ${a.name}`}><Download /></a></Button></figcaption>
       </figure>)}
     </div>
+    {masters.length > 0 && <section className="mt-6 border-t border-border pt-5" aria-labelledby={`${mode}-multipage`}>
+      <h4 id={`${mode}-multipage`} className="flex items-center gap-2 text-sm font-bold"><Layers className="size-4" />Multi-page Canva files</h4>
+      <p className="mt-1 text-xs text-muted-foreground">Four pages each: {SJB_SEQUENCE_PAGE_ORDER.join(' → ')}. Swap page 2 for any post headline.</p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-3">{masters.map(m => <Button key={m.id} asChild variant="outline" className="h-auto justify-between py-3"><a href={sjbCanvaEditUrl(m.id)} target="_blank" rel="noreferrer" aria-label={`Open ${label} ${m.size} four-page Canva file`}><span className="text-left"><span className="block text-sm font-semibold">{m.size}</span><span className="block text-xs text-muted-foreground">4 pages · live Canva</span></span><ExternalLink /></a></Button>)}</div>
+    </section>}
   </div>;
 }

@@ -1,5 +1,7 @@
 # San Juan Bowl event pages and assets
 
+- Campaign design-asset panels resolve reusable four-page Canva masters through `sjb-campaign-sequence-masters`; these are not per-post calendar sequences — why: asset masters must stay separate from finished post registries and preserve original single-page files.
+
 - Sequence companion grounds resolve by look and page role through `sjb-sequence-backgrounds`; only drawn headline/details/tickets pages use them, while original cover imagery and saved Canva pages remain intact — why: coordinated AI-edited grounds must not replace issued art or change campaign identity.
 
 - Drawn Bowl social callouts use SjbFittedCallout to measure the loaded campaign font against their reserved width and height; saved Canva images remain untouched — why: large headlines must fit actual lettering without stretching or overwriting approved originals.
