@@ -104,8 +104,18 @@ function CalendarPage() {
 
   return (
     <main className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6">
-      <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl social calendar</h1>
-      <p className="mt-2 text-sm text-muted-foreground">November – December 2026</p>
+      <header className="sjb-cal-hero relative overflow-hidden rounded-xl px-6 py-10 text-white sm:px-10">
+        <div className="relative z-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FFD600]">Social media · {SJB_EVENT.datesLabel}</p>
+          <h1 className="sjb-cal-hero-title mt-2 text-4xl font-bold uppercase italic sm:text-5xl">San Juan Bowl social calendar</h1>
+          <p className="mt-3 max-w-2xl text-sm text-white/80">November – December 2026 · {SJB_CALENDAR_POSTS.length} posts across Facebook and Instagram, in every campaign look and size.</p>
+          <div className="mt-5 flex flex-wrap gap-2 text-xs">
+            {[["Ready", SJB_CALENDAR_POSTS.filter((p) => p.status === "Approved/Ready").length], ["Ready for content", SJB_CALENDAR_POSTS.filter((p) => p.status.startsWith("Ready For")).length], ["Not started", SJB_CALENDAR_POSTS.filter((p) => p.status === "Not Started").length]].map(([l, n]) => (
+              <span key={l as string} className="rounded-sm border border-white/20 bg-white/5 px-3 py-1.5 backdrop-blur"><b className="text-[#FFD600]">{n}</b> {l}</span>
+            ))}
+          </div>
+        </div>
+      </header>
       <SjbCalendarLookCards mode={mode} onChange={setMode} />
       <SjbPictureStamp stamp={pictureStamp} />
       <SjbCanvaSyncPanel designIds={canvaSyncTargets().map((t) => t.id)} label="Bowl calendar, billboard and carousel" />
@@ -117,13 +127,13 @@ function CalendarPage() {
           const on = view === v;
           return (
             <button key={v} type="button" aria-pressed={on} onClick={() => setView(v)}
-              className={`group flex items-center gap-4 rounded-lg border-2 p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:hover:-translate-y-0.5 ${on ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card text-foreground hover:border-primary/60 hover:shadow-sm"}`}>
-              <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-md ${on ? "bg-primary-foreground/15" : "bg-muted text-primary"}`}><Icon className="h-6 w-6" aria-hidden /></span>
+              className={`group flex items-center gap-4 rounded-lg border-2 p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:hover:-translate-y-0.5 ${on ? "border-[#FFD600] bg-[#0D0E21] text-white shadow-lg" : "border-border bg-card text-foreground hover:border-primary/60 hover:shadow-sm"}`}>
+              <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-md ${on ? "bg-white/10 text-[#FFD600]" : "bg-muted text-primary"}`}><Icon className="h-6 w-6" aria-hidden /></span>
               <span className="min-w-0">
                 <span className="block text-base font-semibold">{title}</span>
-                <span className={`block text-sm ${on ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{sub}</span>
+                <span className={`block text-sm ${on ? "text-white/75" : "text-muted-foreground"}`}>{sub}</span>
               </span>
-              {on && <span className="ml-auto rounded bg-primary-foreground/15 px-2 py-0.5 text-xs font-medium">Showing</span>}
+              {on && <span className="ml-auto rounded bg-[#FFD600] text-[#0D0E21] px-2 py-0.5 text-xs font-medium">Showing</span>}
             </button>
           );
         })}
@@ -135,12 +145,12 @@ function CalendarPage() {
       <ol className="mt-8 space-y-8">
         {groups.dated.map(([date, posts]) => (
           <li key={date} id={`day-${date}`} className={`grid scroll-mt-24 gap-4 rounded-xl p-3 md:grid-cols-[9rem_1fr] ${flash?.dayId === `day-${date}` ? "sjb-day-flash" : ""}`}>
-            <h2 className="pt-1 text-sm font-semibold uppercase text-muted-foreground">{fmt(date)}</h2>
+            <h2 className="sjb-list-date pt-1 text-sm font-bold uppercase italic text-foreground">{fmt(date)}</h2>
             <div className="space-y-4">{posts.map((p) => <div key={p.itemId} id={`post-${p.itemId}`} className={`scroll-mt-24 rounded-md ${flash?.itemId === p.itemId ? "ring-2 ring-primary ring-offset-4 ring-offset-background" : ""}`}><PostRow post={p} mode={mode} format={format} /></div>)}</div>
           </li>
         ))}
         <li id="day-undated" className={`grid scroll-mt-24 gap-4 rounded-xl p-3 md:grid-cols-[9rem_1fr] ${flash?.dayId === "day-undated" ? "sjb-day-flash" : ""}`}>
-          <h2 className="pt-1 text-sm font-semibold uppercase text-muted-foreground">No date yet</h2>
+          <h2 className="sjb-list-date pt-1 text-sm font-bold uppercase italic text-foreground">No date yet</h2>
           <div className="space-y-4">{groups.undated.map((p) => <div key={p.itemId} id={`post-${p.itemId}`} className={`scroll-mt-24 rounded-md ${flash?.itemId === p.itemId ? "ring-2 ring-primary ring-offset-4 ring-offset-background" : ""}`}><PostRow post={p} mode={mode} format={format} /></div>)}</div>
         </li>
       </ol>
