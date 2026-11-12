@@ -11,6 +11,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, CircleDashed } from "lucide-react"
 import { AppShell } from "@/components/AppShell";
 import { EventTimeline } from "@/components/events/EventTimeline";
 import { SjbRecentUpdates } from "@/components/events/SjbRecentUpdates";
+import { SjbHero } from "@/components/events/SjbHero";
 import { SjbEventAreas } from "@/components/events/SjbEventAreas";
 import { SJB_LOGOS, SJB_LOGO_RULES } from "@/lib/san-juan-bowl";
 import { getEventIntake } from "@/lib/event-intake.functions";
@@ -153,10 +154,11 @@ function EventHome() {
               </Link>
             </p>
           ) : null}
+          {isBowl ? <SjbHero /> : (<>
           <h1 className="text-3xl font-bold leading-tight text-[#03002C]">{entry.name}</h1>
           <p className="mt-1 text-[15px] text-[#03002C]/75">
             {[entry.venue, entry.city, entry.dates].filter(Boolean).join(" · ")}
-          </p>
+          </p></>)}
 
           {!isBowl && (<><div className="mt-3 flex items-center gap-3">
             <div className="h-2 w-48 overflow-hidden rounded-full bg-[#03002C]/10 dark:bg-card">

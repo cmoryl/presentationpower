@@ -1585,3 +1585,14 @@ body.export-mode [data-print-surface] {
     overflow: auto;
   }
 }
+
+/* San Juan Bowl landing motion */
+@keyframes sjb-kenburns { from { transform: scale(1); } to { transform: scale(1.12) translateX(-2%); } }
+@keyframes sjb-sweep { from { transform: translateX(-120%); } to { transform: translateX(420%); } }
+@keyframes sjb-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes sjb-progress { from { width: 0; } to { width: 100%; } }
+.sjb-kenburns { animation: sjb-kenburns 14s ease-in-out infinite alternate; }
+.sjb-sweep { animation: sjb-sweep 6s ease-in-out infinite; }
+.sjb-float { animation: sjb-float 5s ease-in-out infinite; filter: drop-shadow(0 12px 30px rgb(0 0 0 / 0.5)); }
+.sjb-progress { animation-name: sjb-progress; animation-timing-function: linear; animation-fill-mode: forwards; }
+@media (prefers-reduced-motion: reduce) { .sjb-kenburns, .sjb-sweep, .sjb-float { animation: none; } }
