@@ -1,3 +1,5 @@
+import liveFront from "@/assets/sjb-badges/sjb-badge-live-front.png.asset.json";
+import liveBack from "@/assets/sjb-badges/sjb-badge-live-back.png.asset.json";
 import { useState } from "react";
 import { Button } from "@/design-system/element";
 import { SJB_ATTENDEE_TYPES, SJB_BADGE_COMPS, SJB_BADGE_SIZE, SJB_SHIRT_COMPS } from "@/lib/sjb-merch-comps";
@@ -15,6 +17,15 @@ export function SjbBadgesPage() {
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl attendee badges</h1>
       <CompNote />
       <p className="mt-1 text-sm text-muted-foreground">Size: {SJB_BADGE_SIZE.trimW} × {SJB_BADGE_SIZE.trimH} in plastic badge with dual hanging slots (same stock as NEXT), {SJB_BADGE_SIZE.bleed} in bleed. Back carries a QR to SANJUANBOWL.COM.</p>
+      <section aria-labelledby="badge-live" className="mt-8">
+        <h2 id="badge-live" className="text-xl font-semibold text-foreground">Live Canva template (working final)</h2>
+        <p className="text-sm text-muted-foreground">The badge as it stands in Canva. The white box on the back is reserved for the QR code. Pictures are preview size; edit the design in Canva.</p>
+        <div className="mt-4 grid max-w-xl grid-cols-2 gap-6">
+          <figure><img src={liveFront.url} alt="Bowl badge front: shield logo, ACC and Sun Belt marks, date, stadium and photo area" className="w-full rounded-md shadow-sm" /><figcaption className="mt-2 text-sm text-muted-foreground">Front</figcaption></figure>
+          <figure><img src={liveBack.url} alt="Bowl badge back: GUEST in large letters over a glowing football, with a white QR area" className="w-full rounded-md shadow-sm" /><figcaption className="mt-2 text-sm text-muted-foreground">Back (white area = QR)</figcaption></figure>
+        </div>
+        <a href="https://www.canva.com/design/DAHauhoJEx8/edit" target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm font-medium text-primary underline">Open in Canva</a>
+      </section>
       <div role="group" aria-label="Attendee type" className="mt-6 flex flex-wrap gap-2">
         {SJB_ATTENDEE_TYPES.map((a) => <Button key={a.id} size="sm" variant={a.id === type ? "default" : "outline"} aria-pressed={a.id === type} onClick={() => setType(a.id)}>{a.label}</Button>)}
       </div>
