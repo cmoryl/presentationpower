@@ -208,7 +208,7 @@ function DemoPageFrame({
 }
 
 /** A composition reflow, never a different campaign or a stretched finished picture. */
-export function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarPost; mode: SjbCalendarMode; width: number; height: number; logo: string }) {
+function CampaignCover({ post, mode, width, height, logo }: { post: SjbCalendarPost; mode: SjbCalendarMode; width: number; height: number; logo: string }) {
   const look = SJB_DEMO_LOOKS[mode];
   const style = SJB_CALENDAR_STYLE[mode];
   const broadcaster = sjbBroadcastMark(post.headline, mode, height > width);

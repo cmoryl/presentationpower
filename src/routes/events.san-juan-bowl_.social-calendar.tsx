@@ -7,7 +7,6 @@ import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
 import { SjbCanvaSyncPanel } from "@/components/events/SjbCanvaSyncPanel";
 import { SjbPictureStamp } from "@/components/events/SjbPictureStamp";
-import { SjbHolidayGrounds } from "@/components/events/SjbHolidayGrounds";
 import { getCanvaSyncStamp } from "@/lib/canva-sync.functions";
 import { canvaSyncTargets } from "@/lib/canva-sync-targets";
 import { useCanvaSynced } from "@/lib/use-canva-sync";
@@ -108,7 +107,6 @@ function CalendarPage() {
       <p className="mt-2 text-sm text-muted-foreground">November – December 2026</p>
       <SjbCalendarLookCards mode={mode} onChange={setMode} />
       <SjbPictureStamp stamp={pictureStamp} />
-      <SjbHolidayGrounds />
       <SjbCanvaSyncPanel designIds={canvaSyncTargets().map((t) => t.id)} label="Bowl calendar, billboard and carousel" />
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:max-w-3xl" role="group" aria-label="View">
         {([
