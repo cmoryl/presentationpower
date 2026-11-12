@@ -2,8 +2,8 @@ import liveFront from "@/assets/sjb-badges/sjb-badge-live-front.png.asset.json";
 import liveBack from "@/assets/sjb-badges/sjb-badge-live-back.png.asset.json";
 import { useState } from "react";
 import { Button } from "@/design-system/element";
-import { SJB_ATTENDEE_TYPES, SJB_BADGE_COMPS, SJB_BADGE_SIZE, SJB_SHIRT_COMPS } from "@/lib/sjb-merch-comps";
-import { SjbBadgeFace, SjbShirt } from "./SjbMerchArt";
+import { SJB_ATTENDEE_TYPES, SJB_BADGE_SIZE, SJB_SHIRT_COMPS } from "@/lib/sjb-merch-comps";
+import { SjbShirt } from "./SjbMerchArt";
 import { SJB_BADGE_STYLES, SjbStyledBadge } from "./SjbBadgeStyles";
 
 function CompNote() {
@@ -45,18 +45,6 @@ export function SjbBadgesPage() {
           ))}
         </div>
       </section>
-      <h2 className="mt-12 text-xl font-semibold text-foreground">Earlier comps</h2>
-      <div className="mt-4 space-y-12">
-        {SJB_BADGE_COMPS.map((c) => (
-          <section key={c.id} aria-labelledby={`badge-${c.id}`}>
-            <h2 id={`badge-${c.id}`} className="text-xl font-semibold text-foreground">{c.name}</h2>
-            <p className="text-sm text-muted-foreground">{c.idea}</p>
-            <div className="mt-4 grid max-w-xl grid-cols-2 gap-6">
-              {(["front", "back"] as const).map((s) => <figure key={s}><SjbBadgeFace comp={c} type={t} side={s} /><figcaption className="mt-2 text-sm capitalize text-muted-foreground">{s}</figcaption></figure>)}
-            </div>
-          </section>
-        ))}
-      </div>
     </main>
   );
 }
