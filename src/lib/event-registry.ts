@@ -533,8 +533,11 @@ export const SJB_EVENT_AREAS: EventAreaGroup[] = [
   {
     id: "production",
     title: "Signs & print",
-    summary: "On-site signs.",
-    tools: [],
+    summary: "On-site signs, badges and apparel.",
+    tools: [
+      { label: "Attendee badges", detail: "Front and back badge comps for Guest, VIP, Media and Staff.", link: { to: "/events/san-juan-bowl/badges" } },
+      { label: "Marketing T-shirts", detail: "Front and back T-shirt comps for staff, fans, VIP and media.", link: { to: "/events/san-juan-bowl/tshirts" } },
+    ],
   },
   {
     id: "share",
