@@ -31,7 +31,7 @@ export function SjbShirtPhotos() {
       </section>
       <section aria-labelledby="sjb-distressed">
         <h2 id="sjb-distressed" className="text-xl font-semibold text-foreground">Distressed full-colour logo — football jersey and tees</h2>
-        <p className="text-sm text-muted-foreground">Page 11 of the Canva shirt file, unchanged, on a replica game jersey and on men's and kids' tees.</p>
+        <p className="text-sm text-muted-foreground">Page 11 of the Canva shirt file, unchanged. Replica game jersey with number 26, SAN JUAN nameplate and ACC / Sun Belt sleeve patches (example number, not an issued jersey), plus men's and kids' tees.</p>
         <Grid list={distressed} cols="md:grid-cols-2" />
       </section>
       <section aria-labelledby="sjb-role-tees">
