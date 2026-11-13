@@ -1,7 +1,7 @@
 type Ptr = { url: string };
 const all = import.meta.glob<Ptr>("@/assets/sjb-shirts/*.asset.json", { eager: true, import: "default" });
 const items = Object.entries(all).map(([p, v]) => ({ name: p.split("/").pop()!.replace(/\.jpg\.asset\.json$/, ""), url: v.url })).sort((a, b) => a.name.localeCompare(b.name));
-const label = (n: string) => n.replace(/^role-/, "").replace(/^distressed-/, "").replace(/^sjb-shirt-/, "Shirt ").replace(/-pair$/, "").replace(/-/g, " ");
+const label = (n: string) => n.replace(/^role-/, "").replace(/^distressed-/, "").replace(/^colour-/, "").replace(/^sjb-shirt-/, "Shirt ").replace(/-pair$/, "").replace(/-/g, " ");
 
 function Grid({ list, cols }: { list: typeof items; cols: string }) {
   return (
@@ -17,10 +17,11 @@ function Grid({ list, cols }: { list: typeof items; cols: string }) {
 }
 
 export function SjbShirtPhotos() {
-  const people = items.filter((i) => /^(man|woman|kid)-/.test(i.name) && !i.name.endsWith("-pair"));
+  const people = items.filter((i) => /^(man|woman|kid|pair|dad)-/.test(i.name) && !i.name.endsWith("-pair"));
   const distressed = items.filter((i) => i.name.startsWith("distressed-"));
+  const colours = items.filter((i) => i.name.startsWith("colour-"));
   const roles = items.filter((i) => i.name.startsWith("role-"));
-  const pairs = items.filter((i) => i.name.endsWith("-pair") && !/^(role|distressed)-/.test(i.name));
+  const pairs = items.filter((i) => i.name.endsWith("-pair") && !/^(role|distressed|colour)-/.test(i.name));
   const flats = items.filter((i) => i.name.startsWith("sjb-shirt-"));
   return (
     <div className="mt-8 space-y-12">
@@ -28,6 +29,11 @@ export function SjbShirtPhotos() {
         <h2 id="sjb-on-people" className="text-xl font-semibold text-foreground">Worn at the game</h2>
         <p className="text-sm text-muted-foreground">Example scenes: the shirt artwork is the exact Canva design; the people and stadium are AI-made, not event photos.</p>
         <Grid list={people} cols="sm:grid-cols-2 lg:grid-cols-4" />
+      </section>
+      <section aria-labelledby="sjb-colours">
+        <h2 id="sjb-colours" className="text-xl font-semibold text-foreground">More shirt colours — royal blue, gold, heather grey</h2>
+        <p className="text-sm text-muted-foreground">Front and back logo options from the Canva shirt file and the official one-colour navy mark.</p>
+        <Grid list={colours} cols="md:grid-cols-2" />
       </section>
       <section aria-labelledby="sjb-distressed">
         <h2 id="sjb-distressed" className="text-xl font-semibold text-foreground">Distressed full-colour logo — football jersey and tees</h2>
