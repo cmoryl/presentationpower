@@ -1643,3 +1643,8 @@ body.export-mode [data-print-surface] {
 .sjb-list-date { border-left: 3px solid #FFD600; padding-left: 0.6rem; }
 @keyframes sjb-cal-sweep { from { background-position: 100% 0; } to { background-position: -150% 0; } }
 @media (prefers-reduced-motion: reduce) { .sjb-cal-hero::after, .sjb-cal-hero-title { animation: none; } }
+
+/* San Juan Bowl micro-site: page headings follow the Light-social lettering. */
+body:has([data-sjb-masthead]) main h1 { font-family: "Barlow Condensed", sans-serif; font-weight: 700; font-style: italic; text-transform: uppercase; line-height: 0.95; }
+body:has([data-sjb-masthead]) main h2 { font-family: "Barlow Condensed", sans-serif; font-weight: 700; text-transform: uppercase; }
+body:has([data-sjb-shell-masthead]) [data-sjb-trail-masthead] { display: none; }

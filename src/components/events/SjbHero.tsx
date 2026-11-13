@@ -6,6 +6,7 @@ import "@fontsource/barlow-condensed/700.css";
 import "@fontsource/barlow-condensed/700-italic.css";
 import { SJB_EVENT, SJB_COLORS, SJB_LOGOS } from "@/lib/san-juan-bowl";
 import { SJB_STADIUM_RENDERS } from "@/lib/sjb-stadium-renders";
+import { SjbSiteNav } from "./SjbMasthead";
 
 const hex = (id: string) => SJB_COLORS.find((c) => c.id === id)?.hex ?? "#000";
 // Dec 16, 2026 7:30 p.m. ET (EST, UTC-5) per SJB_EVENT.kickoffLabel.
@@ -52,7 +53,7 @@ export function SjbHero() {
   ];
 
   return (
-    <section aria-label={SJB_EVENT.name} style={{ background: navy, fontFamily: BOWL_FONT }} className="relative mt-4 overflow-hidden rounded-xl text-white">
+    <section data-sjb-masthead aria-label={SJB_EVENT.name} style={{ background: navy, fontFamily: BOWL_FONT }} className="relative mt-4 overflow-hidden rounded-xl text-white">
       {PLATES.map((p, n) => (
         <img key={p.id} src={p.src} alt="" aria-hidden
           className={`sjb-kenburns absolute inset-0 h-full w-full object-cover transition-opacity duration-[1500ms] ${n === i ? "opacity-70" : "opacity-0"}`} />
@@ -110,6 +111,7 @@ export function SjbHero() {
             style={{ background: n === i ? gold : "rgba(255,255,255,.3)" }} />
         ))}
       </div>
+      <SjbSiteNav />
       <div className="relative border-t border-white/15 py-2" style={{ background: `${navy}cc` }}>
         <p className="sr-only">{ticker.join(" · ")}</p>
         <div aria-hidden className="overflow-hidden">

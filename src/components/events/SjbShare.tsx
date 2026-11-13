@@ -5,6 +5,7 @@
 import { createContext, forwardRef, useContext, useState, type AnchorHTMLAttributes, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
+import { SjbMasthead } from "./SjbMasthead";
 import { Check, Link2 } from "lucide-react";
 import { NEXT_APP_ORIGIN } from "@/lib/next-event";
 import logoColor from "@/assets/san-juan-bowl/sjb-logo-color.svg.asset.json";
@@ -97,7 +98,8 @@ function ShareShell({ children }: { children: ReactNode }) {
 
 /** AppShell inside Element; the menu-free share frame on the share link. */
 export function SjbShell({ children }: { children: ReactNode }) {
-  return useSjbShare() ? <ShareShell>{children}</ShareShell> : <AppShell>{children}</AppShell>;
+  const body = <><div data-sjb-shell-masthead className="px-6"><SjbMasthead /></div>{children}</>;
+  return useSjbShare() ? <ShareShell>{body}</ShareShell> : <AppShell>{body}</AppShell>;
 }
 
 export function SjbShareProvider({ children }: { children: ReactNode }) {
