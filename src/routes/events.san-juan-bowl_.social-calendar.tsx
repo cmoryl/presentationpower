@@ -1,7 +1,7 @@
 import { withSjbTrail } from "@/components/events/SjbBreadcrumbs";
 // /events/san-juan-bowl/social-calendar — the team's Bowl social calendar with
 // dark/light Canva designs (three sizes) and Illustrator files per post.
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { Button } from "@/design-system/element";
@@ -19,6 +19,7 @@ import { SjbSavedSequence } from "@/components/events/SjbSavedSequence";
 import { SjbPackButton } from "@/components/events/SjbPackButton";
 import { sjbCampaignMasterFor, SJB_SEQUENCE_PAGE_ORDER } from "@/lib/sjb-campaign-sequence-masters";
 import { sjbCalendarCover } from "@/lib/sjb-calendar-demo";
+import { SJB_SOCIAL_STUDIO_DESIGNS } from "@/lib/sjb-social-studio";
 import { CalendarDays, List as ListIcon } from "lucide-react";
 import { SJB_CALENDAR_FORMATS, sjbCalendarSequence, sjbCalendarSequenceCanvaUrl, type SjbCalendarFormat } from "@/lib/sjb-calendar-formats";
 import {
@@ -210,6 +211,8 @@ function PostRow({ post, mode, format }: { post: SjbCalendarPost; mode: SjbCalen
         <p className="mt-4 rounded border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">Not built in this look yet.</p>
       )}
 
+      <MoreSizes mode={mode} />
+
       <MultiPageFormats post={post} mode={mode} />
 
       {post.caption && (
@@ -226,6 +229,44 @@ function PostRow({ post, mode, format }: { post: SjbCalendarPost; mode: SjbCalen
         </div>
       )}
     </article>
+  );
+}
+
+// General (not post-specific) banners and sizes from the full social designs
+// gallery for the same look, so planners find reusable artwork alongside the post.
+function MoreSizes({ mode }: { mode: SjbCalendarMode }) {
+  const [open, setOpen] = useState(false);
+  const extras = SJB_SOCIAL_STUDIO_DESIGNS.filter((d) => d.collectionId === mode && !d.post);
+  if (!extras.length) return null;
+  return (
+    <div className="mt-4 border-t border-border pt-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <Button size="sm" variant={open ? "default" : "outline"} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+          {open ? "Hide more sizes" : `View more sizes (${extras.length})`}
+        </Button>
+        <Button size="sm" variant="link" asChild><Link to="/events/san-juan-bowl/social">Open all social designs</Link></Button>
+      </div>
+      {open && (
+        <>
+          <p className="mt-2 text-xs text-muted-foreground">General banners and sizes in this look from the social designs area — not specific to this post.</p>
+          <ul className="mt-3 flex gap-4 overflow-x-auto pb-3">
+            {extras.map((d) => (
+              <li key={d.id} className="flex w-48 shrink-0 flex-col gap-2">
+                <div className="flex h-32 items-center justify-center rounded border border-border bg-muted p-1">
+                  {d.previewUrl ? (
+                    <a href={d.previewUrl} target="_blank" rel="noreferrer" aria-label={`View ${d.name} ${d.width}×${d.height}`} className="h-full w-full">
+                      <img src={d.previewUrl} alt={`${d.name}, ${d.width}×${d.height}`} className="h-full w-full object-contain" loading="lazy" />
+                    </a>
+                  ) : <span className="px-2 text-center text-xs text-muted-foreground">Picture awaiting export</span>}
+                </div>
+                <p className="text-xs font-medium text-foreground">{d.name} <span className="text-muted-foreground">{d.width}×{d.height}</span></p>
+                <Button size="sm" variant="outline" asChild><a href={d.canvaUrl} target="_blank" rel="noreferrer">Canva</a></Button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
   );
 }
 
