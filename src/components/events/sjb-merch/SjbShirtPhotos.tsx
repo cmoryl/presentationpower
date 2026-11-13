@@ -30,7 +30,7 @@ export function SjbShirtPhotos() {
       </section>
       <section aria-labelledby="sjb-role-tees">
         <h2 id="sjb-role-tees" className="text-xl font-semibold text-foreground">Basic team shirts — staff, volunteer, crew, media, VIP</h2>
-        <p className="text-sm text-muted-foreground">Small one-colour shield on the chest; role word and SANJUANBOWL.COM on the back (VIP carries the large shield instead).</p>
+        <p className="text-sm text-muted-foreground">Small one-colour shield on the chest; role word and SANJUANBOWL.COM on the back; Media carries MEDIA on the chest (VIP carries the large shield instead).</p>
         <Grid list={roles} cols="md:grid-cols-2" />
       </section>
       <section aria-labelledby="sjb-front-back">
