@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl recent updates bar
+- [x] Brought the Recent updates bar current: added T-shirt studio comps, attendee-badge Canva files, social calendar and event home cards (Nov 12–13) above the existing entries. All ten card pictures fetch 200 on the public page, the newest-first ordering test passes and build OK.
 ## Bowl basic studio shirt sets
 - [x] Add separate enlarged original front/back designs to all 25 studio sets using 15 transparent source-art pointers; all 50 detailed previews decode, full-size original link opens, mobile fits and coverage test passes. Existing shirt examples remain unchanged.
 - [x] Lower all 25 studio back designs a further 40 pixels for adults and 32 pixels for children, preserving front placement and current print sizes; all sheets reviewed, fit/coverage tests passed, public images decoded and mobile layout verified.
