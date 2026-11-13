@@ -1,3 +1,4 @@
+import { SjbShirtPhotos } from "./SjbShirtPhotos";
 import liveFront from "@/assets/sjb-badges/sjb-badge-live-front.png.asset.json";
 import liveBack from "@/assets/sjb-badges/sjb-badge-live-back.png.asset.json";
 import { useState } from "react";
@@ -54,6 +55,7 @@ export function SjbShirtsPage() {
     <main className="mx-auto max-w-6xl px-6 py-10">
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl marketing T-shirts</h1>
       <CompNote />
+      <SjbShirtPhotos />
       <div className="mt-8 grid gap-10 md:grid-cols-2">
         {SJB_SHIRT_COMPS.map((c) => (
           <section key={c.id} aria-labelledby={`shirt-${c.id}`}>
