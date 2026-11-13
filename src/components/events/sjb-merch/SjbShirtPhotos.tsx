@@ -5,6 +5,36 @@ const studioAssets = import.meta.glob<Ptr>("@/assets/sjb-shirt-studio/studio-*.a
 const studioBySet = new Map(Object.entries(studioAssets).map(([path, value]) => [
   (path.split("/").pop() ?? path).replace(/^studio-/, "").replace(/\.jpg\.asset\.json$/, ""), value.url,
 ]));
+const artworkAssets = import.meta.glob<Ptr>("@/assets/sjb-shirt-artwork/*.asset.json", { eager: true, import: "default" });
+const artworkByName = new Map(Object.entries(artworkAssets).map(([path, value]) => [
+  (path.split("/").pop() ?? path).replace(/\.png\.asset\.json$/, ""), value.url,
+]));
+
+function ArtworkDetails({ name }: { name: string }) {
+  const [, , colour, ...parts] = name.split("-");
+  const [front, back] = parts.join("-").split("-front-");
+  const designs = [front?.replace(/-left-chest$/, ""), back?.replace(/-back$/, "")];
+  return (
+    <div className="mt-4 grid gap-4 sm:grid-cols-2">
+      {designs.map((design, index) => {
+        if (!design) return null;
+        const key = design === "colour-shield" ? `colour-shield-${colour === "white" ? "light" : "dark"}` : design;
+        const url = artworkByName.get(key);
+        if (!url) return null;
+        const light = ["black-playbook", "navy-shield", "colour-shield-light"].includes(key);
+        const side = index === 0 ? "Front" : "Back";
+        return (
+          <figure key={side}>
+            <a href={url} target="_blank" rel="noreferrer" aria-label={`Open ${side.toLowerCase()} design detail — ${design.replace(/-/g, " ")}`} className={`flex h-80 items-center justify-center rounded-md p-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${light ? "bg-muted" : "bg-foreground"}`}>
+              <img src={url} alt={`${side} design detail — ${design.replace(/-/g, " ")}`} loading="lazy" className="h-full w-full object-contain" />
+            </a>
+            <figcaption className="mt-1 text-xs text-muted-foreground">{side} design · Original artwork</figcaption>
+          </figure>
+        );
+      })}
+    </div>
+  );
+}
 const label = (n: string) =>
   n
     .replace(/^(role|distressed|colour|set|design)-/, "")
@@ -66,6 +96,7 @@ export function SjbShirtPhotos() {
                     <figcaption className="mt-1 text-xs text-muted-foreground">Studio comp · Man / woman / child · Fronts above, backs below · AI-made models</figcaption>
                   </figure>}
                 </div>
+                <ArtworkDetails name={set.name} />
               </section>
             );
           })}
