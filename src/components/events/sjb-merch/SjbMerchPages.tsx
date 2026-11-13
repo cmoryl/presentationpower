@@ -39,6 +39,7 @@ export function SjbBadgesPage() {
             <div key={st.id}>
               <h3 className="text-lg font-semibold text-foreground">{st.name}</h3>
               <p className="text-sm text-muted-foreground">{st.idea}</p>
+              <a href={st.canva} target="_blank" rel="noreferrer" className="mt-1 inline-block text-sm font-medium text-primary underline">Open {st.name.split(" · ")[0]} in Canva</a>
               <div className="mt-3 grid max-w-xl grid-cols-2 gap-6">
                 {(["front", "back"] as const).map((s) => <figure key={s}><SjbStyledBadge style={st} type={t} side={s} /><figcaption className="mt-2 text-sm capitalize text-muted-foreground">{s}</figcaption></figure>)}
               </div>

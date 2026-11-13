@@ -16,13 +16,13 @@ const W = SJB_BADGE_SIZE.trimW * 100;
 const H = SJB_BADGE_SIZE.trimH * 100;
 const FONT = "Geist, sans-serif";
 
-export type SjbBadgeStyle = { id: string; name: string; idea: string; mode: SjbCalendarMode; dark: boolean };
+export type SjbBadgeStyle = { id: string; name: string; idea: string; mode: SjbCalendarMode; dark: boolean; canva: string };
 export const SJB_BADGE_STYLES: SjbBadgeStyle[] = [
-  { id: "light", name: "Style 1 · Light Action", idea: "Matches the live Canva file: white sky, rising football and palms behind the attendee word.", mode: "light", dark: false },
-  { id: "night", name: "Style 2 · Night Game", idea: "Navy stadium-night ground with the white-outline shield.", mode: "dark", dark: true },
-  { id: "set2", name: "Style 3 · Set 2 campaign", idea: "Uses the Set 2 social campaign ground so badges match those posts.", mode: "set2", dark: true },
-  { id: "set3", name: "Style 4 · Set 3 campaign", idea: "Set 3 ground with white ACC mark, same layout.", mode: "set3", dark: true },
-  { id: "set4", name: "Style 5 · Set 4 campaign", idea: "Set 4 ground for a bolder, high-energy look.", mode: "set4", dark: true },
+  { id: "light", name: "Style 1 · Light Action", idea: "Matches the live Canva file: white sky, rising football and palms behind the attendee word.", mode: "light", dark: false, canva: "https://www.canva.com/design/DAHa0Pv46DM/qGLE9YI0_HxbLhO23muq9A/edit" },
+  { id: "night", name: "Style 2 · Night Game", idea: "Navy stadium-night ground with the white-outline shield.", mode: "dark", dark: true, canva: "https://www.canva.com/design/DAHa0HxZkvM/edit" },
+  { id: "set2", name: "Style 3 · Set 2 campaign", idea: "Uses the Set 2 social campaign ground so badges match those posts.", mode: "set2", dark: true, canva: "https://www.canva.com/design/DAHa0H0V-nA/edit" },
+  { id: "set3", name: "Style 4 · Set 3 campaign", idea: "Set 3 ground with white ACC mark, same layout.", mode: "set3", dark: true, canva: "https://www.canva.com/design/DAHa0Ol_Ixc/edit" },
+  { id: "set4", name: "Style 5 · Set 4 campaign", idea: "Set 4 ground for a bolder, high-energy look.", mode: "set4", dark: true, canva: "https://www.canva.com/design/DAHa0AG00r0/edit" },
 ];
 
 function Qr({ x, y, size }: { x: number; y: number; size: number }) {
