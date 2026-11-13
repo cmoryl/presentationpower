@@ -1,6 +1,10 @@
 type Ptr = { url: string };
 const all = import.meta.glob<Ptr>("@/assets/sjb-shirts/*.asset.json", { eager: true, import: "default" });
-const items = Object.entries(all).map(([p, v]) => ({ name: p.split("/").pop()!.replace(/\.jpg\.asset\.json$/, ""), url: v.url })).sort((a, b) => a.name.localeCompare(b.name));
+const items = Object.entries(all).map(([p, v]) => ({ name: (p.split("/").pop() ?? p).replace(/\.jpg\.asset\.json$/, ""), url: v.url })).sort((a, b) => a.name.localeCompare(b.name));
+const studioAssets = import.meta.glob<Ptr>("@/assets/sjb-shirt-studio/studio-*.asset.json", { eager: true, import: "default" });
+const studioBySet = new Map(Object.entries(studioAssets).map(([path, value]) => [
+  (path.split("/").pop() ?? path).replace(/^studio-/, "").replace(/\.jpg\.asset\.json$/, ""), value.url,
+]));
 const label = (n: string) =>
   n
     .replace(/^(role|distressed|colour|set|design)-/, "")
@@ -46,7 +50,26 @@ export function SjbShirtPhotos() {
       <section aria-labelledby="sjb-front-back">
         <h2 id="sjb-front-back" className="text-xl font-semibold text-foreground">Front and back sets — men, women and kids</h2>
         <p className="text-sm text-muted-foreground">Fronts mix the full-colour shield, the distressed colour shield, the white shield and the wordmark, at centre chest or left chest; the larger designs go on the back.</p>
-        <Grid list={sets} cols="md:grid-cols-2" />
+        <div className="mt-4 space-y-8">
+          {sets.map((set) => {
+            const studio = studioBySet.get(set.name);
+            return (
+              <section key={set.name} aria-label={label(set.name)} className="border-b border-border pb-8">
+                <h3 className="mb-3 text-sm font-medium capitalize text-foreground">{label(set.name)}</h3>
+                <div className="grid items-start gap-4 lg:grid-cols-2">
+                  <figure>
+                    <a href={set.url} target="_blank" rel="noreferrer"><img src={set.url} alt={`${label(set.name)} — flat front and back`} loading="lazy" className="w-full rounded-md bg-muted" /></a>
+                    <figcaption className="mt-1 text-xs text-muted-foreground">Front and back artwork</figcaption>
+                  </figure>
+                  {studio && <figure>
+                    <a href={studio} target="_blank" rel="noreferrer"><img src={studio} alt={`${label(set.name)} — man, woman and child; fronts above, backs below`} loading="lazy" width={1920} height={1280} className="w-full rounded-md bg-muted" /></a>
+                    <figcaption className="mt-1 text-xs text-muted-foreground">Studio comp · Man / woman / child · Fronts above, backs below · AI-made models</figcaption>
+                  </figure>}
+                </div>
+              </section>
+            );
+          })}
+        </div>
       </section>
       <section aria-labelledby="sjb-colours">
         <h2 id="sjb-colours" className="text-xl font-semibold text-foreground">More shirt colours — royal blue, gold, heather grey, sky blue</h2>

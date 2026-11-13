@@ -1,4 +1,7 @@
 # Roadmap
+## Bowl basic studio shirt sets
+- [x] Create all 25 sets with man, woman and child front/back studio views using exact supplied artwork; retain hidden game-day photos.
+- [x] Add paired studio previews to the shirts page and verify all 25 sheets publicly, full-size links, hidden game-day section and mobile no-overflow; coverage test passes and build OK.
 ## Full Set 2 and Set 4 post sequences
 - [x] Assemble all 28 posts × two looks × three native sizes (168 sequences, 224 platform selections) from eighteen freshly exported, pixel-preserving metadata-cleaned Canva cover/details/ticket pictures and each post's current headline artwork. Shared player and exact-byte ZIP / four-page PDF downloads now work in calendar and public socials. Thirteen tests pass; Set 2/4 post 22 carousel navigation, Story autoplay, real ZIP/PDF downloads and mobile no-overflow verified on public socials with zero page errors. Calendar signed-in check unavailable: requesting user has no auth account. Originals preserved; source documents linked separately, no new per-post Canva files claimed.
 ## Latest saved Canva social refresh — Nov 12
