@@ -48,7 +48,7 @@ export function SjbShirtPhotos() {
       </section>
       <section aria-labelledby="sjb-distressed">
         <h2 id="sjb-distressed" className="text-xl font-semibold text-foreground">Distressed full-colour logo — football jersey and tees</h2>
-        <p className="text-sm text-muted-foreground">Page 11 of the Canva shirt file, unchanged. Puerto Rico–style replica game jersey (flag-stripe sleeves and red collar) with the Bowl patch on the chest, large raised number 26, SAN JUAN nameplate and ACC / Sun Belt sleeve marks (example number and name, not an issued jersey), plus men's, women's and kids' tees.</p>
+        <p className="text-sm text-muted-foreground">Page 11 of the Canva shirt file, unchanged. Puerto Rico–style replica game jersey in Bowl Navy, Banner Gold and Caribbean Sky (striped sleeves, gold collar, lone-star sleeve flag) with the Bowl patch on the chest, large raised number 26, SAN JUAN nameplate and ACC / Sun Belt sleeve marks (example number and name, not an issued jersey), plus men's, women's and kids' tees.</p>
         <Grid list={distressed} cols="md:grid-cols-2" />
       </section>
       <section aria-labelledby="sjb-role-tees">
