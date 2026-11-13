@@ -21,7 +21,6 @@ export const SJB_SITE_NAV: { to: string; label: string; seg: string }[] = [
   { to: "/events/san-juan-bowl/social", label: "Social", seg: "social" },
   { to: "/events/san-juan-bowl/social-calendar", label: "Calendar", seg: "social-calendar" },
   { to: "/events/san-juan-bowl/billboards", label: "Billboards", seg: "billboards" },
-  { to: "/events/san-juan-bowl/set-5-assets", label: "Set 5 assets", seg: "set-5-assets" },
   { to: "/events/san-juan-bowl/badges", label: "Badges", seg: "badges" },
   { to: "/events/san-juan-bowl/tshirts", label: "T-shirts", seg: "tshirts" },
   { to: "/events/san-juan-bowl/stadium", label: "Stadium", seg: "stadium" },
@@ -30,7 +29,7 @@ export const SJB_SITE_NAV: { to: string; label: string; seg: string }[] = [
 
 const SECTION: Record<string, string> = {
   "brand-kit": "Brand kit", designers: "Designer files", guide: "Brand guide", lettering: "Lettering spec",
-  "single-colour": "Single-colour logos", billboards: "Digital billboards", "set-5-assets": "Set 5 design assets",
+  "single-colour": "Single-colour logos", billboards: "Digital billboards",
   social: "Social posts", "social-calendar": "Social calendar", "stadium-policies": "Stadium policies",
   stadium: "Stadium", badges: "Attendee badges", tshirts: "T-shirts",
 };

@@ -12,7 +12,6 @@ const LABELS: Record<string, string> = {
   lettering: "Lettering spec",
   "single-colour": "Single-colour logos",
   billboards: "Digital billboards",
-  "set-5-assets": "Set 5 design assets",
   social: "Social posts",
   "social-calendar": "Social calendar",
   "stadium-policies": "Stadium policies",

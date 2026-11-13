@@ -7,7 +7,6 @@ import badgeFront from "@/assets/sjb-badges/sjb-badge-live-front.png.asset.json"
 import calendarGround from "@/assets/sjb-calendar-style/set2-ground.jpg.asset.json";
 import stadiumHome from "@/assets/sjb-stadium/stadium-night-wide-16x9.jpg";
 import { KIT_RELEASES } from "./brand-kit-releases";
-import { SJB_SET5_ASSETS } from "./sjb-set5-assets";
 import { selectedBillboardArtwork } from "./sjb-selected-billboards";
 
 export interface SjbRecentUpdate {
@@ -69,5 +68,4 @@ export const SJB_RECENT_UPDATES: SjbRecentUpdate[] = [
   { title: "Digital billboards · gold player", detail: "Selected English and Spanish boards.", date: "Nov 8, 2026", image: selectedBillboardArtwork("DAHaD3KaDEU"), link: { to: "/events/san-juan-bowl/billboards" } },
   { title: "Digital billboards · light action", detail: "Wide 1,728 × 512 board.", date: "Nov 8, 2026", image: selectedBillboardArtwork("DAHaLhvVST4"), link: { to: "/events/san-juan-bowl/billboards" } },
   { title: "Social posts", detail: "Every campaign set with Illustrator downloads.", image: "/sjb-canva/live/DAHZ-GDY4eA.png", link: { to: "/events/san-juan-bowl/social" } },
-  { title: "Set 5 design assets", detail: "High-resolution backgrounds and layers.", image: SJB_SET5_ASSETS[0]?.previewUrl ?? "", link: { to: "/events/san-juan-bowl/set-5-assets" } },
 ];
