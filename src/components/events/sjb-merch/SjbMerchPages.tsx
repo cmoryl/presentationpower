@@ -56,17 +56,6 @@ export function SjbShirtsPage() {
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl marketing T-shirts</h1>
       <CompNote />
       <SjbShirtPhotos />
-      <div className="mt-8 grid gap-10 md:grid-cols-2">
-        {SJB_SHIRT_COMPS.map((c) => (
-          <section key={c.id} aria-labelledby={`shirt-${c.id}`}>
-            <h2 id={`shirt-${c.id}`} className="text-lg font-semibold text-foreground">{c.name}</h2>
-            <p className="text-sm text-muted-foreground">{c.audience} · {c.idea}</p>
-            <div className="mt-3 grid grid-cols-2 gap-4 rounded-md bg-muted p-4">
-              {(["front", "back"] as const).map((s) => <figure key={s}><SjbShirt comp={c} side={s} /><figcaption className="text-center text-xs capitalize text-muted-foreground">{s}</figcaption></figure>)}
-            </div>
-          </section>
-        ))}
-      </div>
     </main>
   );
 }

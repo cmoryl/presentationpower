@@ -42,7 +42,6 @@ export function SjbShirtPhotos() {
         <h2 id="sjb-flat-fronts" className="text-xl font-semibold text-foreground">All ten designs</h2>
         <Grid list={flats} cols="sm:grid-cols-3 lg:grid-cols-5" />
       </section>
-      <h2 className="text-xl font-semibold text-foreground">Original comps</h2>
     </div>
   );
 }
