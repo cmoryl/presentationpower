@@ -1,5 +1,6 @@
 # Roadmap
 ## Bowl basic studio shirt sets
+- [x] Correct all 25 studio sets with individual front/left-chest/back print boxes, raised height-limited backs and smaller child prints; contact sheet inspected, three fit tests and coverage test pass, all public images load and mobile fits.
 - [x] Create all 25 sets with man, woman and child front/back studio views using exact supplied artwork; retain hidden game-day photos.
 - [x] Add paired studio previews to the shirts page and verify all 25 sheets publicly, full-size links, hidden game-day section and mobile no-overflow; coverage test passes and build OK.
 ## Full Set 2 and Set 4 post sequences

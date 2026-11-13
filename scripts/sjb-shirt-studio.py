@@ -19,17 +19,27 @@ ART_PAGES = {
     "palms-sjb": "p10", "distressed-colour": "p11", "coqui": "p13",
     "navy-shield": "navy",
 }
-# Measured collar-to-hem fabric bounds on the generated 1920 x 1280 plates.
-FRONTS = [(320, 267, 115), (960, 277, 108), (1600, 318, 96)]
-BACKS = [(320, 864, 218), (960, 881, 200), (1600, 926, 178)]
+# Individual print boxes measured against collar, shoulder blades and torso.
+# (centre x, top y, maximum width, maximum height): man, woman, child.
+# Both dimensions constrain the art; a tall logo cannot reach the waist.
+FRONTS = [(320, 262, 124, 116), (960, 274, 106, 101), (1600, 310, 88, 86)]
+BACKS = [(320, 835, 188, 176), (960, 855, 164, 156), (1600, 905, 138, 133)]
+LEFT_CHEST = [(375, 253, 58, 64), (1006, 266, 49, 55), (1640, 304, 42, 47)]
+
+def fit_print(art_width, art_height, box):
+    cx, top, max_width, max_height = box
+    scale = min(max_width / art_width, max_height / art_height)
+    width = max(1, int(art_width * scale))
+    height = max(1, int(art_height * scale))
+    return cx, top, width, height
 
 def artwork(art, name, colour):
     key = ("color" if colour == "white" else "dark") if name == "colour-shield" else ART_PAGES[name]
     image = Image.open(art / f"{key}.png").convert("RGBA")
     return image.crop(image.getbbox())
 
-def print_ink(base, art, cx, top, width, light):
-    art = art.resize((width, round(width * art.height / art.width)), Image.Resampling.LANCZOS)
+def print_ink(base, art, cx, top, width, height):
+    art = art.resize((width, height), Image.Resampling.LANCZOS)
     height = art.height
     left = round(cx - width / 2)
     fabric = np.asarray(base.crop((left, top, left + width, top + height))).astype(float)
@@ -66,16 +76,14 @@ def build(art, plates, output):
                 subprocess.run(["lovable-assets", "get", "--file", str(plates / f"{colour}-models.jpg.asset.json"), "-o", str(plate)], check=True)
         base = Image.open(plate).convert("RGB")
         fa, ba = artwork(art, front, colour), artwork(art, back, colour)
-        for cx, top, width in FRONTS:
-            if left_chest:
-                cx += 58 if width > 100 else 48
-                width = round(width * .58)
-            print_ink(base, fa, cx, top, width, colour == "white")
-        for cx, top, width in BACKS:
-            print_ink(base, ba, cx, top, width, colour == "white")
+        for box in LEFT_CHEST if left_chest else FRONTS:
+            print_ink(base, fa, *fit_print(fa.width, fa.height, box))
+        for index, box in enumerate(BACKS):
+            cx, top, width, height = fit_print(ba.width, ba.height, box)
+            print_ink(base, ba, cx, top, width, height)
             # Shared supplied website, below the artwork; never invented facts.
-            y = top + round(width * ba.height / ba.width) + 12
-            font = ImageFont.truetype(str(ROOT / "public/fonts/Geist-Bold.ttf"), 10)
+            y = top + height + 10
+            font = ImageFont.truetype(str(ROOT / "public/fonts/Geist-Bold.ttf"), (10, 9, 8)[index])
             draw = ImageDraw.Draw(base)
             draw.text((cx, y), "SANJUANBOWL.COM", anchor="mt", font=font, fill=(235,235,235) if colour != "white" else (25,25,25))
         base.save(output / f"studio-{name}.jpg", quality=95)
