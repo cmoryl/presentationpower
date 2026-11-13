@@ -9,7 +9,7 @@ spec.loader.exec_module(studio)
 
 class PrintFitTests(unittest.TestCase):
     def test_tall_back_art_stays_above_lower_torso(self):
-        for box, lower_limit in zip(studio.BACKS, (1030, 1030, 1060)):
+        for box, lower_limit in zip(studio.BACKS, (1070, 1070, 1092)):
             cx, top, width, height = studio.fit_print(722, 749, box)
             self.assertLessEqual(width, box[2])
             self.assertLessEqual(height, box[3])

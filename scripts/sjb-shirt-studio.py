@@ -23,7 +23,7 @@ ART_PAGES = {
 # (centre x, top y, maximum width, maximum height): man, woman, child.
 # Both dimensions constrain the art; a tall logo cannot reach the waist.
 FRONTS = [(320, 262, 124, 116), (960, 274, 106, 101), (1600, 310, 88, 86)]
-BACKS = [(320, 865, 160, 145), (960, 882, 140, 128), (1600, 930, 116, 110)]
+BACKS = [(320, 905, 160, 145), (960, 922, 140, 128), (1600, 962, 116, 110)]
 LEFT_CHEST = [(375, 253, 58, 64), (1006, 266, 49, 55), (1640, 304, 42, 47)]
 
 def fit_print(art_width, art_height, box):

@@ -1,5 +1,6 @@
 # Roadmap
 ## Bowl basic studio shirt sets
+- [x] Lower all 25 studio back designs a further 40 pixels for adults and 32 pixels for children, preserving front placement and current print sizes; all sheets reviewed, fit/coverage tests passed, public images decoded and mobile layout verified.
 - [x] Reviewed all 25 sheets through 150 chest/back detail crops; refreshed matte ink, fold-following drape and fabric-treated website lettering. Lower/narrower back placement preserved; fit/coverage tests pass and public desktop/mobile verified. These remain illustrative AI-model comps, not photographed samples.
 - [x] Lower all studio back prints by 25–30 pixels and narrow maximum widths by about 15%; fronts unchanged. All 25 sheets inspected and refreshed, fit/coverage tests pass, public images and mobile layout verified.
 - [x] Correct all 25 studio sets with individual front/left-chest/back print boxes, raised height-limited backs and smaller child prints; contact sheet inspected, three fit tests and coverage test pass, all public images load and mobile fits.
