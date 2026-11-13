@@ -6,6 +6,7 @@ const label = (n: string) =>
     .replace(/^(role|distressed|colour|set|design)-/, "")
     .replace(/^(\d\d)-/, "Design $1 · ")
     .replace(/-front-/, " front · ")
+    .replace(/-v7$/, "")
     .replace(/-back$/, " back")
     .replace(/-/g, " ");
 
