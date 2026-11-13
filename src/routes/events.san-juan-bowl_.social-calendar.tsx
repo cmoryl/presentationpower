@@ -105,18 +105,7 @@ function CalendarPage() {
 
   return (
     <main className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6">
-      <header className="sjb-cal-hero relative overflow-hidden rounded-xl px-6 py-10 text-white sm:px-10">
-        <div className="relative z-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FFD600]">Social media · {SJB_EVENT.datesLabel}</p>
-          <h1 className="sjb-cal-hero-title mt-2 text-4xl font-bold uppercase italic sm:text-5xl">San Juan Bowl social calendar</h1>
-          <p className="mt-3 max-w-2xl text-sm text-white/80">November – December 2026 · {SJB_CALENDAR_POSTS.length} posts across Facebook and Instagram, in every campaign look and size.</p>
-          <div className="mt-5 flex flex-wrap gap-2 text-xs">
-            {[["Ready", SJB_CALENDAR_POSTS.filter((p) => p.status === "Approved/Ready").length], ["Ready for content", SJB_CALENDAR_POSTS.filter((p) => p.status.startsWith("Ready For")).length], ["Not started", SJB_CALENDAR_POSTS.filter((p) => p.status === "Not Started").length]].map(([l, n]) => (
-              <span key={l as string} className="rounded-sm border border-white/20 bg-white/5 px-3 py-1.5 backdrop-blur"><b className="text-[#FFD600]">{n}</b> {l}</span>
-            ))}
-          </div>
-        </div>
-      </header>
+      <h1 className="sr-only">San Juan Bowl social calendar</h1>
       <SjbCalendarLookCards mode={mode} onChange={setMode} />
       <SjbPictureStamp stamp={pictureStamp} />
       <SjbCanvaSyncPanel designIds={canvaSyncTargets().map((t) => t.id)} label="Bowl calendar, billboard and carousel" />

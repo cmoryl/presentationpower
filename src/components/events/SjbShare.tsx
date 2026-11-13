@@ -96,7 +96,7 @@ function ShareShell({ children }: { children: ReactNode }) {
 
 /** AppShell inside Element; the menu-free share frame on the share link. */
 export function SjbShell({ children }: { children: ReactNode }) {
-  const body = <><div data-sjb-shell-masthead className="px-6"><SjbMasthead /></div>{children}</>;
+  const body = <><div data-sjb-shell-masthead><SjbMasthead /></div>{children}</>;
   return useSjbShare() ? <ShareShell>{body}</ShareShell> : <AppShell>{body}</AppShell>;
 }
 

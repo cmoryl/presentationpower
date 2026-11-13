@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl full-width micro-site headers
+- [x] Widen shared Bowl headers, add nine distinct section pictograms, emphasize existing stadium/shield artwork and remove the calendar's duplicate statistics hero.
 ## Official Bowl website reference
 - [x] Review sanjuanbowl.com; retain source/asset inventory, add official tickets/calendar/directions/media/sponsor/contact links and San Juan kickoff to the overview without replacing approved artwork.
 ## Bowl recent updates bar

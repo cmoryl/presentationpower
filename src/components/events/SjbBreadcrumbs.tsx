@@ -55,7 +55,7 @@ export function withSjbTrail<P extends object>(Page: ComponentType<P>) {
       <>
         <SjbBreadcrumbs />
         {/* Shell-less pages get the masthead here; SjbShell pages draw it inside their shell. */}
-        <div data-sjb-trail-masthead className="px-6"><SjbMasthead /></div>
+        <div data-sjb-trail-masthead><SjbMasthead /></div>
         <Page {...props} />
       </>
     );

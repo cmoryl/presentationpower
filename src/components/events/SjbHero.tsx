@@ -55,24 +55,23 @@ export function SjbHero() {
   ];
 
   return (
-    <section data-sjb-masthead aria-label={SJB_EVENT.name} style={{ background: navy, fontFamily: BOWL_FONT }} className="relative mt-4 overflow-hidden rounded-xl text-white">
+    <section data-sjb-masthead aria-label={SJB_EVENT.name} style={{ background: navy, fontFamily: BOWL_FONT }} className="sjb-site-band relative mt-4 overflow-hidden text-white">
       {PLATES.map((p, n) => (
         <img key={p.id} src={p.src} alt="" aria-hidden
           className={`sjb-kenburns absolute inset-0 h-full w-full object-cover transition-opacity duration-[1500ms] ${n === i ? "opacity-70" : "opacity-0"}`} />
       ))}
       <div aria-hidden className="absolute inset-0" style={{ background: `linear-gradient(100deg, ${navy} 15%, ${navy}cc 45%, transparent 85%)` }} />
-      <div aria-hidden className="sjb-sweep absolute inset-y-0 w-1/3" style={{ background: `linear-gradient(90deg, transparent, ${sky}22, transparent)` }} />
-      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.22] mix-blend-overlay" style={{ backgroundImage: GRIT }} />
+      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay" style={{ backgroundImage: GRIT }} />
       <div aria-hidden className="pointer-events-none absolute inset-0" style={{ boxShadow: "inset 0 0 140px 30px rgb(0 0 0 / 0.55)" }} />
-      <div className="relative grid gap-6 p-6 sm:p-10 md:grid-cols-[1fr_auto] md:items-end">
+      <div className="relative mx-auto grid max-w-7xl gap-6 px-6 py-10 sm:px-10 sm:py-14 md:grid-cols-[1fr_auto] md:items-center">
         <div>
           <p className="flex items-center gap-2 text-base font-bold italic uppercase tracking-wide" style={{ color: gold }}>
             <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 motion-reduce:animate-none" style={{ background: gold }} /><span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: gold }} /></span>
             {SJB_EVENT.matchupLabel}
           </p>
           <h1
-            className="sjb-title-shine mt-3 text-6xl font-bold italic uppercase leading-[0.9] sm:text-8xl"
-            style={{ fontFamily: BOWL_FONT, backgroundImage: `linear-gradient(100deg, ${gold} 20%, #ffffff 40%, ${sky} 60%, ${gold} 80%)` }}
+            className="mt-3 text-6xl font-bold italic uppercase leading-[0.95] sm:text-8xl"
+            style={{ fontFamily: BOWL_FONT, color: gold }}
           >
             {SJB_EVENT.shortName.toUpperCase()}
           </h1>
@@ -116,7 +115,7 @@ export function SjbHero() {
             </div>
           </div>
         </div>
-        {logo && <img src={logo.svg} alt="San Juan Bowl logo" className="sjb-float h-36 w-auto justify-self-start sm:h-48 md:justify-self-end" />}
+        {logo && <img src={logo.svg} alt="San Juan Bowl logo" className="h-32 w-32 object-contain justify-self-start sm:h-56 sm:w-56 md:justify-self-end" />}
       </div>
       <div className="relative flex gap-1.5 px-6 pb-4 sm:px-10">
         {PLATES.map((p, n) => (

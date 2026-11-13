@@ -1648,3 +1648,4 @@ body.export-mode [data-print-surface] {
 body:has([data-sjb-masthead]) main h1 { font-family: "Barlow Condensed", sans-serif; font-weight: 700; font-style: italic; text-transform: uppercase; line-height: 0.95; }
 body:has([data-sjb-masthead]) main h2 { font-family: "Barlow Condensed", sans-serif; font-weight: 700; text-transform: uppercase; }
 body:has([data-sjb-shell-masthead]) [data-sjb-trail-masthead] { display: none; }
+.sjb-site-band { width: 100vw; margin-inline: calc(50% - 50vw); border-radius: 0; }
