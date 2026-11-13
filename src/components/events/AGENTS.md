@@ -1,6 +1,7 @@
 # San Juan Bowl event pages and assets
 
 - Bowl script rules (brand guide PDF, digital billboards, Illustrator masters) live in `scripts/AGENTS.md`.
+- Official website actions and the countdown instant read `SJB_EVENT`; media/sponsor submissions link to the website's forms — why: one fact authority and no duplicate inquiry handling.
 - Campaign design-asset panels resolve reusable four-page Canva masters and cleaned per-page pictures/ZIP pointers through `sjb-campaign-sequence-masters`; these are not per-post calendar sequences — why: asset masters must stay separate from finished post registries and preserve original single-page files.
 
 - Sequence companion grounds resolve by look, page role and size through `sjbSequenceGround` in `sjb-sequence-backgrounds` (Light tickets use the user-supplied rising-football art, metadata-cleaned, with copy kept in its white sky); only drawn headline/details/tickets pages use them, while original cover imagery and saved Canva pages remain intact — why: coordinated AI-edited grounds must not replace issued art or change campaign identity.

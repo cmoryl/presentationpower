@@ -396,8 +396,8 @@ function sanJuanBowlEntry(): EventEntry {
       {
         label: "Venue and dates",
         state: "ready",
-        detail: `${SJB_EVENT.datesLabel} · ${SJB_EVENT.venue} · ${SJB_EVENT.city}. Kickoff: ${SJB_EVENT.kickoffLabel}. ${SJB_EVENT.matchupLabel}.`,
-        source: { label: "Official Sun Belt announcement", url: SJB_EVENT.announcementUrl },
+        detail: `${SJB_EVENT.datesLabel} · ${SJB_EVENT.venue} · ${SJB_EVENT.city}. Kickoff: ${SJB_EVENT.kickoffLabel} · ${SJB_EVENT.localKickoffLabel}. ${SJB_EVENT.matchupLabel}.`,
+        source: { label: "Official San Juan Bowl website", url: SJB_EVENT.websiteUrl },
       },
       { label: "Floor plans", state: "waiting", blockedOn: "the venue's vector plans" },
       { label: "Sign list", state: "waiting", blockedOn: "the site survey" },

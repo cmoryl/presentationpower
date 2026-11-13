@@ -1,4 +1,6 @@
 # Roadmap
+## Official Bowl website reference
+- [x] Review sanjuanbowl.com; retain source/asset inventory, add official tickets/calendar/directions/media/sponsor/contact links and San Juan kickoff to the overview without replacing approved artwork.
 ## Bowl recent updates bar
 - [x] Brought the Recent updates bar current: added T-shirt studio comps, attendee-badge Canva files, social calendar and event home cards (Nov 12–13) above the existing entries. All ten card pictures fetch 200 on the public page, the newest-first ordering test passes and build OK.
 ## Bowl basic studio shirt sets

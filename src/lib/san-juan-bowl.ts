@@ -3,7 +3,7 @@
 // The logo and its colours come from the designer's supplied FINAL_LOGO_26
 // package (SVG/EPS/AI/PNG, colour and dark-background variants). Nothing here
 // invents a venue, date or room: event facts below come from the official
-// Sun Belt Conference announcement of 22 October 2026.
+// Sun Belt Conference announcement of 22 October 2026 and the official Bowl site.
 
 import { BRAND } from "@/lib/brand-colors";
 import logoColorSvg from "@/assets/san-juan-bowl/sjb-logo-color.svg.asset.json";
@@ -20,6 +20,15 @@ export const SJB_EVENT = {
   venue: "Hiram Bithorn Stadium",
   datesLabel: "December 16, 2026",
   kickoffLabel: "7:30 p.m. ET / 6:30 p.m. CT",
+  localKickoffLabel: "8:30 p.m. AST · San Juan time",
+  kickoffUtc: "2026-12-17T00:30:00Z",
+  websiteUrl: "https://www.sanjuanbowl.com/",
+  ticketsUrl: "https://shop.ticketera.com/event/san-juan-bowl-ipb5yw?lang=en",
+  contactEmail: "sanjuanbowl@transperfect.com",
+  directionsUrl: "https://www.google.com/maps/search/?api=1&query=Hiram+Bithorn+Stadium+San+Juan+Puerto+Rico",
+  calendarUrl: "https://www.sanjuanbowl.com/wp-content/uploads/2026/10/sanjuanbowl-2026-en-1.ics",
+  mediaUrl: "https://www.sanjuanbowl.com/#media",
+  sponsorshipUrl: "https://www.sanjuanbowl.com/#sponsors",
   matchupLabel: "ACC vs. Sun Belt Conference",
   announcementUrl: "https://sunbeltsports.org/news/2026/10/22/football-sun-belt-conference-announces-historic-primary-agreement-with-transperfect-san-juan-bowl.aspx",
 } as const;

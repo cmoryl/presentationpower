@@ -1,6 +1,8 @@
 // San Juan Bowl landing hero: crossfading stadium plates, live kickoff countdown.
 // Facts come only from SJB_EVENT; colours only from SJB_COLORS.
 import { useEffect, useState } from "react";
+import { CalendarPlus, ExternalLink, Ticket } from "lucide-react";
+import { Button } from "@/design-system/element";
 import "@fontsource/barlow-condensed/500.css";
 import "@fontsource/barlow-condensed/700.css";
 import "@fontsource/barlow-condensed/700-italic.css";
@@ -10,7 +12,7 @@ import { SjbSiteNav } from "./SjbMasthead";
 
 const hex = (id: string) => SJB_COLORS.find((c) => c.id === id)?.hex ?? "#000";
 // Dec 16, 2026 7:30 p.m. ET (EST, UTC-5) per SJB_EVENT.kickoffLabel.
-const KICKOFF = Date.UTC(2026, 11, 17, 0, 30);
+const KICKOFF = Date.parse(SJB_EVENT.kickoffUtc);
 const BOWL_FONT = '"Barlow Condensed", sans-serif';
 // Film-grain / worn-ink grit, drawn as an SVG noise tile (no image asset).
 const GRIT = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.6 -.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
@@ -76,6 +78,18 @@ export function SjbHero() {
           </h1>
           <p className="mt-3 text-xl font-medium uppercase tracking-wide text-white/90">{SJB_EVENT.venue} · {SJB_EVENT.city}</p>
           <p className="text-xl font-medium uppercase tracking-wide text-white/90">{SJB_EVENT.datesLabel} · {SJB_EVENT.kickoffLabel}</p>
+          <p className="text-lg font-medium uppercase text-white/75">{SJB_EVENT.localKickoffLabel}</p>
+          <div className="mt-4 flex flex-wrap gap-2 font-sans">
+            <Button asChild><a href={SJB_EVENT.ticketsUrl} target="_blank" rel="noopener noreferrer"><Ticket />Buy tickets</a></Button>
+            <Button asChild variant="secondary"><a href={SJB_EVENT.websiteUrl} target="_blank" rel="noopener noreferrer"><ExternalLink />Official website</a></Button>
+            <Button asChild variant="secondary"><a href={SJB_EVENT.calendarUrl}><CalendarPlus />Add to calendar</a></Button>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 font-sans text-sm text-white/90">
+            <a className="underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={SJB_EVENT.directionsUrl} target="_blank" rel="noopener noreferrer">Directions</a>
+            <a className="underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={SJB_EVENT.mediaUrl} target="_blank" rel="noopener noreferrer">Media credentials</a>
+            <a className="underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={SJB_EVENT.sponsorshipUrl} target="_blank" rel="noopener noreferrer">Sponsorship</a>
+            <a className="underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={`mailto:${SJB_EVENT.contactEmail}`}>Contact</a>
+          </div>
           <div className="mt-6 inline-block rounded-md border-2 p-2 sm:p-3" role="timer" aria-label="Countdown to kickoff"
             style={{ borderColor: "#2a2a2a", background: "linear-gradient(#141414, #050505)", boxShadow: `0 10px 30px rgb(0 0 0 / .55), inset 0 0 0 1px ${gold}33` }}>
             <div className="mb-2 flex items-center justify-between px-1 text-sm font-bold italic uppercase tracking-[0.18em]">
