@@ -26,7 +26,7 @@ export function SjbBadgesPage() {
           <figure><img src={liveFront.url} alt="Bowl badge front: shield logo, ACC and Sun Belt marks, date, stadium and photo area" className="w-full rounded-md shadow-sm" /><figcaption className="mt-2 text-sm text-muted-foreground">Front</figcaption></figure>
           <figure><img src={liveBack.url} alt="Bowl badge back: GUEST in large letters over a glowing football, with a white QR area" className="w-full rounded-md shadow-sm" /><figcaption className="mt-2 text-sm text-muted-foreground">Back (white area = QR)</figcaption></figure>
         </div>
-        <a href="https://www.canva.com/design/DAHauhoJEx8/edit" target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm font-medium text-primary underline">Open in Canva</a>
+        <a href="https://www.canva.com/design/DAHa0Pv46DM/qGLE9YI0_HxbLhO23muq9A/edit" target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm font-medium text-primary underline">Open in Canva</a>
       </section>
       <div role="group" aria-label="Attendee type" className="mt-6 flex flex-wrap gap-2">
         {SJB_ATTENDEE_TYPES.map((a) => <Button key={a.id} size="sm" variant={a.id === type ? "default" : "outline"} aria-pressed={a.id === type} onClick={() => setType(a.id)}>{a.label}</Button>)}
