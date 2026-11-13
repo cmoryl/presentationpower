@@ -44,18 +44,26 @@ def print_ink(base, art, cx, top, width, height):
     left = round(cx - width / 2)
     fabric = np.asarray(base.crop((left, top, left + width, top + height))).astype(float)
     lum = fabric.mean(axis=2)
-    slow = gaussian_filter(lum, 5)
-    dy, dx = np.gradient(gaussian_filter(lum, 2))
+    slow = gaussian_filter(lum, 4)
+    dy, dx = np.gradient(gaussian_filter(lum, 1.5))
     yy, xx = np.mgrid[:height, :width].astype(float)
-    # Tiny fold-following displacement; preserve the supplied proportions.
-    coords = [yy + np.clip(dy * .08, -.8, .8), xx + np.clip(dx * .08, -.8, .8)]
+    # Cylindrical chest/back drape plus local fabric folds; no logo redraw.
+    u = (xx - (width - 1) / 2) / max(width / 2, 1)
+    curve = 1.15 * (u * u - 1 / 3)
+    coords = [yy + curve + np.clip(dy * .22, -1.3, 1.3), xx + np.clip(dx * .2, -1.1, 1.1)]
     raw = np.asarray(art).astype(float)
     warped = np.stack([map_coordinates(raw[:, :, c], coords, order=1, mode="constant") for c in range(4)], axis=2)
-    shading = np.clip((slow + 18) / (np.median(slow) + 18), .68, 1.08)
-    weave = np.clip(1 + (lum - gaussian_filter(lum, .9)) * .005, .92, 1.05)
-    ink = warped[:, :, :3] * shading[:, :, None] * weave[:, :, None]
-    ink = ink * .95 + fabric * .05
-    alpha = gaussian_filter(warped[:, :, 3] / 255, .25)[:, :, None] * .96
+    shading = np.clip(((slow + 10) / (np.median(slow) + 10)) ** .8, .58, 1.05)
+    detail = lum - gaussian_filter(lum, .8)
+    weave = np.clip(1 + detail * .012, .88, 1.06)
+    ink = warped[:, :, :3]
+    # Real matte ink has no emissive pure whites or screen-saturated highlights.
+    ink_lum = ink.mean(axis=2, keepdims=True)
+    ink = (ink * .94 + ink_lum * .06) * .93
+    ink *= shading[:, :, None] * weave[:, :, None]
+    ink = ink * .96 + fabric * .04
+    coverage = np.clip(.95 + detail * .002, .9, .98)
+    alpha = gaussian_filter(warped[:, :, 3] / 255, .38)[:, :, None] * coverage[:, :, None]
     result = np.clip(fabric * (1 - alpha) + ink * alpha, 0, 255).astype("uint8")
     base.paste(Image.fromarray(result), (left, top))
 
@@ -84,8 +92,12 @@ def build(art, plates, output):
             # Shared supplied website, below the artwork; never invented facts.
             y = top + height + 10
             font = ImageFont.truetype(str(ROOT / "public/fonts/Geist-Bold.ttf"), (10, 9, 8)[index])
-            draw = ImageDraw.Draw(base)
-            draw.text((cx, y), "SANJUANBOWL.COM", anchor="mt", font=font, fill=(235,235,235) if colour != "white" else (25,25,25))
+            # Website goes through the same fabric/ink treatment as the design.
+            text_box = font.getbbox("SANJUANBOWL.COM")
+            text = Image.new("RGBA", (text_box[2], text_box[3] - text_box[1] + 2))
+            draw = ImageDraw.Draw(text)
+            draw.text((0, -text_box[1]), "SANJUANBOWL.COM", font=font, fill=(235,235,235) if colour != "white" else (25,25,25))
+            print_ink(base, text, cx, y, text.width, text.height)
         base.save(output / f"studio-{name}.jpg", quality=95)
         print(name)
     return len(sources)
