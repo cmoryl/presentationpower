@@ -1,0 +1,137 @@
+{
+  "date": "2026-11-14",
+  "scope": "Set 4 posts 01\u201304, Feed/Square/Story",
+  "method": "Only headline font_style italic; existing fonts, colours, images and geometry retained. Post03 Story missing SANJUANBOWL.COM restored in footer. Reviewed Canva previews before saving. JPG quality100 at native sizes, stripped metadata without changing decoded RGB pixels. Previous CDN sources preserved.",
+  "files": [
+    {
+      "design_id": "DAHajl-BGig",
+      "post": "01",
+      "width": 1080,
+      "height": 1350,
+      "asset_url": "/__l5e/assets-v1/e81ab7ff-15ae-4a68-9a11-837ebbd5bba0/DAHajl-BGig-italic-20261114.jpg",
+      "size": 1524879,
+      "saved_in_canva": true,
+      "metadata_cleaned_without_pixel_changes": true
+    },
+    {
+      "design_id": "DAHajr3ydI4",
+      "post": "01",
+      "width": 1080,
+      "height": 1080,
+      "asset_url": "/__l5e/assets-v1/d175b5a2-7cfa-4547-96d9-59009546d7e9/DAHajr3ydI4-italic-20261114.jpg",
+      "size": 1217639,
+      "saved_in_canva": true,
+      "metadata_cleaned_without_pixel_changes": true
+    },
+    {
+      "design_id": "DAHajm8xwuA",
+      "post": "01",
+      "width": 1080,
+      "height": 1920,
+      "asset_url": "/__l5e/assets-v1/a43f2231-df09-444b-9aca-0ce11d668e7c/DAHajm8xwuA-italic-20261114.jpg",
+      "size": 1686258,
+      "saved_in_canva": true,
+      "metadata_cleaned_without_pixel_changes": true
+    },
+    {
+      "design_id": "DAHainfGaUM",
+      "post": "02",
+      "width": 1080,
+      "height": 1350,
+      "asset_url": "/__l5e/assets-v1/f656d626-776d-4a49-b71d-93fdefd7b5d9/DAHainfGaUM-italic-20261114.jpg",
+      "size": 1597864,
+      "saved_in_canva": true,
+      "metadata_cleaned_without_pixel_changes": true
+    },
+    {
+      "design_id": "DAHaiiM1NBQ",
+      "post": "02",
+      "width": 1080,
+      "height": 1080,
+      "asset_url": "/__l5e/assets-v1/d3d215bd-e410-4b80-80a6-43f1f04cd027/DAHaiiM1NBQ-italic-20261114.jpg",
+      "size": 1275961,
+      "saved_in_canva": true,
+      "metadata_cleaned_without_pixel_changes": true
+    },
+    {
+      "design_id": "DAHairX-TNc",
+      "post": "02",
+      "width": 1080,
+      "height": 1920,
+      "asset_url": "/__l5e/assets-v1/4747da1d-dcc6-4647-8b8d-a69b71052958/DAHairX-TNc-italic-20261114.jpg",
+      "size": 1770533,
+      "saved_in_canva": true,
+      "metadata_cleaned_without_pixel_changes": true
+    },
+    {
+      "design_id": "DAHaiq3AMXE",
+      "post": "03",
+      "width": 1080,
+      "height": 1350,
+      "asset_url": "/__l5e/assets-v1/1fef23e0-0617-4ea2-8b9f-0710247fb2ae/DAHaiq3AMXE-italic-20261114.jpg",
+      "size": 1582723,
+      "saved_in_canva": true,
+      "metadata_cleaned_without_pixel_changes": true
+    },
+    {
+      "design_id": "DAHairDgr8U",
+      "post": "03",
+      "width": 1080,
+      "height": 1080,
+      "asset_url": "/__l5e/assets-v1/460287a8-1318-472c-87e9-711d9cb7de05/DAHairDgr8U-italic-20261114.jpg",
+      "size": 1256773,
+      "saved_in_canva": true,
+      "metadata_cleaned_without_pixel_changes": true
+    },
+    {
+      "design_id": "DAHaimLrz1c",
+      "post": "03",
+      "width": 1080,
+      "height": 1920,
+      "asset_url": "/__l5e/assets-v1/37f7187f-a36b-4c15-b36d-be6dbee15512/DAHaimLrz1c-italic-20261114.jpg",
+      "size": 1739171,
+      "saved_in_canva": true,
+      "metadata_cleaned_without_pixel_changes": true
+    },
+    {
+      "design_id": "DAHai-4B8c4",
+      "post": "04",
+      "width": 1080,
+      "height": 1350,
+      "asset_url": "/__l5e/assets-v1/401817ff-8ca0-4206-8fdc-9a6af57f88ed/DAHai-4B8c4-italic-20261114.jpg",
+      "size": 1600930,
+      "saved_in_canva": true,
+      "metadata_cleaned_without_pixel_changes": true
+    },
+    {
+      "design_id": "DAHai8069Kw",
+      "post": "04",
+      "width": 1080,
+      "height": 1080,
+      "asset_url": "/__l5e/assets-v1/ff55ed48-c811-4d02-a638-5b9b49bd8fd9/DAHai8069Kw-italic-20261114.jpg",
+      "size": 1269509,
+      "saved_in_canva": true,
+      "metadata_cleaned_without_pixel_changes": true
+    },
+    {
+      "design_id": "DAHaizbjnds",
+      "post": "04",
+      "width": 1080,
+      "height": 1920,
+      "asset_url": "/__l5e/assets-v1/f3b15c92-a6f1-45f5-b2ee-f894b981223b/DAHaizbjnds-italic-20261114.jpg",
+      "size": 1786349,
+      "saved_in_canva": true,
+      "metadata_cleaned_without_pixel_changes": true
+    }
+  ],
+  "verification": {
+    "contact_sheets_visually_reviewed": true,
+    "served_bytes_match_cleaned_exports": 12,
+    "public_gallery_campaign_selection_enlargement_save_image": "passed signed-out at localhost; downloaded Feed matches cleaned bytes",
+    "page_errors": [],
+    "tests": "11 passed across 4 social/sequence test files",
+    "build": "build OK",
+    "publication": "not published this turn"
+  },
+  "remaining": "Set4 posts05\u201325 and27\u201329:72 files; advertising and sequence audit/Illustrator refresh not included in this batch."
+}

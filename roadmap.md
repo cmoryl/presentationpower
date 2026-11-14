@@ -1,4 +1,7 @@
 # Roadmap
+## Bowl Canva socials continuation — Nov 14
+- [x] Continued Set 4 posts 01–04 in Feed, Square and Story (12 Canva saves/cleaned JPGs). Reviewed originals and contact sheets, preserved logos/colours, restored post03 Story website, verified public campaign selection/enlargement/Save image and exact served/downloaded bytes; 11 tests pass and build OK.
+- [ ] Next continuation: Set 4 posts05–25 and27–29 (72 Canva files); retain existing advertising/sequence audit and Illustrator follow-up tasks. No open Canva transactions.
 ## Bowl location-accuracy correction
 - [x] Research official public venue evidence, record architecture/orientation conflicts and withdraw generated-map reconstruction from the main 3D view; preserve it as an explicitly inaccurate archived study and do not certify BoothHUB.
 - [ ] Deliver a 100% location-accurate 3D model: blocked on current georeferenced venue/as-built geometry and approved football conversion; historical public records cannot certify these.
