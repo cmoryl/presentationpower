@@ -1,0 +1,167 @@
+{
+  "posts": [
+    "05",
+    "06",
+    "07",
+    "08",
+    "09"
+  ],
+  "mode": "set4",
+  "changed": "headline italic only; supplied logos, colours and facts preserved",
+  "files": [
+    {
+      "design_id": "DAHajcQp6ss",
+      "size": [
+        1080,
+        1350
+      ],
+      "sha256": "96aab807346ba93709ec30f1696ec2a348a06ea8238af6f88da2b52492ef9239",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajTKuMX0",
+      "size": [
+        1080,
+        1080
+      ],
+      "sha256": "3c5209c712c6343853d0eca4302157c8e7286ec7a46c31fb7e77cdc39fc8e93c",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajbXl9HE",
+      "size": [
+        1080,
+        1920
+      ],
+      "sha256": "6d0abce289fca25f1b72464c84a465d15943f262cb068b6cf0aa5d337785e336",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajU6sr6Q",
+      "size": [
+        1080,
+        1350
+      ],
+      "sha256": "1ea0206bc5fb6807f69c778a208c3ab28c2b3bfeccbbbc3f6d62d8f6333e863a",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajb3FU80",
+      "size": [
+        1080,
+        1080
+      ],
+      "sha256": "71a62349af3173cccf88617390c03531e8e1c9aba77a2ad9c2d71793c7f954ba",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajbzYi_s",
+      "size": [
+        1080,
+        1920
+      ],
+      "sha256": "05c58419c5121209096ce876546bf63a4624bca202a83e3682cb0b4d549fde88",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajXJ2Mvc",
+      "size": [
+        1080,
+        1350
+      ],
+      "sha256": "fb01cb82a360fbd03aa11c76059b4d47e5ad9dada04e5af2ca2e13bb4760d0df",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajZZVMLA",
+      "size": [
+        1080,
+        1080
+      ],
+      "sha256": "94cd504096300a1c831ccc09db76e8ef9cd1bd51e3c596f14f3ee83e43a12169",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajbB-0Y8",
+      "size": [
+        1080,
+        1920
+      ],
+      "sha256": "ed87b72b0ba3dfc3417ba105887ca340c0b8f38db1d091a0bff1f9c8abc19abc",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajaEyyZI",
+      "size": [
+        1080,
+        1350
+      ],
+      "sha256": "3255e04a208099659675b68ce191ba649248a38986b6f903a14a8138c43a83ab",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajUvHuB4",
+      "size": [
+        1080,
+        1080
+      ],
+      "sha256": "0ee9f2ff1e168f3f1f7e08fd1d17244f7078b068ad6321ea123ae2018c99561c",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajcUiY5M",
+      "size": [
+        1080,
+        1920
+      ],
+      "sha256": "0a2ccc997625cdcdc67a043a6e6ebc806b39945a4ece82a5045e89d1c02d2991",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajY9oz8M",
+      "size": [
+        1080,
+        1350
+      ],
+      "sha256": "8d8c11514afff526dbb22349d708e10d8c5a4dd3fff398ed20e8e5cdbabd1c6b",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajU5VTZU",
+      "size": [
+        1080,
+        1080
+      ],
+      "sha256": "c5cbbd00ea9b113d2fed6fd5c26d7ea80a98db806ec612e203e7748c2a7d40bc",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    },
+    {
+      "design_id": "DAHajSOi6ew",
+      "size": [
+        1080,
+        1920
+      ],
+      "sha256": "0279f30e1bbe03fabbe4fc07b9dc7e20731718f0415324b79c82a2d123465762",
+      "metadata_clean": true,
+      "pixels_unchanged": true
+    }
+  ],
+  "public_check": "post07 selection, enlargement and download bytes match; mobile no overflow or page errors",
+  "tests": "15 campaign/sequence tests pass; existing social-studio test has stale Light projection-ID expectation",
+  "remaining_set4_files": 57,
+  "open_transactions": []
+}
