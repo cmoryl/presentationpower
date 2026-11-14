@@ -30,7 +30,10 @@ export function describeLastRun(x: CanvaLastRun): string | null {
     if (r.failed > 0) bits.push(`${r.failed} with problems`);
     if (r.remaining > 0) bits.push(`${r.remaining} still waiting`);
     parts.push(`Last update run: ${at ?? "unknown"} (${r.trigger === "daily" ? "automatic" : "manual"}) — ${bits.join(", ")}`);
-    if (r.stoppedReason) parts.push(`Stopped early: ${r.stoppedReason}`);
+    const ranAt = Date.parse(r.finishedAt ?? r.startedAt ?? "");
+    const newerCheck = x.lastCheckedAt != null && Date.parse(x.lastCheckedAt) > ranAt;
+    if (newerCheck) parts.push("These run numbers are from before the latest check; open Design dates below for the current state");
+    else if (r.stoppedReason) parts.push(`Stopped early: ${r.stoppedReason}`);
   }
   return parts.length ? parts.join(" · ") : null;
 }

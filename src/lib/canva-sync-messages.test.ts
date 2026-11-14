@@ -29,6 +29,14 @@ describe("describeLastRun", () => {
   });
 });
 
+describe("describeLastRun after a newer check", () => {
+  it("marks the run numbers as older than the latest check", () => {
+    const line = describeLastRun({ lastCheckedAt: "2026-11-12T16:00:00.000Z", run: run({ stoppedReason: "Canva's daily download allowance ran out; the rest continue tomorrow." }) })!;
+    expect(line).toMatch(/from before the latest check/);
+    expect(line).not.toMatch(/Stopped early/);
+  });
+});
+
 describe("describePictureStamp", () => {
   it("says nothing until a picture date exists", () =>
     expect(describePictureStamp({ picturesUpdated: null, source: null, lastCheckedAt: null })).toBeNull());
