@@ -1649,3 +1649,7 @@ body:has([data-sjb-masthead]) main h1 { font-family: "Barlow Condensed", sans-se
 body:has([data-sjb-masthead]) main h2 { font-family: "Barlow Condensed", sans-serif; font-weight: 700; text-transform: uppercase; }
 body:has([data-sjb-shell-masthead]) [data-sjb-trail-masthead] { display: none; }
 .sjb-site-band { width: 100vw; margin-inline: calc(50% - 50vw); border-radius: 0; }
+/* Sticky Bowl section row: tighter lettering room once it lifts to the top. */
+.sjb-site-nav--stuck .sjb-site-nav-link { padding-block: 0.5rem; gap: 0.35rem; }
+.sjb-site-nav--stuck .sjb-site-nav-link svg { block-size: 1.15rem; inline-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) { .sjb-site-nav--stuck .sjb-site-nav-link { transition: none; } }

@@ -2,6 +2,7 @@
 // plate, grit, Light-social lettering) plus the Bowl section nav, so every Bowl
 // page reads as one site inside Element. Facts only from SJB_EVENT.
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import "@fontsource/barlow-condensed/500.css";
 import "@fontsource/barlow-condensed/700.css";
 import "@fontsource/barlow-condensed/700-italic.css";
@@ -42,30 +43,94 @@ function useBowlPath() {
   return { share, parts };
 }
 
-/** Section tabs across the Bowl site (app only; share links keep their own tabs). */
+/** Section tabs across the Bowl site (app only; share links keep their own tabs).
+ *  The row lifts to the top of the screen once its own place scrolls away, so
+ *  visitors can jump between Bowl sections without hunting back up the page.
+ *  It pins under the Element header where one is rendered, and to the very top
+ *  on the shell-less Bowl pages (badges, T-shirts, calendar, policies). */
 export function SjbSiteNav({ className = "" }: { className?: string }) {
   const { share, parts } = useBowlPath();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const stuckRef = useRef(false);
+  const [line, setLine] = useState(0);
+  const [stuck, setStuck] = useState(false);
+  const [flowH, setFlowH] = useState(0);
+
+  // Sticky line = the Element header's height, or 0 when the page has none.
+  useEffect(() => {
+    const header = document.querySelector<HTMLElement>("[data-app-shell] > header");
+    const measure = () => setLine(header ? Math.round(header.getBoundingClientRect().height) : 0);
+    measure();
+    if (!header) return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(header);
+    return () => ro.disconnect();
+  }, [pathname]);
+
+  // Stick once the row's own slot has scrolled up past the line.
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const next = !entry.isIntersecting && entry.boundingClientRect.top < line;
+        stuckRef.current = next;
+        setStuck(next);
+      },
+      { rootMargin: `-${line}px 0px 0px 0px`, threshold: 0 },
+    );
+    io.observe(sentinel);
+    return () => io.disconnect();
+  }, [line]);
+
+  // Height of the row while it still sits in the page: that is the space the
+  // placeholder holds open, so lifting the row out never shifts the content below.
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const set = () => { if (!stuckRef.current) setFlowH(nav.getBoundingClientRect().height); };
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(nav);
+    return () => ro.disconnect();
+  }, []);
+
   if (share) return null;
   const top = parts[0] ?? "";
   const navy = hex("navy"), gold = hex("gold");
+  const style: CSSProperties = {
+    fontFamily: SJB_BOWL_FONT,
+    background: stuck ? navy : `${navy}e6`,
+    ...(stuck
+      ? { position: "fixed", top: line, left: 0, right: 0, zIndex: 20, boxShadow: "0 14px 30px rgb(0 0 0 / .5)" }
+      : null),
+  };
   return (
-    <nav aria-label="San Juan Bowl sections" className={`relative overflow-x-auto border-t border-white/15 ${className}`} style={{ background: `${navy}e6`, fontFamily: SJB_BOWL_FONT }}>
-      <ul className="mx-auto flex w-max min-w-full justify-center gap-1 px-4 sm:px-8">
-        {SJB_SITE_NAV.map((n) => {
-          const active = n.seg === top;
-          return (
-            <li key={n.to}>
-              <Link to={n.to as string} aria-current={active ? "page" : undefined}
-                className="flex min-w-20 flex-col items-center gap-2 border-b-[3px] px-3 py-4 text-[15px] font-bold italic uppercase tracking-normal text-white/75 hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-white"
-                style={{ borderColor: active ? gold : "transparent", color: active ? gold : undefined }}>
-                <SjbSectionIcon section={n.seg} className="size-6 shrink-0" />
-                {n.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+    <>
+      <div ref={sentinelRef} aria-hidden className="h-px" />
+      {stuck && <div aria-hidden style={{ height: flowH }} />}
+      <nav ref={navRef} aria-label="San Juan Bowl sections"
+        className={`sjb-site-nav overflow-x-auto border-t border-white/15 ${stuck ? "sjb-site-nav--stuck" : ""} ${className}`}
+        style={style}>
+        <ul className="mx-auto flex w-max min-w-full justify-center gap-1 px-4 sm:px-8">
+          {SJB_SITE_NAV.map((n) => {
+            const active = n.seg === top;
+            return (
+              <li key={n.to}>
+                <Link to={n.to as string} aria-current={active ? "page" : undefined}
+                  className="sjb-site-nav-link flex min-w-20 flex-col items-center gap-2 border-b-[3px] px-3 py-4 text-[15px] font-bold italic uppercase tracking-normal text-white/75 hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-white"
+                  style={{ borderColor: active ? gold : "transparent", color: active ? gold : undefined }}>
+                  <SjbSectionIcon section={n.seg} className="size-6 shrink-0" />
+                  {n.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </>
   );
 }
 
