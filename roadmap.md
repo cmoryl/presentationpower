@@ -1,4 +1,8 @@
 # Roadmap
+## Bowl game-day schedule materials
+- [x] Generated four Canva options each for Feed, Story and Flyer, with announced kickoff and explicit TBC/event-relative timings; candidate links added, not represented as saved files.
+- [x] Added schedules and fan timeline to shared Stadium section; public timeline/link rendering, phone no-overflow and four timing tests pass; build OK, no page errors.
+- [ ] Save selected Canva designs and add reviewed previews/downloads: waits on user option selections; Canva preview URLs return access-denied/challenge pages in this environment, so artwork accuracy and thumbnails remain unverified.
 ## Bowl football conversion correction
 - [x] Both illustrated maps now show conceptual football turf/end zones inside the existing stadium shell, with outdoor areas retained and field alignment explicitly illustrative. Public images, enlargement, byte-identical downloads and phone no-overflow verified; build OK, no page errors. BoothHUB model unchanged.
 ## Bowl pre-game map concept

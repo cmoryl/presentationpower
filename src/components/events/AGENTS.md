@@ -1,6 +1,7 @@
 # San Juan Bowl event pages and assets
 
 - Bowl script rules (brand guide PDF, digital billboards, Illustrator masters) live in `scripts/AGENTS.md`.
+- Bowl game-day timelines share `sjb-game-day` and read kickoff from `SJB_EVENT`; Canva candidates stay labelled unsaved/unapproved until user selection and export review — why: schedule suggestions must not invent times or pass generated candidates off as production files.
 - Bowl stadium-area and pre-game concepts are shared by app/share StadiumPage and enlarged with PlanZoomFrame; generated roads/radius and proposed plaza, stage, vendors and lounge stay illustrative/not to scale and venue-approval-required, separate from the BoothHUB model — why: promotional imagery cannot establish geographic coverage, site geometry or approved event placements.
 - Official website actions and the countdown instant read `SJB_EVENT`; media/sponsor submissions link to the website's forms — why: one fact authority and no duplicate inquiry handling.
 - Bowl overview and smaller shared section-header lettering use SjbHeroLettering's exact supplied long-SVG paths; both read the overview's browser-local face/shadow preferences, not published settings, while page titles and shield assets remain unchanged — why: cohesive header lettering must preserve issued artwork elsewhere.

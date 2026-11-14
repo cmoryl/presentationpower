@@ -8,6 +8,7 @@ import { BOOTHHUB_ORIGIN } from "@/lib/boothhub-3d";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
 import aerialConcept from "@/assets/san-juan-bowl/stadium-aerial-football-concept.jpg";
 import pregameConcept from "@/assets/san-juan-bowl/stadium-pregame-football-concept.jpg";
+import { SjbGameDaySchedule } from "@/components/events/SjbGameDaySchedule";
 
 const STADIUM_URL = `${BOOTHHUB_ORIGIN}/showcase/san-juan-bowl`;
 /** BoothHUB now publishes the Hiram Bithorn Stadium model. */
@@ -54,6 +55,7 @@ export function StadiumPage() {
           </PlanZoomFrame>
           <p className="text-sm text-muted-foreground">AI-generated illustration, not satellite imagery. Roads, buildings, orientation and the radius ring are illustrative and not to scale; not for directions or site planning.</p>
         </section>
+        <SjbGameDaySchedule />
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-2xl font-semibold">Stadium 3D view</h2>
