@@ -3,6 +3,7 @@ import { Clock3, ExternalLink } from "lucide-react";
 import { Button } from "@/design-system/element";
 import { SJB_EVENT } from "@/lib/san-juan-bowl";
 import { SJB_FAN_TIMELINE, SJB_GAME_SCHEDULE, SJB_SCHEDULE_OPTIONS, type SjbTimelineEntry } from "@/lib/sjb-game-day";
+import { SjbScheduleDemos } from "@/components/events/SjbScheduleDemos";
 
 export interface SjbGameDayScheduleProps extends React.ComponentPropsWithoutRef<"section"> {}
 
@@ -25,6 +26,7 @@ export const SjbGameDaySchedule = forwardRef<HTMLElement, SjbGameDayScheduleProp
       <div><h3 className="mb-3 text-lg font-semibold">Fan timeline</h3><Timeline entries={SJB_FAN_TIMELINE} /></div>
     </div>
     <p className="text-sm text-muted-foreground">Kickoff: {SJB_EVENT.kickoffLabel}. Local times use AST (San Juan). Halftime and the final whistle depend on game progress; other timings await confirmation.</p>
+    <SjbScheduleDemos />
     <div>
       <h3 className="text-lg font-semibold">Canva marketing options</h3>
       <p className="mt-1 text-sm text-muted-foreground">Generated candidates · not yet saved or approved. Preview access could not be verified; no production downloads are available.</p>

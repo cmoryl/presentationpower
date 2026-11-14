@@ -8,9 +8,9 @@ export const Route = createFileRoute("/events/san-juan-bowl_/stadium")({
   head: () => ({
     meta: [
       { title: "San Juan Bowl stadium & aerial concept · TransPerfect Element" },
-      { name: "description", content: "Explore proposed outdoor pre-game areas, stage, vendors and lounge, the illustrative three-mile area concept and Hiram Bithorn Stadium in 3D. Concepts require venue approval." },
+      { name: "description", content: "Explore Bowl stadium concepts, game-day and fan timelines, and Feed, Story and Flyer schedule demos with announced kickoff and other times marked TBC." },
       { property: "og:title", content: "San Juan Bowl stadium & aerial concept" },
-      { property: "og:description", content: "Proposed pre-game plaza, stage, vendors and outdoor lounge, with illustrative area overview and stadium in 3D. Not an approved site plan." },
+      { property: "og:description", content: "Stadium and pre-game concepts with game-day schedule artwork and fan timelines. Draft timings and proposed areas remain clearly labelled." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

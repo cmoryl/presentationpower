@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl rendered schedule demos
+- [x] Added six labelled Feed, Story and Flyer artwork views for game schedule and fan timeline in the shared Stadium section, with supplied dark logo, existing artistic stadium plates and shared timing entries. Public view switching, Story enlargement and phone no-overflow pass with no page errors; four timing tests pass. Unsaved Canva candidates remain separate; these are draft layout previews, not production exports.
 ## Bowl game-day schedule materials
 - [x] Generated four Canva options each for Feed, Story and Flyer, with announced kickoff and explicit TBC/event-relative timings; candidate links added, not represented as saved files.
 - [x] Added schedules and fan timeline to shared Stadium section; public timeline/link rendering, phone no-overflow and four timing tests pass; build OK, no page errors.
