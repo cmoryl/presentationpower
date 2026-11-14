@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl stadium structure completion
+- [x] Replaced floating seating strips with closed, ground-supported terraced stands, individual instanced seats and clear aisles, solid concourse/perimeter, closed canopy underside/end caps and full-height supports. App/share desktop/phone camera, canopy, keyboard/reset and download checks pass without errors or overflow; six tests pass and build OK. Open horseshoe and exact field artwork preserved; real-device smoothness and surveyed architectural accuracy remain unverified.
 ## Bowl source-based interactive stadium
 - [x] Built source-based 3D stadium/football concept with exact-aspect supplied field artwork, horseshoe stands, folded canopy, inclined lights and neighbouring arena. App/share and desktop/phone camera presets, canopy toggle, keyboard orbit/reset and labelled PNG downloads verified without errors or overflow; six tests pass and build OK. Separate BoothHUB unchanged. Spatial geometry remains illustrative; real-device GPU performance and physical touch feel not verified.
 ## Bowl Stadium subsection menus

@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, OrbitControls, useTexture } from "@react-three/drei";
-import { DoubleSide, SRGBColorSpace, BufferGeometry, Float32BufferAttribute, Spherical, Vector3 } from "three";
+import { DoubleSide, SRGBColorSpace, BufferGeometry, Float32BufferAttribute, Spherical, Vector3, InstancedMesh, Object3D } from "three";
 import type { OrbitControls as OrbitControlsType } from "three-stdlib";
 import { BRAND } from "@/lib/brand-colors";
 import { SJB_COLORS } from "@/lib/san-juan-bowl";
@@ -12,7 +12,7 @@ import fieldAsset from "@/assets/san-juan-bowl/bowl-field-paint-reference.png.as
 const sky = SJB_COLORS.find(c => c.id === "sky")?.hex ?? BRAND.blue;
 const gold = SJB_COLORS.find(c => c.id === "gold")?.hex ?? BRAND.yellow;
 
-function arcGeometry(innerX: number, innerZ: number, outerX: number, outerZ: number, y: number, folded = false) {
+function arcGeometry(innerX: number, innerZ: number, outerX: number, outerZ: number, y: number, folded = false, bottom = y - .5) {
   const points: number[] = [];
   for (let i = 0; i < 96; i++) {
     const a = C.stand.start + (C.stand.end - C.stand.start) * i / 96;
@@ -24,6 +24,13 @@ function arcGeometry(innerX: number, innerZ: number, outerX: number, outerZ: num
     const r = [Math.cos(b) * innerX, heightB, Math.sin(b) * innerZ];
     const s = [Math.cos(b) * outerX, heightB, Math.sin(b) * outerZ];
     points.push(...p, ...q, ...r, ...q, ...s, ...r);
+    const pb = [p[0], bottom, p[2]], qb = [q[0], bottom, q[2]], rb = [r[0], bottom, r[2]], sb = [s[0], bottom, s[2]];
+    // Closed inner/outer walls and underside, plus end caps: no floating strips.
+    points.push(...p, ...r, ...pb, ...r, ...rb, ...pb);
+    points.push(...q, ...qb, ...s, ...s, ...qb, ...sb);
+    points.push(...pb, ...rb, ...qb, ...qb, ...rb, ...sb);
+    if (i === 0) points.push(...p, ...pb, ...q, ...q, ...pb, ...qb);
+    if (i === 95) points.push(...r, ...s, ...rb, ...s, ...sb, ...rb);
   }
   const geometry = new BufferGeometry();
   geometry.setAttribute("position", new Float32BufferAttribute(points, 3));
@@ -31,19 +38,53 @@ function arcGeometry(innerX: number, innerZ: number, outerX: number, outerZ: num
   return geometry;
 }
 
+function Seating({ upper }: { upper: boolean }) {
+  const seats = useRef<InstancedMesh>(null);
+  const backs = useRef<InstancedMesh>(null);
+  const rows = upper ? 11 : 9;
+  const count = rows * 112;
+  useEffect(() => {
+    if (!seats.current || !backs.current) return;
+    const dummy = new Object3D();
+    for (let row = 0; row < rows; row++) {
+      const tier = row + (upper ? 9 : 0);
+      for (let column = 0; column < 112; column++) {
+        // Aisles between seating sections remain clear.
+        const a = C.stand.start + (C.stand.end - C.stand.start) * (column + .5) / 112;
+        const hidden = column % 14 === 0 || column % 14 === 13;
+        const x = Math.cos(a) * (36.5 + tier * .95), z = Math.sin(a) * (42.4 + tier * .7);
+        dummy.position.set(x, 1.58 + tier * .48, z); dummy.rotation.set(0, -a + Math.PI / 2, 0); dummy.scale.setScalar(hidden ? 0 : 1); dummy.updateMatrix();
+        seats.current.setMatrixAt(row * 112 + column, dummy.matrix);
+        dummy.position.set(x + Math.cos(a) * .23, 1.87 + tier * .48, z + Math.sin(a) * .23); dummy.updateMatrix();
+        backs.current.setMatrixAt(row * 112 + column, dummy.matrix);
+      }
+    }
+    seats.current.instanceMatrix.needsUpdate = true; backs.current.instanceMatrix.needsUpdate = true;
+  }, [upper, rows]);
+  return <group>
+    <instancedMesh ref={seats} args={[undefined, undefined, count]}><boxGeometry args={[.9, .13, .55]} /><meshStandardMaterial color={upper ? sky : BRAND.darkGray} roughness={.7} /></instancedMesh>
+    <instancedMesh ref={backs} args={[undefined, undefined, count]}><boxGeometry args={[.9, .5, .13]} /><meshStandardMaterial color={upper ? sky : BRAND.darkGray} roughness={.7} /></instancedMesh>
+  </group>;
+}
+
 function Horseshoe({ roof }: { roof: boolean }) {
-  const tiers = useMemo(() => Array.from({ length: 20 }, (_, i) => arcGeometry(36 + i * .95, 42 + i * .7, 37.1 + i * .95, 42.85 + i * .7, 1.4 + i * .48)), []);
-  const canopy = useMemo(() => arcGeometry(45, 49, 59, 60, 16, true), []);
-  useEffect(() => () => { tiers.forEach(g => g.dispose()); canopy.dispose(); }, [tiers, canopy]);
+  const tiers = useMemo(() => Array.from({ length: 20 }, (_, i) => arcGeometry(36 + i * .95, 42 + i * .7, 37.1 + i * .95, 42.85 + i * .7, 1.4 + i * .48, false, .15)), []);
+  const canopy = useMemo(() => arcGeometry(45, 49, 59, 60, 16, true, 15.5), []);
+  const concourse = useMemo(() => arcGeometry(55, 56, 61, 63, 10.8, false, .15), []);
+  const innerWall = useMemo(() => arcGeometry(35.5, 41.5, 36, 42, 2.1, false, .15), []);
+  useEffect(() => () => { tiers.forEach(g => g.dispose()); canopy.dispose(); concourse.dispose(); innerWall.dispose(); }, [tiers, canopy, concourse, innerWall]);
   return <group position={[C.field.center[0], 0, C.field.center[1]]}>
-    {tiers.map((geometry, i) => <mesh key={i} geometry={geometry} receiveShadow><meshStandardMaterial color={i < 9 ? BRAND.darkGray : sky} roughness={.85} side={DoubleSide} /></mesh>)}
+    <mesh geometry={concourse} receiveShadow><meshStandardMaterial color={BRAND.blueWhite} roughness={.9} side={DoubleSide} /></mesh>
+    <mesh geometry={innerWall}><meshStandardMaterial color={BRAND.lightGray} roughness={.9} side={DoubleSide} /></mesh>
+    {tiers.map((geometry, i) => <mesh key={i} geometry={geometry} receiveShadow><meshStandardMaterial color={BRAND.lightGray} roughness={.85} side={DoubleSide} /></mesh>)}
+    <Seating upper={false} /><Seating upper />
     {roof && <mesh geometry={canopy} castShadow receiveShadow><meshStandardMaterial color={BRAND.white} roughness={.8} side={DoubleSide} /></mesh>}
     {Array.from({ length: 35 }, (_, i) => {
       const a = C.stand.start + (C.stand.end - C.stand.start) * i / 34;
-      return <group key={i} position={[Math.cos(a) * 56, 0, Math.sin(a) * 58]} rotation={[0, -a, 0]}>
-        <mesh position={[0, 7, 0]} castShadow><boxGeometry args={[1.1, 14, 1.1]} /><meshStandardMaterial color={BRAND.blueWhite} /></mesh>
-        <mesh position={[0, 6, 0]} rotation={[0, 0, Math.PI / 4]}><boxGeometry args={[.6, 7, .7]} /><meshStandardMaterial color={BRAND.lightGray} /></mesh>
-        <mesh position={[0, 6, 0]} rotation={[0, 0, -Math.PI / 4]}><boxGeometry args={[.6, 7, .7]} /><meshStandardMaterial color={BRAND.lightGray} /></mesh>
+      return <group key={i} position={[Math.cos(a) * 59, 0, Math.sin(a) * 61]} rotation={[0, -a, 0]}>
+        <mesh position={[0, 7.8, 0]} castShadow><boxGeometry args={[1.1, 15.6, 1.1]} /><meshStandardMaterial color={BRAND.blueWhite} /></mesh>
+        <mesh position={[0, 5.5, 0]} rotation={[Math.PI / 4, 0, 0]}><boxGeometry args={[.6, 5, .7]} /><meshStandardMaterial color={BRAND.lightGray} /></mesh>
+        <mesh position={[0, 5.5, 0]} rotation={[-Math.PI / 4, 0, 0]}><boxGeometry args={[.6, 5, .7]} /><meshStandardMaterial color={BRAND.lightGray} /></mesh>
       </group>;
     })}
     {Array.from({ length: 8 }, (_, i) => {
