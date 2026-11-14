@@ -11,7 +11,7 @@ import { CANVA_SYNC_QUERY } from "@/lib/use-canva-sync";
 import { describeLastRun, explainSyncError } from "@/lib/canva-sync-messages";
 import { SJB_CALENDAR_PREVIEWS, sjbCalendarDesignLabel } from "@/lib/sjb-social-calendar";
 import { canvaSyncLabel } from "@/lib/canva-sync-targets";
-import { CanvaSyncStatusTable } from "@/components/events/CanvaSyncStatusTable";
+import { CanvaSyncLight, CanvaSyncStatusTable } from "@/components/events/CanvaSyncStatusTable";
 
 const chunk = <T,>(a: T[], n: number) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
 const when = (iso: string | null) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : "unknown");
@@ -30,7 +30,10 @@ export function SjbCanvaSyncPanel({ designIds, label }: SjbCanvaSyncPanelProps) 
   const qc = useQueryClient();
   const lastRun = useQuery({ queryKey: ["canva-asset-sync", "last-run"], queryFn: () => getCanvaSyncLastRun() });
   const runLine = describeLastRun(lastRun.data ?? { lastCheckedAt: null, run: null });
-  const refreshRunLine = () => qc.invalidateQueries({ queryKey: ["canva-asset-sync", "last-run"] });
+  const refreshRunLine = () => {
+    qc.invalidateQueries({ queryKey: ["canva-asset-sync", "last-run"] });
+    qc.invalidateQueries({ queryKey: ["canva-asset-sync", "status"] });
+  };
   const [busy, setBusy] = useState<string | null>(null);
   const [changed, setChanged] = useState<{ id: string; at: string | null }[] | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -95,6 +98,7 @@ export function SjbCanvaSyncPanel({ designIds, label }: SjbCanvaSyncPanelProps) 
     <section aria-label="Sync from Canva" className="mt-6 rounded-md border border-border bg-muted/40 p-4 text-sm">
       <div className="flex flex-wrap items-center gap-3">
         <Button size="sm" variant="outline" onClick={runCheck} disabled={!!busy}><RefreshCw size={14} aria-hidden /> Check Canva for updates</Button>
+        <CanvaSyncLight />
         <span className="text-muted-foreground" aria-live="polite">{busy ?? `${designIds.length} ${label} designs. Checking is free; only changed designs are downloaded.`}</span>
         {runLine
           ? <p className="w-full text-xs text-muted-foreground">{runLine}</p>
