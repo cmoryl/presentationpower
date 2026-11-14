@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl cohesive map styling
+- [x] Restyled both Bowl maps with coordinated light illustrated grounds, navy outlines, sky roads and gold zones; football conversion and proposed-area disclaimers retained, unverified north arrow removed. Shared public images decode, download bytes match, enlargement and mobile no-overflow pass with no page errors. Earlier images and BoothHUB preserved.
 ## Bowl rendered schedule demos
 - [x] Added six labelled Feed, Story and Flyer artwork views for game schedule and fan timeline in the shared Stadium section, with supplied dark logo, existing artistic stadium plates and shared timing entries. Public view switching, Story enlargement and phone no-overflow pass with no page errors; four timing tests pass. Unsaved Canva candidates remain separate; these are draft layout previews, not production exports.
 ## Bowl game-day schedule materials

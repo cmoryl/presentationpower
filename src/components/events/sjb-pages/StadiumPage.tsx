@@ -6,8 +6,8 @@ import { SjbLink, SjbShell, useSjbShare } from "@/components/events/SjbShare";
 import { Button } from "@/design-system/element";
 import { BOOTHHUB_ORIGIN } from "@/lib/boothhub-3d";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
-import aerialConcept from "@/assets/san-juan-bowl/stadium-aerial-football-concept.jpg";
-import pregameConcept from "@/assets/san-juan-bowl/stadium-pregame-football-concept.jpg";
+import aerialConcept from "@/assets/san-juan-bowl/stadium-aerial-styled-concept.jpg";
+import pregameConcept from "@/assets/san-juan-bowl/stadium-pregame-styled-concept.jpg";
 import { SjbGameDaySchedule } from "@/components/events/SjbGameDaySchedule";
 
 const STADIUM_URL = `${BOOTHHUB_ORIGIN}/showcase/san-juan-bowl`;

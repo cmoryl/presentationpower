@@ -1,4 +1,11 @@
 # Event design decisions
+### 2026-11-14 — Bowl maps share a light editorial cartographic style
+**Area:** Both existing Stadium concept maps.
+**Options considered:** retain dark satellite-like plates or restyle the same source layouts as a coordinated light illustrated set.
+**Chosen:** source-edited light blue-white grounds, navy architectural outlines, sky road accents and gold concept zones; preserve football conversion, four proposed outdoor areas and earlier images. Remove the unverified north arrow. Shared app/share display and download imports use the new plates; BoothHUB remains unchanged.
+**Why:** readable, cohesive Bowl styling without representing generated streets or the radius as geographic evidence.
+**Would change if:** approved georeferenced maps or a venue-approved conversion and outdoor plan are supplied.
+
 ### 2026-11-14 — Football conversion corrects both Bowl maps
 **Area:** Playing surface in the illustrated precinct and area overview.
 **Options considered:** retain baseball as the underlying venue reference or illustrate the user-confirmed football conversion within the existing architecture.
