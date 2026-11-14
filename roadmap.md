@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl aerial location concept
+- [x] Generated 1792×1024 Bowl-styled overhead illustration with conceptual three-mile ring; shared stadium page displays it with explicit not-to-scale/non-navigation labelling, zoom/enlargement and byte-matching download. App/share viewing and mobile no-overflow passed with no page errors; existing 3D view preserved. Geography and measured coverage are not verified or claimed.
 ## Smaller Bowl section-header lettering
 - [x] Added exact supplied lettering at a maximum 440px above section titles through the shared app/share masthead; all eight main subpages and public social share checked, browser-local yellow restored, mobile fits with no page errors. Three colour tests pass and build OK.
 ## Bowl supplied hero lettering

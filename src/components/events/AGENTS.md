@@ -1,6 +1,7 @@
 # San Juan Bowl event pages and assets
 
 - Bowl script rules (brand guide PDF, digital billboards, Illustrator masters) live in `scripts/AGENTS.md`.
+- Bowl stadium-area concept is shared by app/share StadiumPage and enlarged with PlanZoomFrame; its generated roads and three-mile ring stay explicitly illustrative/not to scale, separate from the BoothHUB model — why: promotional imagery cannot establish geographic coverage or site geometry.
 - Official website actions and the countdown instant read `SJB_EVENT`; media/sponsor submissions link to the website's forms — why: one fact authority and no duplicate inquiry handling.
 - Bowl overview and smaller shared section-header lettering use SjbHeroLettering's exact supplied long-SVG paths; both read the overview's browser-local face/shadow preferences, not published settings, while page titles and shield assets remain unchanged — why: cohesive header lettering must preserve issued artwork elsewhere.
 - Bowl mastheads use the shared full-bleed `sjb-site-band` and `SjbSectionIcon` navigation pictograms; calendar content starts directly with campaign artwork, not a second statistics hero — why: the event should feel like one asset-led micro-site inside Element.

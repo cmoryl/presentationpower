@@ -1,4 +1,11 @@
 # Event design decisions
+### 2026-11-14 — Bowl starter aerial is an illustrated concept
+**Area:** Bowl stadium-area visual.
+**Options offered:** managed Google satellite map (connection declined), free accurate street map, uploaded aerial base or generated illustrated concept.
+**Chosen:** generated top-down concept, explicitly not satellite imagery or to scale; its three-mile ring is conceptual and it contains no named road/business claims.
+**Why:** the user selected Illustrated concept after skipping Google Maps. No measured radius, directions or surveyed geography are claimed.
+**Would change if:** the user supplies georeferenced aerial imagery or chooses a live geographic map.
+
 
 ### 2026-11-02 — SF supplied final maps replace displayed drafts
 **Area:** San Francisco map displays and downloads.

@@ -7,10 +7,10 @@ import { StadiumPage } from "@/components/events/sjb-pages/StadiumPage";
 export const Route = createFileRoute("/events/san-juan-bowl_/stadium")({
   head: () => ({
     meta: [
-      { title: "San Juan Bowl stadium 3D view · TransPerfect Element" },
-      { name: "description", content: "Interactive 3D view of Hiram Bithorn Stadium in San Juan for the TransPerfect San Juan Bowl, from BoothHUB." },
-      { property: "og:title", content: "San Juan Bowl stadium 3D view" },
-      { property: "og:description", content: "Explore the San Juan Bowl stadium and field in 3D." },
+      { title: "San Juan Bowl stadium & aerial concept · TransPerfect Element" },
+      { name: "description", content: "Illustrated three-mile stadium-area concept and BoothHUB's 3D view of Hiram Bithorn Stadium for the San Juan Bowl. The illustration is not to scale." },
+      { property: "og:title", content: "San Juan Bowl stadium & aerial concept" },
+      { property: "og:description", content: "View the illustrative three-mile area concept and explore the stadium in 3D." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
