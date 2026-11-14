@@ -6,10 +6,13 @@ import { SjbLink, SjbShell, useSjbShare } from "@/components/events/SjbShare";
 import { Button } from "@/design-system/element";
 import { BOOTHHUB_ORIGIN } from "@/lib/boothhub-3d";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
-import aerialConcept from "@/assets/san-juan-bowl/stadium-aerial-styled-concept.jpg";
-import pregameConcept from "@/assets/san-juan-bowl/stadium-pregame-styled-concept.jpg";
+import aerialAsset from "@/assets/san-juan-bowl/stadium-aerial-reference-paint.jpg.asset.json";
+import pregameAsset from "@/assets/san-juan-bowl/stadium-pregame-reference-paint.jpg.asset.json";
+import fieldPaint from "@/assets/san-juan-bowl/bowl-field-paint-reference.png.asset.json";
 import { SjbGameDaySchedule } from "@/components/events/SjbGameDaySchedule";
 
+const aerialConcept = aerialAsset.url;
+const pregameConcept = pregameAsset.url;
 const STADIUM_URL = `${BOOTHHUB_ORIGIN}/showcase/san-juan-bowl`;
 /** BoothHUB now publishes the Hiram Bithorn Stadium model. */
 const STADIUM_READY = true;
@@ -54,6 +57,14 @@ export function StadiumPage() {
             <img src={aerialConcept} alt="Illustrated overhead stadium-area concept showing a football conversion in Bowl navy, blue and gold, with a conceptual three-mile radius ring" width={1792} height={1024} className="h-auto w-full" />
           </PlanZoomFrame>
           <p className="text-sm text-muted-foreground">AI-generated illustration, not satellite imagery. Roads, buildings, orientation and the radius ring are illustrative and not to scale; not for directions or site planning.</p>
+        </section>
+        <section aria-labelledby="sjb-field-paint-title" className="space-y-3 border-y py-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div><p className="text-xs font-semibold uppercase text-muted-foreground">Supplied reference · provisional</p><h2 id="sjb-field-paint-title" className="text-2xl font-semibold">Field paint reference</h2></div>
+            <Button asChild variant="outline"><a href={fieldPaint.url} download="san-juan-bowl-field-paint-reference.png"><Download className="size-4" />Download supplied reference</a></Button>
+          </div>
+          <PlanZoomFrame label="Bowl field paint reference"><img src={fieldPaint.url} alt="Supplied provisional field-paint reference with green TransPerfect end zones, central Bowl shield and Share sponsor placements" width={1920} height={905} className="h-auto w-full" /></PlanZoomFrame>
+          <p className="text-sm text-muted-foreground">Your supplied artwork is preserved unchanged here and placed into both concept maps. Paint design is provisional, not confirmed or approved for production; field positioning and fit remain illustrative. This image does not establish surveyed dimensions. The BoothHUB model has not been changed.</p>
         </section>
         <SjbGameDaySchedule />
         <div className="flex flex-wrap items-end justify-between gap-3">

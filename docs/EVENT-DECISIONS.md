@@ -1,4 +1,11 @@
 # Event design decisions
+### 2026-11-14 — Supplied field-paint image is provisional visual authority
+**Area:** Field paint in the two Bowl map concepts.
+**Options considered:** ask AI to recreate sponsor marks or place the supplied raster artwork unchanged.
+**Chosen:** original pixels transformed only for map placement, with a separate full-size unchanged reference. Green end zones, central shield and sponsor positions follow the image; earlier map plates retained. BoothHUB unchanged.
+**Why:** the user said this is probably the field paint; visual fidelity does not confer approval or surveyed placement.
+**Would change if:** the organiser supplies approved field-paint masters and conversion geometry.
+
 ### 2026-11-14 — Bowl maps share a light editorial cartographic style
 **Area:** Both existing Stadium concept maps.
 **Options considered:** retain dark satellite-like plates or restyle the same source layouts as a coordinated light illustrated set.

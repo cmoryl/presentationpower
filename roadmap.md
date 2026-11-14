@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl supplied field-paint reference
+- [x] Preserve uploaded artwork as a provisional reference; place original pixels into both illustrated maps and add enlarged original/reference download to shared Stadium page. Placement remains illustrative and BoothHUB unchanged.
 ## Bowl cohesive map styling
 - [x] Restyled both Bowl maps with coordinated light illustrated grounds, navy outlines, sky roads and gold zones; football conversion and proposed-area disclaimers retained, unverified north arrow removed. Shared public images decode, download bytes match, enlargement and mobile no-overflow pass with no page errors. Earlier images and BoothHUB preserved.
 ## Bowl rendered schedule demos
