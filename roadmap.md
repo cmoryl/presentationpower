@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl source-based interactive stadium
+- [x] Built source-based 3D stadium/football concept with exact-aspect supplied field artwork, horseshoe stands, folded canopy, inclined lights and neighbouring arena. App/share and desktop/phone camera presets, canopy toggle, keyboard orbit/reset and labelled PNG downloads verified without errors or overflow; six tests pass and build OK. Separate BoothHUB unchanged. Spatial geometry remains illustrative; real-device GPU performance and physical touch feel not verified.
 ## Bowl Stadium subsection menus
 - [x] Added grouped sticky Stadium navigation for maps, field artwork, schedule timelines/demos/Canva options and the 3D view. All seven destinations verified on app/share at desktop and phone sizes, with visible headings below both pinned menus, keyboard focus and no overflow/page errors; four timing tests pass. Existing content unchanged.
 ## Bowl supplied field-paint reference

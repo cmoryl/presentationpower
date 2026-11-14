@@ -168,7 +168,7 @@ export function DisplayTitle({
   maxWidthPx?: number;
   /** Lines the headline is authored to occupy before the copy-fit steps in. */
   fitLines?: number;
-  as?: keyof React.JSX.IntrinsicElements;
+  as?: keyof HTMLElementTagNameMap;
   className?: string;
 }) {
   const spec = DISPLAY_SPECS[size];

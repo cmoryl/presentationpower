@@ -1,4 +1,11 @@
 # Event design decisions
+### 2026-11-14 — Source-based stadium concept remains separate from BoothHUB
+**Area:** Interactive Bowl stadium/football preview.
+**Options considered:** replace the existing external model, use a generic football-stadium asset, or reconstruct the illustrated map with unchanged supplied field pixels.
+**Chosen:** a client-only interactive source-based concept with horseshoe stands, folded canopy, inclined floodlights and neighbouring arena; camera presets and canopy visibility; retain the separate BoothHUB model unchanged.
+**Why:** no approved venue mesh or surveyed conversion plan was supplied, and a generic enclosed football stadium would contradict Hiram Bithorn. Artwork uses its original aspect ratio, not redrawn sponsor marks. All spatial coordinates are illustrative image-derived estimates.
+**Would change if:** the organiser supplies a licensed venue mesh and approved conversion geometry.
+
 ### 2026-11-14 — Supplied field-paint image is provisional visual authority
 **Area:** Field paint in the two Bowl map concepts.
 **Options considered:** ask AI to recreate sponsor marks or place the supplied raster artwork unchanged.

@@ -1,5 +1,11 @@
 # Event lessons log
 
+### 2026-11-14 — Source-map field paint must not show through a 3D overlay
+**Context:** Interactive Bowl source-map reconstruction.
+**What happened:** the illustrated map contained a skewed copy of the field; a correctly proportioned 3D field left duplicate yard lines visible beside it.
+**Rule now:** cover the old painted footprint with unmarked turf sampled from the supplied artwork before applying the exact-aspect field texture; inspect overhead and close field views. Do not redraw sponsor marks.
+**Enforced by:** `sjb-stadium-concept.test.ts` aspect-ratio check and browser overhead/field screenshot review.
+
 ### 2026-11-02 — Event-calendar pages and historical galleries are not recap evidence
 **Context:** NEXT San Francisco post-event research, review v1.0.
 **What happened:** initial searches found advance promotion, an opening-day indexed post and historical NYC/London images. A second targeted search found two dated attendee/partner reflections and five real attendee images. Public access did not establish image reuse rights, and the photo set did not cover the whole event.

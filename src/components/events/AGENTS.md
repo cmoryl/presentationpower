@@ -1,5 +1,7 @@
 # San Juan Bowl event pages and assets
 
+- The client-only lazy `SjbStadiumViewer`/`SjbStadiumScene` reconstructs illustrated stadium geometry from `sjb-stadium-concept` source-image coordinates and maps the unchanged field raster at its original aspect ratio; it never updates the separate BoothHUB model or claims surveyed geometry — why: source artwork fidelity and an interactive concept must not imply an approved conversion plan.
+
 - Bowl script rules (brand guide PDF, digital billboards, Illustrator masters) live in `scripts/AGENTS.md`.
 - Bowl game-day timelines share `sjb-game-day` and read kickoff from `SJB_EVENT`; `SjbScheduleDemos` draws Feed/Story/Flyer game and fan views from those same entries and approved dark logo, separately from unsaved/unapproved Canva candidates — why: visible draft artwork must not invent times or imply saved Canva files or production approval.
 - Bowl stadium-area and pre-game concepts are shared by app/share StadiumPage and enlarged with PlanZoomFrame; generated roads/radius and proposed plaza, stage, vendors and lounge stay illustrative/not to scale and venue-approval-required, separate from the BoothHUB model — why: promotional imagery cannot establish geographic coverage, site geometry or approved event placements.

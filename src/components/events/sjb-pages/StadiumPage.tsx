@@ -1,5 +1,4 @@
-// /events/san-juan-bowl/stadium — the BoothHUB interactive stadium, embedded.
-// BoothHUB owns the model; Element only frames its public showcase page.
+// Shared source-based stadium concept, with the separate BoothHUB model retained.
 
 import { ArrowLeft, ExternalLink, Download, Users, Music2, Store, Armchair } from "lucide-react";
 import { SjbLink, SjbShell, useSjbShare } from "@/components/events/SjbShare";
@@ -11,6 +10,7 @@ import pregameAsset from "@/assets/san-juan-bowl/stadium-pregame-reference-paint
 import fieldPaint from "@/assets/san-juan-bowl/bowl-field-paint-reference.png.asset.json";
 import { SjbGameDaySchedule } from "@/components/events/SjbGameDaySchedule";
 import { SjbStadiumNav } from "@/components/events/SjbStadiumNav";
+import { SjbStadiumViewer } from "@/components/events/SjbStadiumViewer";
 
 const aerialConcept = aerialAsset.url;
 const pregameConcept = pregameAsset.url;
@@ -73,7 +73,7 @@ export function StadiumPage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 id="sjb-3d-title" className="text-2xl font-semibold">Stadium 3D view</h2>
-            <p className="text-sm text-muted-foreground">Hiram Bithorn Stadium, San Juan. Drag to orbit; the model is built and edited in BoothHUB.</p>
+            <p className="text-sm text-muted-foreground">Hiram Bithorn · football conversion concept from the aerial map and supplied field artwork.</p>
           </div>
           {STADIUM_READY && !share && (
           <Button asChild variant="outline">
@@ -83,6 +83,9 @@ export function StadiumPage() {
           </Button>
           )}
         </div>
+        <SjbStadiumViewer />
+        <details className="border-t border-border pt-4">
+        <summary className="cursor-pointer text-sm font-semibold">Separate BoothHUB stadium model · unchanged</summary>
         {STADIUM_READY ? (
         <iframe
           src={STADIUM_URL}
@@ -90,6 +93,7 @@ export function StadiumPage() {
           className="h-[78dvh] w-full rounded-md border bg-muted"
           allow="fullscreen; xr-spatial-tracking"
           allowFullScreen
+          loading="lazy"
         />
         ) : (
           <div className="flex h-[50dvh] flex-col items-center justify-center gap-2 rounded-md border bg-muted p-6 text-center">
@@ -100,6 +104,7 @@ export function StadiumPage() {
           </div>
         )}
         <p className="text-xs text-muted-foreground">Stadium dimensions shown are from public sources until the venue supplies surveyed plans.</p>
+        </details>
         </section>
       </div>
     </SjbShell>

@@ -6,10 +6,10 @@ import { StadiumPage } from "@/components/events/sjb-pages/StadiumPage";
 export const Route = createFileRoute("/share/san-juan-bowl/stadium")({
   head: () => ({
     meta: [
-      { title: "San Juan Bowl stadium & aerial concept · Public view" },
-      { name: "description", content: "Public Bowl stadium concepts, game-day and fan timelines, plus Feed, Story and Flyer schedule demos with announced kickoff and unconfirmed times marked TBC." },
-      { property: "og:title", content: "San Juan Bowl stadium & aerial concept · Public view" },
-      { property: "og:description", content: "Explore stadium concepts and draft game-day schedule artwork. Unconfirmed times are TBC; proposed locations require venue approval." },
+      { title: "San Juan Bowl 3D stadium & football field · Public view" },
+      { name: "description", content: "Public interactive stadium and football-field concept from the illustrated aerial map and supplied paint artwork, with game-day schedules. Geometry is provisional." },
+      { property: "og:title", content: "San Juan Bowl 3D stadium & football field · Public view" },
+      { property: "og:description", content: "Explore the source-based stadium in 3D, overhead and field views. Supplied artwork is preserved; geometry is not surveyed or venue-approved." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
