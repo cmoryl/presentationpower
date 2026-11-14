@@ -1,4 +1,7 @@
 # Roadmap
+## Bowl location-accuracy correction
+- [x] Research official public venue evidence, record architecture/orientation conflicts and withdraw generated-map reconstruction from the main 3D view; preserve it as an explicitly inaccurate archived study and do not certify BoothHUB.
+- [ ] Deliver a 100% location-accurate 3D model: blocked on current georeferenced venue/as-built geometry and approved football conversion; historical public records cannot certify these.
 ## Bowl stadium structure completion
 - [x] Replaced floating seating strips with closed, ground-supported terraced stands, individual instanced seats and clear aisles, solid concourse/perimeter, closed canopy underside/end caps and full-height supports. App/share desktop/phone camera, canopy, keyboard/reset and download checks pass without errors or overflow; six tests pass and build OK. Open horseshoe and exact field artwork preserved; real-device smoothness and surveyed architectural accuracy remain unverified.
 ## Bowl source-based interactive stadium

@@ -11,6 +11,7 @@ import fieldPaint from "@/assets/san-juan-bowl/bowl-field-paint-reference.png.as
 import { SjbGameDaySchedule } from "@/components/events/SjbGameDaySchedule";
 import { SjbStadiumNav } from "@/components/events/SjbStadiumNav";
 import { SjbStadiumViewer } from "@/components/events/SjbStadiumViewer";
+import { SJB_STADIUM_EVIDENCE } from "@/lib/sjb-stadium-evidence";
 
 const aerialConcept = aerialAsset.url;
 const pregameConcept = pregameAsset.url;
@@ -73,7 +74,7 @@ export function StadiumPage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 id="sjb-3d-title" className="text-2xl font-semibold">Stadium 3D view</h2>
-            <p className="text-sm text-muted-foreground">Hiram Bithorn · football conversion concept from the aerial map and supplied field artwork.</p>
+            <p className="text-sm text-muted-foreground">Location-accurate model pending verified venue geometry and approved football-field placement.</p>
           </div>
           {STADIUM_READY && !share && (
           <Button asChild variant="outline">
@@ -83,7 +84,17 @@ export function StadiumPage() {
           </Button>
           )}
         </div>
-        <SjbStadiumViewer />
+        <div className="space-y-3 border-y border-border py-5">
+          <h3 className="text-lg font-semibold">Accuracy review · not certified</h3>
+          <p className="text-sm text-muted-foreground">The previous generated-map reconstruction does not meet location accuracy requirements and is withdrawn from the main view. Official historic documentation provides a better reference, but does not establish the current surveyed venue or the approved football conversion.</p>
+          <dl className="grid gap-5 md:grid-cols-3">{SJB_STADIUM_EVIDENCE.observations.map(item => <div key={item.title}><dt className="font-semibold text-sm">{item.title}</dt><dd className="mt-2 text-sm text-muted-foreground">{item.text}<span className="mt-2 block text-xs">{item.source}</span></dd></div>)}</dl>
+          <Button asChild variant="outline"><a href={SJB_STADIUM_EVIDENCE.nominationUrl} target="_blank" rel="noreferrer">Official stadium record <ExternalLink className="size-4" /></a></Button>
+          <p className="text-sm text-muted-foreground">Still needed: current georeferenced footprint, elevations and roof geometry; verified surrounding buildings; approved field alignment, safety clearances and event placements. No model here is certified 100% accurate.</p>
+        </div>
+        <details className="border-t border-border pt-4">
+          <summary className="cursor-pointer text-sm font-semibold">Archived illustrative 3D study · not location-accurate</summary>
+          <div className="pt-4"><SjbStadiumViewer /></div>
+        </details>
         <details className="border-t border-border pt-4">
         <summary className="cursor-pointer text-sm font-semibold">Separate BoothHUB stadium model · unchanged</summary>
         {STADIUM_READY ? (
@@ -103,7 +114,7 @@ export function StadiumPage() {
             </p>
           </div>
         )}
-        <p className="text-xs text-muted-foreground">Stadium dimensions shown are from public sources until the venue supplies surveyed plans.</p>
+        <p className="text-xs text-muted-foreground">Separate existing model, unchanged. Its survey provenance, site alignment and current conversion accuracy have not been verified.</p>
         </details>
         </section>
       </div>
