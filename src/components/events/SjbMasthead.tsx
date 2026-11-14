@@ -69,20 +69,24 @@ export function SjbSiteNav({ className = "" }: { className?: string }) {
     return () => ro.disconnect();
   }, [pathname]);
 
-  // Stick once the row's own slot has scrolled up past the line.
+  // Stick once the row's own slot has scrolled up past the line. A scroll
+  // listener (not IntersectionObserver) so it also re-checks after route
+  // changes and HMR, where an observer can miss the transition.
   useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        const next = !entry.isIntersecting && entry.boundingClientRect.top < line;
-        stuckRef.current = next;
-        setStuck(next);
-      },
-      { rootMargin: `-${line}px 0px 0px 0px`, threshold: 0 },
-    );
-    io.observe(sentinel);
-    return () => io.disconnect();
+    const update = () => {
+      const sentinel = sentinelRef.current;
+      if (!sentinel) return;
+      const next = sentinel.getBoundingClientRect().top < line;
+      stuckRef.current = next;
+      setStuck((prev) => (prev === next ? prev : next));
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
   }, [line]);
 
   // Height of the row while it still sits in the page: that is the space the
@@ -112,7 +116,7 @@ export function SjbSiteNav({ className = "" }: { className?: string }) {
       <div ref={sentinelRef} aria-hidden className="h-px" />
       {stuck && <div aria-hidden style={{ height: flowH }} />}
       <nav ref={navRef} aria-label="San Juan Bowl sections"
-        className={`sjb-site-nav overflow-x-auto border-t border-white/15 ${stuck ? "sjb-site-nav--stuck" : ""} ${className}`}
+        className={`sjb-site-nav relative overflow-x-auto border-t border-white/15 ${stuck ? "sjb-site-nav--stuck" : ""} ${className}`}
         style={style}>
         <ul className="mx-auto flex w-max min-w-full justify-center gap-1 px-4 sm:px-8">
           {SJB_SITE_NAV.map((n) => {
