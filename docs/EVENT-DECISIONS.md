@@ -1,4 +1,11 @@
 # Event design decisions
+### 2026-11-14 — Football conversion corrects both Bowl maps
+**Area:** Playing surface in the illustrated precinct and area overview.
+**Options considered:** retain baseball as the underlying venue reference or illustrate the user-confirmed football conversion within the existing architecture.
+**Chosen:** football turf and end zones inside the retained baseball-stadium shell in both maps; previous images preserved, BoothHUB unchanged.
+**Why:** the user confirmed the event converts the field to football. The depicted alignment remains a concept, not an approved conversion drawing.
+**Would change if:** a venue-approved conversion plan supplies the actual alignment and field artwork.
+
 ### 2026-11-14 — Bowl pre-game concept is a separate precinct close-up
 **Area:** Outdoor pre-game stage, vendor and gathering suggestions.
 **Options considered:** tiny activity symbols on the three-mile overview or a separate edited close-up with visible stage, stalls and outdoor areas.

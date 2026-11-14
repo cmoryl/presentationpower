@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl football conversion correction
+- [x] Both illustrated maps now show conceptual football turf/end zones inside the existing stadium shell, with outdoor areas retained and field alignment explicitly illustrative. Public images, enlargement, byte-identical downloads and phone no-overflow verified; build OK, no page errors. BoothHUB model unchanged.
 ## Bowl pre-game map concept
 - [x] Added a source-based illustrated precinct close-up with proposed outdoor fan plaza, stage, vendor/food area and lounge; original radius overview and 3D model retained. Venue approval/not-to-scale notices explicit. Public viewing, enlargement, byte-identical download and phone no-overflow verified with no page errors; build OK and three existing colour tests pass.
 ## Bowl aerial location concept
