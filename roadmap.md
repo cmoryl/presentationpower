@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl supplied hero lettering
+- [x] Replace only overview hero title with all 22 exact supplied vector paths; independent face/shadow colours, yellow preset and reset work and persist in this browser. Desktop/mobile screenshots reviewed, no phone overflow or page errors; three preference tests pass. Changes are local preferences, not globally published colour settings.
 ## Bowl full-width micro-site headers
 - [x] Widen shared Bowl headers, add nine distinct section pictograms, emphasize existing stadium/shield artwork and remove the calendar's duplicate statistics hero.
 ## Official Bowl website reference

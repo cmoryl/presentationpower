@@ -1,7 +1,7 @@
 // San Juan Bowl landing hero: crossfading stadium plates, live kickoff countdown.
 // Facts come only from SJB_EVENT; colours only from SJB_COLORS.
 import { useEffect, useState } from "react";
-import { CalendarPlus, ExternalLink, Ticket } from "lucide-react";
+import { CalendarPlus, ExternalLink, Ticket, Palette, RotateCcw } from "lucide-react";
 import { Button } from "@/design-system/element";
 import "@fontsource/barlow-condensed/500.css";
 import "@fontsource/barlow-condensed/700.css";
@@ -9,6 +9,9 @@ import "@fontsource/barlow-condensed/700-italic.css";
 import { SJB_EVENT, SJB_COLORS, SJB_LOGOS } from "@/lib/san-juan-bowl";
 import { SJB_STADIUM_RENDERS } from "@/lib/sjb-stadium-renders";
 import { SjbSiteNav } from "./SjbMasthead";
+import { SjbHeroLettering } from "./SjbHeroLettering";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { readSjbHeroColours, SJB_HERO_COLOUR_KEY, SJB_HERO_DEFAULT_COLOURS, type SjbHeroColours } from "@/lib/sjb-hero-colours";
 
 const hex = (id: string) => SJB_COLORS.find((c) => c.id === id)?.hex ?? "#000";
 // Dec 16, 2026 7:30 p.m. ET (EST, UTC-5) per SJB_EVENT.kickoffLabel.
@@ -31,6 +34,14 @@ function useNow() {
 export function SjbHero() {
   const now = useNow();
   const [i, setI] = useState(0);
+  const [colours, setColours] = useState<SjbHeroColours>(SJB_HERO_DEFAULT_COLOURS);
+  useEffect(() => {
+    try { setColours(readSjbHeroColours(localStorage.getItem(SJB_HERO_COLOUR_KEY))); } catch { /* Storage may be disabled. */ }
+  }, []);
+  const updateColours = (next: SjbHeroColours) => {
+    setColours(next);
+    try { localStorage.setItem(SJB_HERO_COLOUR_KEY, JSON.stringify(next)); } catch { /* Keep the live preview editable. */ }
+  };
   useEffect(() => {
     if (PLATES.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = setInterval(() => setI((v) => (v + 1) % PLATES.length), 7000);
@@ -69,12 +80,30 @@ export function SjbHero() {
             <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 motion-reduce:animate-none" style={{ background: gold }} /><span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: gold }} /></span>
             {SJB_EVENT.matchupLabel}
           </p>
-          <h1
-            className="mt-3 text-6xl font-bold italic uppercase leading-[0.95] sm:text-8xl"
-            style={{ fontFamily: BOWL_FONT, color: gold }}
-          >
-            {SJB_EVENT.shortName.toUpperCase()}
-          </h1>
+          <div className="relative mt-4 max-w-[900px]">
+            <h1 aria-label={SJB_EVENT.shortName}>
+              <SjbHeroLettering face={colours.face} shadow={colours.shadow} aria-hidden className="block h-auto w-full" />
+            </h1>
+            <div className="mt-1 flex justify-end font-sans">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label="Edit hero lettering colours" title="Edit hero lettering colours" className="text-white/75 hover:bg-white/10 hover:text-white"><Palette className="size-4" /></Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-72 font-sans">
+                  <p className="mb-3 text-sm font-semibold">Hero lettering colours</p>
+                  <div className="flex gap-6">
+                    <label className="flex flex-col gap-2 text-sm">Letter face<input aria-label="Letter face colour" type="color" value={colours.face} onChange={(e) => updateColours({ ...colours, face: e.target.value })} className="h-9 w-20 cursor-pointer rounded border border-border bg-background" /></label>
+                    <label className="flex flex-col gap-2 text-sm">Letter shadow<input aria-label="Letter shadow colour" type="color" value={colours.shadow} onChange={(e) => updateColours({ ...colours, shadow: e.target.value })} className="h-9 w-20 cursor-pointer rounded border border-border bg-background" /></label>
+                  </div>
+                  <div className="mt-4 flex items-center gap-2">
+                    <Button size="sm" variant="secondary" onClick={() => updateColours({ ...colours, face: gold })}><span aria-hidden className="size-3 rounded-sm" style={{ background: gold }} />Yellow</Button>
+                    <Button size="sm" variant="ghost" onClick={() => updateColours(SJB_HERO_DEFAULT_COLOURS)}><RotateCcw className="size-4" />Reset</Button>
+                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground">Colour preference saved in this browser.</p>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
           <p className="mt-3 text-xl font-medium uppercase tracking-wide text-white/90">{SJB_EVENT.venue} · {SJB_EVENT.city}</p>
           <p className="text-xl font-medium uppercase tracking-wide text-white/90">{SJB_EVENT.datesLabel} · {SJB_EVENT.kickoffLabel}</p>
           <p className="text-lg font-medium uppercase text-white/75">{SJB_EVENT.localKickoffLabel}</p>

@@ -45,6 +45,9 @@ export const Route = createFileRoute("/events/$eventId")({
       ? `Everything for ${e.name} in one place — checklist, maps, schedule, agendas, signage and more.`
       : "One home for this event: checklist, maps, schedule, agendas, signage and badges.";
     return {
+      links: params.eventId === "san-juan-bowl"
+        ? [{ rel: "icon", href: "/sjb-hero-favicon.svg", type: "image/svg+xml" }]
+        : [],
       meta: [
         { title },
         { name: "description", content: desc },
