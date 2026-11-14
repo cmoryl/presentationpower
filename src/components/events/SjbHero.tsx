@@ -1,7 +1,7 @@
 // San Juan Bowl landing hero: crossfading stadium plates, live kickoff countdown.
 // Facts come only from SJB_EVENT; colours only from SJB_COLORS.
 import { useEffect, useState } from "react";
-import { CalendarPlus, ExternalLink, Ticket, Palette, RotateCcw } from "lucide-react";
+import { CalendarPlus, ExternalLink, Ticket, Palette, RotateCcw, MapPin, BadgeCheck, Handshake, Mail } from "lucide-react";
 import { Button } from "@/design-system/element";
 import "@fontsource/barlow-condensed/500.css";
 import "@fontsource/barlow-condensed/700.css";
@@ -107,17 +107,19 @@ export function SjbHero() {
           <p className="mt-3 text-xl font-medium uppercase tracking-wide text-white/90">{SJB_EVENT.venue} · {SJB_EVENT.city}</p>
           <p className="text-xl font-medium uppercase tracking-wide text-white/90">{SJB_EVENT.datesLabel} · {SJB_EVENT.kickoffLabel}</p>
           <p className="text-lg font-medium uppercase text-white/75">{SJB_EVENT.localKickoffLabel}</p>
-          <div className="mt-4 flex flex-wrap gap-2 font-sans">
-            <Button asChild><a href={SJB_EVENT.ticketsUrl} target="_blank" rel="noopener noreferrer"><Ticket />Buy tickets</a></Button>
-            <Button asChild variant="secondary"><a href={SJB_EVENT.websiteUrl} target="_blank" rel="noopener noreferrer"><ExternalLink />Official website</a></Button>
-            <Button asChild variant="secondary"><a href={SJB_EVENT.calendarUrl}><CalendarPlus />Add to calendar</a></Button>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 font-sans text-sm text-white/90">
-            <a className="underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={SJB_EVENT.directionsUrl} target="_blank" rel="noopener noreferrer">Directions</a>
-            <a className="underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={SJB_EVENT.mediaUrl} target="_blank" rel="noopener noreferrer">Media credentials</a>
-            <a className="underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={SJB_EVENT.sponsorshipUrl} target="_blank" rel="noopener noreferrer">Sponsorship</a>
-            <a className="underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={`mailto:${SJB_EVENT.contactEmail}`}>Contact</a>
-          </div>
+          <nav aria-label="Official event actions" className="mt-5 max-w-2xl font-sans tracking-normal">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Button asChild className="rounded-sm shadow-none"><a href={SJB_EVENT.ticketsUrl} target="_blank" rel="noopener noreferrer"><Ticket />Buy tickets<ExternalLink className="ml-1 opacity-70" /></a></Button>
+              <Button asChild variant="ghost" className="rounded-sm text-icon-inverse hover:bg-icon-inverse/10 hover:text-icon-inverse"><a href={SJB_EVENT.websiteUrl} target="_blank" rel="noopener noreferrer"><ExternalLink />Official website</a></Button>
+              <Button asChild variant="ghost" className="rounded-sm text-icon-inverse hover:bg-icon-inverse/10 hover:text-icon-inverse"><a href={SJB_EVENT.calendarUrl}><CalendarPlus />Add to calendar</a></Button>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-x-1 gap-y-1 border-t border-icon-inverse/20 pt-2">
+              <Button asChild variant="ghost" size="sm" className="rounded-sm text-icon-inverse/85 hover:bg-icon-inverse/10 hover:text-icon-inverse"><a href={SJB_EVENT.directionsUrl} target="_blank" rel="noopener noreferrer"><MapPin />Directions</a></Button>
+              <Button asChild variant="ghost" size="sm" className="rounded-sm text-icon-inverse/85 hover:bg-icon-inverse/10 hover:text-icon-inverse"><a href={SJB_EVENT.mediaUrl} target="_blank" rel="noopener noreferrer"><BadgeCheck />Media credentials</a></Button>
+              <Button asChild variant="ghost" size="sm" className="rounded-sm text-icon-inverse/85 hover:bg-icon-inverse/10 hover:text-icon-inverse"><a href={SJB_EVENT.sponsorshipUrl} target="_blank" rel="noopener noreferrer"><Handshake />Sponsorship</a></Button>
+              <Button asChild variant="ghost" size="sm" className="rounded-sm text-icon-inverse/85 hover:bg-icon-inverse/10 hover:text-icon-inverse"><a href={`mailto:${SJB_EVENT.contactEmail}`}><Mail />Contact</a></Button>
+            </div>
+          </nav>
           <div className="mt-6 inline-block rounded-md border-2 p-2 sm:p-3" role="timer" aria-label="Countdown to kickoff"
             style={{ borderColor: "#2a2a2a", background: "linear-gradient(#141414, #050505)", boxShadow: `0 10px 30px rgb(0 0 0 / .55), inset 0 0 0 1px ${gold}33` }}>
             <div className="mb-2 flex items-center justify-between px-1 text-sm font-bold italic uppercase tracking-[0.18em]">
