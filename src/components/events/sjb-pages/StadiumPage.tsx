@@ -10,6 +10,7 @@ import aerialAsset from "@/assets/san-juan-bowl/stadium-aerial-reference-paint.j
 import pregameAsset from "@/assets/san-juan-bowl/stadium-pregame-reference-paint.jpg.asset.json";
 import fieldPaint from "@/assets/san-juan-bowl/bowl-field-paint-reference.png.asset.json";
 import { SjbGameDaySchedule } from "@/components/events/SjbGameDaySchedule";
+import { SjbStadiumNav } from "@/components/events/SjbStadiumNav";
 
 const aerialConcept = aerialAsset.url;
 const pregameConcept = pregameAsset.url;
@@ -22,11 +23,12 @@ export function StadiumPage() {
   const share = useSjbShare();
   return (
     <SjbShell>
+      <SjbStadiumNav />
       <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6">
         <SjbLink page="event" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> San Juan Bowl
         </SjbLink>
-        <section aria-labelledby="sjb-pregame-title" className="space-y-3 border-b pb-6">
+        <section id="stadium-pregame" tabIndex={-1} aria-labelledby="sjb-pregame-title" className="space-y-3 border-b pb-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase text-muted-foreground">Proposed areas · concept study</p>
@@ -45,7 +47,7 @@ export function StadiumPage() {
           </dl>
           <p className="text-sm text-muted-foreground">AI-generated concept showing the planned football conversion inside the existing stadium; field positioning is illustrative, not an approved conversion plan. All four outdoor areas are suggestions; locations, land availability, access and footprints require venue approval. Geography is not to scale; not for navigation or site planning.</p>
         </section>
-        <section aria-labelledby="sjb-aerial-title" className="space-y-3 pb-6">
+        <section id="stadium-area" tabIndex={-1} aria-labelledby="sjb-aerial-title" className="space-y-3 pb-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase text-muted-foreground">Illustrated concept · football conversion</p>
@@ -58,7 +60,7 @@ export function StadiumPage() {
           </PlanZoomFrame>
           <p className="text-sm text-muted-foreground">AI-generated illustration, not satellite imagery. Roads, buildings, orientation and the radius ring are illustrative and not to scale; not for directions or site planning.</p>
         </section>
-        <section aria-labelledby="sjb-field-paint-title" className="space-y-3 border-y py-6">
+        <section id="stadium-field" tabIndex={-1} aria-labelledby="sjb-field-paint-title" className="space-y-3 border-y py-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div><p className="text-xs font-semibold uppercase text-muted-foreground">Supplied reference · provisional</p><h2 id="sjb-field-paint-title" className="text-2xl font-semibold">Field paint reference</h2></div>
             <Button asChild variant="outline"><a href={fieldPaint.url} download="san-juan-bowl-field-paint-reference.png"><Download className="size-4" />Download supplied reference</a></Button>
@@ -66,10 +68,11 @@ export function StadiumPage() {
           <PlanZoomFrame label="Bowl field paint reference"><img src={fieldPaint.url} alt="Supplied provisional field-paint reference with green TransPerfect end zones, central Bowl shield and Share sponsor placements" width={1920} height={905} className="h-auto w-full" /></PlanZoomFrame>
           <p className="text-sm text-muted-foreground">Your supplied artwork is preserved unchanged here and placed into both concept maps. Paint design is provisional, not confirmed or approved for production; field positioning and fit remain illustrative. This image does not establish surveyed dimensions. The BoothHUB model has not been changed.</p>
         </section>
-        <SjbGameDaySchedule />
+        <SjbGameDaySchedule id="stadium-timelines" tabIndex={-1} />
+        <section id="stadium-3d" tabIndex={-1} aria-labelledby="sjb-3d-title" className="space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-2xl font-semibold">Stadium 3D view</h2>
+            <h2 id="sjb-3d-title" className="text-2xl font-semibold">Stadium 3D view</h2>
             <p className="text-sm text-muted-foreground">Hiram Bithorn Stadium, San Juan. Drag to orbit; the model is built and edited in BoothHUB.</p>
           </div>
           {STADIUM_READY && !share && (
@@ -97,6 +100,7 @@ export function StadiumPage() {
           </div>
         )}
         <p className="text-xs text-muted-foreground">Stadium dimensions shown are from public sources until the venue supplies surveyed plans.</p>
+        </section>
       </div>
     </SjbShell>
   );

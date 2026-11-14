@@ -26,8 +26,8 @@ export const SjbGameDaySchedule = forwardRef<HTMLElement, SjbGameDayScheduleProp
       <div><h3 className="mb-3 text-lg font-semibold">Fan timeline</h3><Timeline entries={SJB_FAN_TIMELINE} /></div>
     </div>
     <p className="text-sm text-muted-foreground">Kickoff: {SJB_EVENT.kickoffLabel}. Local times use AST (San Juan). Halftime and the final whistle depend on game progress; other timings await confirmation.</p>
-    <SjbScheduleDemos />
-    <div>
+    <SjbScheduleDemos id="stadium-demos" tabIndex={-1} />
+    <div id="stadium-canva" tabIndex={-1}>
       <h3 className="text-lg font-semibold">Canva marketing options</h3>
       <p className="mt-1 text-sm text-muted-foreground">Generated candidates · not yet saved or approved. Preview access could not be verified; no production downloads are available.</p>
       <div className="mt-4 grid gap-6 sm:grid-cols-3">{SJB_SCHEDULE_OPTIONS.map((format) => <div key={format.name}>

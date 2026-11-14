@@ -68,7 +68,7 @@ const TABS: { page: Exclude<SjbPage, "event">; label: string }[] = [
 function ShareShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh bg-white text-[#03002C]">
-      <header className="sticky top-0 z-20 border-b border-[#03002C]/10 bg-white/95 backdrop-blur">
+      <header data-sjb-share-header className="sticky top-0 z-20 border-b border-[#03002C]/10 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
           <div className="flex items-center gap-2">
             <img src={logoColor.url} alt="" className="h-9 w-9" />

@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl Stadium subsection menus
+- [x] Added grouped sticky Stadium navigation for maps, field artwork, schedule timelines/demos/Canva options and the 3D view. All seven destinations verified on app/share at desktop and phone sizes, with visible headings below both pinned menus, keyboard focus and no overflow/page errors; four timing tests pass. Existing content unchanged.
 ## Bowl supplied field-paint reference
 - [x] Preserve uploaded artwork as a provisional reference; place original pixels into both illustrated maps and add enlarged original/reference download to shared Stadium page. Placement remains illustrative and BoothHUB unchanged.
 ## Bowl cohesive map styling
