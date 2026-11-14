@@ -1,4 +1,11 @@
 # Event design decisions
+### 2026-11-14 — Bowl pre-game concept is a separate precinct close-up
+**Area:** Outdoor pre-game stage, vendor and gathering suggestions.
+**Options considered:** tiny activity symbols on the three-mile overview or a separate edited close-up with visible stage, stalls and outdoor areas.
+**Chosen:** separate source-based illustrated precinct close-up; preserve the original radius overview and BoothHUB model. All proposed areas require venue approval, with no surveyed footprints, access or capacity claims.
+**Why:** activities need inspectable detail without confusing the conceptual radius with an approved site plan.
+**Would change if:** the venue supplies an approved outdoor event layout and verified geography.
+
 ### 2026-11-14 — Bowl starter aerial is an illustrated concept
 **Area:** Bowl stadium-area visual.
 **Options offered:** managed Google satellite map (connection declined), free accurate street map, uploaded aerial base or generated illustrated concept.

@@ -1,4 +1,6 @@
 # Roadmap
+## Bowl pre-game map concept
+- [x] Added a source-based illustrated precinct close-up with proposed outdoor fan plaza, stage, vendor/food area and lounge; original radius overview and 3D model retained. Venue approval/not-to-scale notices explicit. Public viewing, enlargement, byte-identical download and phone no-overflow verified with no page errors; build OK and three existing colour tests pass.
 ## Bowl aerial location concept
 - [x] Generated 1792×1024 Bowl-styled overhead illustration with conceptual three-mile ring; shared stadium page displays it with explicit not-to-scale/non-navigation labelling, zoom/enlargement and byte-matching download. App/share viewing and mobile no-overflow passed with no page errors; existing 3D view preserved. Geography and measured coverage are not verified or claimed.
 ## Smaller Bowl section-header lettering

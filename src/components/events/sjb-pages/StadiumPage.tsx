@@ -1,12 +1,13 @@
 // /events/san-juan-bowl/stadium — the BoothHUB interactive stadium, embedded.
 // BoothHUB owns the model; Element only frames its public showcase page.
 
-import { ArrowLeft, ExternalLink, Download } from "lucide-react";
+import { ArrowLeft, ExternalLink, Download, Users, Music2, Store, Armchair } from "lucide-react";
 import { SjbLink, SjbShell, useSjbShare } from "@/components/events/SjbShare";
 import { Button } from "@/design-system/element";
 import { BOOTHHUB_ORIGIN } from "@/lib/boothhub-3d";
 import { PlanZoomFrame } from "@/components/events/PlanZoomFrame";
 import aerialConcept from "@/assets/san-juan-bowl/stadium-aerial-concept.jpg";
+import pregameConcept from "@/assets/san-juan-bowl/stadium-pregame-concept.jpg";
 
 const STADIUM_URL = `${BOOTHHUB_ORIGIN}/showcase/san-juan-bowl`;
 /** BoothHUB now publishes the Hiram Bithorn Stadium model. */
@@ -21,11 +22,30 @@ export function StadiumPage() {
         <SjbLink page="event" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> San Juan Bowl
         </SjbLink>
+        <section aria-labelledby="sjb-pregame-title" className="space-y-3 border-b pb-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase text-muted-foreground">Proposed areas · concept study</p>
+              <h1 id="sjb-pregame-title" className="text-2xl font-semibold">Outdoor pre-game precinct</h1>
+            </div>
+            <Button asChild variant="outline"><a href={pregameConcept} download="san-juan-bowl-pregame-concept.jpg"><Download className="size-4" />Download pre-game concept</a></Button>
+          </div>
+          <PlanZoomFrame label="Bowl pre-game concept">
+            <img src={pregameConcept} alt="Illustrative stadium close-up showing proposed outdoor pre-game fan plaza, covered stage, vendor tents and food trucks, and a shaded outdoor lounge around the stadium" width={1792} height={1024} className="h-auto w-full" />
+          </PlanZoomFrame>
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-4 py-2 lg:grid-cols-4">
+            <div><dt className="flex items-center gap-2 text-sm font-semibold"><Users className="size-4 shrink-0" />01 · Fan plaza</dt><dd className="mt-1 text-sm text-muted-foreground">Gathering space and football activities.</dd></div>
+            <div><dt className="flex items-center gap-2 text-sm font-semibold"><Music2 className="size-4 shrink-0" />02 · Stage</dt><dd className="mt-1 text-sm text-muted-foreground">Covered performance stage and audience space.</dd></div>
+            <div><dt className="flex items-center gap-2 text-sm font-semibold"><Store className="size-4 shrink-0" />03 · Vendors + food</dt><dd className="mt-1 text-sm text-muted-foreground">Canopy stalls and food trucks.</dd></div>
+            <div><dt className="flex items-center gap-2 text-sm font-semibold"><Armchair className="size-4 shrink-0" />04 · Outdoor lounge</dt><dd className="mt-1 text-sm text-muted-foreground">Shaded seating, tables and umbrellas.</dd></div>
+          </dl>
+          <p className="text-sm text-muted-foreground">AI-generated concept, not a confirmed event plan. All four areas are suggestions; locations, land availability, access and footprints require venue approval. Geography is illustrative and not to scale; not for navigation or site planning.</p>
+        </section>
         <section aria-labelledby="sjb-aerial-title" className="space-y-3 pb-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase text-muted-foreground">Illustrated concept · v1</p>
-              <h1 id="sjb-aerial-title" className="text-2xl font-semibold">Stadium area · 3-mile radius concept</h1>
+              <h2 id="sjb-aerial-title" className="text-2xl font-semibold">Stadium area · 3-mile radius concept</h2>
             </div>
             <Button asChild variant="outline"><a href={aerialConcept} download="san-juan-bowl-aerial-concept.jpg"><Download className="size-4" />Download concept</a></Button>
           </div>
