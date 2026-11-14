@@ -1,4 +1,6 @@
 # Roadmap
+## Smaller Bowl section-header lettering
+- [x] Added exact supplied lettering at a maximum 440px above section titles through the shared app/share masthead; all eight main subpages and public social share checked, browser-local yellow restored, mobile fits with no page errors. Three colour tests pass and build OK.
 ## Bowl supplied hero lettering
 - [x] Replace only overview hero title with all 22 exact supplied vector paths; independent face/shadow colours, yellow preset and reset work and persist in this browser. Desktop/mobile screenshots reviewed, no phone overflow or page errors; three preference tests pass. Changes are local preferences, not globally published colour settings.
 ## Bowl full-width micro-site headers

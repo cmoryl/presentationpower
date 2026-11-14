@@ -2,7 +2,7 @@
 
 - Bowl script rules (brand guide PDF, digital billboards, Illustrator masters) live in `scripts/AGENTS.md`.
 - Official website actions and the countdown instant read `SJB_EVENT`; media/sponsor submissions link to the website's forms — why: one fact authority and no duplicate inquiry handling.
-- Bowl overview hero lettering uses SjbHeroLettering's exact supplied long-SVG paths; independent face/shadow preferences are browser-local, not published settings, and other headings/shield assets remain unchanged — why: hero-only colour editing must preserve issued artwork elsewhere.
+- Bowl overview and smaller shared section-header lettering use SjbHeroLettering's exact supplied long-SVG paths; both read the overview's browser-local face/shadow preferences, not published settings, while page titles and shield assets remain unchanged — why: cohesive header lettering must preserve issued artwork elsewhere.
 - Bowl mastheads use the shared full-bleed `sjb-site-band` and `SjbSectionIcon` navigation pictograms; calendar content starts directly with campaign artwork, not a second statistics hero — why: the event should feel like one asset-led micro-site inside Element.
 - Campaign design-asset panels resolve reusable four-page Canva masters and cleaned per-page pictures/ZIP pointers through `sjb-campaign-sequence-masters`; these are not per-post calendar sequences — why: asset masters must stay separate from finished post registries and preserve original single-page files.
 

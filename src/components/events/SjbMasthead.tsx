@@ -9,6 +9,8 @@ import "@fontsource/barlow-condensed/700-italic.css";
 import { SJB_EVENT, SJB_COLORS, SJB_LOGOS } from "@/lib/san-juan-bowl";
 import { SJB_STADIUM_RENDERS } from "@/lib/sjb-stadium-renders";
 import { SjbSectionIcon } from "./SjbSectionIcon";
+import { SjbHeroLettering } from "./SjbHeroLettering";
+import { readSjbHeroColours, SJB_HERO_COLOUR_KEY, SJB_HERO_DEFAULT_COLOURS } from "@/lib/sjb-hero-colours";
 
 export const SJB_BOWL_FONT = '"Barlow Condensed", sans-serif';
 export const SJB_GRIT = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.6 -.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
@@ -140,6 +142,15 @@ export function SjbSiteNav({ className = "" }: { className?: string }) {
 
 export function SjbMasthead() {
   const { parts } = useBowlPath();
+  const [colours, setColours] = useState(SJB_HERO_DEFAULT_COLOURS);
+  useEffect(() => {
+    const refresh = () => {
+      try { setColours(readSjbHeroColours(localStorage.getItem(SJB_HERO_COLOUR_KEY))); } catch { /* Storage may be disabled. */ }
+    };
+    refresh();
+    window.addEventListener("storage", refresh);
+    return () => window.removeEventListener("storage", refresh);
+  }, []);
   const seg = parts[parts.length - 1] ?? "brand-kit";
   const title = SECTION[seg] ?? "Brand kit";
   const navy = hex("navy"), gold = hex("gold"), sky = hex("sky");
@@ -151,9 +162,10 @@ export function SjbMasthead() {
       <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay" style={{ backgroundImage: SJB_GRIT }} />
       <div aria-hidden className="pointer-events-none absolute inset-0" style={{ boxShadow: "inset 0 0 120px 20px rgb(0 0 0 / 0.5)" }} />
       <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-10 sm:px-8 sm:py-14">
-        <div className="min-w-0">
-          <p className="text-sm font-bold italic uppercase tracking-wide" style={{ color: gold }}>{SJB_EVENT.name}</p>
-          <p className="mt-2 text-5xl font-bold italic uppercase leading-[0.95] sm:text-7xl">
+        <div className="min-w-0 flex-1">
+          <SjbHeroLettering face={colours.face} shadow={colours.shadow}
+            role="img" aria-label={SJB_EVENT.shortName} className="block h-auto w-full max-w-[440px]" />
+          <p className="mt-4 text-5xl font-bold italic uppercase leading-[0.95] sm:text-7xl">
             {title}
           </p>
           <p className="mt-2 text-base font-medium uppercase tracking-wide text-white/85">
