@@ -1,0 +1,3 @@
+CREATE FUNCTION public.element_v221_people(ids uuid[] DEFAULT '{}'::uuid[], q text DEFAULT '') RETURNS TABLE(id uuid,display_name text) LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $$ SELECT p.id,p.display_name FROM public.profiles p WHERE public.has_any_role(auth.uid()) AND EXISTS(SELECT 1 FROM public.user_roles r WHERE r.user_id=p.id) AND (CASE WHEN cardinality(ids)>0 THEN p.id=ANY(ids) ELSE coalesce(p.display_name,'') ILIKE '%'||left(q,80)||'%' END) ORDER BY p.display_name,p.id LIMIT 64 $$;
+REVOKE ALL ON FUNCTION public.element_v221_people(uuid[],text) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.element_v221_people(uuid[],text) TO authenticated,service_role;

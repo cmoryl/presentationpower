@@ -2366,6 +2366,24 @@ export type Database = {
         }
         Relationships: []
       }
+      element_v221_documents: {
+        Row: {
+          data: Json
+          path: string
+          updated_at: string
+        }
+        Insert: {
+          data?: Json
+          path: string
+          updated_at?: string
+        }
+        Update: {
+          data?: Json
+          path?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       event_agendas: {
         Row: {
           created_at: string
@@ -6037,6 +6055,25 @@ export type Database = {
           display_name: string
           id: string
         }[]
+      }
+      element_v221_merge: { Args: { p: Json; t: Json }; Returns: Json }
+      element_v221_people: {
+        Args: { ids?: string[]; q?: string }
+        Returns: {
+          display_name: string
+          id: string
+        }[]
+      }
+      element_v221_store: {
+        Args: {
+          body?: Json
+          max_rows?: number
+          op: string
+          p: string
+          sort_desc?: boolean
+          sort_field?: string
+        }
+        Returns: Json
       }
       get_london_head_revision: { Args: never; Returns: Json }
       get_next_brand_kit_share: { Args: { _token: string }; Returns: Json }

@@ -20,6 +20,7 @@ import { Route as BuildRouteImport } from './routes/build'
 import { Route as ConvertRouteImport } from './routes/convert'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DemosRouteImport } from './routes/demos'
+import { Route as ElementRouteImport } from './routes/element'
 import { Route as ElementsRouteImport } from './routes/elements'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -316,6 +317,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const DemosRoute = DemosRouteImport.update({
   id: '/demos',
   path: '/demos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ElementRoute = ElementRouteImport.update({
+  id: '/element',
+  path: '/element',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ElementsRoute = ElementsRouteImport.update({
@@ -1581,6 +1587,7 @@ export interface FileRoutesByFullPath {
   '/convert': typeof ConvertRoute
   '/dashboard': typeof DashboardRoute
   '/demos': typeof DemosRoute
+  '/element': typeof ElementRoute
   '/elements': typeof ElementsRoute
   '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
@@ -1835,6 +1842,7 @@ export interface FileRoutesByTo {
   '/convert': typeof ConvertRoute
   '/dashboard': typeof DashboardRoute
   '/demos': typeof DemosRoute
+  '/element': typeof ElementRoute
   '/elements': typeof ElementsRoute
   '/faq': typeof FaqRoute
   '/files': typeof FilesRoute
@@ -2088,6 +2096,7 @@ export interface FileRoutesById {
   '/convert': typeof ConvertRoute
   '/dashboard': typeof DashboardRoute
   '/demos': typeof DemosRoute
+  '/element': typeof ElementRoute
   '/elements': typeof ElementsRoute
   '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
@@ -2345,6 +2354,7 @@ export interface FileRouteTypes {
     | '/convert'
     | '/dashboard'
     | '/demos'
+    | '/element'
     | '/elements'
     | '/events'
     | '/faq'
@@ -2599,6 +2609,7 @@ export interface FileRouteTypes {
     | '/convert'
     | '/dashboard'
     | '/demos'
+    | '/element'
     | '/elements'
     | '/faq'
     | '/files'
@@ -2851,6 +2862,7 @@ export interface FileRouteTypes {
     | '/convert'
     | '/dashboard'
     | '/demos'
+    | '/element'
     | '/elements'
     | '/events'
     | '/faq'
@@ -3107,6 +3119,7 @@ export interface RootRouteChildren {
   ConvertRoute: typeof ConvertRoute
   DashboardRoute: typeof DashboardRoute
   DemosRoute: typeof DemosRoute
+  ElementRoute: typeof ElementRoute
   ElementsRoute: typeof ElementsRoute
   EventsRoute: typeof EventsRouteWithChildren
   FaqRoute: typeof FaqRoute
@@ -3300,6 +3313,13 @@ declare module '@tanstack/react-router' {
       path: '/demos'
       fullPath: '/demos'
       preLoaderRoute: typeof DemosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/element': {
+      id: '/element'
+      path: '/element'
+      fullPath: '/element'
+      preLoaderRoute: typeof ElementRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/elements': {
@@ -5307,6 +5327,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConvertRoute: ConvertRoute,
   DashboardRoute: DashboardRoute,
   DemosRoute: DemosRoute,
+  ElementRoute: ElementRoute,
   ElementsRoute: ElementsRoute,
   EventsRoute: EventsRouteWithChildren,
   FaqRoute: FaqRoute,

@@ -160,7 +160,7 @@
       {
         "step": 1,
         "name": "Non-destructive stored-content converter and exact clean/partial/failed coverage report",
-        "status": "in_progress"
+        "status": "stopped_additive_records_already_written_original_content_unchanged"
       },
       {
         "step": 2,
@@ -214,6 +214,36 @@
         "name": "Apply chrome.css scoped only to Element build navigation, agent drawer and library",
         "status": "not_started"
       }
+    ],
+    "status": "abandoned_by_user_2026-11-15T22:09Z",
+    "stop_receipt": {
+      "materials": 36,
+      "content_unchanged": 36,
+      "routing_unchanged": true,
+      "coverage_preliminary": {
+        "clean": 15,
+        "partial": 20,
+        "failed": 1
+      },
+      "caveat": "Existing v221 stack 1a926527-f229-4e63-90ef-d575a377eae9 throws OVC undefined in render verification; not certified clean."
+    }
+  },
+  "mounted_v221": {
+    "requested_at": "2026-11-15T22:09:00Z",
+    "status": "adapter_first",
+    "architecture": "Run explicitly authorized first-party v221 application in isolated /element area with Lovable Cloud Firestore-shaped adapter; preserve React port.",
+    "sequence": [
+      "Inspect Store.use/db/snapArr and identity contract",
+      "Build isolated path-document storage and server-enforced project roles",
+      "Verify project/material/edit/save/reopen/version/reviewer hash signoff round trip",
+      "Stop for report; exports/agent/skill downloads not authorized yet"
+    ],
+    "excluded": [
+      "Bowl",
+      "NEXT",
+      "events",
+      "brand kits",
+      "social calendars"
     ]
   }
 }

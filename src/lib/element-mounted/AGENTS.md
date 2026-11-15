@@ -1,0 +1,5 @@
+# Isolated first-party v221 host
+- Mount the unchanged issued application in an opaque-origin sandboxed iframe with a narrow parent message bridge, namespaced browser drafts and a dedicated path-document table — why: the authorized app must run without sharing React state, storage or navigation.
+- All document mutations go through the authenticated atomic Cloud RPC; deep-merge updates under per-document locks, enforce authoring roles and owner/reviewer decisions there, and never alter canonical source sign-off logic — why: browser controls do not enforce permission or concurrent-save integrity.
+- Keep the React port and original materials intact; do not migrate existing content or connect exports, sampling, agent, downloads or skill publishing until the store round trip is proven — why: the user abandoned conversion and authorized an adapter-first cutover only.
+- Use the issued HTML asset byte-for-byte and supply capabilities ahead of it through the wrapper; reference-harness passes are not Cloud round-trip certification — why: this area runs the first-party build rather than another renderer.
