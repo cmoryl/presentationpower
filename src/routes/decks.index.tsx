@@ -14,6 +14,8 @@ import {
   Upload,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { SourceModuleLibrary } from "@/components/editor/SourceModuleLibrary";
+import { BuildWorkspaceNav } from "@/components/editor/BuildWorkspaceNav";
 import { useSignedIn, useOpenCloudDeck } from "@/components/CloudDeckControls";
 import { useDeckStore, type Deck } from "@/lib/deck-store";
 import { DeckCoverThumb } from "@/components/slide/DeckCoverThumb";
@@ -435,6 +437,7 @@ function DecksIndex() {
 
   return (
     <AppShell>
+      <BuildWorkspaceNav active="slides" className="mb-4" />
       {/* Header — one job: name the page and offer the single primary action. */}
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-black/10 pb-6 pt-4 dark:border-white/10">
         <div>
@@ -456,6 +459,8 @@ function DecksIndex() {
           </Link>
         )}
       </header>
+
+      <SourceModuleLibrary format="slide" />
 
       {!hasAny && !loadFailed && <EmptyNew signedIn={signedIn} />}
 

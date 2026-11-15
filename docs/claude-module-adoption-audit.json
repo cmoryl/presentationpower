@@ -1,0 +1,308 @@
+{
+  "source": "TransPerfect_ELEMENT.zip",
+  "verified_at": "2026-11-15",
+  "scope": "Source-backed live editor; not completed native-template replacement",
+  "modules": [
+    {
+      "id": "hero",
+      "name": "Hero",
+      "fields": 34,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "kpis",
+      "name": "KPI trio",
+      "fields": 2,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "stats",
+      "name": "Stat strip",
+      "fields": 2,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "capabilities",
+      "name": "Capability grid",
+      "fields": 2,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "features",
+      "name": "Icon feature row",
+      "fields": 2,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "storyRows",
+      "name": "Challenge / Solution / Result",
+      "fields": 2,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "storyColumns",
+      "name": "Challenge / Approach / Impact",
+      "fields": 1,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "quote",
+      "name": "Quote band + snapshot",
+      "fields": 5,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "quoteStats",
+      "name": "Quote card + stat grid",
+      "fields": 4,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "expert",
+      "name": "Project stats + expert card",
+      "fields": 5,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "cta",
+      "name": "CTA bar",
+      "fields": 4,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "footer",
+      "name": "Footer",
+      "fields": 7,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "row",
+      "name": "Flexible row",
+      "fields": 2,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "numbersGrid",
+      "name": "Numbers grid",
+      "fields": 7,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "stages",
+      "name": "Process stages",
+      "fields": 5,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "footprint",
+      "name": "Global footprint",
+      "fields": 9,
+      "browser_choice_checked": true,
+      "layout_status": "unported"
+    },
+    {
+      "id": "bigMetric",
+      "name": "Big metric",
+      "fields": 9,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "pillars",
+      "name": "Photo pillars",
+      "fields": 3,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "hub",
+      "name": "Hub and spoke",
+      "fields": 7,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "pipeline",
+      "name": "Pipeline",
+      "fields": 7,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "logoWall",
+      "name": "Logo wall",
+      "fields": 5,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "dataChart",
+      "name": "Data chart",
+      "fields": 6,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "comparison",
+      "name": "Comparison table",
+      "fields": 6,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "timeline",
+      "name": "Timeline",
+      "fields": 4,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "testimonials",
+      "name": "Testimonial wall",
+      "fields": 3,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "team",
+      "name": "Team trio",
+      "fields": 3,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "tiers",
+      "name": "Package tiers",
+      "fields": 4,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "checklist",
+      "name": "Checklist",
+      "fields": 4,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "agenda",
+      "name": "Agenda",
+      "fields": 7,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "divider",
+      "name": "Section divider",
+      "fields": 6,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "typeDesign",
+      "name": "Words as design",
+      "fields": 4,
+      "browser_choice_checked": true,
+      "layout_status": "unported"
+    },
+    {
+      "id": "news",
+      "name": "In the news",
+      "fields": 4,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "cover",
+      "name": "Title page",
+      "fields": 7,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "kpiTrend",
+      "name": "KPI trends",
+      "fields": 5,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    },
+    {
+      "id": "funnel",
+      "name": "Funnel and waterfall",
+      "fields": 7,
+      "browser_choice_checked": true,
+      "layout_status": "unported"
+    },
+    {
+      "id": "heatmap",
+      "name": "Heatmap",
+      "fields": 8,
+      "browser_choice_checked": true,
+      "layout_status": "unported"
+    },
+    {
+      "id": "bullet",
+      "name": "Target bars",
+      "fields": 6,
+      "browser_choice_checked": true,
+      "layout_status": "unported"
+    },
+    {
+      "id": "seriesChart",
+      "name": "Multi-series chart",
+      "fields": 8,
+      "browser_choice_checked": true,
+      "layout_status": "unported"
+    },
+    {
+      "id": "pagebreak",
+      "name": "Page break",
+      "fields": 0,
+      "browser_choice_checked": true,
+      "layout_status": "initial React adaptation; exact source parity unverified"
+    }
+  ],
+  "verification": {
+    "save_reopen": true,
+    "nested_row_edit": true,
+    "pdf_proof_download": true,
+    "flat_pptx_proof_download": true,
+    "desktop_phone_page_overflow": false,
+    "page_errors": [],
+    "full_suite": {
+      "passed_files": 415,
+      "failed_files": 7,
+      "passed_tests": 2799,
+      "failed_tests": 8,
+      "failures": "same pre-existing failures recorded before this request"
+    }
+  },
+  "preserved": [
+    "Existing event photographs and rights gates",
+    "Brand kits and issued artwork",
+    "Native/original saved materials",
+    "Existing production export and access enforcement"
+  ],
+  "remaining": [
+    "Exact source geometry and variant behavior",
+    "Native slide/social renderer replacement",
+    "Missing artwork in 274 templates",
+    "Project/material/version/review/agent parity",
+    "Press and Office verification"
+  ]
+}

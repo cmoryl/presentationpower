@@ -1,13 +1,15 @@
 # Roadmap
 ## Claude full Element update
-- [ ] Walk the complete supplied module inventory and replace the live template editor module by module, preserving event photos, kits, existing saved records and production exports.
+- [x] Inventoried and browser-walked all 38 supplied modules plus page breaks; integrated source controls, flexible rows, 14 sizes and source-template save/reopen/proof downloads in the live editor. Event photos, kits and native/original records preserved.
+- [ ] Complete faithful module geometry and native slide/social replacement; six source families remain explicitly unported, other adaptations are not certified as exact. Missing source artwork remains an external blocker.
 - [x] Established the linked Claude build as the forward reference; updated live module/print/social headers, cross-surface navigation, print/slide editor navigation and horizontal inspector controls.
 - [ ] Complete exact source editor, module-variant and project/material parity; current shared-workspace adoption is a first pass, not the whole Claude build.
 - [x] Inspect the supplied archive safely and record detected capabilities and missing dependencies.
 - [x] Approved plan; extracted 299 source-backed drafts and imported 128 supplied photographs/sprites into the existing admin curator; native copy/open/reopen verified, temporary test draft removed.
 - [ ] Finish source module/variant geometry, project/material/version/review UX and agent-tool integration; current draft mapping is partial, not full build parity.
 - [ ] Resolve missing source artwork: 274 drafts reference unavailable files (698 virtual blob paths); requires original image bytes from the Claude build.
-- [ ] Verify integrated editing, saving, review and export flows; resolve missing artwork/source dependencies or report them explicitly.
+- [x] Verified source template editing/save/reopen, nested rows, module choices, social/slides entry points, PDF/flat-PPTX proof downloads and phone fit; eight source tests pass and build OK.
+- [ ] Verify full native/review/agent/press/Office parity; missing artwork and exact renderer work remain incomplete. Full suite retains the same eight pre-existing failures.
 ## Bowl brand-kit submenu
 - [x] Add a shared icon-led pinned section strip for existing brand sections on app/share views; remove the standalone Animations shortcut without changing content or downloads.
 - [x] Verified five section jumps on app and public brand kit, heading clearance beneath pinned menus and phone fit; public phone view reviewed.

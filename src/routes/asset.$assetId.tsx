@@ -18,6 +18,7 @@ import { AppShell } from "@/components/AppShell";
 import { BuildWorkspaceNav } from "@/components/editor/BuildWorkspaceNav";
 import { SourceBuildEditor } from "@/components/editor/SourceBuildEditor";
 import { workingLayout, sourceLayoutPatch } from "@/lib/element-update/registry";
+import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
 import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
@@ -281,6 +282,7 @@ function stableRawContent(
 
 function AssetEditor() {
   useRequireSignIn();
+  const capabilities = useWorkspaceCapabilities();
   const { assetId } = Route.useParams();
   const navigate = useNavigate();
   const { brandModes } = useTaxonomy();
@@ -1169,6 +1171,7 @@ function AssetEditor() {
   const densityGap = density === "compact" ? "gap-4" : density === "airy" ? "gap-10" : "gap-6";
 
   const sourceBuild = workingLayout(rawContent);
+  if (sourceBuild && (capabilities.isLoading || !capabilities.canAuthorSystem)) return <AppShell>{!capabilities.isLoading && <p className="py-8 text-sm text-muted-foreground">This material is awaiting review. Source editing is available to the design team.</p>}</AppShell>;
   if (sourceBuild) return <AppShell>
     <BuildWorkspaceNav active="print" className="mb-4" />
     <div className="mb-5 flex flex-wrap items-center justify-between gap-3">

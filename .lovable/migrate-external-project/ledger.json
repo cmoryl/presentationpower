@@ -7,14 +7,14 @@
       "source": "Single bundled index.html with inline JavaScript and CSS; no package.json or separate source modules",
       "outcome": "Port into existing React/TanStack structure",
       "status": "partial",
-      "next_action": "Live module/print/social areas and print/slide editors now share task-oriented cross-surface navigation; shared inspector uses horizontal named controls. Exact source renderer/editor/project parity remains unfinished."
+      "next_action": "Source-backed templates now open the live three-column source editor; source module entry points are available in modules, social and slides. Legacy editors remain for native/original saved work. Exact source geometry and native slide replacement remain incomplete."
     },
     {
       "capability": "Module editing and layout",
       "source": "MODULES, LIB_DESIGNS, responsive fitting and per-format controls",
       "outcome": "Preserve supported editing capabilities through current governed registries",
       "status": "partial",
-      "next_action": "Supported narrative, statistics, quote and contact structures map to existing PrintSection renderers; other families and source variant geometry remain pending. Original layouts retained, not certified."
+      "next_action": "Inventoried all 38 families plus pagebreak, preserving literal fields/defaults. All 39 library choices walked in the browser; controls, nested rows, add/remove/duplicate/reorder and 14 sizes integrated. Renderer is an initial React adaptation, not exact Claude parity. Six families explicitly unported; other variant details still need faithful geometry."
     },
     {
       "capability": "Projects, materials, versions and review",
@@ -48,8 +48,8 @@
       "capability": "Exports",
       "source": "PNG/JPG, editable PowerPoint, SVG, browser PDF and press-preparation controls",
       "outcome": "Preserve existing QA, outlined print-master and colour-space contracts",
-      "status": "pending",
-      "next_action": "Existing QA/export contracts retained unchanged; no source press/live-text or CMYK behavior adopted. Source layout overflow and export parity not certified."
+      "status": "partial",
+      "next_action": "Verified one saved/reopened quote through real PDF and flat PowerPoint proof downloads. Missing artwork, unported geometry, missing images and page overflow block source proofs. Native deck, outlined press master and production export paths remain unchanged; Office openability and exact source export parity unverified."
     },
     {
       "capability": "Agent and providers",
@@ -70,7 +70,7 @@
       "source": "Existing production Element application",
       "outcome": "No destructive replacement or automatic publication",
       "status": "partial",
-      "next_action": "Signed-in module, print, social and social-editor navigation checked on desktop; populated social canvas verified, phone has no page overflow and no page errors. Sixteen relevant tests pass; preview build OK. Existing full-suite eight failures recorded previously. Source-complete edit/review/export parity remains unverified; not published."
+      "next_action": "Authenticated template title save/reopen and flexible-row editing verified. Walked 39 source entries, checked modules/social/slides entry points, downloaded PDF and PPTX proofs. Desktop/phone no page overflow or page errors; build OK. Eight source tests pass; full suite 415 files/2799 tests passed and same seven files/eight pre-existing failures remain. No publishing. Full replacement remains incomplete."
     }
   ],
   "reference_url": "https://claude.ai/artifact/7WXARzAhxXMfoJppmzkDSs"
