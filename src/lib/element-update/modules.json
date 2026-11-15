@@ -1,0 +1,3601 @@
+{
+  "hero": {
+    "name": "Hero",
+    "group": "Open",
+    "vk": "layout",
+    "vk2": "scheme",
+    "desc": "Title block with photo placement, overlays, alignment and color schemes.",
+    "fields": [
+      {
+        "t": "head",
+        "l": "Words"
+      },
+      {
+        "k": "title",
+        "l": "Title",
+        "t": "textarea"
+      },
+      {
+        "k": "highlight",
+        "l": "Words to color (copy them from the title)"
+      },
+      {
+        "k": "lead",
+        "l": "Intro sentence",
+        "t": "textarea"
+      },
+      {
+        "k": "short",
+        "l": "Short title for social and ads"
+      },
+      {
+        "t": "head",
+        "l": "Photo"
+      },
+      {
+        "k": "layout",
+        "l": "Placement",
+        "t": "select",
+        "o": [
+          [
+            "text",
+            "No photo"
+          ],
+          [
+            "right",
+            "Photo right"
+          ],
+          [
+            "left",
+            "Photo left"
+          ],
+          [
+            "fade",
+            "Photo fading in"
+          ],
+          [
+            "full",
+            "Full-bleed photo"
+          ]
+        ]
+      },
+      {
+        "k": "photo",
+        "l": "Photo",
+        "t": "image"
+      },
+      {
+        "k": "photoWidth",
+        "l": "Photo width",
+        "t": "range",
+        "min": 30,
+        "max": 70,
+        "step": 2,
+        "unit": "%"
+      },
+      {
+        "k": "overlay",
+        "l": "Overlay color",
+        "t": "select",
+        "o": [
+          [
+            "navy",
+            "Navy"
+          ],
+          [
+            "indigo",
+            "Indigo"
+          ],
+          [
+            "cobalt",
+            "Cobalt"
+          ],
+          [
+            "signature",
+            "Violet to aqua"
+          ],
+          [
+            "white",
+            "White"
+          ],
+          [
+            "black",
+            "Black"
+          ],
+          [
+            "none",
+            "No overlay"
+          ]
+        ]
+      },
+      {
+        "k": "overlayStrength",
+        "l": "Overlay strength",
+        "t": "range",
+        "min": 0,
+        "max": 95,
+        "step": 5,
+        "unit": "%"
+      },
+      {
+        "k": "overlayDir",
+        "l": "Overlay shape",
+        "t": "select",
+        "o": [
+          [
+            "left",
+            "Strongest behind the text"
+          ],
+          [
+            "even",
+            "Even"
+          ],
+          [
+            "bottom",
+            "Strongest at the bottom"
+          ]
+        ]
+      },
+      {
+        "k": "words",
+        "l": "Words",
+        "t": "select",
+        "opt": true,
+        "o": [
+          [
+            "auto",
+            "Where the look puts them"
+          ],
+          [
+            "over",
+            "On the picture"
+          ]
+        ]
+      },
+      {
+        "k": "panel",
+        "l": "Panel behind the words",
+        "t": "select",
+        "o": [
+          [
+            "none",
+            "None"
+          ],
+          [
+            "light",
+            "Frosted, light"
+          ],
+          [
+            "dark",
+            "Frosted, dark"
+          ],
+          [
+            "card",
+            "White card"
+          ]
+        ]
+      },
+      {
+        "k": "logo",
+        "l": "Client logo",
+        "t": "image",
+        "lib": true
+      },
+      {
+        "k": "logoTone",
+        "l": "Logo colour",
+        "t": "select",
+        "o": [
+          [
+            "color",
+            "Original colours"
+          ],
+          [
+            "grey",
+            "Grey"
+          ],
+          [
+            "white",
+            "White"
+          ]
+        ]
+      },
+      {
+        "k": "logoW",
+        "l": "Logo width",
+        "t": "range",
+        "min": 70,
+        "max": 340,
+        "step": 10,
+        "unit": "px"
+      },
+      {
+        "k": "chip",
+        "l": "Floating figure on the photo"
+      },
+      {
+        "k": "chipSub",
+        "l": "Floating figure caption"
+      },
+      {
+        "t": "head",
+        "l": "Position"
+      },
+      {
+        "k": "align",
+        "l": "Text alignment",
+        "t": "select",
+        "o": [
+          [
+            "left",
+            "Left"
+          ],
+          [
+            "center",
+            "Centered"
+          ]
+        ]
+      },
+      {
+        "k": "valign",
+        "l": "Vertical position",
+        "t": "select",
+        "o": [
+          [
+            "top",
+            "Top"
+          ],
+          [
+            "center",
+            "Centered in the safe area"
+          ],
+          [
+            "bottom",
+            "Bottom"
+          ]
+        ]
+      },
+      {
+        "k": "safe",
+        "l": "Text safe margin",
+        "t": "select",
+        "o": [
+          [
+            "standard",
+            "Standard (32 px)"
+          ],
+          [
+            "roomy",
+            "Roomy (56 px)"
+          ],
+          [
+            "wide",
+            "Wide (80 px)"
+          ]
+        ]
+      },
+      {
+        "k": "width",
+        "l": "Text width",
+        "t": "select",
+        "o": [
+          [
+            "narrow",
+            "Narrow"
+          ],
+          [
+            "standard",
+            "Standard"
+          ],
+          [
+            "wide",
+            "Wide"
+          ]
+        ]
+      },
+      {
+        "k": "height",
+        "l": "Hero height",
+        "t": "select",
+        "o": [
+          [
+            "compact",
+            "Compact"
+          ],
+          [
+            "standard",
+            "Standard"
+          ],
+          [
+            "tall",
+            "Tall"
+          ],
+          [
+            "custom",
+            "Custom (drag the hero's bottom edge)"
+          ]
+        ]
+      },
+      {
+        "k": "heightPx",
+        "l": "Custom height",
+        "t": "range",
+        "min": 160,
+        "max": 1000,
+        "step": 4,
+        "unit": " px"
+      },
+      {
+        "t": "head",
+        "l": "Blend into the page"
+      },
+      {
+        "k": "fadeBottom",
+        "l": "Edge fade",
+        "t": "select",
+        "o": [
+          [
+            "auto",
+            "Match the background"
+          ],
+          [
+            "none",
+            "No fade"
+          ],
+          [
+            "soft",
+            "Soft fade"
+          ],
+          [
+            "long",
+            "Long fade"
+          ]
+        ]
+      },
+      {
+        "k": "fadeEdge",
+        "l": "Fade from",
+        "t": "select",
+        "o": [
+          [
+            "bottom",
+            "Bottom"
+          ],
+          [
+            "top",
+            "Top"
+          ],
+          [
+            "topbottom",
+            "Top and bottom"
+          ],
+          [
+            "sides",
+            "Both sides"
+          ],
+          [
+            "left",
+            "Left side"
+          ],
+          [
+            "right",
+            "Right side"
+          ],
+          [
+            "all",
+            "All edges"
+          ]
+        ]
+      },
+      {
+        "k": "overlap",
+        "l": "Next section overlaps the hero",
+        "t": "select",
+        "o": [
+          [
+            "auto",
+            "Automatic"
+          ],
+          [
+            "none",
+            "No overlap"
+          ],
+          [
+            "small",
+            "Small, 40 px"
+          ],
+          [
+            "standard",
+            "Standard, 72 px"
+          ],
+          [
+            "deep",
+            "Deep, 120 px"
+          ]
+        ]
+      },
+      {
+        "t": "head",
+        "l": "Color"
+      },
+      {
+        "k": "scheme",
+        "l": "Background",
+        "t": "select",
+        "o": [
+          [
+            "dark",
+            "Deep gradient"
+          ],
+          [
+            "navy",
+            "Navy"
+          ],
+          [
+            "indigo",
+            "Indigo glow"
+          ],
+          [
+            "cobalt",
+            "Cobalt"
+          ],
+          [
+            "signature",
+            "Violet to aqua"
+          ],
+          [
+            "light",
+            "White with aurora"
+          ],
+          [
+            "ice",
+            "Ice"
+          ]
+        ]
+      },
+      {
+        "k": "textColor",
+        "l": "Text color",
+        "t": "select",
+        "o": [
+          [
+            "auto",
+            "Automatic"
+          ],
+          [
+            "light",
+            "White"
+          ],
+          [
+            "dark",
+            "Navy"
+          ]
+        ]
+      },
+      {
+        "k": "accent",
+        "l": "Highlight color",
+        "t": "select",
+        "o": [
+          [
+            "auto",
+            "Automatic"
+          ],
+          [
+            "cobalt",
+            "Cobalt"
+          ],
+          [
+            "sky",
+            "Sky"
+          ],
+          [
+            "light-sky",
+            "Light sky"
+          ],
+          [
+            "aqua",
+            "Aqua"
+          ],
+          [
+            "violet",
+            "Violet"
+          ]
+        ]
+      }
+    ],
+    "def": {
+      "layout": "text",
+      "scheme": "dark",
+      "eyebrowStyle": "plain",
+      "eyebrow": "Client Case Study",
+      "title": "Helping Global Teams Move Faster with GlobalLink",
+      "highlight": "Move Faster",
+      "lead": "TransPerfect GlobalLink brings people, content and technology together to help global teams translate, adapt and deliver with speed and clarity.",
+      "short": "Helping global teams move faster",
+      "photo": null,
+      "photoWidth": 46,
+      "overlay": "navy",
+      "overlayStrength": 60,
+      "overlayDir": "left",
+      "panel": "none",
+      "chip": "",
+      "chipSub": "",
+      "align": "left",
+      "valign": "top",
+      "width": "standard",
+      "height": "standard",
+      "heightPx": 380,
+      "fadeEdge": "bottom",
+      "safe": "standard",
+      "textColor": "auto",
+      "accent": "auto",
+      "fadeBottom": "auto",
+      "overlap": "auto",
+      "logo": null,
+      "logoTone": "color",
+      "logoW": 200
+    }
+  },
+  "kpis": {
+    "name": "KPI trio",
+    "group": "Proof",
+    "vk": "variant",
+    "desc": "Three headline results; cards, one bar or dark cards.",
+    "fields": [
+      {
+        "k": "variant",
+        "l": "Style",
+        "t": "select",
+        "o": [
+          [
+            "cards",
+            "White cards"
+          ],
+          [
+            "bar",
+            "Single bar"
+          ],
+          [
+            "dark",
+            "Navy cards"
+          ]
+        ]
+      },
+      {
+        "k": "items",
+        "l": "Results",
+        "t": "list",
+        "min": 2,
+        "max": 3,
+        "f": [
+          {
+            "k": "icon",
+            "l": "Icon",
+            "t": "icon"
+          },
+          {
+            "k": "value",
+            "l": "Value"
+          },
+          {
+            "k": "caption",
+            "l": "Caption"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "variant": "cards",
+      "items": [
+        {
+          "icon": "clock",
+          "value": "10 Days",
+          "caption": "Project time, down from 3 months"
+        },
+        {
+          "icon": "coins",
+          "value": "33%",
+          "caption": "Reduction in engineering localization costs"
+        },
+        {
+          "icon": "check-circle-2",
+          "value": "On Time",
+          "caption": "Modules rolled out within budget"
+        }
+      ]
+    }
+  },
+  "stats": {
+    "name": "Stat strip",
+    "group": "Proof",
+    "vk": "variant",
+    "desc": "3–5 icon stats: open, in cards, or on an ice band.",
+    "fields": [
+      {
+        "k": "variant",
+        "l": "Style",
+        "t": "select",
+        "o": [
+          [
+            "open",
+            "Open with hairlines"
+          ],
+          [
+            "cards",
+            "Cards"
+          ],
+          [
+            "band",
+            "Ice band"
+          ]
+        ]
+      },
+      {
+        "k": "items",
+        "l": "Stats",
+        "t": "list",
+        "min": 3,
+        "max": 5,
+        "f": [
+          {
+            "k": "icon",
+            "l": "Icon",
+            "t": "icon"
+          },
+          {
+            "k": "value",
+            "l": "Value"
+          },
+          {
+            "k": "caption",
+            "l": "Caption"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "variant": "open",
+      "items": [
+        {
+          "icon": "users",
+          "value": "100%",
+          "caption": "Global teams empowered"
+        },
+        {
+          "icon": "coins",
+          "value": "48%",
+          "caption": "Reduction in localization costs"
+        },
+        {
+          "icon": "gauge",
+          "value": "98%",
+          "caption": "Translation quality score"
+        },
+        {
+          "icon": "globe-2",
+          "value": "35+",
+          "caption": "Markets supported"
+        },
+        {
+          "icon": "trending-up",
+          "value": "3.4x",
+          "caption": "Faster time-to-market"
+        }
+      ]
+    }
+  },
+  "capabilities": {
+    "name": "Capability grid",
+    "group": "Proof",
+    "vk": "variant",
+    "desc": "3–6 icon + verb cards: tray grid or open two-column list.",
+    "fields": [
+      {
+        "k": "variant",
+        "l": "Style",
+        "t": "select",
+        "o": [
+          [
+            "tray",
+            "Cards in a tray"
+          ],
+          [
+            "list",
+            "Open two-column list"
+          ]
+        ]
+      },
+      {
+        "k": "items",
+        "l": "Capabilities",
+        "t": "list",
+        "min": 3,
+        "max": 6,
+        "f": [
+          {
+            "k": "icon",
+            "l": "Icon",
+            "t": "icon"
+          },
+          {
+            "k": "title",
+            "l": "Verb"
+          },
+          {
+            "k": "text",
+            "l": "Line",
+            "t": "textarea"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "variant": "tray",
+      "items": [
+        {
+          "icon": "layers-3",
+          "title": "Supports",
+          "text": "Adobe AEM 6.5 LTS SP packages with cross-environment compatibility"
+        },
+        {
+          "icon": "git-branch",
+          "title": "Adapts",
+          "text": "to any AEM content tree, out-of-the-box or custom"
+        },
+        {
+          "icon": "globe-2",
+          "title": "Enables",
+          "text": "custom localization for URLs and internal and external links"
+        },
+        {
+          "icon": "workflow",
+          "title": "Automates",
+          "text": "translation submission through AEM publishing workflow triggers"
+        },
+        {
+          "icon": "refresh-cw",
+          "title": "Triggers",
+          "text": "AEM workflows with AI and human oversight"
+        },
+        {
+          "icon": "brain",
+          "title": "Learns",
+          "text": "adaptive forms with dictionaries stored under new path locations"
+        }
+      ]
+    }
+  },
+  "features": {
+    "name": "Icon feature row",
+    "group": "Proof",
+    "desc": "Centered label over 3–5 icon-and-line columns.",
+    "fields": [
+      {
+        "k": "label",
+        "l": "Label"
+      },
+      {
+        "k": "items",
+        "l": "Columns",
+        "t": "list",
+        "min": 3,
+        "max": 5,
+        "f": [
+          {
+            "k": "icon",
+            "l": "Icon",
+            "t": "icon"
+          },
+          {
+            "k": "text",
+            "l": "Line"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "label": "We Know How",
+      "items": [
+        {
+          "icon": "building",
+          "text": "Supports 600+ global enterprises"
+        },
+        {
+          "icon": "bot",
+          "text": "Enables workflows with AI and human oversight"
+        },
+        {
+          "icon": "handshake",
+          "text": "Combines in-house teams and external vendors"
+        },
+        {
+          "icon": "network",
+          "text": "Integrates with 100+ platforms seamlessly"
+        },
+        {
+          "icon": "trending-up",
+          "text": "Reduces costs and accelerates time-to-market"
+        }
+      ]
+    }
+  },
+  "storyRows": {
+    "name": "Challenge / Solution / Result",
+    "group": "Story",
+    "vk": "variant",
+    "desc": "Three-part story as rows, numbered steps or side-by-side cards.",
+    "fields": [
+      {
+        "k": "variant",
+        "l": "Style",
+        "t": "select",
+        "o": [
+          [
+            "rows",
+            "Rows with labels"
+          ],
+          [
+            "numbered",
+            "Numbered steps"
+          ],
+          [
+            "cards",
+            "Side-by-side columns"
+          ]
+        ]
+      },
+      {
+        "k": "items",
+        "l": "Rows",
+        "t": "list",
+        "min": 2,
+        "max": 6,
+        "f": [
+          {
+            "k": "icon",
+            "l": "Icon",
+            "t": "icon"
+          },
+          {
+            "k": "heading",
+            "l": "Heading"
+          },
+          {
+            "k": "text",
+            "l": "Paragraph",
+            "t": "textarea"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "variant": "rows",
+      "items": [
+        {
+          "icon": "search",
+          "heading": "The Challenge",
+          "text": "Aēsop needed to localize hundreds of product knowledge modules across multiple markets. Disconnected processes, inconsistent terminology and manual handoffs slowed delivery and increased costs."
+        },
+        {
+          "icon": "workflow",
+          "heading": "The Solution",
+          "text": "GlobalLink for Adobe Experience Manager Plus unified content, automation and workflows in one centralized ecosystem with a one-click workflow and full visibility."
+        },
+        {
+          "icon": "trophy",
+          "heading": "The Result",
+          "text": "Aēsop cut project management time by more than 70% and reduced engineering localization costs by 33% across 7 markets — on time and on budget."
+        }
+      ]
+    }
+  },
+  "storyColumns": {
+    "name": "Challenge / Approach / Impact",
+    "group": "Story",
+    "desc": "Three cards with intro and bullets. eBrochures.",
+    "fields": [
+      {
+        "k": "items",
+        "l": "Columns",
+        "t": "list",
+        "min": 3,
+        "max": 6,
+        "f": [
+          {
+            "k": "icon",
+            "l": "Icon",
+            "t": "icon"
+          },
+          {
+            "k": "heading",
+            "l": "Heading"
+          },
+          {
+            "k": "text",
+            "l": "Intro",
+            "t": "textarea"
+          },
+          {
+            "k": "bullets",
+            "l": "Bullets (one per line)",
+            "t": "textarea"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "items": [
+        {
+          "icon": "search",
+          "heading": "The Challenge",
+          "text": "The client struggled with fragmented tools and slow localization.",
+          "bullets": "Disconnected systems\nInconsistent terminology\nLong turnaround times\nLimited visibility"
+        },
+        {
+          "icon": "workflow",
+          "heading": "Our Approach",
+          "text": "We implemented GlobalLink AI to unify content operations.",
+          "bullets": "Unified orchestration\nAI-powered workflow\nCentralized governance\nReal-time dashboards"
+        },
+        {
+          "icon": "trending-up",
+          "heading": "The Impact",
+          "text": "Measurable improvements in speed, quality and efficiency.",
+          "bullets": "3.4x faster time-to-market\n48% lower localization costs\n98% translation quality\n35+ markets"
+        }
+      ]
+    }
+  },
+  "quote": {
+    "name": "Quote band + snapshot",
+    "group": "Voice",
+    "vk": "side",
+    "desc": "Testimonial on a soft tint, optional proof card.",
+    "fields": [
+      {
+        "k": "quote",
+        "l": "Quote",
+        "t": "textarea"
+      },
+      {
+        "k": "attribution",
+        "l": "Attribution"
+      },
+      {
+        "k": "side",
+        "l": "Beside the quote",
+        "t": "select",
+        "o": [
+          [
+            "snapshot",
+            "Engagement Snapshot"
+          ],
+          [
+            "discover",
+            "Discover line + proof"
+          ],
+          [
+            "none",
+            "Nothing (full width)"
+          ]
+        ]
+      },
+      {
+        "k": "sideText",
+        "l": "Snapshot label or discover line",
+        "t": "textarea"
+      },
+      {
+        "k": "proof",
+        "l": "Proof points",
+        "t": "list",
+        "min": 0,
+        "max": 3,
+        "f": [
+          {
+            "k": "icon",
+            "l": "Icon",
+            "t": "icon"
+          },
+          {
+            "k": "text",
+            "l": "Text"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "quote": "TransPerfect helped us simplify a complex localization process and free our internal team to focus on higher-value work.",
+      "attribution": "- Aēsop",
+      "side": "snapshot",
+      "sideText": "Engagement Snapshot"
+    }
+  },
+  "quoteStats": {
+    "name": "Quote card + stat grid",
+    "group": "Voice",
+    "desc": "2×2 stats beside a feature testimonial.",
+    "fields": [
+      {
+        "k": "items",
+        "l": "Stats",
+        "t": "list",
+        "min": 2,
+        "max": 4,
+        "f": [
+          {
+            "k": "icon",
+            "l": "Icon",
+            "t": "icon"
+          },
+          {
+            "k": "value",
+            "l": "Value"
+          },
+          {
+            "k": "caption",
+            "l": "Caption"
+          }
+        ]
+      },
+      {
+        "k": "quote",
+        "l": "Quote",
+        "t": "textarea"
+      },
+      {
+        "k": "client",
+        "l": "Client title"
+      },
+      {
+        "k": "attribution",
+        "l": "Attribution"
+      }
+    ],
+    "def": {
+      "items": [
+        {
+          "icon": "users",
+          "value": "100%",
+          "caption": "Global teams empowered"
+        },
+        {
+          "icon": "coins",
+          "value": "48%",
+          "caption": "Reduction in localization costs"
+        },
+        {
+          "icon": "gauge",
+          "value": "98%",
+          "caption": "Translation quality score"
+        },
+        {
+          "icon": "globe-2",
+          "value": "35+",
+          "caption": "Markets supported"
+        }
+      ],
+      "quote": "GlobalLink gave our team the speed, visibility, and consistency we need to scale multicultural content with confidence.",
+      "client": "Client Title",
+      "attribution": "- Aēsop"
+    }
+  },
+  "expert": {
+    "name": "Project stats + expert card",
+    "group": "Voice",
+    "desc": "Icon stat cards with a Talk-to-an-Expert card.",
+    "fields": [
+      {
+        "k": "label",
+        "l": "Section label"
+      },
+      {
+        "k": "items",
+        "l": "Stats",
+        "t": "list",
+        "min": 2,
+        "max": 4,
+        "f": [
+          {
+            "k": "icon",
+            "l": "Icon",
+            "t": "icon"
+          },
+          {
+            "k": "value",
+            "l": "Value"
+          },
+          {
+            "k": "caption",
+            "l": "Caption"
+          }
+        ]
+      },
+      {
+        "k": "title",
+        "l": "Card title"
+      },
+      {
+        "k": "line",
+        "l": "Card line",
+        "t": "textarea"
+      },
+      {
+        "k": "button",
+        "l": "Button"
+      }
+    ],
+    "def": {
+      "label": "Project Statistics",
+      "items": [
+        {
+          "icon": "trophy",
+          "value": "15+",
+          "caption": "Years partner experience"
+        },
+        {
+          "icon": "globe-2",
+          "value": "200+",
+          "caption": "Shared customers"
+        },
+        {
+          "icon": "network",
+          "value": "100+",
+          "caption": "Platform integrations"
+        }
+      ],
+      "title": "Talk to a GlobalLink Expert",
+      "line": "Our experts help global teams streamline content operations and drive measurable results.",
+      "button": "Contact an Expert"
+    }
+  },
+  "cta": {
+    "name": "CTA bar",
+    "group": "Action",
+    "vk": "fill",
+    "desc": "G mark, title, sub-line and a Book a Demo pill.",
+    "fields": [
+      {
+        "k": "fill",
+        "l": "Fill",
+        "t": "select",
+        "o": [
+          [
+            "navy",
+            "Navy"
+          ],
+          [
+            "gradient",
+            "Violet to aqua gradient"
+          ],
+          [
+            "cobalt",
+            "Cobalt"
+          ]
+        ]
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "sub",
+        "l": "Sub-line"
+      },
+      {
+        "k": "button",
+        "l": "Button"
+      }
+    ],
+    "def": {
+      "fill": "navy",
+      "title": "See GlobalLink in Action",
+      "sub": "Explore how GlobalLink AI can transform your content operations.",
+      "button": "Book a Demo"
+    }
+  },
+  "footer": {
+    "name": "Footer",
+    "group": "Close",
+    "vk": "style",
+    "desc": "Wordmarks, URL and email. Always last.",
+    "fields": [
+      {
+        "k": "style",
+        "l": "Style",
+        "t": "select",
+        "o": [
+          [
+            "open",
+            "Open strip"
+          ],
+          [
+            "card",
+            "White card"
+          ]
+        ]
+      },
+      {
+        "k": "url",
+        "l": "URL"
+      },
+      {
+        "k": "email",
+        "l": "Email"
+      },
+      {
+        "k": "line",
+        "l": "Line beside the logo (a tagline)",
+        "opt": true
+      },
+      {
+        "k": "extra",
+        "l": "More contact details (social handles, offices)",
+        "opt": true
+      },
+      {
+        "k": "aboutHead",
+        "l": "About: its heading",
+        "opt": true
+      },
+      {
+        "k": "about",
+        "l": "About: a short paragraph above the contact row",
+        "t": "textarea",
+        "opt": true
+      }
+    ],
+    "def": {
+      "style": "open",
+      "url": "transperfect.com/globallink",
+      "email": "globallink@transperfect.com"
+    }
+  },
+  "row": {
+    "name": "Flexible row",
+    "group": "Compose",
+    "vk": "layout",
+    "desc": "1–4 slots; drop any sub-module in each and switch it live.",
+    "fields": [
+      {
+        "k": "layout",
+        "l": "Columns",
+        "t": "select",
+        "o": [
+          [
+            "1",
+            "One, full width"
+          ],
+          [
+            "2",
+            "Two, equal"
+          ],
+          [
+            "2-1",
+            "Two, wide then narrow"
+          ],
+          [
+            "1-2",
+            "Two, narrow then wide"
+          ],
+          [
+            "3",
+            "Three, equal"
+          ],
+          [
+            "4",
+            "Four, equal"
+          ]
+        ]
+      },
+      {
+        "k": "align",
+        "l": "Height",
+        "t": "select",
+        "o": [
+          [
+            "stretch",
+            "Equal heights"
+          ],
+          [
+            "start",
+            "Natural heights"
+          ]
+        ]
+      }
+    ],
+    "def": {
+      "layout": "3",
+      "align": "stretch",
+      "slots": [
+        null,
+        null,
+        null
+      ]
+    }
+  },
+  "numbersGrid": {
+    "name": "Numbers grid",
+    "group": "Corporate",
+    "vk": "variant",
+    "desc": "Big spectrum figures in a grid, with an optional platform card. From “Numbers that work for you”.",
+    "fields": [
+      {
+        "k": "variant",
+        "l": "Style",
+        "t": "select",
+        "o": [
+          [
+            "card",
+            "Grid with platform card"
+          ],
+          [
+            "grid",
+            "Grid only"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "accent",
+        "l": "Words in the spectrum gradient (copy them from the title)"
+      },
+      {
+        "k": "items",
+        "l": "Figures",
+        "t": "list",
+        "min": 2,
+        "max": 6,
+        "f": [
+          {
+            "k": "value",
+            "l": "Figure"
+          },
+          {
+            "k": "label",
+            "l": "Label"
+          }
+        ]
+      },
+      {
+        "k": "cardTitle",
+        "l": "Card title"
+      },
+      {
+        "k": "card",
+        "l": "Card figures",
+        "t": "list",
+        "min": 2,
+        "max": 4,
+        "f": [
+          {
+            "k": "value",
+            "l": "Figure"
+          },
+          {
+            "k": "label",
+            "l": "Label"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "variant": "card",
+      "eyebrow": "24/7/365 local support",
+      "title": "Numbers that work for you",
+      "accent": "work for you",
+      "items": [
+        {
+          "value": "10,000+",
+          "label": "TransPerfect employees"
+        },
+        {
+          "value": "150+",
+          "label": "Cities worldwide"
+        },
+        {
+          "value": "50+",
+          "label": "Countries"
+        },
+        {
+          "value": "6",
+          "label": "Continents"
+        },
+        {
+          "value": "10K+",
+          "label": "Executed deployments"
+        },
+        {
+          "value": "90%",
+          "label": "Agnostic AI marketplace"
+        }
+      ],
+      "cardTitle": "The World’s Only Global Performance Platform™",
+      "card": [
+        {
+          "value": "90%",
+          "label": "Of Fortune 500 companies run on GlobalLink"
+        },
+        {
+          "value": "97%",
+          "label": "Of clients achieve ROI in 12 months"
+        },
+        {
+          "value": "6,000+",
+          "label": "Clients trust GlobalLink"
+        },
+        {
+          "value": "200+",
+          "label": "Full-time developers"
+        }
+      ]
+    }
+  },
+  "stages": {
+    "name": "Process stages",
+    "group": "Corporate",
+    "vk": "variant",
+    "desc": "Numbered stages with photos, checklists and a progress line. From “Three stages, end to end”.",
+    "fields": [
+      {
+        "k": "variant",
+        "l": "Style",
+        "t": "select",
+        "o": [
+          [
+            "columns",
+            "Stages side by side"
+          ],
+          [
+            "focus",
+            "One stage in focus"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "current",
+        "l": "Stage in focus",
+        "t": "select",
+        "o": [
+          [
+            "1",
+            "Stage 1"
+          ],
+          [
+            "2",
+            "Stage 2"
+          ],
+          [
+            "3",
+            "Stage 3"
+          ],
+          [
+            "4",
+            "Stage 4"
+          ]
+        ]
+      },
+      {
+        "k": "items",
+        "l": "Stages",
+        "t": "list",
+        "min": 2,
+        "max": 4,
+        "f": [
+          {
+            "k": "label",
+            "l": "Short name (on the progress line)"
+          },
+          {
+            "k": "title",
+            "l": "Stage title"
+          },
+          {
+            "k": "points",
+            "l": "Checklist (one per line)",
+            "t": "textarea"
+          },
+          {
+            "k": "photo",
+            "l": "Photo",
+            "t": "image"
+          },
+          {
+            "k": "tone",
+            "l": "Colour",
+            "t": "select"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "variant": "columns",
+      "current": "1",
+      "eyebrow": "Translation process",
+      "title": "Three stages, end to end",
+      "items": [
+        {
+          "label": "Pre-flight",
+          "title": "Project analysis & pre-flight",
+          "points": "Timeline construction\nTranslation memory analysis\nGlossary & style guide creation",
+          "photo": null,
+          "tone": "teal"
+        },
+        {
+          "label": "Production",
+          "title": "Production",
+          "points": "Translations & review\nFormatting & layout\nPost-localization testing",
+          "photo": null,
+          "tone": "blue"
+        },
+        {
+          "label": "Post-production",
+          "title": "Post-production",
+          "points": "Client feedback\nQuality assurance assessment",
+          "photo": null,
+          "tone": "violet"
+        }
+      ]
+    }
+  },
+  "footprint": {
+    "name": "Global footprint",
+    "group": "Corporate",
+    "vk": "variant",
+    "desc": "Dotted world map with a big city count, the support pill and a city list, or a regional split.",
+    "fields": [
+      {
+        "k": "variant",
+        "l": "Style",
+        "t": "select",
+        "o": [
+          [
+            "list",
+            "Map with city list"
+          ],
+          [
+            "split",
+            "Map with regional split"
+          ]
+        ]
+      },
+      {
+        "k": "region",
+        "l": "Map focus",
+        "t": "select",
+        "o": [
+          [
+            "world",
+            "World"
+          ],
+          [
+            "na",
+            "North America"
+          ],
+          [
+            "latam",
+            "Latin America"
+          ],
+          [
+            "emea",
+            "Europe, Middle East & Africa"
+          ],
+          [
+            "apac",
+            "Asia-Pacific"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "value",
+        "l": "Figure"
+      },
+      {
+        "k": "unit",
+        "l": "Figure label"
+      },
+      {
+        "k": "pill",
+        "l": "Pill"
+      },
+      {
+        "k": "cities",
+        "l": "Cities (one per line or comma separated)",
+        "t": "textarea"
+      },
+      {
+        "k": "split",
+        "l": "Regions",
+        "t": "list",
+        "min": 2,
+        "max": 4,
+        "f": [
+          {
+            "k": "value",
+            "l": "Figure"
+          },
+          {
+            "k": "label",
+            "l": "Region"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "variant": "list",
+      "region": "world",
+      "eyebrow": "Global footprint",
+      "title": "Local teams, everywhere you sell",
+      "value": "150+",
+      "unit": "cities",
+      "pill": "24/7/365 local support",
+      "cities": "New York, London, Barcelona, Berlin, Dubai, Mumbai, Singapore, Shanghai, Seoul, Tokyo, Sydney, São Paulo, Mexico City, Toronto, Chicago, Boston",
+      "split": [
+        {
+          "value": "60",
+          "label": "Americas"
+        },
+        {
+          "value": "74",
+          "label": "Europe, Middle East & Africa"
+        },
+        {
+          "value": "22",
+          "label": "Asia Pacific"
+        }
+      ]
+    }
+  },
+  "bigMetric": {
+    "name": "Big metric",
+    "group": "Corporate",
+    "desc": "One headline figure with a before/after bar and a list of what drives it. From “−60% turnaround time”.",
+    "fields": [
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "value",
+        "l": "Figure"
+      },
+      {
+        "k": "caption",
+        "l": "What the figure means"
+      },
+      {
+        "k": "before",
+        "l": "Before (bar label)"
+      },
+      {
+        "k": "after",
+        "l": "After (bar label)"
+      },
+      {
+        "k": "ratio",
+        "l": "After as a share of before",
+        "t": "range",
+        "min": 10,
+        "max": 100,
+        "step": 5,
+        "unit": "%"
+      },
+      {
+        "k": "chips",
+        "l": "Outcomes (comma separated)"
+      },
+      {
+        "k": "items",
+        "l": "What drives it",
+        "t": "list",
+        "min": 2,
+        "max": 5,
+        "f": [
+          {
+            "k": "icon",
+            "l": "Icon",
+            "t": "icon"
+          },
+          {
+            "k": "title",
+            "l": "Title"
+          },
+          {
+            "k": "text",
+            "l": "Text"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "eyebrow": "GlobalLink AI",
+      "title": "The World’s Only Global Performance Platform™",
+      "value": "−60%",
+      "caption": "turnaround time with GlobalLink AI",
+      "before": "Standard workflow",
+      "after": "With GlobalLink AI",
+      "ratio": 40,
+      "chips": "Budgets optimized, Content generated, Faster delivery",
+      "items": [
+        {
+          "icon": "sparkles",
+          "title": "AI tools",
+          "text": "Optimize budgets, generate content, cut turnaround by 60%"
+        },
+        {
+          "icon": "lock",
+          "title": "Secure files",
+          "text": "Secure file sharing and storage"
+        },
+        {
+          "icon": "refresh-cw",
+          "title": "Automation",
+          "text": "Automated translation for web, apps and more"
+        },
+        {
+          "icon": "users",
+          "title": "Personalization",
+          "text": "Personalized content at scale, online and at events"
+        }
+      ]
+    }
+  },
+  "pillars": {
+    "name": "Photo pillars",
+    "group": "Corporate",
+    "desc": "Three tall photo cards washed in teal, blue and violet, each with a title, line and points. From “The power of AI”.",
+    "fields": [
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "items",
+        "l": "Pillars",
+        "t": "list",
+        "min": 2,
+        "max": 4,
+        "f": [
+          {
+            "k": "title",
+            "l": "Title"
+          },
+          {
+            "k": "text",
+            "l": "Line"
+          },
+          {
+            "k": "points",
+            "l": "Points (one per line)",
+            "t": "textarea"
+          },
+          {
+            "k": "photo",
+            "l": "Photo",
+            "t": "image"
+          },
+          {
+            "k": "tone",
+            "l": "Colour",
+            "t": "select"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "eyebrow": "AI at TransPerfect",
+      "title": "TransPerfect brings you the power of AI",
+      "items": [
+        {
+          "title": "Technology",
+          "text": "In-house R&D team gives you the power to personalize & scale",
+          "points": "Proprietary neural machine translation\nThird-party models & LLMs\nData security and privacy",
+          "photo": null,
+          "tone": "teal"
+        },
+        {
+          "title": "Services",
+          "text": "Client-powered feedback loop: we listen to what you want",
+          "points": "Human post-editing\nSpecialized AI consulting\nContent matrix development",
+          "photo": null,
+          "tone": "blue"
+        },
+        {
+          "title": "Products",
+          "text": "Performance reporting & ongoing improvement",
+          "points": "Standalone portal\nAI-powered workflows\nPlug-ins, APIs and integrations",
+          "photo": null,
+          "tone": "violet"
+        }
+      ]
+    }
+  },
+  "hub": {
+    "name": "Hub and spoke",
+    "group": "Corporate",
+    "desc": "GlobalLink at the centre, with two lists of options feeding in. From the AI marketplace.",
+    "fields": [
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "intro",
+        "l": "Intro sentence",
+        "t": "textarea"
+      },
+      {
+        "k": "leftTitle",
+        "l": "Left list title"
+      },
+      {
+        "k": "left",
+        "l": "Left list (one per line)",
+        "t": "textarea"
+      },
+      {
+        "k": "rightTitle",
+        "l": "Right list title"
+      },
+      {
+        "k": "right",
+        "l": "Right list (one per line)",
+        "t": "textarea"
+      }
+    ],
+    "def": {
+      "eyebrow": "GlobalLink AI marketplace",
+      "title": "The tool that’s best for you",
+      "intro": "TransPerfect’s AI marketplace gives you the flexibility to use the tool that’s best for you.",
+      "leftTitle": "Neural MT",
+      "left": "TransPerfect\nMicrosoft\nDeepL\nAmazon",
+      "rightTitle": "LLMs",
+      "right": "OpenAI (GPT)\nAnthropic (Claude)\nGoogle (Gemini)\nBring your own"
+    }
+  },
+  "pipeline": {
+    "name": "Pipeline",
+    "group": "Corporate",
+    "desc": "Numbered steps on a line, grouped under two brackets, ending on a highlighted result. From “AI + human-in-the-loop”.",
+    "fields": [
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "intro",
+        "l": "Intro sentence",
+        "t": "textarea"
+      },
+      {
+        "k": "groupA",
+        "l": "First bracket label"
+      },
+      {
+        "k": "splitAt",
+        "l": "Steps under the first bracket",
+        "t": "select",
+        "o": [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "2",
+            "2"
+          ],
+          [
+            "3",
+            "3"
+          ],
+          [
+            "4",
+            "4"
+          ]
+        ]
+      },
+      {
+        "k": "groupB",
+        "l": "Second bracket label"
+      },
+      {
+        "k": "items",
+        "l": "Steps (the last one is the result)",
+        "t": "list",
+        "min": 3,
+        "max": 6,
+        "f": [
+          {
+            "k": "icon",
+            "l": "Icon",
+            "t": "icon"
+          },
+          {
+            "k": "label",
+            "l": "Step"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "eyebrow": "How we work",
+      "title": "AI + human-in-the-loop",
+      "intro": "The speed and efficiency of AI combined with the precision and excellence of human intelligence.",
+      "groupA": "AI speed",
+      "splitAt": "2",
+      "groupB": "Human precision",
+      "items": [
+        {
+          "icon": "database",
+          "label": "Leverage TM"
+        },
+        {
+          "icon": "sparkles",
+          "label": "AI empty segments"
+        },
+        {
+          "icon": "pen-line",
+          "label": "Human post-editing"
+        },
+        {
+          "icon": "file-check",
+          "label": "Human proofreading"
+        },
+        {
+          "icon": "send",
+          "label": "Client delivery"
+        }
+      ]
+    }
+  },
+  "logoWall": {
+    "name": "Logo wall",
+    "group": "Corporate",
+    "vk": "cols",
+    "desc": "Client or partner logos on white tiles. Upload each logo (with permission to use it).",
+    "fields": [
+      {
+        "k": "cols",
+        "l": "Columns",
+        "t": "select",
+        "o": [
+          [
+            "4",
+            "4"
+          ],
+          [
+            "5",
+            "5"
+          ],
+          [
+            "6",
+            "6"
+          ]
+        ]
+      },
+      {
+        "k": "tone",
+        "l": "Logo colour",
+        "t": "select",
+        "o": [
+          [
+            "color",
+            "Original colours"
+          ],
+          [
+            "grey",
+            "Greyscale"
+          ],
+          [
+            "white",
+            "White on navy"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "logos",
+        "l": "Logos",
+        "t": "list",
+        "min": 1,
+        "max": 24,
+        "f": [
+          {
+            "k": "name",
+            "l": "Name (alt text)"
+          },
+          {
+            "k": "photo",
+            "l": "Logo",
+            "t": "image",
+            "lib": true
+          }
+        ]
+      }
+    ],
+    "def": {
+      "cols": "5",
+      "tone": "color",
+      "eyebrow": "Our clients",
+      "title": "The world runs on TransPerfect"
+    }
+  },
+  "dataChart": {
+    "name": "Data chart",
+    "group": "Proof",
+    "vk": "kind",
+    "desc": "A bar, line or donut chart drawn from numbers you type, in brand colours. Vector in Illustrator; a crisp picture in PowerPoint.",
+    "fields": [
+      {
+        "k": "kind",
+        "l": "Chart",
+        "t": "select",
+        "o": [
+          [
+            "bar",
+            "Bars"
+          ],
+          [
+            "line",
+            "Line"
+          ],
+          [
+            "donut",
+            "Donut"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "unit",
+        "l": "Unit after each number (e.g. %, K, days)",
+        "opt": true
+      },
+      {
+        "k": "note",
+        "l": "Source or note under the chart",
+        "opt": true
+      },
+      {
+        "k": "items",
+        "l": "Values",
+        "t": "list",
+        "min": 2,
+        "max": 8,
+        "f": [
+          {
+            "k": "label",
+            "l": "Label"
+          },
+          {
+            "k": "value",
+            "l": "Number"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "kind": "bar",
+      "eyebrow": "Time to market",
+      "title": "Weeks from content freeze to launch",
+      "unit": " wks",
+      "note": "Fictional launch data for the example project.",
+      "items": [
+        {
+          "label": "2023",
+          "value": "14"
+        },
+        {
+          "label": "2024",
+          "value": "11"
+        },
+        {
+          "label": "2025",
+          "value": "8"
+        },
+        {
+          "label": "2026",
+          "value": "6"
+        }
+      ]
+    }
+  },
+  "comparison": {
+    "name": "Comparison table",
+    "group": "Proof",
+    "desc": "Before / after, or us / typical: three to six rows of figures, ticks or short text, the second column highlighted.",
+    "fields": [
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "rowLabel",
+        "l": "First column heading",
+        "opt": true
+      },
+      {
+        "k": "colA",
+        "l": "Second column heading (before / typical)"
+      },
+      {
+        "k": "colB",
+        "l": "Third column heading (highlighted)"
+      },
+      {
+        "k": "rows",
+        "l": "Rows",
+        "t": "list",
+        "min": 2,
+        "max": 7,
+        "f": [
+          {
+            "k": "label",
+            "l": "Row"
+          },
+          {
+            "k": "a",
+            "l": "Second column"
+          },
+          {
+            "k": "b",
+            "l": "Third column"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "eyebrow": "Before and after",
+      "title": "What changed for the launch team",
+      "rowLabel": "",
+      "colA": "Before",
+      "colB": "With GlobalLink",
+      "rows": [
+        {
+          "label": "Markets live on day one",
+          "a": "3",
+          "b": "14"
+        },
+        {
+          "label": "Weeks from freeze to launch",
+          "a": "12",
+          "b": "6"
+        },
+        {
+          "label": "Cost per translated word",
+          "a": "Baseline",
+          "b": "31% lower"
+        },
+        {
+          "label": "Product names reworked",
+          "a": "Dozens",
+          "b": "0"
+        },
+        {
+          "label": "One glossary for every market",
+          "a": "✗",
+          "b": "✓"
+        }
+      ]
+    }
+  },
+  "timeline": {
+    "name": "Timeline",
+    "group": "Story",
+    "vk": "direction",
+    "desc": "Dated milestones along a line: engagement histories, roll-out plans, what happens when.",
+    "fields": [
+      {
+        "k": "direction",
+        "l": "Direction",
+        "t": "select",
+        "o": [
+          [
+            "across",
+            "Across the page"
+          ],
+          [
+            "down",
+            "Down the page"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "items",
+        "l": "Milestones",
+        "t": "list",
+        "min": 2,
+        "max": 6,
+        "f": [
+          {
+            "k": "when",
+            "l": "Date or stage"
+          },
+          {
+            "k": "heading",
+            "l": "Heading"
+          },
+          {
+            "k": "text",
+            "l": "Line",
+            "t": "textarea"
+          },
+          {
+            "k": "icon",
+            "l": "Icon",
+            "t": "icon"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "direction": "across",
+      "eyebrow": "How the launch ran",
+      "title": "Twelve weeks, every market",
+      "items": [
+        {
+          "when": "Week 1",
+          "heading": "Connect",
+          "text": "CMS and commerce platform linked; glossary agreed.",
+          "icon": "webhook"
+        },
+        {
+          "when": "Week 3",
+          "heading": "Translate",
+          "text": "4,800 pages through memory, AI and linguists.",
+          "icon": "languages"
+        },
+        {
+          "when": "Week 8",
+          "heading": "Review",
+          "text": "38 in-market reviewers approve in one tool.",
+          "icon": "user-check"
+        },
+        {
+          "when": "Week 12",
+          "heading": "Launch",
+          "text": "14 markets live the same morning.",
+          "icon": "rocket"
+        }
+      ]
+    }
+  },
+  "testimonials": {
+    "name": "Testimonial wall",
+    "group": "Voice",
+    "desc": "Three short quotes side by side, each with a name, role and, if you have it, a logo.",
+    "fields": [
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "items",
+        "l": "Quotes",
+        "t": "list",
+        "min": 2,
+        "max": 3,
+        "f": [
+          {
+            "k": "quote",
+            "l": "Quote",
+            "t": "textarea"
+          },
+          {
+            "k": "name",
+            "l": "Name"
+          },
+          {
+            "k": "role",
+            "l": "Role and company"
+          },
+          {
+            "k": "logo",
+            "l": "Logo",
+            "t": "image",
+            "lib": true,
+            "opt": true
+          }
+        ]
+      }
+    ],
+    "def": {
+      "eyebrow": "What clients say",
+      "title": "Three teams, one launch day",
+      "items": [
+        {
+          "quote": "Every region went live the same morning, with the same product names and the same sizing.",
+          "name": "Jordan Ellery",
+          "role": "VP Digital Commerce, Fernwood & Vale (fictional)"
+        },
+        {
+          "quote": "The glossary did the arguing for us. Our reviewers stopped debating names and started selling.",
+          "name": "Priya Nandakumar",
+          "role": "Localization Lead, Fernwood & Vale (fictional)"
+        },
+        {
+          "quote": "We saw the first market live in nine days. That used to take a quarter.",
+          "name": "Marco Alvarez",
+          "role": "Head of Growth, Fernwood & Vale (fictional)"
+        }
+      ]
+    }
+  },
+  "team": {
+    "name": "Team trio",
+    "group": "Voice",
+    "desc": "Three portraits with role lines, for the people behind a programme.",
+    "fields": [
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "items",
+        "l": "People",
+        "t": "list",
+        "min": 2,
+        "max": 4,
+        "f": [
+          {
+            "k": "name",
+            "l": "Name"
+          },
+          {
+            "k": "role",
+            "l": "Role"
+          },
+          {
+            "k": "line",
+            "l": "One line about them",
+            "t": "textarea"
+          },
+          {
+            "k": "photo",
+            "l": "Portrait",
+            "t": "image",
+            "opt": true
+          }
+        ]
+      }
+    ],
+    "def": {
+      "eyebrow": "Your team",
+      "title": "The people who run your programme",
+      "items": [
+        {
+          "name": "Dana Reyes",
+          "role": "Program Manager",
+          "line": "Owns the schedule and reports progress every Friday."
+        },
+        {
+          "name": "Yuki Tanaka",
+          "role": "Lead Linguist, Japanese",
+          "line": "Trained on outdoor and fit terminology."
+        },
+        {
+          "name": "Sam Whitfield",
+          "role": "Solutions Architect",
+          "line": "Connects your CMS and commerce platform."
+        }
+      ]
+    }
+  },
+  "tiers": {
+    "name": "Package tiers",
+    "group": "Corporate",
+    "desc": "Two or three columns of what each tier includes, one marked as the one to pick.",
+    "fields": [
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "featured",
+        "l": "Highlighted tier (1, 2 or 3)",
+        "t": "select",
+        "o": [
+          [
+            "0",
+            "None"
+          ],
+          [
+            "1",
+            "First"
+          ],
+          [
+            "2",
+            "Second"
+          ],
+          [
+            "3",
+            "Third"
+          ]
+        ]
+      },
+      {
+        "k": "items",
+        "l": "Tiers",
+        "t": "list",
+        "min": 2,
+        "max": 3,
+        "f": [
+          {
+            "k": "name",
+            "l": "Tier name"
+          },
+          {
+            "k": "line",
+            "l": "One line under the name"
+          },
+          {
+            "k": "features",
+            "l": "What it includes (one per line)",
+            "t": "textarea"
+          },
+          {
+            "k": "cta",
+            "l": "Button",
+            "opt": true
+          }
+        ]
+      }
+    ],
+    "def": {
+      "eyebrow": "Programmes",
+      "title": "Pick the level of support",
+      "featured": "2",
+      "items": [
+        {
+          "name": "Connect",
+          "line": "For one platform and a few markets",
+          "features": "CMS connector\nTranslation memory\nQuarterly review",
+          "cta": "Talk to us"
+        },
+        {
+          "name": "Scale",
+          "line": "For a launch across many markets",
+          "features": "Everything in Connect\nAI first drafts with linguist edit\nIn-market reviewers in one tool\nWeekly reporting",
+          "cta": "Book a demo"
+        },
+        {
+          "name": "Enterprise",
+          "line": "For the whole content operation",
+          "features": "Everything in Scale\nNamed program manager\nCustom workflows and SLAs\nSecurity review",
+          "cta": "Talk to us"
+        }
+      ]
+    }
+  },
+  "checklist": {
+    "name": "Checklist",
+    "group": "Story",
+    "vk": "cols",
+    "desc": "A tick-list of what the client gets, or must prepare. One or two columns.",
+    "fields": [
+      {
+        "k": "cols",
+        "l": "Columns",
+        "t": "select",
+        "o": [
+          [
+            "1",
+            "One"
+          ],
+          [
+            "2",
+            "Two"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "items",
+        "l": "Items (one per line)",
+        "t": "textarea"
+      }
+    ],
+    "def": {
+      "cols": "2",
+      "eyebrow": "Before we start",
+      "title": "What we need from your team",
+      "items": "A content owner for each market\nAccess to the CMS staging environment\nThe current glossary, if one exists\nBrand guidelines and tone notes\nLaunch dates by market\nA weekly 30-minute check-in"
+    }
+  },
+  "agenda": {
+    "name": "Agenda",
+    "group": "Corporate",
+    "vk": "layout",
+    "desc": "What the meeting or the page covers, in order. From the guide's Agenda slide.",
+    "fields": [
+      {
+        "k": "layout",
+        "l": "Layout",
+        "t": "select",
+        "o": [
+          [
+            "split",
+            "Title left, rows right"
+          ],
+          [
+            "rows",
+            "Numbered rows"
+          ],
+          [
+            "cards",
+            "Numbered tiles"
+          ],
+          [
+            "line",
+            "Stops on a line"
+          ],
+          [
+            "columns",
+            "Two columns"
+          ],
+          [
+            "splitStat",
+            "Title and a big figure left, rows right"
+          ],
+          [
+            "splitIcons",
+            "Title and icon tiles left, rows right"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "intro",
+        "l": "Line under the title",
+        "t": "textarea",
+        "opt": true
+      },
+      {
+        "k": "stat",
+        "l": "Big figure (for the figure layout)",
+        "opt": true
+      },
+      {
+        "k": "statLabel",
+        "l": "What the figure counts",
+        "opt": true
+      },
+      {
+        "k": "items",
+        "l": "Agenda items",
+        "t": "list",
+        "min": 2,
+        "max": 6,
+        "f": [
+          {
+            "k": "heading",
+            "l": "Item"
+          },
+          {
+            "k": "icon",
+            "l": "Icon (for the icon layout)",
+            "opt": true
+          },
+          {
+            "k": "text",
+            "l": "Line",
+            "t": "textarea"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "layout": "split",
+      "eyebrow": "Agenda",
+      "title": "What we will cover",
+      "intro": "Four parts, about forty minutes, with time for questions at the end.",
+      "items": [
+        {
+          "heading": "Where you are today",
+          "text": "How content moves between your teams and your markets now."
+        },
+        {
+          "heading": "What changes with GlobalLink",
+          "text": "One workflow, one glossary, one view of every market."
+        },
+        {
+          "heading": "A launch, start to finish",
+          "text": "The Fernwood & Vale roll-out in fourteen markets."
+        },
+        {
+          "heading": "Next steps",
+          "text": "A pilot plan, owners and dates."
+        }
+      ]
+    }
+  },
+  "divider": {
+    "name": "Section divider",
+    "group": "Corporate",
+    "vk": "layout",
+    "desc": "A numbered break between the parts of a long material. From the guide's Section divider slide.",
+    "fields": [
+      {
+        "k": "layout",
+        "l": "Layout",
+        "t": "select",
+        "o": [
+          [
+            "left",
+            "Left, with tinted panel"
+          ],
+          [
+            "centered",
+            "Centred"
+          ],
+          [
+            "numeral",
+            "Large numeral"
+          ],
+          [
+            "rule",
+            "Title on a spectrum rule"
+          ],
+          [
+            "band",
+            "Frosted banner"
+          ],
+          [
+            "photo",
+            "Photo, tinted in the section colour"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Section label"
+      },
+      {
+        "k": "num",
+        "l": "Number",
+        "opt": true
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "accent",
+        "l": "Words of the title in the gradient",
+        "opt": true
+      },
+      {
+        "k": "sub",
+        "l": "Line under the title",
+        "t": "textarea",
+        "opt": true
+      }
+    ],
+    "def": {
+      "layout": "left",
+      "eyebrow": "Section 02",
+      "num": "02",
+      "title": "From pilot to every market",
+      "accent": "every market",
+      "sub": "How the first two markets became fourteen, and what the team did differently each time."
+    }
+  },
+  "typeDesign": {
+    "name": "Words as design",
+    "group": "Corporate",
+    "vk": "layout",
+    "desc": "Three giant words in the gradient, with what sits under each. From the guide's Type as design slide; three at most.",
+    "fields": [
+      {
+        "k": "layout",
+        "l": "Layout",
+        "t": "select",
+        "o": [
+          [
+            "rows",
+            "Words left, lists right"
+          ],
+          [
+            "columns",
+            "Three columns"
+          ],
+          [
+            "stacked",
+            "Words in one line"
+          ],
+          [
+            "cards",
+            "Cards"
+          ],
+          [
+            "centered",
+            "Centred"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "items",
+        "l": "Words",
+        "t": "list",
+        "min": 2,
+        "max": 3,
+        "f": [
+          {
+            "k": "label",
+            "l": "Label above the word"
+          },
+          {
+            "k": "heading",
+            "l": "Word"
+          },
+          {
+            "k": "text",
+            "l": "Lines (one per line)",
+            "t": "textarea"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "layout": "rows",
+      "eyebrow": "AI strategy",
+      "title": "Content-driven AI strategy",
+      "items": [
+        {
+          "label": "Human-centric",
+          "heading": "Human",
+          "text": "Brand campaigns\nLegal contracts\nHR communications\nExecutive messaging"
+        },
+        {
+          "label": "Hybrid-friendly",
+          "heading": "Hybrid",
+          "text": "Customer support\nProduct manuals\nKnowledge base\nEmail and notifications"
+        },
+        {
+          "label": "AI-driven",
+          "heading": "AI",
+          "text": "User forums\nSupport chat\nProduct reviews\nInternal documents"
+        }
+      ]
+    }
+  },
+  "news": {
+    "name": "In the news",
+    "group": "Corporate",
+    "vk": "layout",
+    "desc": "Dated headlines from the press and the trade, with a line each. From the guide's In the news slide.",
+    "fields": [
+      {
+        "k": "layout",
+        "l": "Layout",
+        "t": "select",
+        "o": [
+          [
+            "columns",
+            "Cards in a row"
+          ],
+          [
+            "grid",
+            "Two by two"
+          ],
+          [
+            "featured",
+            "One large, three small"
+          ],
+          [
+            "list",
+            "Headline list"
+          ],
+          [
+            "rail",
+            "Dated rail"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "items",
+        "l": "Stories",
+        "t": "list",
+        "min": 2,
+        "max": 4,
+        "f": [
+          {
+            "k": "label",
+            "l": "Outlet"
+          },
+          {
+            "k": "when",
+            "l": "Date"
+          },
+          {
+            "k": "heading",
+            "l": "Headline"
+          },
+          {
+            "k": "text",
+            "l": "Line",
+            "t": "textarea"
+          },
+          {
+            "k": "logo",
+            "l": "Client logo",
+            "t": "image",
+            "lib": true,
+            "opt": true
+          }
+        ]
+      }
+    ],
+    "def": {
+      "layout": "columns",
+      "eyebrow": "In the news",
+      "title": "What the trade is saying",
+      "items": [
+        {
+          "label": "Slator",
+          "when": "Oct 2026",
+          "heading": "AI-first workflows reach the mainstream",
+          "text": "Language service buyers move human review to the end of the line."
+        },
+        {
+          "label": "CSA Research",
+          "when": "Sep 2026",
+          "heading": "Glossaries drive quality more than models",
+          "text": "Brand terms matter more than which engine translates them."
+        },
+        {
+          "label": "Multilingual",
+          "when": "Aug 2026",
+          "heading": "One platform, fourteen markets",
+          "text": "A retailer's launch moves from a quarter to nine days."
+        },
+        {
+          "label": "Fernwood Review",
+          "when": "Jul 2026",
+          "heading": "Launch day, same morning",
+          "text": "Regional teams go live together for the first time."
+        }
+      ]
+    }
+  },
+  "cover": {
+    "name": "Title page",
+    "group": "Corporate",
+    "vk": "layout",
+    "desc": "The first sheet of a whitepaper or report: a photo cover, a split cover, a side-photo cover or a type-only cover.",
+    "fields": [
+      {
+        "k": "layout",
+        "l": "Layout",
+        "t": "select",
+        "o": [
+          [
+            "photo",
+            "Full photo, tinted"
+          ],
+          [
+            "split",
+            "Photo over a white panel"
+          ],
+          [
+            "side",
+            "Photo on the right"
+          ],
+          [
+            "aura",
+            "Type on the Spectrum aura"
+          ],
+          [
+            "bar",
+            "Photo with a bottom title bar"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "accent",
+        "l": "Words of the title in the gradient",
+        "opt": true
+      },
+      {
+        "k": "sub",
+        "l": "Line under the title",
+        "t": "textarea",
+        "opt": true
+      },
+      {
+        "k": "meta",
+        "l": "Details (one per line)",
+        "t": "textarea",
+        "opt": true
+      },
+      {
+        "k": "photo",
+        "l": "Photo",
+        "t": "image",
+        "opt": true
+      }
+    ],
+    "def": {
+      "layout": "photo",
+      "eyebrow": "Whitepaper",
+      "title": "The title of your whitepaper goes here",
+      "accent": "your whitepaper",
+      "sub": "A line that says what the reader will take away.",
+      "meta": "TransPerfect\nMonth 2026",
+      "photo": null
+    }
+  },
+  "kpiTrend": {
+    "name": "KPI trends",
+    "group": "Proof",
+    "vk": "layout",
+    "desc": "Two to four figures, each with a sparkline and a change chip. Type the trend as numbers separated by commas.",
+    "fields": [
+      {
+        "k": "layout",
+        "l": "Layout",
+        "t": "select",
+        "o": [
+          [
+            "tiles",
+            "Tiles with sparklines"
+          ],
+          [
+            "strip",
+            "One strip"
+          ],
+          [
+            "rail",
+            "Rows"
+          ],
+          [
+            "bars",
+            "Mini columns"
+          ],
+          [
+            "hero",
+            "One large, rest beside"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "note",
+        "l": "Source or note",
+        "opt": true
+      },
+      {
+        "k": "items",
+        "l": "Figures",
+        "t": "list",
+        "min": 2,
+        "max": 4,
+        "f": [
+          {
+            "k": "label",
+            "l": "Label"
+          },
+          {
+            "k": "value",
+            "l": "Figure"
+          },
+          {
+            "k": "delta",
+            "l": "Change (e.g. +12%, −3 days)"
+          },
+          {
+            "k": "series",
+            "l": "Trend (numbers, commas)"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "layout": "tiles",
+      "eyebrow": "Programme health",
+      "title": "Twelve months on GlobalLink",
+      "note": "Fictional figures for the example project.",
+      "items": [
+        {
+          "label": "Markets live",
+          "value": "14",
+          "delta": "+11",
+          "series": "3,3,4,5,7,8,9,11,12,13,14,14"
+        },
+        {
+          "label": "Weeks to launch",
+          "value": "6",
+          "delta": "−8 wks",
+          "series": "14,13,12,11,10,9,9,8,7,7,6,6"
+        },
+        {
+          "label": "Cost per word",
+          "value": "−31%",
+          "delta": "−31%",
+          "series": "100,98,95,90,86,82,79,75,73,71,70,69"
+        },
+        {
+          "label": "Reuse from memory",
+          "value": "68%",
+          "delta": "+22 pts",
+          "series": "46,48,50,53,55,58,60,62,64,66,67,68"
+        }
+      ]
+    }
+  },
+  "funnel": {
+    "name": "Funnel and waterfall",
+    "group": "Proof",
+    "vk": "layout",
+    "desc": "How a number narrows stage by stage. The waterfall shows what each stage gained or lost against the one before. Type each stage's number, largest first.",
+    "fields": [
+      {
+        "k": "layout",
+        "l": "Layout",
+        "t": "select",
+        "o": [
+          [
+            "taper",
+            "Centred funnel"
+          ],
+          [
+            "bars",
+            "Bars with step rates"
+          ],
+          [
+            "columns",
+            "Columns"
+          ],
+          [
+            "steps",
+            "Chevron steps"
+          ],
+          [
+            "waterfall",
+            "Waterfall"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "unit",
+        "l": "Unit after each number",
+        "opt": true
+      },
+      {
+        "k": "totalLabel",
+        "l": "Waterfall: label for the final bar",
+        "opt": true
+      },
+      {
+        "k": "note",
+        "l": "Source or note",
+        "opt": true
+      },
+      {
+        "k": "items",
+        "l": "Stages",
+        "t": "list",
+        "min": 3,
+        "max": 6,
+        "f": [
+          {
+            "k": "label",
+            "l": "Stage"
+          },
+          {
+            "k": "value",
+            "l": "Number"
+          },
+          {
+            "k": "text",
+            "l": "Line (optional)",
+            "t": "textarea",
+            "opt": true
+          }
+        ]
+      }
+    ],
+    "def": {
+      "layout": "taper",
+      "eyebrow": "Content pipeline",
+      "title": "From request to published, in the first quarter",
+      "unit": "",
+      "totalLabel": "Remaining",
+      "note": "Fictional figures for the example project.",
+      "items": [
+        {
+          "label": "Requests received",
+          "value": "1,200",
+          "text": ""
+        },
+        {
+          "label": "Briefed and scoped",
+          "value": "940",
+          "text": ""
+        },
+        {
+          "label": "Translated and reviewed",
+          "value": "870",
+          "text": ""
+        },
+        {
+          "label": "Signed off by market",
+          "value": "780",
+          "text": ""
+        },
+        {
+          "label": "Published",
+          "value": "742",
+          "text": ""
+        }
+      ]
+    }
+  },
+  "heatmap": {
+    "name": "Heatmap",
+    "group": "Proof",
+    "vk": "layout",
+    "desc": "A grid of values shaded by size: markets by quarter, topics by region. Type column labels, then each row's numbers, separated by commas.",
+    "fields": [
+      {
+        "k": "layout",
+        "l": "Layout",
+        "t": "select",
+        "o": [
+          [
+            "numbers",
+            "Shaded numbers"
+          ],
+          [
+            "grid",
+            "Colour grid"
+          ],
+          [
+            "dots",
+            "Dots"
+          ],
+          [
+            "bands",
+            "Joined bands"
+          ],
+          [
+            "strip",
+            "Calendar strip"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "cols",
+        "l": "Column labels (commas)",
+        "t": "textarea"
+      },
+      {
+        "k": "lo",
+        "l": "Legend: low end",
+        "opt": true
+      },
+      {
+        "k": "hi",
+        "l": "Legend: high end",
+        "opt": true
+      },
+      {
+        "k": "note",
+        "l": "Source or note",
+        "opt": true
+      },
+      {
+        "k": "rows",
+        "l": "Rows",
+        "t": "list",
+        "min": 2,
+        "max": 7,
+        "f": [
+          {
+            "k": "label",
+            "l": "Row"
+          },
+          {
+            "k": "values",
+            "l": "Numbers (commas)"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "layout": "numbers",
+      "eyebrow": "Volume by market",
+      "title": "Where the words go, quarter by quarter",
+      "cols": "Q1, Q2, Q3, Q4, Q1, Q2",
+      "lo": "Fewer words",
+      "hi": "More words",
+      "note": "Millions of words. Fictional figures for the example project.",
+      "rows": [
+        {
+          "label": "Germany",
+          "values": "1.2, 1.6, 2.1, 2.8, 3.1, 3.6"
+        },
+        {
+          "label": "France",
+          "values": "0.9, 1.1, 1.8, 2.2, 2.6, 2.9"
+        },
+        {
+          "label": "Japan",
+          "values": "0.4, 0.8, 1.4, 2.0, 2.7, 3.4"
+        },
+        {
+          "label": "Brazil",
+          "values": "0.2, 0.3, 0.7, 1.1, 1.6, 2.2"
+        },
+        {
+          "label": "Poland",
+          "values": "0.1, 0.2, 0.4, 0.6, 0.9, 1.3"
+        }
+      ]
+    }
+  },
+  "bullet": {
+    "name": "Target bars",
+    "group": "Proof",
+    "vk": "layout",
+    "desc": "Actual against target for two to five measures, in five drawings. Type the actual and the target as plain numbers.",
+    "fields": [
+      {
+        "k": "layout",
+        "l": "Layout",
+        "t": "select",
+        "o": [
+          [
+            "bullet",
+            "Bullet bars"
+          ],
+          [
+            "rings",
+            "Rings"
+          ],
+          [
+            "dumbbell",
+            "Start and end"
+          ],
+          [
+            "progress",
+            "Progress bars"
+          ],
+          [
+            "table",
+            "Table with status"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "unit",
+        "l": "Unit after each number",
+        "opt": true
+      },
+      {
+        "k": "note",
+        "l": "Source or note",
+        "opt": true
+      },
+      {
+        "k": "items",
+        "l": "Measures",
+        "t": "list",
+        "min": 2,
+        "max": 5,
+        "f": [
+          {
+            "k": "label",
+            "l": "Measure"
+          },
+          {
+            "k": "value",
+            "l": "Actual"
+          },
+          {
+            "k": "target",
+            "l": "Target"
+          },
+          {
+            "k": "text",
+            "l": "Line (optional)",
+            "t": "textarea",
+            "opt": true
+          }
+        ]
+      }
+    ],
+    "def": {
+      "layout": "bullet",
+      "eyebrow": "Year one scorecard",
+      "title": "Where the programme stands against plan",
+      "unit": "",
+      "note": "Fictional figures for the example project.",
+      "items": [
+        {
+          "label": "Markets live",
+          "value": "14",
+          "target": "12",
+          "text": "Two markets ahead of plan."
+        },
+        {
+          "label": "Content on one platform (%)",
+          "value": "82",
+          "target": "90",
+          "text": "Legal and HR still to move."
+        },
+        {
+          "label": "Memory reuse (%)",
+          "value": "68",
+          "target": "60",
+          "text": ""
+        },
+        {
+          "label": "Weeks to launch",
+          "value": "6",
+          "target": "6",
+          "text": ""
+        }
+      ]
+    }
+  },
+  "seriesChart": {
+    "name": "Multi-series chart",
+    "group": "Proof",
+    "vk": "layout",
+    "desc": "Two to four series on one chart, with a legend and an optional callout. Type labels once, then each series' numbers, separated by commas.",
+    "fields": [
+      {
+        "k": "layout",
+        "l": "Layout",
+        "t": "select",
+        "o": [
+          [
+            "lines",
+            "Lines"
+          ],
+          [
+            "grouped",
+            "Grouped columns"
+          ],
+          [
+            "stacked",
+            "Stacked columns"
+          ],
+          [
+            "area",
+            "Areas"
+          ],
+          [
+            "callout",
+            "Lines with a callout"
+          ]
+        ]
+      },
+      {
+        "k": "eyebrow",
+        "l": "Label above the title"
+      },
+      {
+        "k": "title",
+        "l": "Title"
+      },
+      {
+        "k": "cats",
+        "l": "Labels along the bottom (commas)",
+        "t": "textarea"
+      },
+      {
+        "k": "calloutHead",
+        "l": "Callout: heading",
+        "opt": true
+      },
+      {
+        "k": "calloutText",
+        "l": "Callout: text",
+        "t": "textarea",
+        "opt": true
+      },
+      {
+        "k": "note",
+        "l": "Source or note",
+        "opt": true
+      },
+      {
+        "k": "series",
+        "l": "Series",
+        "t": "list",
+        "min": 2,
+        "max": 4,
+        "f": [
+          {
+            "k": "name",
+            "l": "Name"
+          },
+          {
+            "k": "values",
+            "l": "Numbers (commas)"
+          }
+        ]
+      }
+    ],
+    "def": {
+      "layout": "lines",
+      "eyebrow": "Words by workflow",
+      "title": "Machine translation took the lead in year two",
+      "cats": "2022, 2023, 2024, 2025, 2026",
+      "calloutHead": "Human review stayed flat",
+      "calloutText": "Volume grew fourfold while the reviewed share held at about a fifth, so quality scores rose with it.",
+      "note": "Millions of words. Fictional figures for the example project.",
+      "series": [
+        {
+          "name": "Machine, then review",
+          "values": "2, 5, 11, 19, 27"
+        },
+        {
+          "name": "Human only",
+          "values": "6, 6, 7, 7, 8"
+        },
+        {
+          "name": "Machine only",
+          "values": "1, 2, 4, 8, 14"
+        }
+      ]
+    }
+  },
+  "pagebreak": {
+    "name": "Page break",
+    "group": "Compose",
+    "desc": "Starts a new page in print sizes. Social and ad sizes ignore it.",
+    "fields": [],
+    "def": {},
+    "render": ""
+  }
+}

@@ -13,6 +13,7 @@ import { ArrowLeft, LayoutTemplate, Ruler, Sparkles, Wand2 } from "lucide-react"
 
 import { AppShell } from "@/components/AppShell";
 import { BuildWorkspaceHeader } from "@/components/editor/BuildWorkspaceHeader";
+import { SourceModuleLibrary } from "@/components/editor/SourceModuleLibrary";
 import { SocialModuleFrame } from "@/components/campaigns/SocialModuleFrame";
 import { SocialModulePicker } from "@/components/campaigns/SocialModulePicker";
 import { BRAND_MODES } from "@/lib/taxonomy";
@@ -176,6 +177,8 @@ function SocialModuleStudio() {
             <ArrowLeft size={14} /> Back to social
           </Link>
         } />
+
+        <SourceModuleLibrary format="square" />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           {/* Stage */}

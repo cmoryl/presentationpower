@@ -16,6 +16,8 @@ import { useServerFn } from "@tanstack/react-start";
 
 import { AppShell } from "@/components/AppShell";
 import { BuildWorkspaceNav } from "@/components/editor/BuildWorkspaceNav";
+import { SourceBuildEditor } from "@/components/editor/SourceBuildEditor";
+import { workingLayout, sourceLayoutPatch } from "@/lib/element-update/registry";
 import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
@@ -1165,6 +1167,25 @@ function AssetEditor() {
 
   const densityPad = density === "compact" ? "p-8" : density === "airy" ? "p-16" : "p-12";
   const densityGap = density === "compact" ? "gap-4" : density === "airy" ? "gap-10" : "gap-6";
+
+  const sourceBuild = workingLayout(rawContent);
+  if (sourceBuild) return <AppShell>
+    <BuildWorkspaceNav active="print" className="mb-4" />
+    <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+      <div><Link to="/library/print" className="text-sm text-muted-foreground">Print library</Link><h1 className="mt-2 text-2xl font-semibold text-foreground">{row.title}</h1></div>
+    </div>
+    <SourceBuildEditor layout={sourceBuild} title={row.title} saving={saving} dirty={dirty}
+      onChange={next => patchContent(sourceLayoutPatch(rawContent, next) as Partial<CaseStudyContent>)}
+      onSave={async () => {
+        const current = rowRef.current;
+        if (!current) throw new Error("This material is unavailable.");
+        setSaving(true);
+        try {
+          const updated = await save({ data: { assetId: current.id, title: current.title, content: current.content as unknown as Record<string, unknown>, context: current.context as unknown as Record<string, unknown> } });
+          if (rowRef.current === current) { setRow(updated); setDirty(false); }
+        } finally { setSaving(false); }
+      }} />
+  </AppShell>;
 
   return (
     <AppShell>

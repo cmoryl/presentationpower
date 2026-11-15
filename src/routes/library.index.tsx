@@ -1,5 +1,6 @@
 import { BRAND } from "@/lib/brand-colors";
 import { BuildWorkspaceHeader } from "@/components/editor/BuildWorkspaceHeader";
+import { SourceModuleLibrary } from "@/components/editor/SourceModuleLibrary";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { BackToTop } from "@/components/BackToTop";
 import { moduleCopy } from "@/lib/module-copy";
@@ -917,6 +918,8 @@ function Library() {
               </div>
             )}
         </BuildWorkspaceHeader>
+
+        <SourceModuleLibrary />
 
         <div className="sticky top-0 z-20 -mx-2 rounded-2xl border border-black/10 bg-white/85 px-3 py-3 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-[#05041A]/80">
           <div className="flex flex-wrap items-center gap-2">

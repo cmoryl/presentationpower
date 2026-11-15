@@ -1,0 +1,3 @@
+# Source build adoption
+- Keep the complete literal Claude module field/default inventory in a browser-safe registry and edit a separate working layout, never the preserved source record — why: source-backed editing must not erase provenance or execute uploaded application code.
+- Route source-backed print assets through the shared source editor and retain legacy editors for existing native/original records until their renderer is explicitly migrated — why: replacement must not corrupt saved work or silently substitute unported layouts.

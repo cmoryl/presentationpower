@@ -1,5 +1,8 @@
 import { createPortal } from "react-dom";
 import { BuildWorkspaceHeader } from "@/components/editor/BuildWorkspaceHeader";
+import { Button } from "@/design-system/element";
+import { ElementUpdateDrafts } from "@/components/print/ElementUpdateDrafts";
+import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
 import { ApprovedPrintFrame } from "@/components/print/ApprovedPrintFrame";
 import { approvePrintDemoContent } from "@/lib/print-library/demo-approve";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -178,6 +181,8 @@ const TEMPLATES: Template[] = [
 // Page
 // ---------------------------------------------------------------------------
 function PrintCenterPage() {
+  const capabilities = useWorkspaceCapabilities();
+  const [templateView, setTemplateView] = useState<"source" | "issued">("source");
   const { brandModes } = useTaxonomy();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
@@ -262,14 +267,18 @@ function PrintCenterPage() {
     <AppShell>
       <BuildWorkspaceHeader active="print" title="Print library"><LibrarySubnav active="/library/print" /></BuildWorkspaceHeader>
 
-      <PrintLibraryBrowser
+      {capabilities.canAuthorSystem && !capabilities.isLoading && <div className="mb-6 flex flex-wrap gap-2" role="tablist" aria-label="Print template collections">
+        <Button role="tab" aria-selected={templateView === "source"} variant={templateView === "source" ? "default" : "outline"} onClick={() => setTemplateView("source")}>Element templates</Button>
+        <Button role="tab" aria-selected={templateView === "issued"} variant={templateView === "issued" ? "default" : "outline"} onClick={() => setTemplateView("issued")}>Issued library</Button>
+      </div>}
+      {capabilities.canAuthorSystem && !capabilities.isLoading && templateView === "source" ? <ElementUpdateDrafts /> : <PrintLibraryBrowser
         brandModes={brandModes}
         divisionId={previewBrandId}
         onDivisionChange={setPreviewBrandId}
         renderPreview={renderPrintPreviewApproved}
         state={browserState}
         onStateChange={patchBrowserState}
-      />
+      />}
 
       {/* Approved shelf */}
       {isAuthed === true && previewBrand ? <ApprovedShelf brand={previewBrand} /> : null}

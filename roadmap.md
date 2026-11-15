@@ -1,5 +1,6 @@
 # Roadmap
 ## Claude full Element update
+- [ ] Walk the complete supplied module inventory and replace the live template editor module by module, preserving event photos, kits, existing saved records and production exports.
 - [x] Established the linked Claude build as the forward reference; updated live module/print/social headers, cross-surface navigation, print/slide editor navigation and horizontal inspector controls.
 - [ ] Complete exact source editor, module-variant and project/material parity; current shared-workspace adoption is a first pass, not the whole Claude build.
 - [x] Inspect the supplied archive safely and record detected capabilities and missing dependencies.

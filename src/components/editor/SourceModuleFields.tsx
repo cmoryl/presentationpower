@@ -1,0 +1,20 @@
+import { forwardRef } from "react";
+import { Plus, Trash2 } from "lucide-react";
+import { Button } from "@/design-system/element";
+import { record, records, string, sourceImage, type ModuleData, type SourceField } from "@/lib/element-update/registry";
+
+export interface SourceModuleFieldsProps { fields: SourceField[]; data: ModuleData; onChange: (data: ModuleData) => void; prefix: string; className?: string }
+export const SourceModuleFields = forwardRef<HTMLDivElement, SourceModuleFieldsProps>(function SourceModuleFieldsImpl({ fields, data, onChange, prefix, className = "" }, ref) {
+  return <div ref={ref} className={`space-y-4 ${className}`}>{fields.map((field, fieldIndex) => {
+    if (field.t === "head") return <h3 key={fieldIndex} className="border-t border-border pt-4 text-xs font-semibold uppercase text-muted-foreground">{field.l}</h3>;
+    const key = field.k; if (!key || key === "logoTone") return null;
+    const id = `${prefix}-${key}`; const value = data[key]; const patch = (next: unknown) => onChange({ ...data, [key]: next });
+    const inputClass = "w-full min-w-0 rounded-sm border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-ring";
+    if (field.t === "list") {
+      const items = records(value);
+      return <fieldset key={key} className="min-w-0 space-y-3"><legend className="mb-2 text-sm font-medium">{field.l}</legend>{items.map((item, index) => <div key={index} className="space-y-3 border-l-2 border-border pl-3"><div className="flex items-center justify-between"><span className="text-xs text-muted-foreground">{index + 1}</span><Button size="icon" variant="ghost" title={`Remove ${field.l} ${index + 1}`} aria-label={`Remove ${field.l} ${index + 1}`} disabled={items.length <= (field.min ?? 0)} onClick={() => patch(items.filter((_, i) => i !== index))}><Trash2 size={14} /></Button></div><SourceModuleFields fields={field.f ?? []} data={item} prefix={`${id}-${index}`} onChange={next => patch(items.map((old, i) => i === index ? next : old))} /></div>)}<Button size="sm" variant="outline" disabled={items.length >= (field.max ?? 100)} onClick={() => patch([...items, {}])}><Plus size={14} />Add {field.l.toLowerCase()}</Button></fieldset>;
+    }
+    if (field.t === "image") return <div key={key} className="space-y-2"><label htmlFor={id} className="text-sm font-medium">{field.l}</label>{sourceImage(value) && <img src={sourceImage(value)} alt={field.l} className="h-24 max-w-full object-contain" />}<input id={id} className={inputClass} type="url" value={string(record(value).url ?? record(value).src)} placeholder="Approved image URL" onChange={e => patch(e.target.value ? { ...record(value), elib: undefined, url: e.target.value } : null)} />{Boolean(record(value).elib) && <p className="break-all text-xs text-muted-foreground">{string(record(value).elib)}</p>}<Button size="sm" variant="ghost" disabled={!value} onClick={() => patch(null)}><Trash2 size={14} />Remove image</Button></div>;
+    return <div key={key} className="space-y-1.5"><label htmlFor={id} className="text-sm font-medium">{field.l}{field.t === "range" ? ` · ${string(value)}${field.unit ?? ""}` : ""}</label>{field.t === "select" ? <select id={id} className={inputClass} value={string(value)} onChange={e => patch(e.target.value)}>{!(field.o ?? []).some(option => option[0] === string(value)) && <option value={string(value)}>{string(value) || "Choose…"}</option>}{field.o?.map(([v, label]) => <option key={v} value={v}>{label}</option>)}</select> : field.t === "range" ? <input id={id} type="range" className="w-full accent-primary" min={field.min} max={field.max} step={field.step ?? 1} value={Number(value ?? field.min ?? 0)} onChange={e => patch(Number(e.target.value))} /> : field.t === "textarea" ? <textarea id={id} className={`${inputClass} min-h-24 resize-y`} value={string(value)} onChange={e => patch(e.target.value)} /> : <input id={id} className={inputClass} value={string(value)} onChange={e => patch(e.target.value)} />}</div>;
+  })}</div>;
+});
