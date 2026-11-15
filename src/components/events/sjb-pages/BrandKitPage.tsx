@@ -10,6 +10,8 @@ import masterKit from "@/assets/sjb/master-logo-kit.zip.asset.json";
 import brandGuide from "@/assets/sjb/brand-guide.pdf.asset.json";
 import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 import { SjbLettering } from "@/components/events/SjbLettering";
+import { SjbLogoAnimation } from "@/components/events/SjbLogoAnimation";
+import { Button } from "@/design-system/element";
 import { SJB_LETTERING_SPEC_VISIBLE } from "@/components/events/SjbShare";
 
 import { useState } from "react";
@@ -363,8 +365,13 @@ export function SjbBrandKit() {
           )}
           <SjbShareLinkButton />
           <div className="mt-3"><BrandKitPdfExport kitId="san-juan-bowl" /></div>
+          <div className="mt-3"><Button asChild variant="outline"><a href="#animations">Animations</a></Button></div>
         </header>
 
+        <section id="animations" className="scroll-mt-48 space-y-4 border-t border-border pt-6" aria-labelledby="sjb-animations-heading" data-export-ignore="true">
+          <h2 id="sjb-animations-heading" className="text-2xl font-semibold text-foreground">Animations</h2>
+          <SjbLogoAnimation />
+        </section>
         <SjbBrandKitBody />
         {/* Designer content (construction + production) lives on this one page. */}
         <ConstructionSection />

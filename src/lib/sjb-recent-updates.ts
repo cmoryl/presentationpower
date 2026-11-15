@@ -8,6 +8,7 @@ import calendarGround from "@/assets/sjb-calendar-style/set2-ground.jpg.asset.js
 import stadiumHome from "@/assets/sjb-stadium/stadium-night-wide-16x9.jpg";
 import { KIT_RELEASES } from "./brand-kit-releases";
 import { selectedBillboardArtwork } from "./sjb-selected-billboards";
+import animationPreview from "@/assets/san-juan-bowl/bowl-logo-animation-preview.jpg.asset.json";
 
 export interface SjbRecentUpdate {
   title: string;
@@ -29,6 +30,13 @@ const bowlKitDate = new Date(`${bowlKit.released}T00:00:00Z`).toLocaleDateString
 });
 
 export const SJB_RECENT_UPDATES: SjbRecentUpdate[] = [
+  {
+    title: "Logo animation",
+    detail: "Seamless 360° rotating logo, with looping playback and original video download in the brand kit.",
+    date: "Nov 15, 2026",
+    image: animationPreview.url,
+    link: { to: "/events/san-juan-bowl/brand-kit", hash: "animations" },
+  },
   {
     title: "T-shirt studio comps",
     detail: "Man, woman and child wearing every front-and-back set, with the artwork shown enlarged.",

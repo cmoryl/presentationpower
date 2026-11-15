@@ -1,4 +1,7 @@
 # Roadmap
+## Bowl brand animations area
+- [x] Move the supplied looping video out of the event homepage into the brand kit’s Animations area and add a newest-first Recent updates card linking directly to it.
+- [x] Verified homepage removal, Recent updates → Animations navigation, looping brand-area playback, MP4 download and phone fit; desktop section reviewed.
 ## Bowl supplied logo animation
 - [x] Add the original uploaded rotation video to the Bowl event home with looping muted playback, pause/play and original MP4 download; respect reduced-motion preferences.
 - [x] Verified public playback, pause/play, loop wrap, phone fit and byte-identical original MP4 download; desktop video inspected and page check passed.

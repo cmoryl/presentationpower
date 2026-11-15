@@ -14,7 +14,6 @@ import { EventWebReferences } from "@/components/events/EventWebReferences";
 import { SjbRecentUpdates } from "@/components/events/SjbRecentUpdates";
 import { SjbHero } from "@/components/events/SjbHero";
 import { SjbEventAreas } from "@/components/events/SjbEventAreas";
-import { SjbLogoAnimation } from "@/components/events/SjbLogoAnimation";
 import { SJB_LOGOS, SJB_LOGO_RULES } from "@/lib/san-juan-bowl";
 import { getEventIntake } from "@/lib/event-intake.functions";
 import { EVENT_INTAKE_ITEMS, INTAKE_STATUS_LABEL, summarizeIntake, type IntakeStatus } from "@/lib/event-intake";
@@ -179,7 +178,7 @@ function EventHome() {
           <EventTimeline eventId={eventId} ready={progress.ready} total={progress.total} /></>)}
         </header>
 
-        {isBowl ? <><SjbLogoAnimation /><SjbRecentUpdates /><SjbEventAreas /></> : (<>
+        {isBowl ? <><SjbRecentUpdates /><SjbEventAreas /></> : (<>
         <nav aria-label="Event sections" className="mt-6 flex flex-wrap gap-1 border-b border-[#03002C]/12">
           {(["overview", ...tabs.map((t) => t.id)] as const).map((id) => {
             const on = id === tab;
