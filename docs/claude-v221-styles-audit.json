@@ -24,35 +24,48 @@
         "exit": 0,
         "fails": 0,
         "seconds": 12,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "audit.js",
         "exit": 0,
         "fails": 0,
         "seconds": 17,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "batch1.js",
         "exit": 0,
         "fails": 0,
         "seconds": 10,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "editable.js",
         "exit": 0,
         "fails": 0,
         "seconds": 11,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "editorpolish.js",
         "exit": 1,
         "fails": 0,
         "seconds": 1,
-        "issues": []
+        "issues": [
+          "ENOENT: no such file or directory, open '../node_modules/axe-core/axe.min.js'"
+        ],
+        "status": "dependency_blocked",
+        "stderr": "node:fs:440\n    return binding.readFileUtf8(path, stringToFlags(options.flag));\n                   ^\n\nError: ENOENT: no such file or directory, open '<reference-harness>/suites/../node_modules/axe-core/axe.min.js'\n    at Object.readFileSync (node:fs:440:20)\n    at Object.<anonymous> (<reference-harness>/suites/editorpolish.js:4:14)\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function.<anonymous> (node:internal/modules/cjs/loader:1309:12)\n    at Module._load (/tmp/v221-styles/shim.cjs:3:92)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'open',\n  path: '<reference-harness>/suites/../node_modules/axe-core/axe.min.js'\n}\n\nNode.js v22.23.5\n",
+        "rerun": {
+          "exit": 1,
+          "assertion_fail_lines": 0
+        },
+        "interpretation": "Non-zero exit before assertions: missing axe-core dependency, not a behavioral assertion failure."
       },
       {
         "suite": "exportpro.js",
@@ -61,7 +74,8 @@
         "seconds": 9,
         "issues": [
           "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/bigphoto.jpg'"
-        ]
+        ],
+        "status": "fixture_blocked"
       },
       {
         "suite": "help.js",
@@ -70,126 +84,147 @@
         "seconds": 4,
         "issues": [
           "CRASH Error: ENOENT: no such file or directory, open '/tmp/v221-styles/pkg2/suites/module-builder.html'"
-        ]
+        ],
+        "status": "fixture_blocked"
       },
       {
         "suite": "hero.js",
         "exit": 0,
         "fails": 0,
         "seconds": 11,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "herofade.js",
         "exit": 1,
         "fails": 0,
         "seconds": 5,
-        "issues": []
+        "issues": [
+          "ENOENT: no such file or directory, open 'suites/photo.jpg'"
+        ],
+        "status": "fixture_blocked",
+        "interpretation": "Historical stderr confirms a missing input before assertions; zero FAIL lines, not a behavioral assertion failure."
       },
       {
         "suite": "herosafe.js",
         "exit": 0,
         "fails": 0,
         "seconds": 12,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "herosize.js",
         "exit": 0,
         "fails": 0,
         "seconds": 42,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "journey.js",
         "exit": 0,
         "fails": 0,
         "seconds": 15,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "landing.js",
         "exit": 0,
         "fails": 0,
         "seconds": 57,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "library.js",
         "exit": 0,
         "fails": 0,
         "seconds": 16,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "mx.js",
         "exit": 0,
         "fails": 0,
         "seconds": 4,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "mxnew.js",
         "exit": 0,
         "fails": 0,
         "seconds": 27,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "mxspx.js",
         "exit": 0,
         "fails": 0,
         "seconds": 14,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "mxtest.js",
         "exit": 0,
         "fails": 0,
         "seconds": 10,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "navtest.js",
         "exit": 0,
         "fails": 0,
         "seconds": 28,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "output.js",
         "exit": 0,
         "fails": 0,
         "seconds": 38,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "pages.js",
         "exit": 0,
         "fails": 0,
         "seconds": 41,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "presence.js",
         "exit": 0,
         "fails": 0,
         "seconds": 16,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "printsystem.js",
         "exit": 0,
         "fails": 0,
         "seconds": 10,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "retention2.js",
         "exit": 0,
         "fails": 0,
         "seconds": 91,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "review.js",
@@ -198,84 +233,96 @@
         "seconds": 8,
         "issues": [
           "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/pa.jpg'"
-        ]
+        ],
+        "status": "fixture_blocked"
       },
       {
         "suite": "reviewmode.js",
         "exit": 0,
         "fails": 0,
         "seconds": 91,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "roles.js",
         "exit": 0,
         "fails": 0,
         "seconds": 39,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "sequences.js",
         "exit": 0,
         "fails": 0,
         "seconds": 48,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "signature.js",
         "exit": 0,
         "fails": 0,
         "seconds": 16,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "sizephoto.js",
         "exit": 0,
         "fails": 0,
         "seconds": 18,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "sotest.js",
         "exit": 0,
         "fails": 0,
         "seconds": 18,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "spbriefs.js",
         "exit": 0,
         "fails": 0,
         "seconds": 15,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "spectrum.js",
         "exit": 0,
         "fails": 0,
         "seconds": 9,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "spproj.js",
         "exit": 0,
         "fails": 0,
         "seconds": 7,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "spxl.js",
         "exit": 0,
         "fails": 0,
         "seconds": 39,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "visual.js",
         "exit": 0,
         "fails": 0,
         "seconds": 47,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "visual2.js",
@@ -284,184 +331,220 @@
         "seconds": 9,
         "issues": [
           "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/pa-hi.jpg'"
-        ]
+        ],
+        "status": "fixture_blocked"
       },
       {
         "suite": "btt.js",
         "exit": 0,
         "fails": 0,
         "seconds": 13,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "breakhunt.js",
         "exit": 0,
         "fails": 0,
         "seconds": 11,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "curate.js",
         "exit": 0,
         "fails": 0,
         "seconds": 13,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "lpdl.js",
         "exit": 0,
         "fails": 0,
         "seconds": 13,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "vscan.js",
         "exit": 0,
         "fails": 0,
         "seconds": 6,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "libview.js",
         "exit": 0,
         "fails": 0,
         "seconds": 31,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "herofit.js",
         "exit": 0,
         "fails": 0,
         "seconds": 14,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "curator.js",
         "exit": 0,
         "fails": 0,
         "seconds": 5,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "designlogic.js",
         "exit": 0,
         "fails": 0,
         "seconds": 23,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "rebuildclean.js",
         "exit": 0,
         "fails": 0,
         "seconds": 23,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "multiuser.js",
-        "exit": 124,
+        "exit": 1,
         "fails": 1,
-        "seconds": 240,
+        "seconds": 319,
         "issues": [
-          "Harness timed out at 240 seconds"
-        ]
+          "FAIL owner, editor and viewer all see a clean approval — [\"Changed after approval\",\"Changed after approval\",\"Changed after approval\"]"
+        ],
+        "previous_run": {
+          "exit": 124,
+          "fails": 1,
+          "seconds": 240,
+          "issues": [
+            "Harness timed out at 240 seconds"
+          ]
+        },
+        "timeout_seconds": 600,
+        "status": "assertion_failure",
+        "interpretation": "Previous 240-second stop was a harness budget limit, not a suite failure. Completed at 319 seconds under timeout 600; one clean-approval assertion failed in the isolated reference harness. Not a React defect certification."
       },
       {
         "suite": "secfix.js",
         "exit": 0,
         "fails": 0,
         "seconds": 20,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v200.js",
         "exit": 0,
         "fails": 0,
         "seconds": 5,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v201.js",
         "exit": 0,
         "fails": 0,
         "seconds": 91,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v202.js",
         "exit": 0,
         "fails": 0,
         "seconds": 10,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v204.js",
         "exit": 0,
         "fails": 0,
         "seconds": 72,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v205.js",
         "exit": 0,
         "fails": 0,
         "seconds": 22,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v207.js",
         "exit": 0,
         "fails": 0,
         "seconds": 10,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v208.js",
         "exit": 0,
         "fails": 0,
         "seconds": 12,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v209.js",
         "exit": 0,
         "fails": 0,
         "seconds": 24,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v211.js",
         "exit": 0,
         "fails": 0,
         "seconds": 44,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v212.js",
         "exit": 0,
         "fails": 0,
         "seconds": 30,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v213.js",
         "exit": 0,
         "fails": 0,
         "seconds": 72,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v214.js",
         "exit": 0,
         "fails": 0,
         "seconds": 30,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v215.js",
         "exit": 0,
         "fails": 0,
         "seconds": 33,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v216.js",
@@ -469,34 +552,59 @@
         "fails": 3,
         "seconds": 81,
         "issues": [
-          "FAIL Stop stops it: nothing after that point is made \u2014 {\"busy\":false,\"btn\":\"Send\",\"last\":\"Done.\",\"made\":true}",
+          "FAIL Stop stops it: nothing after that point is made — {\"busy\":false,\"btn\":\"Send\",\"last\":\"Done.\",\"made\":true}",
           "FAIL the module the agent added is brought into view and outlined",
           "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/photo.jpg'"
-        ]
+        ],
+        "status": "environment_and_fixture_blocked",
+        "environment_blocked_assertions": [
+          "Stop stops it: nothing after that point is made",
+          "the module the agent added is brought into view and outlined"
+        ],
+        "environment_block_reason": "These assertions drive the live agent drawer and real sampling API. External network is deliberately blocked in this isolated harness, so the agent cannot produce the required step feed.",
+        "fixture_block_reason": "Historical run also crashed on missing photo.jpg; rerun awaits fixture attachment.",
+        "interpretation": "Raw FAIL/CRASH lines retained as evidence, not unexplained behavioral defects."
       },
       {
         "suite": "v218.js",
         "exit": 0,
         "fails": 0,
         "seconds": 41,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v219.js",
         "exit": 0,
         "fails": 0,
         "seconds": 163,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       },
       {
         "suite": "v221.js",
         "exit": 0,
         "fails": 0,
         "seconds": 27,
-        "issues": []
+        "issues": [],
+        "status": "clean"
       }
     ],
-    "interpretation": "Reference results do not certify React parity. Missing fixtures and source mock-store behavior failures remain explicit."
+    "interpretation": "Reference results do not certify React parity. 58 historical clean suites; five fixture-blocked suites, one dependency-blocked suite, v216 environment/fixture-blocked, and one completed multiuser assertion failure. No all-green release claim. Full fixture rerun awaits attachment.",
+    "fixture_package": {
+      "name": "element-v221-suite-fixtures.zip",
+      "received": false,
+      "checked_at_utc": "2026-11-15T21:09:55.787114+00:00",
+      "status": "Not present in either upload mount during this turn; fixture-dependent reruns pending.",
+      "staging_instruction": "Safely inspect and extract alongside the staged suites and runp.sh; preserve required shots/, journey/, exports/ and tmp/shots/ directories."
+    },
+    "classification": {
+      "clean": 58,
+      "fixture_blocked": 5,
+      "dependency_blocked": 1,
+      "environment_and_fixture_blocked": 1,
+      "assertion_failure": 1
+    }
   },
   "react_verification": {
     "focused_tests": 24,
@@ -512,7 +620,7 @@
   "remaining": [
     "Final family/signature/content wrappers for cross-size rendering",
     "Source project/material/review/agent parity and corresponding React behavior assertions",
-    "Complete reference release gate: missing photo/build/axe fixtures, multiuser timeout and v216 source-harness failures",
+    "Complete reference release gate: fixture ZIP not yet received, axe-core dependency absent, v216 live-sampling assertions environment-blocked, and completed multiuser clean-approval assertion unresolved.",
     "Office openability and exact source export parity"
   ],
   "pre_existing_defects": "Eight unrelated Bowl/London-map/light-mode failures remain separately tracked; not an Element port gate."
