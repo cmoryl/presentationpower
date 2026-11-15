@@ -91,7 +91,7 @@ export function StadiumPage() {
           <Button asChild variant="outline"><a href={SJB_STADIUM_EVIDENCE.nominationUrl} target="_blank" rel="noreferrer">Official stadium record <ExternalLink className="size-4" /></a></Button>
           <p className="text-sm text-muted-foreground">Still needed: current georeferenced footprint, elevations and roof geometry; verified surrounding buildings; approved field alignment, safety clearances and event placements. No model here is certified 100% accurate.</p>
         </div>
-        <details className="border-t border-border pt-4">
+        <details open className="border-t border-border pt-4">
           <summary className="cursor-pointer text-sm font-semibold">Archived illustrative 3D study · not location-accurate</summary>
           <div className="pt-4"><SjbStadiumViewer /></div>
         </details>
