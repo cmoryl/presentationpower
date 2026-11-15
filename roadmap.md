@@ -1,14 +1,18 @@
 # Roadmap
 ## Claude full Element update
+- [x] Corrected the migration ledger: the previous ZIP was bundled output; ELEMENT v221's ordered 151-file source and 698-image packages are the authoritative next inputs, not absent artwork.
+- [ ] Priority 1 — port the shared field renderer, conditional when(d) rules, vk/vk2 variants, SUBS/flexible rows, effective source renderers and baked reader into the existing editor. Blocked on attachment of element-v221-source.zip; stop further bundle reverse-engineering.
+- [ ] Priority 2 — host the 698 original images and resolve assets.json hashes without changing material IDs. Blocked on attachment of element-v221-library-images.zip.
+- [ ] Priority 3 — apply Templates display labels and exact *_WAS saved-project migrations, retaining spectrum/spx keys. Blocked on source package and preceding priorities; existing Templates build label already remains unchanged.
 - [x] Audited source process and aligned Build → modules/templates → saved work, role-aware navigation, selected variant configuration, material naming, undo/redo, recursive checks and proof delivery; authenticated reopen/phone/review-door verified. Full audit in docs/claude-build-process-audit.json; source project/review/version/agent parity remains explicitly incomplete.
 - [x] Inventoried and browser-walked all 38 supplied modules plus page breaks; integrated source controls, flexible rows, 14 sizes and source-template save/reopen/proof downloads in the live editor. Event photos, kits and native/original records preserved.
-- [ ] Complete faithful module geometry and native slide/social replacement; six source families remain explicitly unported, other adaptations are not certified as exact. Missing source artwork remains an external blocker.
+- [ ] Complete faithful module geometry and native slide/social replacement; six source families remain explicitly unported, other adaptations are not certified as exact. Await authoritative source and image packages; image bytes exist upstream.
 - [x] Established the linked Claude build as the forward reference; updated live module/print/social headers, cross-surface navigation, print/slide editor navigation and horizontal inspector controls.
 - [ ] Complete exact source editor, module-variant and project/material parity; current shared-workspace adoption is a first pass, not the whole Claude build.
 - [x] Inspect the supplied archive safely and record detected capabilities and missing dependencies.
 - [x] Approved plan; extracted 299 source-backed drafts and imported 128 supplied photographs/sprites into the existing admin curator; native copy/open/reopen verified, temporary test draft removed.
 - [ ] Finish source module/variant geometry, project/material/version/review UX and agent-tool integration; current draft mapping is partial, not full build parity.
-- [ ] Resolve missing source artwork: 274 drafts reference unavailable files (698 virtual blob paths); requires original image bytes from the Claude build.
+- [ ] Connect source artwork: 274 drafts reference 698 hash-backed images existing in the artifact asset store; awaiting the announced original-image package, not replacement imagery.
 - [x] Verified source template editing/save/reopen, nested rows, module choices, social/slides entry points, PDF/flat-PPTX proof downloads and phone fit; eight source tests pass and build OK.
 - [ ] Verify full native/review/agent/press/Office parity; missing artwork and exact renderer work remain incomplete. Full suite retains the same eight pre-existing failures.
 ## Bowl brand-kit submenu

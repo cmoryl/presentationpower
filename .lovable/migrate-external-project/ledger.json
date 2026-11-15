@@ -1,10 +1,17 @@
 {
   "source": "TransPerfect_ELEMENT.zip",
+  "authoritative_revision": "ELEMENT v221",
+  "source_correction": "The earlier ZIP is bundled output, not the editable source. The authoritative 151-file source package and 698-image asset package were announced separately and are not attached in this turn.",
+  "v221_priorities": [
+    { "capability": "Field-definition renderer and final source render functions", "source": "element-v221-source.zip", "outcome": "Port into the existing React editor; evaluate when(d), vk/vk2 and SUBS, then share one stack across formats", "status": "awaiting_source_package", "next_action": "Inspect the source archive safely; enumerate every definition and wrapper in filename load order before porting the effective renderer and baked reader. Do not continue bundle reverse-engineering." },
+    { "capability": "698 library images", "source": "element-v221-library-images.zip and element-library/assets.json", "outcome": "Resolve original asset hashes to hosted original bytes without changing material IDs", "status": "awaiting_image_package", "next_action": "Inspect the package and map supplied hashes to uploaded asset pointers; report unresolved IDs, never invent replacement artwork." },
+    { "capability": "Templates rename", "source": "94b-nav.js and SPXL/SPXT legacy-name migrations", "outcome": "Change display labels only; preserve spectrum route key, spx prefixes and saved project membership", "status": "awaiting_source_package", "next_action": "After the renderer and image work, inspect exact *_WAS values and relevant current adapters before migrating names. Do not guess legacy project strings or rename the corporate style registry." }
+  ],
   "intent": "Adopt the supplied Claude build into actual modules, print, social, slides and editors while preserving existing saved work and production safeguards.",
   "capabilities": [
     {
       "capability": "Application code",
-      "source": "Single bundled index.html with inline JavaScript and CSS; no package.json or separate source modules",
+      "source": "Earlier archive: bundled index.html with inline JavaScript/CSS. Authoritative v221 source: 151 ordered src/*.js files, announced separately.",
       "outcome": "Port into existing React/TanStack structure",
       "status": "partial",
       "next_action": "Source-backed templates now open the live three-column source editor; source module entry points are available in modules, social and slides. Legacy editors remain for native/original saved work. Exact source geometry and native slide replacement remain incomplete."
@@ -42,7 +49,7 @@
       "source": "378 client-logo files, 121 library images and seven sprite files",
       "outcome": "Preserve original files and private client-asset handling",
       "status": "partial",
-      "next_action": "128 supplied library photographs/sprites imported unchanged. 274 templates reference unavailable artwork; 698 virtual blob paths need source bytes. 378 client logos remain in supplied archive, not publicly imported."
+      "next_action": "128 supplied photographs/sprites imported unchanged. The 698 images affecting 274 templates exist in the Claude asset store; their announced package has not arrived here. Preserve hash IDs and wire assets.json to original hosted bytes once attached. 378 client logos remain private/unpublished."
     },
     {
       "capability": "Exports",

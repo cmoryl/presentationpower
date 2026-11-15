@@ -2,6 +2,15 @@
   "date": "2026-11-15",
   "reference": "https://claude.ai/artifact/7WXARzAhxXMfoJppmzkDSs",
   "status": "Process/navigation alignment implemented; full source-build parity incomplete",
+  "v221_correction": {
+    "authority": "User-supplied ELEMENT v221 architecture brief, 2026-11-15 18:32 UTC",
+    "previous_input": "Bundled output; not the 151-file editable source",
+    "source_package": "element-v221-source.zip — not attached at this audit",
+    "image_package": "element-v221-library-images.zip — not attached at this audit",
+    "priority_order": ["Shared field-definition renderer and effective source geometry", "698 hash-preserving original image mappings", "Templates label and legacy project-name migration"],
+    "implementation_status": "No additional renderer or project migration claimed; await authoritative packages instead of reverse-engineering the bundle again",
+    "verification_gate": "Inspect all function definitions in filename load order; import baked data/reader, not baking. Source release signature without WARNING and 66 source suites fails=0 remain unverified. No parity claim until current failures are fixed or explicitly waived."
+  },
   "findings": [
     {
       "area": "Navigation",
@@ -57,7 +66,17 @@
       "failed_files": 7,
       "passed_tests": 2807,
       "failed_tests": 8,
-      "note": "Same eight pre-existing failures as prior run"
+      "note": "Previous run's eight failures, not rerun or waived in this documentation correction",
+      "unresolved_tests": [
+        "sjb-recent-updates.test.ts > Bowl recent updates bar > shows the newest work first and every card has artwork",
+        "light-mode-surface-guard.test.ts > light-mode surface override guard > no unscoped or .light rule paints a dark-mode surface color onto a surface property",
+        "london-map-export-editability.test.ts > London map exports are editable > Ground Floor — Illustrator file keeps paths and live text",
+        "sjb-calendar-demo.test.ts > Bowl calendar demo sequences > replaces calendar and downloadable covers with the exact saved size-specific artwork",
+        "sjb-calendar-demo.test.ts > Bowl calendar demo sequences > uses the approved single image on the headline page (page 2) only where a cleaned export exists",
+        "sjb-event-facts.test.ts > San Juan Bowl official announcement > marks venue and dates ready with the supplied official source",
+        "sjb-event-links.test.ts > Bowl event isolation > keeps unbuilt Bowl signs, badges and pillars unavailable",
+        "sjb-social-studio.test.ts > Bowl social page selection > keeps extra portrait projection sizes inside their actual matching calendar look"
+      ]
     },
     "authenticated_flow": [
       "Build \u2192 modules",
@@ -75,7 +94,7 @@
     "role_testing": "Pure tests; no full live all-role audit"
   },
   "remaining_external_blockers": [
-    "Unavailable source artwork affecting 274 templates",
+    "Attachment of the announced v221 source and image packages; 698 image bytes affecting 274 templates exist upstream, not missing artwork",
     "Office and print-vendor production verification"
   ],
   "remaining_implementation": [
