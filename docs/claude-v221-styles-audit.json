@@ -16,8 +16,8 @@
   "reference_harness": {
     "environment": "Isolated supplied mock test.html, external network blocked except pinned local export dependencies; Python-bundled Chromium via shim",
     "total": 66,
-    "clean": 58,
-    "not_clean": 8,
+    "clean": 64,
+    "not_clean": 2,
     "results": [
       {
         "suite": "advanceD.js",
@@ -53,39 +53,84 @@
       },
       {
         "suite": "editorpolish.js",
-        "exit": 1,
+        "exit": 0,
         "fails": 0,
-        "seconds": 1,
-        "issues": [
-          "ENOENT: no such file or directory, open '../node_modules/axe-core/axe.min.js'"
+        "assertion_fail_lines": 0,
+        "seconds": 72,
+        "timeout_seconds": 600,
+        "issues": [],
+        "stderr": "Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.\n",
+        "run_history": [
+          {
+            "suite": "editorpolish.js",
+            "exit": 1,
+            "fails": 0,
+            "seconds": 1,
+            "issues": [
+              "ENOENT: no such file or directory, open '../node_modules/axe-core/axe.min.js'"
+            ],
+            "status": "dependency_blocked",
+            "stderr": "node:fs:440\n    return binding.readFileUtf8(path, stringToFlags(options.flag));\n                   ^\n\nError: ENOENT: no such file or directory, open '<reference-harness>/suites/../node_modules/axe-core/axe.min.js'\n    at Object.readFileSync (node:fs:440:20)\n    at Object.<anonymous> (<reference-harness>/suites/editorpolish.js:4:14)\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function.<anonymous> (node:internal/modules/cjs/loader:1309:12)\n    at Module._load (/tmp/v221-styles/shim.cjs:3:92)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'open',\n  path: '<reference-harness>/suites/../node_modules/axe-core/axe.min.js'\n}\n\nNode.js v22.23.5\n",
+            "rerun": {
+              "exit": 1,
+              "assertion_fail_lines": 0
+            },
+            "interpretation": "Non-zero exit before assertions: missing axe-core dependency, not a behavioral assertion failure."
+          }
         ],
-        "status": "dependency_blocked",
-        "stderr": "node:fs:440\n    return binding.readFileUtf8(path, stringToFlags(options.flag));\n                   ^\n\nError: ENOENT: no such file or directory, open '<reference-harness>/suites/../node_modules/axe-core/axe.min.js'\n    at Object.readFileSync (node:fs:440:20)\n    at Object.<anonymous> (<reference-harness>/suites/editorpolish.js:4:14)\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function.<anonymous> (node:internal/modules/cjs/loader:1309:12)\n    at Module._load (/tmp/v221-styles/shim.cjs:3:92)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'open',\n  path: '<reference-harness>/suites/../node_modules/axe-core/axe.min.js'\n}\n\nNode.js v22.23.5\n",
-        "rerun": {
-          "exit": 1,
-          "assertion_fail_lines": 0
-        },
-        "interpretation": "Non-zero exit before assertions: missing axe-core dependency, not a behavioral assertion failure."
+        "status": "clean",
+        "fixture_rerun": true,
+        "interpretation": "Completed with supplied original fixtures and existing axe-core dependency; exit 0 and no FAIL/CRASH lines."
       },
       {
         "suite": "exportpro.js",
-        "exit": 1,
-        "fails": 1,
-        "seconds": 9,
-        "issues": [
-          "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/bigphoto.jpg'"
+        "exit": 0,
+        "fails": 0,
+        "assertion_fail_lines": 0,
+        "seconds": 27,
+        "timeout_seconds": 600,
+        "issues": [],
+        "stderr": "Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.\n",
+        "run_history": [
+          {
+            "suite": "exportpro.js",
+            "exit": 1,
+            "fails": 1,
+            "seconds": 9,
+            "issues": [
+              "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/bigphoto.jpg'"
+            ],
+            "status": "fixture_blocked"
+          }
         ],
-        "status": "fixture_blocked"
+        "status": "clean",
+        "fixture_rerun": true,
+        "interpretation": "Completed with supplied original fixtures and existing axe-core dependency; exit 0 and no FAIL/CRASH lines."
       },
       {
         "suite": "help.js",
-        "exit": 1,
-        "fails": 1,
-        "seconds": 4,
-        "issues": [
-          "CRASH Error: ENOENT: no such file or directory, open '/tmp/v221-styles/pkg2/suites/module-builder.html'"
+        "exit": 0,
+        "fails": 0,
+        "assertion_fail_lines": 0,
+        "seconds": 14,
+        "timeout_seconds": 600,
+        "issues": [],
+        "stderr": "Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.\n",
+        "run_history": [
+          {
+            "suite": "help.js",
+            "exit": 1,
+            "fails": 1,
+            "seconds": 4,
+            "issues": [
+              "CRASH Error: ENOENT: no such file or directory, open '/tmp/v221-styles/pkg2/suites/module-builder.html'"
+            ],
+            "status": "fixture_blocked"
+          }
         ],
-        "status": "fixture_blocked"
+        "status": "clean",
+        "fixture_rerun": true,
+        "interpretation": "Completed with supplied original fixtures and existing axe-core dependency; exit 0 and no FAIL/CRASH lines."
       },
       {
         "suite": "hero.js",
@@ -97,14 +142,29 @@
       },
       {
         "suite": "herofade.js",
-        "exit": 1,
+        "exit": 0,
         "fails": 0,
-        "seconds": 5,
-        "issues": [
-          "ENOENT: no such file or directory, open 'suites/photo.jpg'"
+        "assertion_fail_lines": 0,
+        "seconds": 4,
+        "timeout_seconds": 600,
+        "issues": [],
+        "stderr": "Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.\n",
+        "run_history": [
+          {
+            "suite": "herofade.js",
+            "exit": 1,
+            "fails": 0,
+            "seconds": 5,
+            "issues": [
+              "ENOENT: no such file or directory, open 'suites/photo.jpg'"
+            ],
+            "status": "fixture_blocked",
+            "interpretation": "Historical stderr confirms a missing input before assertions; zero FAIL lines, not a behavioral assertion failure."
+          }
         ],
-        "status": "fixture_blocked",
-        "interpretation": "Historical stderr confirms a missing input before assertions; zero FAIL lines, not a behavioral assertion failure."
+        "status": "clean",
+        "fixture_rerun": true,
+        "interpretation": "Completed with supplied original fixtures and existing axe-core dependency; exit 0 and no FAIL/CRASH lines."
       },
       {
         "suite": "herosafe.js",
@@ -228,13 +288,28 @@
       },
       {
         "suite": "review.js",
-        "exit": 1,
-        "fails": 1,
-        "seconds": 8,
-        "issues": [
-          "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/pa.jpg'"
+        "exit": 0,
+        "fails": 0,
+        "assertion_fail_lines": 0,
+        "seconds": 34,
+        "timeout_seconds": 600,
+        "issues": [],
+        "stderr": "Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.\n",
+        "run_history": [
+          {
+            "suite": "review.js",
+            "exit": 1,
+            "fails": 1,
+            "seconds": 8,
+            "issues": [
+              "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/pa.jpg'"
+            ],
+            "status": "fixture_blocked"
+          }
         ],
-        "status": "fixture_blocked"
+        "status": "clean",
+        "fixture_rerun": true,
+        "interpretation": "Completed with supplied original fixtures and existing axe-core dependency; exit 0 and no FAIL/CRASH lines."
       },
       {
         "suite": "reviewmode.js",
@@ -326,13 +401,28 @@
       },
       {
         "suite": "visual2.js",
-        "exit": 1,
-        "fails": 1,
-        "seconds": 9,
-        "issues": [
-          "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/pa-hi.jpg'"
+        "exit": 0,
+        "fails": 0,
+        "assertion_fail_lines": 0,
+        "seconds": 32,
+        "timeout_seconds": 600,
+        "issues": [],
+        "stderr": "Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.\n",
+        "run_history": [
+          {
+            "suite": "visual2.js",
+            "exit": 1,
+            "fails": 1,
+            "seconds": 9,
+            "issues": [
+              "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/pa-hi.jpg'"
+            ],
+            "status": "fixture_blocked"
+          }
         ],
-        "status": "fixture_blocked"
+        "status": "clean",
+        "fixture_rerun": true,
+        "interpretation": "Completed with supplied original fixtures and existing axe-core dependency; exit 0 and no FAIL/CRASH lines."
       },
       {
         "suite": "btt.js",
@@ -418,21 +508,38 @@
         "suite": "multiuser.js",
         "exit": 1,
         "fails": 1,
-        "seconds": 319,
+        "assertion_fail_lines": 1,
+        "seconds": 317,
+        "timeout_seconds": 600,
         "issues": [
           "FAIL owner, editor and viewer all see a clean approval — [\"Changed after approval\",\"Changed after approval\",\"Changed after approval\"]"
         ],
-        "previous_run": {
-          "exit": 124,
-          "fails": 1,
-          "seconds": 240,
-          "issues": [
-            "Harness timed out at 240 seconds"
-          ]
-        },
-        "timeout_seconds": 600,
+        "stderr": "Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.\n",
+        "run_history": [
+          {
+            "suite": "multiuser.js",
+            "exit": 1,
+            "fails": 1,
+            "seconds": 319,
+            "issues": [
+              "FAIL owner, editor and viewer all see a clean approval — [\"Changed after approval\",\"Changed after approval\",\"Changed after approval\"]"
+            ],
+            "previous_run": {
+              "exit": 124,
+              "fails": 1,
+              "seconds": 240,
+              "issues": [
+                "Harness timed out at 240 seconds"
+              ]
+            },
+            "timeout_seconds": 600,
+            "status": "assertion_failure",
+            "interpretation": "Previous 240-second stop was a harness budget limit, not a suite failure. Completed at 319 seconds under timeout 600; one clean-approval assertion failed in the isolated reference harness. Not a React defect certification."
+          }
+        ],
         "status": "assertion_failure",
-        "interpretation": "Previous 240-second stop was a harness budget limit, not a suite failure. Completed at 319 seconds under timeout 600; one clean-approval assertion failed in the isolated reference harness. Not a React defect certification."
+        "fixture_rerun": true,
+        "interpretation": "Completed in 317 seconds with timeout 600. Clean-approval assertion reproduced after fixtures were supplied: owner/editor/viewer all saw Changed after approval. No page errors. Cause not diagnosed; this is a reference-harness assertion failure, not React certification or a timeout."
       },
       {
         "suite": "secfix.js",
@@ -548,22 +655,46 @@
       },
       {
         "suite": "v216.js",
-        "exit": 1,
-        "fails": 3,
-        "seconds": 81,
+        "exit": 0,
+        "fails": 1,
+        "assertion_fail_lines": 1,
+        "seconds": 74,
+        "timeout_seconds": 600,
         "issues": [
-          "FAIL Stop stops it: nothing after that point is made — {\"busy\":false,\"btn\":\"Send\",\"last\":\"Done.\",\"made\":true}",
-          "FAIL the module the agent added is brought into view and outlined",
-          "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/photo.jpg'"
+          "FAIL the module the agent added is brought into view and outlined"
         ],
-        "status": "environment_and_fixture_blocked",
+        "stderr": "Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.\n",
+        "run_history": [
+          {
+            "suite": "v216.js",
+            "exit": 1,
+            "fails": 3,
+            "seconds": 81,
+            "issues": [
+              "FAIL Stop stops it: nothing after that point is made — {\"busy\":false,\"btn\":\"Send\",\"last\":\"Done.\",\"made\":true}",
+              "FAIL the module the agent added is brought into view and outlined",
+              "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/photo.jpg'"
+            ],
+            "status": "environment_and_fixture_blocked",
+            "environment_blocked_assertions": [
+              "Stop stops it: nothing after that point is made",
+              "the module the agent added is brought into view and outlined"
+            ],
+            "environment_block_reason": "These assertions drive the live agent drawer and real sampling API. External network is deliberately blocked in this isolated harness, so the agent cannot produce the required step feed.",
+            "fixture_block_reason": "Historical run also crashed on missing photo.jpg; rerun awaits fixture attachment.",
+            "interpretation": "Raw FAIL/CRASH lines retained as evidence, not unexplained behavioral defects."
+          }
+        ],
+        "status": "environment_blocked",
+        "fixture_rerun": true,
         "environment_blocked_assertions": [
-          "Stop stops it: nothing after that point is made",
           "the module the agent added is brought into view and outlined"
         ],
-        "environment_block_reason": "These assertions drive the live agent drawer and real sampling API. External network is deliberately blocked in this isolated harness, so the agent cannot produce the required step feed.",
-        "fixture_block_reason": "Historical run also crashed on missing photo.jpg; rerun awaits fixture attachment.",
-        "interpretation": "Raw FAIL/CRASH lines retained as evidence, not unexplained behavioral defects."
+        "environment_block_reason": "This assertion drives the live agent drawer and real sampling API. External network remains blocked in the isolated reference harness, so no live sampling step feed is available.",
+        "observed_passed_assertions": [
+          "Stop stops it: nothing after that point is made"
+        ],
+        "interpretation": "Fixture crash resolved. Stop passed this rerun; only agent-added-module scroll/outline remains environment-blocked. Exit 0 does not make a suite clean when a FAIL line remains."
       },
       {
         "suite": "v218.js",
@@ -590,20 +721,42 @@
         "status": "clean"
       }
     ],
-    "interpretation": "Reference results do not certify React parity. 58 historical clean suites; five fixture-blocked suites, one dependency-blocked suite, v216 environment/fixture-blocked, and one completed multiuser assertion failure. No all-green release claim. Full fixture rerun awaits attachment.",
+    "interpretation": "Reference results do not certify React parity. Aggregate: 64 clean of 66; v216 has one live-sampling environment-blocked assertion (Stop now passes), multiuser has one reproducible clean-approval assertion failure. Fixture/dependency blockers resolved. No all-green release or React/Office parity claim.",
     "fixture_package": {
       "name": "element-v221-suite-fixtures.zip",
-      "received": false,
-      "checked_at_utc": "2026-11-15T21:09:55.787114+00:00",
-      "status": "Not present in either upload mount during this turn; fixture-dependent reruns pending.",
-      "staging_instruction": "Safely inspect and extract alongside the staged suites and runp.sh; preserve required shots/, journey/, exports/ and tmp/shots/ directories."
+      "received": true,
+      "sha256": "5c3cb711ae554546b128ed2f15436c9776ef0d9bf434bfd6778e433838cf4fa9",
+      "checked_at_utc": "2026-11-15T21:17:36.577755+00:00",
+      "status": "Safely inspected and extracted pkg3 contents directly beside staged suites/runp.sh; original fixtures kept in isolated /tmp harness only.",
+      "files": [
+        "bigphoto.jpg",
+        "pa.jpg",
+        "pa-hi.jpg",
+        "photo.jpg",
+        "herofade.png",
+        "module-builder.html",
+        "img/media-cs-crunchyroll.jpg"
+      ],
+      "output_directories": [
+        "shots/",
+        "journey/",
+        "exports/",
+        "tmp/shots/"
+      ],
+      "dependency": "axe-core/axe.min.js copied from existing installed project dependency into temporary harness; no application dependency changes.",
+      "shipping_build": "module-builder.html remains a suite input only, distinct from test.html; neither mounted in the React app."
     },
     "classification": {
-      "clean": 58,
-      "fixture_blocked": 5,
-      "dependency_blocked": 1,
-      "environment_and_fixture_blocked": 1,
-      "assertion_failure": 1
+      "clean": 64,
+      "assertion_failure": 1,
+      "environment_blocked": 1
+    },
+    "rerun_summary": {
+      "suites_rerun": 8,
+      "newly_clean": 6,
+      "per_suite_timeout_seconds": 600,
+      "all_results_scope": "64 clean comprises 58 earlier clean runs plus six fixture/dependency reruns; not a fresh all-66 run.",
+      "missing_fixture_blockers": 0
     }
   },
   "react_verification": {
@@ -620,7 +773,7 @@
   "remaining": [
     "Final family/signature/content wrappers for cross-size rendering",
     "Source project/material/review/agent parity and corresponding React behavior assertions",
-    "Complete reference release gate: fixture ZIP not yet received, axe-core dependency absent, v216 live-sampling assertions environment-blocked, and completed multiuser clean-approval assertion unresolved.",
+    "Complete reference release gate: v216 live-sampling module scroll/outline assertion environment-blocked; multiuser clean-approval assertion reproduced at 317 seconds under timeout 600 and remains undiagnosed. Fixtures and axe-core blockers resolved.",
     "Office openability and exact source export parity"
   ],
   "pre_existing_defects": "Eight unrelated Bowl/London-map/light-mode failures remain separately tracked; not an Element port gate."
