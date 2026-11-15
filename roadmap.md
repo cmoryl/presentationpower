@@ -1,4 +1,7 @@
 # Roadmap
+## Event-card photographs
+- [x] Populate NEXT London/San Francisco, NeXus, Hackathon, Legalweek and LegalNEXT cards from existing private event references; preserve Bowl artwork because its game has not occurred.
+- [x] Verified all six signed-in card images decode and match their events; desktop reviewed and phone fit passed. Bowl retains approved artwork; researched photos remain private and Legalweek is labelled a recap cover.
 ## NEXT location photo headers
 - [x] Add inspected London and San Francisco event photographs behind city headers, retaining navigation and issued artwork on shared pages.
 - [x] Verified signed-in London/San Francisco photographs, enlargement-free header rendering, phone fit and signed-out London privacy; five tests pass. Public photo headers await marketing clearance (none currently approved).

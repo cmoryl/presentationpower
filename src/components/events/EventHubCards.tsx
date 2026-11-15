@@ -13,6 +13,7 @@ import { Button } from "@/design-system/element";
 import ground from "@/assets/next-workspace/issued-cover-ground.jpg";
 import { NEXT_EVENT } from "@/lib/next-event";
 import { SF_VENUE } from "@/lib/next-sf-event";
+import { EventCardPhoto } from "./EventCardPhoto";
 
 type Card = { id: string; name: string; line: string; dates: string };
 
@@ -61,6 +62,7 @@ export function EventHubCards() {
             </> : c.id === SJB_EVENT.id ? (
               <img src={SJB_LOGOS[0].svg} alt={`${SJB_EVENT.shortName} official logo`} className="h-full w-full object-contain" />
             ) : <CalendarDays className="h-12 w-12 text-muted-foreground" />}
+            <EventCardPhoto eventId={c.id} eventName={c.name} />
           </div>
           <div className="flex flex-1 flex-col gap-3 p-5">
             <h3 className="text-lg font-semibold leading-snug">{c.name}</h3>
