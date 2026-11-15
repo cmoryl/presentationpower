@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { ArrowLeft, LayoutTemplate, Ruler, Sparkles, Wand2 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { BuildWorkspaceHeader } from "@/components/editor/BuildWorkspaceHeader";
 import { SocialModuleFrame } from "@/components/campaigns/SocialModuleFrame";
 import { SocialModulePicker } from "@/components/campaigns/SocialModulePicker";
 import { BRAND_MODES } from "@/lib/taxonomy";
@@ -167,27 +168,14 @@ function SocialModuleStudio() {
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-[1400px] px-4 py-8 sm:px-6">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 sm:flex sm:justify-between">
-          <div className="min-w-0">
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#003FC7]">
-              <LayoutTemplate size={12} /> Social · module studio
-            </p>
-            <h1 className="mt-3 text-3xl font-black tracking-tight text-[#03002C] sm:text-4xl">
-              Build social from any module
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-black/65">
-              Every module in the Element library — heroes, stat rails, quotes, logo walls, process
-              arcs, contact bands — renders into any social size. The frame auto-fits type and
-              content to the platform safe area, so nothing overlaps or crops.
-            </p>
-          </div>
+        <BuildWorkspaceHeader active="social" title="Social module editor" actions={
           <Link
             to="/social"
             className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-black/10 px-3 py-1.5 text-xs font-semibold text-[#03002C] transition hover:bg-black/5"
           >
             <ArrowLeft size={14} /> Back to social
           </Link>
-        </div>
+        } />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           {/* Stage */}

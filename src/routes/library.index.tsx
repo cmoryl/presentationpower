@@ -1,6 +1,5 @@
 import { BRAND } from "@/lib/brand-colors";
-import { HeroVideoLayer } from "@/components/hero/HeroVideoLayer";
-import heroPresentationVideo from "@/assets/hero-presentation.mp4.asset.json";
+import { BuildWorkspaceHeader } from "@/components/editor/BuildWorkspaceHeader";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { BackToTop } from "@/components/BackToTop";
 import { moduleCopy } from "@/lib/module-copy";
@@ -307,6 +306,10 @@ export const Route = createFileRoute("/library/")({
     meta: [
       { title: "Library · TransPerfect Element" },
       { name: "description", content: "Approved module variants ready to drop into a deck." },
+      { property: "og:title", content: "Module library · TransPerfect Element" },
+      { property: "og:description", content: "Browse governed Element modules for slides, print and social." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(taxonomyQueryOptions),
@@ -895,28 +898,8 @@ function Library() {
     <LibraryPackProvider packId={packId} recipeId={recipeId}>
       <AppShell>
         <BackToTop />
-        <header className="full-bleed relative hero-flush mb-6 overflow-hidden border-b border-black/5 bg-muted py-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
-          <HeroVideoLayer src={heroPresentationVideo.url} opacity={0.55} tint="#FFFFFF" />
-          <div className="relative z-10 mx-auto max-w-[1400px]">
-            <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
-              Element · Presentation
-            </div>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Slides that are already on brand.
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
-              Browse the ready-made slide designs Element builds your decks from — every one
-              approved, every one live in your brand's colors and type. Choose a division to see
-              only what you're cleared to use, or open{" "}
-              <Link to="/library/imported" className="underline hover:text-[#003FC7]">
-                imported slides
-              </Link>{" "}
-              to pick up a deck you brought in.
-            </p>
-
-            <div className="mt-5">
+        <BuildWorkspaceHeader active="modules" title="Module library">
               <LibrarySubnav active="/library" />
-            </div>
 
             {activePreset && (
               <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[#003FC7]/25 bg-[#003FC7]/5 px-4 py-3 text-sm dark:border-white/15 dark:bg-white/5">
@@ -933,8 +916,7 @@ function Library() {
                 </Link>
               </div>
             )}
-          </div>
-        </header>
+        </BuildWorkspaceHeader>
 
         <div className="sticky top-0 z-20 -mx-2 rounded-2xl border border-black/10 bg-white/85 px-3 py-3 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-[#05041A]/80">
           <div className="flex flex-wrap items-center gap-2">

@@ -8,6 +8,7 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 
 import { CreateOnlyNotice } from "@/components/access/CreateOnlyNotice";
 import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
+import { Button } from "@/design-system/element";
 
 export type EditorRailTab = {
   id: string;
@@ -44,15 +45,17 @@ export function EditorSideRail({
   const activeTab = tabs.find((t) => t.id === open) ?? null;
 
   return (
-    <div className={`flex h-full max-w-full shrink-0 ${className}`}>
+    <div className={`flex h-full w-full max-w-full shrink-0 flex-col rounded-md border border-border bg-card text-card-foreground ${className}`}>
+      <div role="group" aria-label="Editor panels" className="flex max-w-full flex-wrap gap-1 border-b border-border p-2">
+        {tabs.map(tab => <RailTab key={tab.id} icon={tab.icon} label={tab.label} badge={tab.badge} active={open === tab.id} onClick={() => setOpen(open === tab.id ? null : tab.id)} />)}
+      </div>
       <div
-        className="relative overflow-hidden transition-[width] duration-300 ease-out"
-        style={{ width: activeTab ? width : 0 }}
+        className={activeTab ? "relative min-w-0 overflow-hidden" : "hidden"}
+        style={{ width: `min(${width}px, 100%)` }}
         aria-hidden={!activeTab}
       >
         <div
-          className="flex h-full flex-col overflow-hidden rounded-l-2xl border border-r-0 border-black/10 bg-white/90 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.06]"
-          style={{ width }}
+          className="flex h-full w-full min-w-0 flex-col overflow-hidden"
         >
           {/* EVERY tab stays mounted. Panels host portal targets (the studio
               toolbar, the layers list), so unmounting a closed tab would send
@@ -72,19 +75,6 @@ export function EditorSideRail({
         </div>
       </div>
 
-      <div className="flex w-11 shrink-0 flex-col gap-1 self-start rounded-r-2xl border border-black/10 bg-white/80 p-1 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
-        {tabs.map((tab) => (
-          <RailTab
-            key={tab.id}
-            icon={tab.icon}
-            label={tab.label}
-            badge={tab.badge}
-            active={open === tab.id}
-            onClick={() => setOpen(open === tab.id ? null : tab.id)}
-          />
-        ))}
-        <div className="flex-1" />
-      </div>
     </div>
   );
 }
@@ -103,26 +93,21 @@ function RailTab({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       aria-pressed={active}
       title={active ? `Close ${label}` : `Open ${label}`}
-      className={`relative flex flex-col items-center gap-1.5 rounded-lg py-3 transition ${
-        active
-          ? "bg-primary text-primary-foreground"
-          : "text-black/60 hover:bg-black/5 dark:text-foreground/60 dark:hover:bg-white/10"
-      }`}
+      variant={active ? "default" : "ghost"}
+      size="sm"
+      className="relative gap-1.5"
     >
       {icon}
-      <span
-        className="text-[10px] font-semibold uppercase tracking-[0.14em]"
-        style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-      >
+      <span className="text-xs font-medium">
         {label}
       </span>
       {badge != null && <span className="absolute right-0.5 top-0.5">{badge}</span>}
-    </button>
+    </Button>
   );
 }
 

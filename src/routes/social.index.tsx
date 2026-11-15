@@ -4,8 +4,7 @@
 // favorites-to-kit entry point and kit-profile presets. Every playbook
 // opens /social/demo/$id for a fully-rendered live preview.
 
-import { HeroVideoLayer } from "@/components/hero/HeroVideoLayer";
-import heroSocialVideo from "@/assets/hero-social.mp4.asset.json";
+import { BuildWorkspaceHeader } from "@/components/editor/BuildWorkspaceHeader";
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
@@ -51,6 +50,7 @@ export const Route = createFileRoute("/social/")({
           "Division-scoped social campaign playbooks with live demo kits for every TransPerfect division.",
       },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://presentationpower.lovable.app/social" }],
   }),
@@ -95,22 +95,7 @@ function SocialView() {
   return (
     <>
       {/* Hero */}
-      <header className="full-bleed relative hero-flush overflow-hidden border-b border-black/5 bg-muted py-9 lg:py-12">
-        <HeroVideoLayer src={heroSocialVideo.url} opacity={0.55} tint="#FFFFFF" />
-        <div className="relative z-10 mx-auto max-w-7xl">
-          <div className="max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-md border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
-              <Share2 size={12} /> Element · Social
-            </div>
-            <h1 className="text-4xl font-semibold tracking-tight text-[#03002C] sm:text-5xl">
-              Social that looks like one studio made it.
-            </h1>
-            <p className="max-w-2xl text-base text-black/65">
-              Ready-to-post sets for every division — brand moments, product teases, milestones,
-              thought leadership, and client wins — designed in Element and rendering live in your
-              palette, sized right for every channel.
-            </p>
-
+      <BuildWorkspaceHeader active="social" title="Social workspace">
             <div className="flex flex-wrap gap-3 pt-2">
               <a
                 href="#playbooks"
@@ -143,9 +128,7 @@ function SocialView() {
                 Module studio <ArrowRight size={14} />
               </Link>
             </div>
-          </div>
-        </div>
-      </header>
+      </BuildWorkspaceHeader>
 
       <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6 lg:px-8">
         {/* Your saved kits (signed-in, non-empty only) */}

@@ -1,5 +1,7 @@
 # Roadmap
 ## Claude full Element update
+- [x] Established the linked Claude build as the forward reference; updated live module/print/social headers, cross-surface navigation, print/slide editor navigation and horizontal inspector controls.
+- [ ] Complete exact source editor, module-variant and project/material parity; current shared-workspace adoption is a first pass, not the whole Claude build.
 - [x] Inspect the supplied archive safely and record detected capabilities and missing dependencies.
 - [x] Approved plan; extracted 299 source-backed drafts and imported 128 supplied photographs/sprites into the existing admin curator; native copy/open/reopen verified, temporary test draft removed.
 - [ ] Finish source module/variant geometry, project/material/version/review UX and agent-tool integration; current draft mapping is partial, not full build parity.

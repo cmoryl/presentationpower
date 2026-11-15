@@ -15,6 +15,7 @@ import { X4_ICC_PROFILES, type IccProfileKey } from "@/lib/pdf-x4";
 import { useServerFn } from "@tanstack/react-start";
 
 import { AppShell } from "@/components/AppShell";
+import { BuildWorkspaceNav } from "@/components/editor/BuildWorkspaceNav";
 import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
@@ -234,8 +235,12 @@ import { printSectionLayoutId } from "@/lib/print-section-layouts";
 export const Route = createFileRoute("/asset/$assetId")({
   head: ({ params }) => ({
     meta: [
-      { title: `Print asset · ${params.assetId.slice(0, 6)}` },
+      { title: `Print editor · ${params.assetId.slice(0, 6)} · TransPerfect Element` },
       { name: "description", content: "Edit and export your print-ready case study." },
+      { property: "og:title", content: "Print editor · TransPerfect Element" },
+      { property: "og:description", content: "Build, review and export your Element print material." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(taxonomyQueryOptions),
@@ -1163,6 +1168,7 @@ function AssetEditor() {
 
   return (
     <AppShell>
+      <BuildWorkspaceNav active="print" className="mb-4" />
       {/* Studio: navy pasteboard chrome around a white press sheet. Chrome
           regions opt into the dark variant; the page itself never does, so
           the printed artwork renders exactly as it exports. */}

@@ -1,13 +1,13 @@
 {
   "source": "TransPerfect_ELEMENT.zip",
-  "intent": "Integrate the supplied Claude update into the existing Element application, not replace its production services",
+  "intent": "Adopt the supplied Claude build into actual modules, print, social, slides and editors while preserving existing saved work and production safeguards.",
   "capabilities": [
     {
       "capability": "Application code",
       "source": "Single bundled index.html with inline JavaScript and CSS; no package.json or separate source modules",
       "outcome": "Port into existing React/TanStack structure",
       "status": "partial",
-      "next_action": "299 source records and saved layouts statically extracted; existing admin print curator offers native editable draft creation. Full project/build-area UI and renderer parity remain unfinished."
+      "next_action": "Live module/print/social areas and print/slide editors now share task-oriented cross-surface navigation; shared inspector uses horizontal named controls. Exact source renderer/editor/project parity remains unfinished."
     },
     {
       "capability": "Module editing and layout",
@@ -70,7 +70,8 @@
       "source": "Existing production Element application",
       "outcome": "No destructive replacement or automatic publication",
       "status": "partial",
-      "next_action": "Three preservation tests pass; authenticated draft create/reopen checked without page errors and temporary draft removed. Preview build OK. Full suite: 2794 pass, 8 fail; full edit/review/export/responsive integration not verified. No publication."
+      "next_action": "Signed-in module, print, social and social-editor navigation checked on desktop; populated social canvas verified, phone has no page overflow and no page errors. Sixteen relevant tests pass; preview build OK. Existing full-suite eight failures recorded previously. Source-complete edit/review/export parity remains unverified; not published."
     }
-  ]
+  ],
+  "reference_url": "https://claude.ai/artifact/7WXARzAhxXMfoJppmzkDSs"
 }

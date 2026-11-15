@@ -33,6 +33,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { DeckLookPresetPicker } from "@/components/decks/DeckLookPresetPicker";
 import { AppShell } from "@/components/AppShell";
+import { BuildWorkspaceNav } from "@/components/editor/BuildWorkspaceNav";
 import {
   AuthoringNav,
   EditorMenu,
@@ -171,7 +172,7 @@ import { resolveBrandMode } from "@/lib/brand-profiles";
 
 export const Route = createFileRoute("/decks/$deckId/")({
   head: ({ params }) => ({
-    meta: [{ title: `Deck ${params.deckId} · TransPerfect Element` }],
+    meta: [{ title: `Slide editor · ${params.deckId.slice(0, 6)} · TransPerfect Element` }, { name: "description", content: "Build, review and export slides in the Element workspace." }, { property: "og:title", content: "Slide editor · TransPerfect Element" }, { property: "og:description", content: "Edit governed slides and prepare your deck for delivery." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }],
   }),
   component: DeckEditorGate,
 });
@@ -573,6 +574,7 @@ function DeckEditor() {
 
   return (
     <AppShell>
+      <BuildWorkspaceNav active="slides" className="mb-5" />
       <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
         <SlideMediaRefreshProvider slides={deck.slides}>
           <div className="deck-editor-ui contents" ref={nameIconButtons}>

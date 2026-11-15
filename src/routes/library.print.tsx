@@ -1,6 +1,5 @@
 import { createPortal } from "react-dom";
-import { HeroVideoLayer } from "@/components/hero/HeroVideoLayer";
-import heroPrintVideo from "@/assets/hero-print.mp4.asset.json";
+import { BuildWorkspaceHeader } from "@/components/editor/BuildWorkspaceHeader";
 import { ApprovedPrintFrame } from "@/components/print/ApprovedPrintFrame";
 import { approvePrintDemoContent } from "@/lib/print-library/demo-approve";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -261,23 +260,7 @@ function PrintCenterPage() {
 
   return (
     <AppShell>
-      <header className="full-bleed relative hero-flush mb-10 overflow-hidden border-b border-black/5 bg-muted py-9 lg:py-12">
-        <HeroVideoLayer src={heroPrintVideo.url} opacity={0.55} tint="#FFFFFF" />
-        <div className="relative z-10 mx-auto max-w-[1400px]">
-          <div className="text-xs uppercase tracking-[0.3em] text-black/50">Element · Print</div>
-          <div className="mt-3">
-            <LibrarySubnav active="/library/print" />
-          </div>
-          <h1 className="mt-4 text-4xl font-semibold text-[#03002C] sm:text-5xl">
-            Print that comes out on brand.
-          </h1>
-          <p className="mt-3 max-w-2xl text-black/60">
-            One-pagers, brochures, case studies, and proposals built on the same Element system as
-            your decks. Pick a design, see it in your division's look, then make it yours — the
-            layout, type, and print-ready file are handled.
-          </p>
-        </div>
-      </header>
+      <BuildWorkspaceHeader active="print" title="Print library"><LibrarySubnav active="/library/print" /></BuildWorkspaceHeader>
 
       <PrintLibraryBrowser
         brandModes={brandModes}

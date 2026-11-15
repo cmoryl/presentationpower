@@ -49,7 +49,7 @@ export function LibrarySubnav({ active }: { active: Target }) {
   const inPrint = active.startsWith("/library/print");
   const items = inPrint ? PRINT_ITEMS : PRESENTATION_ITEMS;
   return (
-    <nav aria-label="Library sections" className="flex flex-wrap items-center gap-1.5">
+    <nav aria-label="Library sections" className="flex max-w-full items-center gap-1 overflow-x-auto [scrollbar-width:thin]">
       {items.map((it) => {
         const isActive = it.to === active;
         return (
@@ -58,10 +58,10 @@ export function LibrarySubnav({ active }: { active: Target }) {
             to={it.to}
             aria-current={isActive ? "page" : undefined}
             className={
-              "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition " +
+              "inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-2 text-xs transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring " +
               (isActive
-                ? "border-[#003FC7] bg-primary text-primary-foreground"
-                : "border-black/15 bg-white text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]")
+                ? "bg-muted text-foreground font-semibold"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground")
             }
           >
             {it.icon}
