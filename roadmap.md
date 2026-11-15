@@ -2,8 +2,8 @@
 ## Claude full Element update
 - [x] Corrected the migration ledger: the previous ZIP was bundled output; ELEMENT v221's ordered 151-file source and 698-image packages are the authoritative next inputs, not absent artwork.
 - [ ] Priority 1 — port the shared field renderer, conditional when(d) rules, vk/vk2 variants, SUBS/flexible rows, effective source renderers and baked reader into the existing editor. Blocked on attachment of element-v221-source.zip; stop further bundle reverse-engineering.
-- [ ] Priority 2 — host the 698 original images and resolve assets.json hashes without changing material IDs. Blocked on attachment of element-v221-library-images.zip.
-- [ ] Priority 3 — apply Templates display labels and exact *_WAS saved-project migrations, retaining spectrum/spx keys. Blocked on source package and preceding priorities; existing Templates build label already remains unchanged.
+- [ ] Priority 2 — host the 698 original images and resolve assets.json hashes without changing material IDs. All 698 images confirmed packaged and fully mapped; pending attachment of element-v221-library-images.zip only, not an availability risk.
+- [x] Priority 3 — Templates label uses shared metadata; implemented exact current/legacy project-name lookup without rewriting saved names, preserving first live match and spectrum/nav-spx/order 4. Both templates/spectrum spoken aliases resolve to the same destination; 18 focused tests passed. No source project resolver/creation or goTo exists yet; connect the tested adapter when those capabilities are ported, not a rename blocker.
 - [x] Audited source process and aligned Build → modules/templates → saved work, role-aware navigation, selected variant configuration, material naming, undo/redo, recursive checks and proof delivery; authenticated reopen/phone/review-door verified. Full audit in docs/claude-build-process-audit.json; source project/review/version/agent parity remains explicitly incomplete.
 - [x] Inventoried and browser-walked all 38 supplied modules plus page breaks; integrated source controls, flexible rows, 14 sizes and source-template save/reopen/proof downloads in the live editor. Event photos, kits and native/original records preserved.
 - [ ] Complete faithful module geometry and native slide/social replacement; six source families remain explicitly unported, other adaptations are not certified as exact. Await authoritative source and image packages; image bytes exist upstream.
@@ -14,7 +14,9 @@
 - [ ] Finish source module/variant geometry, project/material/version/review UX and agent-tool integration; current draft mapping is partial, not full build parity.
 - [ ] Connect source artwork: 274 drafts reference 698 hash-backed images existing in the artifact asset store; awaiting the announced original-image package, not replacement imagery.
 - [x] Verified source template editing/save/reopen, nested rows, module choices, social/slides entry points, PDF/flat-PPTX proof downloads and phone fit; eight source tests pass and build OK.
-- [ ] Verify full native/review/agent/press/Office parity; missing artwork and exact renderer work remain incomplete. Full suite retains the same eight pre-existing failures.
+- [ ] Verify full native/review/agent/press/Office parity; source/image attachment and exact renderer work remain incomplete. Eight unrelated pre-existing failures are tracked separately, not an Element port gate.
+## Separate pre-existing defects
+- [ ] Diagnose and resolve the eight Bowl, London-map export and light-mode surface guard failures listed by full test name in docs/claude-build-process-audit.json. None waived; tracked outside the Element port. No event facts, export contracts or artwork should be changed merely to satisfy stale assertions.
 ## Bowl brand-kit submenu
 - [x] Add a shared icon-led pinned section strip for existing brand sections on app/share views; remove the standalone Animations shortcut without changing content or downloads.
 - [x] Verified five section jumps on app and public brand kit, heading clearance beneath pinned menus and phone fit; public phone view reviewed.

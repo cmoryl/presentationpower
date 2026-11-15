@@ -5,11 +5,15 @@
   "v221_correction": {
     "authority": "User-supplied ELEMENT v221 architecture brief, 2026-11-15 18:32 UTC",
     "previous_input": "Bundled output; not the 151-file editable source",
-    "source_package": "element-v221-source.zip — not attached at this audit",
-    "image_package": "element-v221-library-images.zip — not attached at this audit",
-    "priority_order": ["Shared field-definition renderer and effective source geometry", "698 hash-preserving original image mappings", "Templates label and legacy project-name migration"],
-    "implementation_status": "No additional renderer or project migration claimed; await authoritative packages instead of reverse-engineering the bundle again",
-    "verification_gate": "Inspect all function definitions in filename load order; import baked data/reader, not baking. Source release signature without WARNING and 66 source suites fails=0 remain unverified. No parity claim until current failures are fixed or explicitly waived."
+    "source_package": "element-v221-source.zip \u2014 not attached at this audit",
+    "image_package": "element-v221-library-images.zip \u2014 all 698 images confirmed packaged and mapped; pending attachment only",
+    "priority_order": [
+      "Shared field-definition renderer and effective source geometry",
+      "698 hash-preserving original image mappings",
+      "Templates label and legacy project-name migration"
+    ],
+    "implementation_status": "Templates navigation uses shared compatibility metadata. Exact current/legacy project match and templates/spectrum spoken-name adapter implemented without rewriting records. Source project creation/resolution and goTo do not exist in the current app, so live membership and agent-command integration are not claimed.",
+    "verification_gate": "Inspect all source definitions in filename load order; import baked data/reader. Source signature without WARNING and 66 suites fails=0 remain unverified. The eight unrelated pre-existing failures are tracked separately, not an Element port gate, and remain unresolved/not waived."
   },
   "findings": [
     {
@@ -70,13 +74,14 @@
       "unresolved_tests": [
         "sjb-recent-updates.test.ts > Bowl recent updates bar > shows the newest work first and every card has artwork",
         "light-mode-surface-guard.test.ts > light-mode surface override guard > no unscoped or .light rule paints a dark-mode surface color onto a surface property",
-        "london-map-export-editability.test.ts > London map exports are editable > Ground Floor — Illustrator file keeps paths and live text",
+        "london-map-export-editability.test.ts > London map exports are editable > Ground Floor \u2014 Illustrator file keeps paths and live text",
         "sjb-calendar-demo.test.ts > Bowl calendar demo sequences > replaces calendar and downloadable covers with the exact saved size-specific artwork",
         "sjb-calendar-demo.test.ts > Bowl calendar demo sequences > uses the approved single image on the headline page (page 2) only where a cleaned export exists",
         "sjb-event-facts.test.ts > San Juan Bowl official announcement > marks venue and dates ready with the supplied official source",
         "sjb-event-links.test.ts > Bowl event isolation > keeps unbuilt Bowl signs, badges and pillars unavailable",
         "sjb-social-studio.test.ts > Bowl social page selection > keeps extra portrait projection sizes inside their actual matching calendar look"
-      ]
+      ],
+      "scope": "Separate pre-existing defect list; not an Element port gate; none waived"
     },
     "authenticated_flow": [
       "Build \u2192 modules",
@@ -94,7 +99,7 @@
     "role_testing": "Pure tests; no full live all-role audit"
   },
   "remaining_external_blockers": [
-    "Attachment of the announced v221 source and image packages; 698 image bytes affecting 274 templates exist upstream, not missing artwork",
+    "Pending attachment of source and image packages; all 698 images are confirmed packaged and mapped, not an availability risk",
     "Office and print-vendor production verification"
   ],
   "remaining_implementation": [
@@ -103,5 +108,19 @@
     "Native social/slide renderer parity",
     "Saved-file format categorization",
     "Agent and cross-format source-copy coverage"
-  ]
+  ],
+  "templates_rename": {
+    "new_example_name": "Example: Templates",
+    "legacy_example_name": "Example: Spectrum templates",
+    "new_master_name": "Template masters",
+    "legacy_master_name": "Spectrum template masters",
+    "lookup": "First non-deleted exact match to either name, preserving existing order and object identity",
+    "writes": "None; saved names never rewritten",
+    "navigation": "Templates display label, spectrum key, nav-spx icon key, order 4; existing /library/print destination unchanged",
+    "agent_aliases": [
+      "templates",
+      "spectrum"
+    ],
+    "live_integration_limits": "No source project store or source goTo implementation is present; helpers ready for those adapters, not claimed as live migrated project behavior."
+  }
 }

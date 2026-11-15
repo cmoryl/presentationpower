@@ -3,9 +3,27 @@
   "authoritative_revision": "ELEMENT v221",
   "source_correction": "The earlier ZIP is bundled output, not the editable source. The authoritative 151-file source package and 698-image asset package were announced separately and are not attached in this turn.",
   "v221_priorities": [
-    { "capability": "Field-definition renderer and final source render functions", "source": "element-v221-source.zip", "outcome": "Port into the existing React editor; evaluate when(d), vk/vk2 and SUBS, then share one stack across formats", "status": "awaiting_source_package", "next_action": "Inspect the source archive safely; enumerate every definition and wrapper in filename load order before porting the effective renderer and baked reader. Do not continue bundle reverse-engineering." },
-    { "capability": "698 library images", "source": "element-v221-library-images.zip and element-library/assets.json", "outcome": "Resolve original asset hashes to hosted original bytes without changing material IDs", "status": "awaiting_image_package", "next_action": "Inspect the package and map supplied hashes to uploaded asset pointers; report unresolved IDs, never invent replacement artwork." },
-    { "capability": "Templates rename", "source": "94b-nav.js and SPXL/SPXT legacy-name migrations", "outcome": "Change display labels only; preserve spectrum route key, spx prefixes and saved project membership", "status": "awaiting_source_package", "next_action": "After the renderer and image work, inspect exact *_WAS values and relevant current adapters before migrating names. Do not guess legacy project strings or rename the corporate style registry." }
+    {
+      "capability": "Field-definition renderer and final source render functions",
+      "source": "element-v221-source.zip",
+      "outcome": "Port into the existing React editor; evaluate when(d), vk/vk2 and SUBS, then share one stack across formats",
+      "status": "awaiting_source_package",
+      "next_action": "Inspect the source archive safely; enumerate every definition and wrapper in filename load order before porting the effective renderer and baked reader. Do not continue bundle reverse-engineering."
+    },
+    {
+      "capability": "698 library images",
+      "source": "element-v221-library-images.zip and element-library/assets.json",
+      "outcome": "Resolve original asset hashes to hosted original bytes without changing material IDs",
+      "status": "pending_attachment",
+      "next_action": "All 698 images are confirmed present and packaged, with every mapping in assets.json. Await attachment only, then inspect and host original bytes preserving hashes; this is not an asset-availability risk."
+    },
+    {
+      "capability": "Templates rename",
+      "source": "Exact v221 names supplied by user on 2026-11-15 18:40 UTC",
+      "outcome": "Change display labels only; preserve spectrum route key, spx prefixes and saved project membership",
+      "status": "compatibility_adapter_implemented",
+      "next_action": "Shared navigation already displays Templates and now uses the canonical adapter. Exact current/legacy lookup and both spoken aliases implemented. No Claude project resolver, project creation, or goTo command exists in the current app; connect these tested helpers when those capabilities are ported. No stored project rename or data migration required."
+    }
   ],
   "intent": "Adopt the supplied Claude build into actual modules, print, social, slides and editors while preserving existing saved work and production safeguards.",
   "capabilities": [
@@ -56,7 +74,7 @@
       "source": "PNG/JPG, editable PowerPoint, SVG, browser PDF and press-preparation controls",
       "outcome": "Preserve existing QA, outlined print-master and colour-space contracts",
       "status": "partial",
-      "next_action": "Verified one saved/reopened quote through real PDF and flat PowerPoint proof downloads. Missing artwork, unported geometry, missing images and page overflow block source proofs. Native deck, outlined press master and production export paths remain unchanged; Office openability and exact source export parity unverified."
+      "next_action": "128 photographs/sprites imported unchanged. All 698 library images are confirmed present, packaged, and fully mapped by assets.json; only attachment is pending. Preserve original hash IDs when hosting. 378 client logos remain private/unpublished."
     },
     {
       "capability": "Agent and providers",
@@ -113,5 +131,11 @@
       "Full cross-format copy coverage"
     ],
     "verification": "Authenticated build-to-module-to-editor-to-files-reopen verified; review door opens /approvals; mobile main-menu Build verified; no page errors or page overflow. Pure role tests passed; all-role authenticated testing not performed."
+  },
+  "pre_existing_defects": {
+    "audit": "docs/claude-build-process-audit.json",
+    "count": 8,
+    "status": "unresolved; not waived",
+    "scope": "Bowl, London map exports and light-mode surface guard; tracked separately and not an Element port gate"
   }
 }

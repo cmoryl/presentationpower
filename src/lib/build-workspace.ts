@@ -1,8 +1,10 @@
+import { TEMPLATE_NAV } from "./element-update/template-navigation";
+
 /** Shared build destinations; saved records and approval systems remain authoritative. */
 export const BUILD_DESTINATIONS = [
   { id: "start", label: "Build", to: "/build", icon: "start" },
   { id: "modules", label: "Modules", to: "/library", icon: "modules" },
-  { id: "print", label: "Templates", to: "/library/print", icon: "print" },
+  { id: "print", label: TEMPLATE_NAV.label, to: TEMPLATE_NAV.to, icon: "print" },
   { id: "work", label: "My work", to: "/files", icon: "work" },
   { id: "review", label: "Review", to: "/approvals", icon: "review" },
 ] as const;
