@@ -1,0 +1,16 @@
+{
+  "source": "TransPerfect_ELEMENT.zip",
+  "intent": "Integrate the supplied Claude update into the existing Element application, not replace its production services",
+  "capabilities": [
+    {"capability":"Application code","source":"Single bundled index.html with inline JavaScript and CSS; no package.json or separate source modules","outcome":"Port into existing React/TanStack structure","status":"inspected","next_action":"Inventory and map screens and module variants before implementation"},
+    {"capability":"Module editing and layout","source":"MODULES, LIB_DESIGNS, responsive fitting and per-format controls","outcome":"Preserve supported editing capabilities through current governed registries","status":"pending","next_action":"Compare source definitions with current module and print registries"},
+    {"capability":"Projects, materials, versions and review","source":"Store supports localStorage and optional injected collection-style shared database","outcome":"Use existing Lovable Cloud auth and data ownership","status":"pending","next_action":"Map source records and review actions to current application tables"},
+    {"capability":"Schema and existing records","source":"No schema or standalone record export detected; embedded template content is present","outcome":"Preserve current Cloud records; do not substitute demo content for approved facts","status":"pending","next_action":"Classify embedded templates separately from saved user projects"},
+    {"capability":"Authentication and authorization","source":"Injected identity/owner checks and optional shared Store adapter","outcome":"Retain existing Element role enforcement","status":"pending","next_action":"Audit source actions against existing role authorities"},
+    {"capability":"Uploaded artwork","source":"378 client-logo files, 121 library images and seven sprite files","outcome":"Preserve original files and private client-asset handling","status":"inspected","next_action":"Deduplicate against current assets; resolve approximately 698 unmatched image references before claiming complete coverage"},
+    {"capability":"Exports","source":"PNG/JPG, editable PowerPoint, SVG, browser PDF and press-preparation controls","outcome":"Preserve existing QA, outlined print-master and colour-space contracts","status":"pending","next_action":"Port compatible exports; identify incompatible live-text/automatic CMYK behavior without silently adopting it"},
+    {"capability":"Agent and providers","source":"Agent tools and runtime integration hooks in bundled script","outcome":"Retain existing AI model registry and connected providers","status":"pending","next_action":"Inspect actual agent execution call sites and adapt to current gateway"},
+    {"capability":"Public endpoints, callbacks, webhooks and schedules","source":"No separate server files detected in archive","outcome":"Preserve all current Element endpoints and schedules","status":"pending","next_action":"Confirm runtime hooks do not represent missing external capabilities"},
+    {"capability":"Cutover and verification","source":"Existing production Element application","outcome":"No destructive replacement or automatic publication","status":"pending","next_action":"Review integration plan and verify complete representative editing and export flows"}
+  ]
+}
