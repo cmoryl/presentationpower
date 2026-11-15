@@ -1,14 +1,15 @@
-import { forwardRef, useEffect, useState, type ComponentPropsWithoutRef } from "react";
-import { ArrowDownRight, Image, Shapes, Palette, Type, Scan, ShieldCheck, PanelsTopLeft, FileDown, Grid2X2, Flag, Globe, Layers, MapPin, Compass, type LucideIcon } from "lucide-react";
+import { forwardRef, useEffect, useRef, useState, type ComponentPropsWithoutRef } from "react";
+import { ArrowDownRight, Image, Shapes, Palette, Type, Scan, ShieldCheck, PanelsTopLeft, FileDown, Grid2X2, Flag, Globe, Layers, MapPin, Compass, Clapperboard, type LucideIcon } from "lucide-react";
 import { Button, cn } from "@/design-system/element";
 
 export interface BrandKitSectionNavProps extends ComponentPropsWithoutRef<"nav"> {
   sections: readonly (readonly [string, string])[];
-  variant?: "grid" | "rail";
+  variant?: "grid" | "rail" | "strip";
 }
 
 function sectionVisual(id: string, label: string): { icon: LucideIcon; detail: string } {
   const key = `${id} ${label}`.toLowerCase();
+  if (/animation/.test(key)) return { icon: Clapperboard, detail: "Motion artwork & videos" };
   if (/clear|siz|safe/.test(key)) return { icon: Scan, detail: "Spacing & minimum sizes" };
   if (/misuse|rule|usage/.test(key)) return { icon: ShieldCheck, detail: "Correct use & common mistakes" };
   if (/icon/.test(key)) return { icon: Grid2X2, detail: "Symbols & approved sets" };
@@ -29,6 +30,27 @@ function sectionVisual(id: string, label: string): { icon: LucideIcon; detail: s
 export const BrandKitSectionNav = forwardRef<HTMLElement, BrandKitSectionNavProps>(
   ({ sections, variant = "grid", className, ...props }, ref) => {
     const [active, setActive] = useState("");
+    const strip = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+      if (variant !== "strip") return;
+      let frame = 0;
+      const measure = () => {
+        const host = strip.current;
+        if (!host) return;
+        const headers = [...document.querySelectorAll<HTMLElement>("[data-app-shell] > header, [data-sjb-share-header], .sjb-site-nav--stuck")];
+        const top = Math.max(0, ...headers.map(e => e.getBoundingClientRect().bottom));
+        host.style.setProperty("--brand-nav-top", `${top}px`);
+        let selected = sections[0]?.[0] ?? "";
+        for (const [id] of sections) {
+          const target = document.getElementById(id);
+          if (target && target.getBoundingClientRect().top <= top + host.offsetHeight + 32) selected = id;
+        }
+        setActive(selected);
+      };
+      const update = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(measure); };
+      measure(); window.addEventListener("scroll", update, { passive: true }); window.addEventListener("resize", update);
+      return () => { cancelAnimationFrame(frame); window.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
+    }, [variant, sections]);
     useEffect(() => {
       const syncHash = () => setActive(window.location.hash.slice(1));
       syncHash();
@@ -36,6 +58,25 @@ export const BrandKitSectionNav = forwardRef<HTMLElement, BrandKitSectionNavProp
       return () => window.removeEventListener("hashchange", syncHash);
     }, []);
 
+    if (variant === "strip") return <div ref={strip} className="sticky top-[var(--brand-nav-top,0px)] z-10 border-y border-border bg-background shadow-sm" data-export-ignore="true">
+      <nav ref={ref} aria-label="Brand kit sections" className={cn("overflow-x-auto", className)} {...props}>
+        <div className="mx-auto flex w-max min-w-full justify-center">
+          {sections.map(([id, label]) => {
+            const { icon: Icon } = sectionVisual(id, label);
+            return <Button asChild key={id} variant="ghost" className={cn("h-auto min-h-20 min-w-24 flex-col gap-2 rounded-none border-b-2 px-4 py-3 text-xs", active === id ? "border-primary bg-accent text-foreground" : "border-transparent text-muted-foreground")}>
+              <a href={`#${id}`} aria-current={active === id ? "location" : undefined} onClick={event => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                event.preventDefault(); const target = document.getElementById(id); if (!target) return;
+                window.history.replaceState(window.history.state, "", `#${id}`);
+                target.scrollIntoView({ behavior: "instant", block: "start" });
+                const align = () => { const host = strip.current; if (!host) return; const top = Number.parseFloat(host.style.getPropertyValue("--brand-nav-top")) || 0; window.scrollBy({ top: target.getBoundingClientRect().top - top - host.offsetHeight - 16, behavior: "instant" }); };
+                window.setTimeout(align, 150); window.setTimeout(align, 500); setActive(id);
+              }}><Icon aria-hidden className="size-5" />{label}</a>
+            </Button>;
+          })}
+        </div>
+      </nav>
+    </div>;
     return (
       <nav ref={ref} aria-label="Guide sections" className={cn("mt-8", className)} {...props}>
         <h2 className="mb-4 text-sm font-semibold text-foreground">Explore the guide</h2>

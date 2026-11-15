@@ -11,7 +11,7 @@ import brandGuide from "@/assets/sjb/brand-guide.pdf.asset.json";
 import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 import { SjbLettering } from "@/components/events/SjbLettering";
 import { SjbLogoAnimation } from "@/components/events/SjbLogoAnimation";
-import { Button } from "@/design-system/element";
+import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
 import { SJB_LETTERING_SPEC_VISIBLE } from "@/components/events/SjbShare";
 
 import { useState } from "react";
@@ -46,6 +46,7 @@ import {
 
 
 const card = "border-t border-border bg-background py-5";
+const BRAND_SECTIONS = [["animations", "Animations"], ["applications", "Applications"], ["bowl-logos", "Logos"], ["bowl-colours", "Colours"], ["bowl-pairings", "Colour balance"], ["bowl-typography", "Typography"], ["bowl-naming", "Naming"], ["bowl-construction", "Construction"], ["bowl-production", "Production"]] as const;
 
 /** Backgrounds offered in the per-variant preview switcher. */
 const PREVIEW_BGS = [
@@ -328,6 +329,7 @@ export function SjbBrandKit() {
   const share = useSjbShare();
   return (
     <SjbShell>
+      <BrandKitSectionNav sections={BRAND_SECTIONS} variant="strip" aria-label="Bowl brand kit sections" />
       <div className="mx-auto max-w-5xl space-y-10 px-6 py-8 text-[#03002C]">
         <SjbLink page="event"
           className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#03002C]/70 hover:text-[#03002C]"
@@ -365,7 +367,6 @@ export function SjbBrandKit() {
           )}
           <SjbShareLinkButton />
           <div className="mt-3"><BrandKitPdfExport kitId="san-juan-bowl" /></div>
-          <div className="mt-3"><Button asChild variant="outline"><a href="#animations">Animations</a></Button></div>
         </header>
 
         <section id="animations" className="scroll-mt-48 space-y-4 border-t border-border pt-6" aria-labelledby="sjb-animations-heading" data-export-ignore="true">
@@ -374,8 +375,8 @@ export function SjbBrandKit() {
         </section>
         <SjbBrandKitBody />
         {/* Designer content (construction + production) lives on this one page. */}
-        <ConstructionSection />
-        <LargeFormatSection />
+        <section id="bowl-construction"><ConstructionSection /></section>
+        <section id="bowl-production"><LargeFormatSection /></section>
         {!share && <KitSignList kit="san-juan-bowl" />}
 
 
@@ -389,7 +390,7 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
   return (
     <>
         <SjbApplicationGallery />
-        <section className="space-y-4">
+        <section id="bowl-logos" className="space-y-4">
           <div>
             <h2 className="text-[20px] font-bold">Logo</h2>
             <p className="mt-1 text-[13px] text-[#666666]">
@@ -499,7 +500,7 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
           </ul>
         </section>
 
-        <section className="space-y-3">
+        <section id="bowl-colours" className="space-y-3">
           <h2 className="text-[17px] font-bold">Logo palette — print &amp; web codes</h2>
           <p className="text-[13px] text-[#666666]">
             Read from the supplied artwork. These are for San Juan Bowl material; everything else stays on the
@@ -562,7 +563,7 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
           </div>
         </section>
 
-        <section className="space-y-3">
+        <section id="bowl-pairings" className="space-y-3">
           <h2 className="text-[17px] font-bold">Colour balance &amp; readable pairings</h2>
           <p className="text-[13px] text-[#666666]">
             A suggested share of each colour in a layout, then every text/background pair checked against web
@@ -612,7 +613,7 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
           </div>
         </section>
 
-        <section className="space-y-3">
+        <section id="bowl-typography" className="space-y-3">
           <h2 className="text-[17px] font-bold">Typography</h2>
           <p className="text-[13px] text-[#666666]">{SJB_TYPE_NOTE}</p>
           <div className={`${card} divide-y divide-[#03002C]/8`}>
@@ -646,7 +647,7 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
           </ul>
         </section>
 
-        <section className={`${card} space-y-2`}>
+        <section id="bowl-naming" className={`${card} space-y-2`}>
           <h2 className="text-[17px] font-bold">Naming the event</h2>
           <dl className="grid gap-3 sm:grid-cols-3">
             {SJB_NAMING.map((n) => (

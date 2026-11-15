@@ -1,4 +1,7 @@
 # Roadmap
+## Bowl brand-kit submenu
+- [x] Add a shared icon-led pinned section strip for existing brand sections on app/share views; remove the standalone Animations shortcut without changing content or downloads.
+- [x] Verified five section jumps on app and public brand kit, heading clearance beneath pinned menus and phone fit; public phone view reviewed.
 ## NEXT photo-header composition review
 - [x] Give real event scenes more vertical space, remove competing artwork behind photos and keep headline copy away from people; show the scene below copy on phones without heavy face-darkening.
 - [x] Reviewed both desktop scenes with speakers visible and London on phone; images decode, phone fits and signed-out artwork fallback remains private-safe.
