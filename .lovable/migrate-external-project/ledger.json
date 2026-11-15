@@ -1,20 +1,20 @@
 {
   "source": "TransPerfect_ELEMENT.zip",
   "authoritative_revision": "ELEMENT v221",
-  "source_correction": "The earlier ZIP is bundled output, not the editable source. The authoritative 151-file source package and 698-image asset package were announced separately and are not attached in this turn.",
+  "source_correction": "Both authoritative v221 packages received and safely inspected on 2026-11-15; earlier archive remains bundled output.",
   "v221_priorities": [
     {
       "capability": "Field-definition renderer and final source render functions",
       "source": "element-v221-source.zip",
       "outcome": "Port into the existing React editor; evaluate when(d), vk/vk2 and SUBS, then share one stack across formats",
-      "status": "awaiting_source_package",
+      "status": "source_inspected_port_in_progress",
       "next_action": "Inspect the source archive safely; enumerate every definition and wrapper in filename load order before porting the effective renderer and baked reader. Do not continue bundle reverse-engineering."
     },
     {
       "capability": "698 library images",
       "source": "element-v221-library-images.zip and element-library/assets.json",
       "outcome": "Resolve original asset hashes to hosted original bytes without changing material IDs",
-      "status": "pending_attachment",
+      "status": "package_verified_upload_in_progress",
       "next_action": "All 698 images are confirmed present and packaged, with every mapping in assets.json. Await attachment only, then inspect and host original bytes preserving hashes; this is not an asset-availability risk."
     },
     {
@@ -67,14 +67,14 @@
       "source": "378 client-logo files, 121 library images and seven sprite files",
       "outcome": "Preserve original files and private client-asset handling",
       "status": "partial",
-      "next_action": "128 supplied photographs/sprites imported unchanged. The 698 images affecting 274 templates exist in the Claude asset store; their announced package has not arrived here. Preserve hash IDs and wire assets.json to original hosted bytes once attached. 378 client logos remain private/unpublished."
+      "next_action": "698 original image files and assets.json received; hash-preserving hosting in progress. Existing private logos/photos remain unchanged."
     },
     {
       "capability": "Exports",
       "source": "PNG/JPG, editable PowerPoint, SVG, browser PDF and press-preparation controls",
       "outcome": "Preserve existing QA, outlined print-master and colour-space contracts",
       "status": "partial",
-      "next_action": "128 photographs/sprites imported unchanged. All 698 library images are confirmed present, packaged, and fully mapped by assets.json; only attachment is pending. Preserve original hash IDs when hosting. 378 client logos remain private/unpublished."
+      "next_action": "Existing outlined press/native-deck safeguards retained. Source downloads remain digital/flat proofs; verify source rendering, images and overflow before delivery."
     },
     {
       "capability": "Agent and providers",

@@ -1,0 +1,455 @@
+[
+  {
+    "file": "21-engine-submodules.js",
+    "line": 552,
+    "target": "MODULES.row"
+  },
+  {
+    "file": "29-engine-advance.js",
+    "line": 76,
+    "target": "MODULES.kpis.render"
+  },
+  {
+    "file": "29-engine-advance.js",
+    "line": 81,
+    "target": "MODULES.stats.render"
+  },
+  {
+    "file": "29-engine-advance.js",
+    "line": 89,
+    "target": "MODULES.numbersGrid.render"
+  },
+  {
+    "file": "32-engine-advance-c.js",
+    "line": 398,
+    "target": "derive"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 44,
+    "target": "lyOpt",
+    "module": "kpis"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 45,
+    "target": "lyWrap",
+    "module": "kpis"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 63,
+    "target": "lyOpt",
+    "module": "stats"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 64,
+    "target": "lyWrap",
+    "module": "stats"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 73,
+    "target": "lyOpt",
+    "module": "capabilities"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 79,
+    "target": "lyWrap",
+    "module": "capabilities"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 105,
+    "target": "lyOpt",
+    "module": "features"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 106,
+    "target": "lyWrap",
+    "module": "features"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 121,
+    "target": "lyOpt",
+    "module": "storyRows"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 122,
+    "target": "lyWrap",
+    "module": "storyRows"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 139,
+    "target": "lyOpt",
+    "module": "storyColumns"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 176,
+    "target": "lyWrap",
+    "module": "storyColumns"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 278,
+    "target": "lyOpt",
+    "module": "quote"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 279,
+    "target": "lyWrap",
+    "module": "quote"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 288,
+    "target": "lyOpt",
+    "module": "quoteStats"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 289,
+    "target": "lyWrap",
+    "module": "quoteStats"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 303,
+    "target": "lyOpt",
+    "module": "expert"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 304,
+    "target": "lyWrap",
+    "module": "expert"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 316,
+    "target": "lyOpt",
+    "module": "cta"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 317,
+    "target": "lyWrap",
+    "module": "cta"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 323,
+    "target": "lyOpt",
+    "module": "footer"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 324,
+    "target": "lyWrap",
+    "module": "footer"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 330,
+    "target": "lyOpt",
+    "module": "numbersGrid"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 331,
+    "target": "lyWrap",
+    "module": "numbersGrid"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 346,
+    "target": "lyOpt",
+    "module": "stages"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 347,
+    "target": "lyWrap",
+    "module": "stages"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 359,
+    "target": "lyOpt",
+    "module": "footprint"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 360,
+    "target": "lyWrap",
+    "module": "footprint"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 368,
+    "target": "lyOpt",
+    "module": "bigMetric"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 369,
+    "target": "lyWrap",
+    "module": "bigMetric"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 377,
+    "target": "lyOpt",
+    "module": "pillars"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 378,
+    "target": "lyWrap",
+    "module": "pillars"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 387,
+    "target": "lyOpt",
+    "module": "hub"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 388,
+    "target": "lyWrap",
+    "module": "hub"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 396,
+    "target": "lyOpt",
+    "module": "pipeline"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 397,
+    "target": "lyWrap",
+    "module": "pipeline"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 409,
+    "target": "lyWrap",
+    "module": "logoWall"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 414,
+    "target": "lyOpt",
+    "module": "dataChart"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 415,
+    "target": "lyWrap",
+    "module": "dataChart"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 444,
+    "target": "lyOpt",
+    "module": "comparison"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 445,
+    "target": "lyWrap",
+    "module": "comparison"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 461,
+    "target": "lyOpt",
+    "module": "timeline"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 462,
+    "target": "lyWrap",
+    "module": "timeline"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 472,
+    "target": "lyOpt",
+    "module": "testimonials"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 473,
+    "target": "lyWrap",
+    "module": "testimonials"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 480,
+    "target": "lyOpt",
+    "module": "team"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 481,
+    "target": "lyWrap",
+    "module": "team"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 488,
+    "target": "lyOpt",
+    "module": "tiers"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 489,
+    "target": "lyWrap",
+    "module": "tiers"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 496,
+    "target": "lyOpt",
+    "module": "checklist"
+  },
+  {
+    "file": "33-engine-layouts.js",
+    "line": 497,
+    "target": "lyWrap",
+    "module": "checklist"
+  },
+  {
+    "file": "35b-dataviz-react.js",
+    "line": 337,
+    "target": "MODULES.kpiTrend.render"
+  },
+  {
+    "file": "35b-dataviz-react.js",
+    "line": 338,
+    "target": "MODULES.funnel.render"
+  },
+  {
+    "file": "35b-dataviz-react.js",
+    "line": 339,
+    "target": "MODULES.heatmap.render"
+  },
+  {
+    "file": "35b-dataviz-react.js",
+    "line": 340,
+    "target": "MODULES.bullet.render"
+  },
+  {
+    "file": "35b-dataviz-react.js",
+    "line": 341,
+    "target": "MODULES.seriesChart.render"
+  },
+  {
+    "file": "35c-pipeline-react.js",
+    "line": 196,
+    "target": "lyOpt",
+    "module": "pipeline"
+  },
+  {
+    "file": "35c-pipeline-react.js",
+    "line": 197,
+    "target": "lyWrap",
+    "module": "pipeline"
+  },
+  {
+    "file": "75-logo-library.js",
+    "line": 35,
+    "target": "imgSrc"
+  },
+  {
+    "file": "75-logo-library.js",
+    "line": 40,
+    "target": "hasImg"
+  },
+  {
+    "file": "75-logo-library.js",
+    "line": 44,
+    "target": "cleanPhoto"
+  },
+  {
+    "file": "76-lib-preview.js",
+    "line": 23,
+    "target": "over[MODULES[kk].vk]"
+  },
+  {
+    "file": "80-landing.js",
+    "line": 38,
+    "target": "groups[MODULES[k].group]"
+  },
+  {
+    "file": "83-division-library.js",
+    "line": 32,
+    "target": "imgSrc"
+  },
+  {
+    "file": "83-division-library.js",
+    "line": 37,
+    "target": "hasImg"
+  },
+  {
+    "file": "83-division-library.js",
+    "line": 41,
+    "target": "cleanPhoto"
+  },
+  {
+    "file": "86-pages.js",
+    "line": 10,
+    "target": "MODULES.pagebreak"
+  },
+  {
+    "file": "91-module-examples.js",
+    "line": 37,
+    "target": "gCount[MODULES[k].group]"
+  },
+  {
+    "file": "99o-families.js",
+    "line": 21,
+    "target": "derive"
+  },
+  {
+    "file": "99r-print-polish.js",
+    "line": 31,
+    "target": "SUBS.image.render"
+  },
+  {
+    "file": "99r-print-polish.js",
+    "line": 36,
+    "target": "MODULES.storyColumns.render"
+  },
+  {
+    "file": "99u-signature.js",
+    "line": 800,
+    "target": "cleanPhoto"
+  },
+  {
+    "file": "99v-print-system.js",
+    "line": 245,
+    "target": "MODULES.row.render"
+  },
+  {
+    "file": "99v-print-system.js",
+    "line": 250,
+    "target": "MODULES.storyColumns.render"
+  },
+  {
+    "file": "99v-print-system.js",
+    "line": 261,
+    "target": "MODULES[k].render"
+  }
+]
