@@ -36,7 +36,28 @@ describe('isolated v221 Firestore-shaped host', () => {
     const db=await harness().use('db');
     expect(()=>db.doc('projects')).toThrow('invalid_argument');expect(()=>db.collection('projects/p')).toThrow('invalid_argument');
   });
-  it('does not connect exports, the agent or skill download capabilities', async () => {
-    const h=harness(); for(const name of ['downloads','sample','room']) expect(await h.use(name)).toBeNull();
+  it('bridges Blobs to the parent and resolves only after its successful save response', async () => {
+    const h=harness(); const downloads=await h.use('downloads');
+    const data=new Blob(['issued output'],{type:'application/pdf'});
+    const result=downloads.save({filename:'material.pdf',data});
+    await new Promise(r=>setTimeout(r,0));
+    const request=h.sent.find(x=>x.action==='download');
+    expect(request?.args).toEqual({filename:'material.pdf',data});
+    h.receive({source:h.parent,data:{v221:true,type:'response',id:request?.id,result:true}});
+    await expect(result).resolves.toBe(true);
+  });
+  it('rejects cancellation with the source cancellation code and preserves failures', async () => {
+    for (const code of ['download_cancelled','download_failed']) {
+      const h=harness(); const downloads=await h.use('downloads');
+      const result=downloads.save({filename:'material.pdf',data:new Blob(['pdf'])});
+      const assertion=expect(result).rejects.toEqual({code,message:'save outcome'});
+      await new Promise(r=>setTimeout(r,0));
+      const request=h.sent.find(x=>x.action==='download');
+      h.receive({source:h.parent,data:{v221:true,type:'response',id:request?.id,error:{code,message:'save outcome'}}});
+      await assertion;
+    }
+  });
+  it('does not connect the agent or room capabilities', async () => {
+    const h=harness(); for(const name of ['sample','room']) expect(await h.use(name)).toBeNull();
   });
 });

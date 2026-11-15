@@ -29,6 +29,7 @@ export const V221_HOST_BRIDGE = `
  window.addEventListener('message',function(e){if(e.source!==parent||!e.data||!e.data.v221)return;var m=e.data;if(m.type==='init'&&!host){host=m.host;memory=m.storage||{};readyResolve(host)}else if(m.type==='response'){var p=pending[m.id];if(p){delete pending[m.id];if(m.error)p.reject(m.error);else p.resolve(m.result)}}else if(m.type==='changed'){watchers.forEach(function(w){w.run()})}});
  var user={id:function(){return ready.then(function(h){return h.id})},me:function(){return ready.then(function(h){return {id:h.id,name:h.name}})},can:function(){return ready.then(function(h){return h.canWrite})},canEdit:function(){return ready.then(function(h){return h.canWrite})},isOwner:function(){return ready.then(function(h){return h.isAdmin})},profiles:function(ids){return call('people',{ids:ids})},search:function(q){return call('people',{query:q})}};
  var assets={list:function(){return ready.then(function(h){return {assets:h.assets}})}};
- window.claude={use:function(n){return Promise.resolve(n==='db'?db:n==='user'?user:n==='assets'?assets:null)}};
+ var downloads={save:function(file){return call('download',file)}};
+ window.claude={use:function(n){return Promise.resolve(n==='db'?db:n==='user'?user:n==='assets'?assets:n==='downloads'?downloads:null)}};
  parent.postMessage({v221:true,type:'ready'},'*');
 })();`;

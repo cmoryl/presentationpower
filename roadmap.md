@@ -2,7 +2,8 @@
 ## Isolated first-party v221 application
 - [x] Adapter implemented: inspected actual source; isolated path documents, atomic deep updates and SQL-enforced project roles.
 - [x] Project/material/edit/save/reopen/version/reviewer sign-off verified with real injected team session and user-authorized simulated other-editor attribution on the test material only; approved hash persisted, two versions read back. No approval rule changed.
-- [ ] Exports, agent, sampling and downloads deferred pending a separate user request; not authorized by store verification.
+- [ ] Connect and verify issued single-size PDF, multi-size ZIP and project editable-files ZIP downloads; report file names, sizes and openability.
+- [ ] Cloud-backed 66-suite private release gate is a subsequent milestone, not certified by export checks; presence follows it. Agent/sampling await Chris's explicit provider and budget authorization.
 - [ ] Two-client concurrent editing/realtime remains uncertified; presence is a separate missing room-capability feature, not a database adapter gap.
 ## Ordered single-editor cutover (review-gated)
 - [x] STOPPED by user: converter direction abandoned. 36 additive recovery/conversion records already written; original content/routing unchanged; no further conversions.
