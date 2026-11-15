@@ -1,240 +1,96 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
-import { ChevronRight, LayoutGrid, X } from "lucide-react";
-
+import { useEffect, useRef, useState } from "react";
+import { BookOpen, Building2, CalendarDays, Compass, Flag, LayoutGrid, MapPin, Signpost, X } from "lucide-react";
+import { Button } from "@/design-system/element";
 import {
-  NEXT_WORKSPACE_BY_PATH,
-  NEXT_WORKSPACE_GROUPS,
-  NEXT_WORKSPACE_PAGES,
-  isNextWorkspacePath,
-  nextWorkspaceCrumbs,
-  nextWorkspaceMenu,
-  nextWorkspaceMenuPath,
-  nextWorkspacePageFor,
+  NEXT_WORKSPACE_GROUPS, NEXT_WORKSPACE_PAGES, isNextWorkspacePath,
+  nextWorkspaceMenu, nextWorkspaceMenuPath, nextWorkspacePageFor,
   type NextWorkspacePath,
 } from "@/lib/next-workspace";
 
-/** Plan a new city is one guided flow across these pages, in this order. */
-const CITY_STEPS: Array<{ n: number; label: string; to: NextWorkspacePath; hash?: string }> = [
-  { n: 1, label: "Venue record", to: "/events/next/locations" },
-  { n: 2, label: "Floor plans", to: "/events/next/venue" },
-  { n: 3, label: "Sign schedule", to: "/events/next/city" },
-  { n: 4, label: "City templates", to: "/events/next/city", hash: "city-templates" },
+const GROUP_ICONS = { plan: Compass, programme: CalendarDays, signage: Signpost, london: Building2, "san-francisco": MapPin, reference: BookOpen };
+const GROUP_LABELS = { plan: "Plan the event", programme: "Programme", signage: "Signage & badges", london: "London", "san-francisco": "San Francisco", reference: "Reference" };
+const CITY_STEPS: Array<{ label: string; to: NextWorkspacePath; hash?: string }> = [
+  { label: "Venue record", to: "/events/next/locations" },
+  { label: "Floor plans", to: "/events/next/venue" },
+  { label: "Sign schedule", to: "/events/next/city" },
+  { label: "City templates", to: "/events/next/city", hash: "city-templates" },
 ];
 
-/**
- * The shared NEXT navigation spine.
- *
- * Mounted once by AppShell for every `/events/next*` route, so no NEXT page can
- * drift out of the structure. It shows the group the current page belongs to
- * (its siblings as underlined tabs) plus a "All NEXT pages" panel listing the whole
- * workspace — the single place to find anything.
- */
+/** Registry-driven global sections and local siblings, visible before scrolling. */
 export function NextSubnav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const hash = useRouterState({ select: (s) => s.location.hash });
   const [open, setOpen] = useState(false);
-
-  if (!isNextWorkspacePath(pathname)) return null;
   const current = nextWorkspacePageFor(pathname);
   const groupId = current?.group ?? "plan";
-  const group = NEXT_WORKSPACE_GROUPS.find((g) => g.id === groupId) ?? NEXT_WORKSPACE_GROUPS[0];
-  const siblings = nextWorkspaceMenu(group.id);
+  const home = pathname === "/events/next";
   const menuPath = nextWorkspaceMenuPath(current);
-  const crumbs = nextWorkspaceCrumbs(current);
-  // Pages folded under one menu item show as a second row of tabs.
-  const folded = menuPath
-    ? NEXT_WORKSPACE_PAGES.filter((p) => p.to === menuPath || p.navAs === menuPath)
-    : [];
-  const cleanPath = pathname.replace(/\/+$/, "");
-  // Step 1 (the venue record) also lives in the venue directory; it still shows
-  // the step bar so the city flow never drops the user.
-  const showSteps = menuPath === "/events/next/city" || cleanPath === "/events/next/locations";
-  const stepIndex = CITY_STEPS.findIndex((st) =>
-    st.hash
-      ? cleanPath === st.to && hash.replace(/^#/, "") === st.hash
-      : cleanPath === st.to && !CITY_STEPS.some((o) => o.hash && o.to === st.to && hash.replace(/^#/, "") === o.hash),
-  );
-  const prevStep = stepIndex > 0 ? CITY_STEPS[stepIndex - 1] : null;
-  const nextStep = stepIndex >= 0 && stepIndex < CITY_STEPS.length - 1 ? CITY_STEPS[stepIndex + 1] : null;
-
-  const tab =
-    "relative inline-flex items-center gap-1.5 border-b-2 px-1 pb-2 pt-1 text-[13px] font-medium transition " +
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] ";
-  const idle =
-    "border-transparent text-black/70 hover:border-black/30 hover:text-black dark:text-white/75 dark:hover:border-white/40 dark:hover:text-white";
-  const active =
-    "border-[#003FC7] text-[#03002C] font-semibold dark:border-[#A1FBF9] dark:text-white";
-
+  const folded = NEXT_WORKSPACE_PAGES.filter((p) => p.to === menuPath || p.navAs === menuPath);
+  const sentinel = useRef<HTMLDivElement>(null);
+  const nav = useRef<HTMLDivElement>(null);
+  const [stuck, setStuck] = useState(false);
+  const [top, setTop] = useState(0);
+  const [height, setHeight] = useState(0);
+  useEffect(() => { setOpen(false); }, [pathname]);
+  useEffect(() => {
+    const header = document.querySelector<HTMLElement>("[data-app-shell] > header");
+    const update = () => {
+      const line = header?.getBoundingClientRect().height ?? 0;
+      setTop(line);
+      setStuck((sentinel.current?.getBoundingClientRect().top ?? line) < line);
+      setHeight(nav.current?.getBoundingClientRect().height ?? 0);
+    };
+    const ro = new ResizeObserver(update);
+    if (header) ro.observe(header);
+    if (nav.current) ro.observe(nav.current);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => { ro.disconnect(); window.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
+  }, [pathname]);
+  if (!isNextWorkspacePath(pathname)) return null;
+  const showSteps = menuPath === "/events/next/city" || pathname === "/events/next/locations";
   return (
-    <div className="mb-5">
-      <nav aria-label="Breadcrumb" className="mb-2">
-        <ol className="flex flex-wrap items-center gap-1 text-[12px] text-black/60 dark:text-white/65">
-          {crumbs.map((c, i) => {
-            const last = i === crumbs.length - 1;
-            return (
-              <li key={`${c.label}-${i}`} className="inline-flex items-center gap-1">
-                {c.to && !last ? (
-                  <Link to={c.to} className="hover:text-[#003FC7] hover:underline dark:hover:text-white">
-                    {c.label}
-                  </Link>
-                ) : (
-                  <span aria-current={last ? "page" : undefined} className={last ? "font-medium text-[#03002C] dark:text-white" : undefined}>
-                    {c.label}
-                  </span>
-                )}
-                {!last ? <ChevronRight size={11} aria-hidden /> : null}
-              </li>
-            );
-          })}
-        </ol>
-      </nav>
-      <span className="block pb-1 text-[11px] font-semibold tracking-[0.14em] text-black/60 uppercase md:hidden dark:text-white/65">
-        {group.label}
-      </span>
-      <nav
-        aria-label={group.label}
-        className="-mx-1 flex flex-nowrap items-end gap-x-5 overflow-x-auto whitespace-nowrap border-b border-black/10 px-1 pt-0.5 [scrollbar-width:none] md:mx-0 md:flex-wrap md:gap-y-1 md:overflow-visible md:px-0 md:whitespace-normal dark:border-white/15"
-      >
-        <span className="hidden pb-2 text-[11px] font-semibold tracking-[0.14em] text-black/60 uppercase md:inline dark:text-white/65">
-          {group.label}
-        </span>
-        {siblings.map((p) => {
-          const isActive = menuPath === p.to;
-          return (
-            <Link
-              key={p.to}
-              to={p.to}
-              title={p.purpose}
-              aria-current={isActive ? "page" : undefined}
-              className={tab + (isActive ? active : idle)}
-            >
-              {p.label}
-              {p.scope === "london" ? (
-                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-black/50 dark:text-white/55">
-                  London
-                </span>
-              ) : null}
-            </Link>
-          );
-        })}
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          className={tab + idle + " ml-auto"}
-        >
-          {open ? <X size={12} aria-hidden /> : <LayoutGrid size={12} aria-hidden />}
-          All NEXT pages
-        </button>
-      </nav>
-
-      {showSteps ? (
-        <ol aria-label="Plan a new city — steps" className="mt-3 flex flex-nowrap gap-2 overflow-x-auto [scrollbar-width:none]">
-          {CITY_STEPS.map((st) => {
-            const on = CITY_STEPS[stepIndex]?.n === st.n;
-            return (
-              <li key={st.n} className="shrink-0">
-                <Link
-                  to={st.to}
-                  hash={st.hash}
-                  aria-current={on ? "step" : undefined}
-                  className={`inline-flex items-center gap-2 border px-3 py-1.5 text-[12.5px] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] ${
-                    on
-                      ? "border-[#003FC7] bg-[#003FC7] text-white"
-                      : "border-black/15 bg-white text-[#03002C] hover:border-[#003FC7] dark:border-white/20 dark:bg-transparent dark:text-white"
-                  }`}
-                >
-                  <span className="font-mono text-[11px]">{st.n}</span> {st.label}
-                </Link>
-              </li>
-            );
-          })}
-          {prevStep || nextStep ? (
-            <li className="ml-auto flex shrink-0 gap-2">
-              {prevStep ? (
-                <Link
-                  to={prevStep.to}
-                  hash={prevStep.hash}
-                  className="inline-flex items-center border border-black/15 bg-white px-3 py-1.5 text-[12.5px] font-medium text-[#03002C] hover:border-[#003FC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] dark:border-white/20 dark:bg-transparent dark:text-white"
-                >
-                  ← Back: {prevStep.label}
-                </Link>
-              ) : null}
-              {nextStep ? (
-                <Link
-                  to={nextStep.to}
-                  hash={nextStep.hash}
-                  className="inline-flex items-center bg-[#03002C] px-3 py-1.5 text-[12.5px] font-semibold text-white hover:bg-[#003FC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2"
-                >
-                  Next: {nextStep.label} →
-                </Link>
-              ) : null}
-            </li>
-          ) : null}
-        </ol>
-      ) : null}
-      {!showSteps || cleanPath === "/events/next/locations" ? (folded.length > 1 ? (
-        <nav aria-label={`${NEXT_WORKSPACE_BY_PATH[menuPath ?? ""]?.label ?? "Section"} pages`} className="mt-3 flex gap-2">
-          {folded.map((p) => {
-            const on = current?.to === p.to;
-            return (
-              <Link
-                key={p.to}
-                to={p.to}
-                aria-current={on ? "page" : undefined}
-                className={`border px-3 py-1.5 text-[12.5px] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] ${
-                  on
-                    ? "border-[#003FC7] bg-[#003FC7] text-white"
-                    : "border-black/15 bg-white text-[#03002C] hover:border-[#003FC7] dark:border-white/20 dark:bg-transparent dark:text-white"
-                }`}
-              >
-                {p.to === menuPath && p.to === "/events/next/locations"
-                  ? "Venue directory"
-                  : p.to === menuPath && p.to === "/events/next/playbook"
-                    ? "Signage playbook"
-                    : p.label}
-              </Link>
-            );
-          })}
-        </nav>
-      ) : null) : null}
-
-      {open ? (
-        <div className="mt-3 rounded-md border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/5">
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {NEXT_WORKSPACE_GROUPS.map((g) => (
-              <div key={g.id}>
-                <div className="text-[11px] font-medium tracking-[0.14em] text-[#003FC7] uppercase dark:text-[#A1FBF9]">
-                  {g.label}
-                </div>
-                <p className="mt-1 text-xs text-black/50 dark:text-white/50">{g.blurb}</p>
-                <ul className="mt-2 space-y-1.5">
-                  {nextWorkspaceMenu(g.id).map((p) => (
-                    <li key={p.to}>
-                      <Link
-                        to={p.to}
-                        onClick={() => setOpen(false)}
-                        className="block rounded-sm px-2 py-1.5 hover:bg-[#003FC7]/8 dark:hover:bg-white/10"
-                      >
-                        <span className="text-sm font-medium">{p.label}</span>
-                        {p.scope === "london" ? (
-                          <span className="ml-1.5 font-mono text-[10px] uppercase text-black/50 dark:border-white/15 dark:text-white/50">
-                            London
-                          </span>
-                        ) : null}
-                        <span className="block text-xs text-black/55 dark:text-white/55">
-                          {p.purpose}
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+    <>
+      <div ref={sentinel} aria-hidden className="h-px" />
+      {stuck && <div aria-hidden style={{ height }} />}
+      <div ref={nav} data-next-site-nav className={`next-site-nav z-20 ${stuck ? "next-site-nav--stuck fixed inset-x-0" : "relative"}`} style={stuck ? { top } : undefined}>
+        <nav aria-label="NEXT sections" className="next-site-nav-row overflow-x-auto">
+          <div className="mx-auto flex w-max min-w-full justify-center px-3 sm:px-6">
+            <Link to="/events/next" data-active={home} aria-current={home ? "page" : undefined} className="next-site-link flex min-w-20 flex-col items-center gap-2 px-4 py-4 text-xs font-semibold"><Flag className="size-5" />Overview</Link>
+            {NEXT_WORKSPACE_GROUPS.map((g) => {
+              const Icon = GROUP_ICONS[g.id];
+              const destination = nextWorkspaceMenu(g.id).find((p) => p.to !== "/events/next");
+              if (!destination) return null;
+              return <Link key={g.id} to={destination.to} data-active={!home && groupId === g.id} aria-current={!home && groupId === g.id ? "page" : undefined} className="next-site-link flex min-w-24 flex-col items-center gap-2 px-4 py-4 text-xs font-semibold"><Icon className="size-5" />{GROUP_LABELS[g.id]}</Link>;
+            })}
+            <Button variant="ghost" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-controls="next-all-pages" className="my-auto ml-2 h-12 text-inherit hover:bg-white/10 hover:text-inherit">{open ? <X /> : <LayoutGrid />}All pages</Button>
           </div>
+        </nav>
+        <nav aria-label="NEXT section pages" className="next-site-secondary border-b border-border">
+          <div className="mx-auto flex max-w-[1400px] gap-5 overflow-x-auto px-6 sm:px-8">
+            {home ? <>
+              <Link to="/events/next" hash="editions" className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">City editions</Link>
+              <Link to="/events/next" hash="master-system" className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">Division templates</Link>
+              <Link to="/events/next" hash="next-directory" className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">Event directory</Link>
+            </> : nextWorkspaceMenu(groupId).filter((p) => p.to !== "/events/next").map((p) => <Link key={p.to} to={p.to} data-active={menuPath === p.to} aria-current={menuPath === p.to ? "page" : undefined} className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">{p.label}</Link>)}
+          </div>
+        </nav>
+        {open && <div id="next-all-pages" className="next-site-secondary max-h-[60vh] overflow-y-auto border-b border-border shadow-lg">
+          <div className="mx-auto grid max-w-[1400px] gap-6 px-6 py-6 sm:grid-cols-2 lg:grid-cols-3">
+            {NEXT_WORKSPACE_GROUPS.map((g) => <section key={g.id}>
+              <h2 className="border-b border-border pb-2 text-sm font-semibold">{GROUP_LABELS[g.id]}</h2>
+              <ul className="mt-2 space-y-1">{nextWorkspaceMenu(g.id).map((p) => <li key={p.to}><Link to={p.to} onClick={() => setOpen(false)} className="block py-2 text-sm hover:underline">{p.label}</Link></li>)}</ul>
+            </section>)}
+          </div>
+        </div>}
+      </div>
+      {(showSteps || folded.length > 1) && <nav aria-label={showSteps ? "Plan a new city — steps" : "NEXT subsection pages"} className="next-site-secondary border-b border-border">
+        <div className="mx-auto flex max-w-[1400px] gap-5 overflow-x-auto px-6 py-3 sm:px-8">
+          {showSteps ? CITY_STEPS.map((s, i) => <Link key={s.label} to={s.to} hash={s.hash} className="shrink-0 text-xs font-medium hover:underline">{i + 1}. {s.label}</Link>)
+            : folded.map((p) => <Link key={p.to} to={p.to} aria-current={current?.to === p.to ? "page" : undefined} className="shrink-0 text-xs hover:underline">{p.label}</Link>)}
         </div>
-      ) : null}
-    </div>
+      </nav>}
+    </>
   );
 }

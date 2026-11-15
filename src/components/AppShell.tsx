@@ -6,7 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { AdminSidebar } from "@/components/AdminShell";
 import { NotificationBell } from "@/components/NotificationBell";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { NextSubnav } from "@/components/next/NextSubnav";
+import { NextMasthead } from "@/components/next/NextMasthead";
+import { isNextWorkspacePath } from "@/lib/next-workspace";
 import { SocialSubnav } from "@/components/SocialSubnav";
 import { ElementLockup } from "@/components/brand/ElementLogo";
 
@@ -223,6 +224,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
   if (bare) {
     return (
       <div className="min-h-dvh bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
+        <NextMasthead />
         {children}
       </div>
     );
@@ -526,6 +528,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
           )}
         </div>
       </header>
+      <NextMasthead />
       {/* --shell-pad-top is the contract full-bleed heroes cancel with `hero-flush`. */}
       <main
         className="relative z-10 mx-auto max-w-[1400px] px-3 pb-10 pt-3 sm:px-8 sm:pb-14"
@@ -536,15 +539,13 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
             <AdminSidebar />
             <div className="min-w-0 flex-1">
               <Breadcrumbs />
-              <NextSubnav />
               <SocialSubnav />
               {children ?? <Outlet />}
             </div>
           </div>
         ) : (
           <>
-            <Breadcrumbs />
-            <NextSubnav />
+            {!isNextWorkspacePath(pathname) && <Breadcrumbs />}
             <SocialSubnav />
             {children ?? <Outlet />}
           </>

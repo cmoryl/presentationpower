@@ -1,4 +1,3 @@
-import { BRAND } from "@/lib/brand-colors";
 // /events/next — TransPerfect NEXT 2026 hub.
 //
 // Indexes the full NEXT design system: 11 divisions × 56 formats (616 Canva
@@ -7,24 +6,17 @@ import { BRAND } from "@/lib/brand-colors";
 
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   CalendarDays,
-  ChevronLeft,
   ChevronRight,
-  ExternalLink,
-  Globe2,
   IdCard,
-  ImageIcon,
-  MapPin,
   Search,
-  Sparkles,
 } from "lucide-react";
 import {
   NEXT_CITY_SERIES,
   NEXT_DIVISIONS,
-  NEXT_EVENT,
   NEXT_FORMAT_GROUPS,
   cityStopLine,
   deckPagesFor,
@@ -38,35 +30,10 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { loadNextRegistry } from "@/lib/next-event";
 import { NextEditions } from "@/components/events/NextEditions";
 import { RegistryCard } from "@/components/next/NextRegistry";
-import {
-  LONDON_STYLES,
-  LONDON_VENUE,
-  londonPanelsByFloor,
-  isVenueTemplatePanel,
-  londonVenueItemMeta,
-} from "@/lib/next-london-signage";
-import { CityBadge } from "@/components/next/CityBadge";
-import { PillarSign } from "@/components/next/PillarSign";
-import { AgendaSheet } from "@/components/next/AgendaSheet";
-import { agendaDefault } from "@/lib/next-agenda";
-import {
-  pickAgendaFile,
-  pickPillarFile,
-  useSavedAgendaFiles,
-  useSavedPillarFiles,
-} from "@/hooks/use-next-live-masters";
+import { LONDON_VENUE } from "@/lib/next-london-signage";
 
 import {
-  PILLAR_KINDS,
-  pillarDefault,
-  type PillarConfig,
-  type PillarKindId,
-} from "@/lib/next-pillar-masters";
-import { CITY_BADGE_DEFAULT, cityBadgeDivision } from "@/lib/next-city-badge";
-import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import {
   NEXT_WORKSPACE_GROUPS,
-  NEXT_WORKSPACE_PAGES,
   nextWorkspaceGroup,
 } from "@/lib/next-workspace";
 
@@ -77,17 +44,18 @@ export const Route = createFileRoute("/events/next")({
       {
         name: "description",
         content:
-          "Every NEXT 2026 design in one place — 11 divisions, 56 formats each, plus the City Series roadshow and generatable kits for social, signage, screens and decks.",
+          "TransPerfect NEXT event workspace: city editions, division templates, brand resources, programmes and on-site signage.",
       },
       { property: "og:title", content: "TransPerfect NEXT 2026 · Event brand system" },
       {
         property: "og:description",
         content:
-          "11 divisions, 56 formats each, City Series roadshow, and one-click generatable NEXT kits.",
+          "Explore NEXT city editions, division templates, programmes and event assets.",
       },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://presentationpower.lovable.app/events/next" }],
+    links: [{ rel: "canonical", href: "https://transperfectelement.lovable.app/events/next" }],
   }),
   component: () => (
     <AppShell>
@@ -111,15 +79,14 @@ function NextHub() {
   const division = NEXT_DIVISIONS.find((d) => d.id === divisionId) ?? NEXT_DIVISIONS[0];
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-6 pb-24 pt-8">
-      <Hero division={division} />
+    <div className="mx-auto w-full next-workspace-content max-w-[1200px] px-3 pb-24 pt-3 sm:px-6">
+      <div id="editions" tabIndex={-1} className="scroll-mt-40 outline-none">
+        <NextEditions />
+      </div>
 
       <MasterDesignSystem division={division} onSelect={setDivisionId} />
 
-      <div id="editions" tabIndex={-1} className="mt-14 scroll-mt-24 outline-none">
-        <HubTemplatePicker division={division} />
-        <NextEditions />
-      </div>
+
 
       <LondonStatus />
 
@@ -129,70 +96,6 @@ function NextHub() {
 
       <WorkspaceDirectory />
     </div>
-  );
-}
-
-function Hero({ division }: { division: NextDivision }) {
-  const goEditions = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const el = document.getElementById("editions");
-    el?.scrollIntoView({ behavior: "smooth", block: "start" });
-    el?.focus({ preventScroll: true });
-  };
-  return (
-    <section className="full-bleed relative -mt-8 overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:-mt-12 sm:py-16 lg:py-20 dark:bg-card">
-      <NextAurora division={division} />
-      <NextWatermark accent={division.accent} />
-      {/* Scrim keeps metadata text at AA over the aurora gradients. */}
-      <div aria-hidden className="absolute inset-0 bg-[#03002C]/45 dark:bg-card" />
-
-      <div className="relative">
-        <span className="inline-flex items-center gap-1.5 rounded-md border border-white/20 bg-[#03002C]/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/85 dark:bg-card">
-          <Sparkles size={12} /> {NEXT_EVENT.subBrandLine}
-        </span>
-
-        <div className="mt-8 grid gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-end">
-          <div className="min-w-0">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.24em] text-white/85">
-              {NEXT_EVENT.datesLabel}
-            </p>
-            <h1 className="mt-3 text-[42px] font-semibold leading-[1.02] sm:text-6xl">
-              {NEXT_EVENT.name}
-            </h1>
-            <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-white/85">
-              Start with your division to find its master templates, or pick a city for on-site assets.
-            </p>
-
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <a
-                href="#master-system"
-                className="inline-flex items-center gap-2 rounded-md bg-white px-5 py-2.5 text-sm font-semibold text-[#03002C] shadow-lg shadow-black/25 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#03002C]"
-              >
-                <Search size={14} /> Find a division template
-              </a>
-              <a
-                href="#editions"
-                onClick={goEditions}
-                className="inline-flex items-center gap-2 rounded-md border border-white/40 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-              >
-                <MapPin size={14} /> Choose a city edition <ArrowRight size={14} />
-              </a>
-            </div>
-
-            <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-white sm:grid-cols-4">
-              <Fact icon={CalendarDays} label="Dates" value={NEXT_EVENT.datesLabel} />
-              <Fact
-                icon={MapPin}
-                label="Venue"
-                value={`${NEXT_EVENT.venue} · ${NEXT_EVENT.city}`}
-              />
-              <Fact icon={Globe2} label="Naming" value={NEXT_EVENT.namePattern} />
-              <Fact icon={Sparkles} label="CTA" value={NEXT_EVENT.ctaLabel} />
-            </dl>
-          </div>
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -208,7 +111,7 @@ function MasterDesignSystem({
   return (
     <section
       id="master-system"
-      className="mt-10 scroll-mt-24 rounded-lg border border-border bg-card p-6 shadow-sm sm:p-8"
+      className="mt-12 scroll-mt-40 border-t border-border pt-8"
       aria-labelledby="next-master"
     >
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -259,6 +162,8 @@ function MasterDesignSystem({
 
 
       <DivisionDetail division={division} />
+
+      <HubTemplatePicker division={division} />
 
       <Pathways accent={division.accent} divisionId={division.id} />
 
@@ -383,174 +288,6 @@ function TemplateSearch({ divisionId }: { divisionId: string }) {
   );
 }
 
-/** Aurora backdrop — cross-fading per-division blob layers with scroll + pointer parallax. */
-function NextAurora({ division }: { division: NextDivision }) {
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const reducedMotion = useReducedMotion();
-
-  const [scrollY, setScrollY] = useState(0);
-  useEffect(() => {
-    if (reducedMotion) return;
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      setScrollY(window.scrollY);
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [reducedMotion]);
-
-  const [pointer, setPointer] = useState({ x: 0, y: 0 });
-  useEffect(() => {
-    if (reducedMotion) return;
-    const el = rootRef.current?.parentElement;
-    if (!el) return;
-    let raf = 0;
-    let targetX = 0;
-    let targetY = 0;
-    let curX = 0;
-    let curY = 0;
-    const tick = () => {
-      curX += (targetX - curX) * 0.08;
-      curY += (targetY - curY) * 0.08;
-      setPointer({ x: curX, y: curY });
-      if (Math.abs(targetX - curX) < 0.001 && Math.abs(targetY - curY) < 0.001) {
-        raf = 0;
-        return;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    const kick = () => {
-      if (!raf) raf = requestAnimationFrame(tick);
-    };
-    const onMove = (e: MouseEvent) => {
-      const r = el.getBoundingClientRect();
-      targetX = ((e.clientX - r.left) / r.width) * 2 - 1;
-      targetY = ((e.clientY - r.top) / r.height) * 2 - 1;
-      kick();
-    };
-    const onLeave = () => {
-      targetX = 0;
-      targetY = 0;
-      kick();
-    };
-    el.addEventListener("mousemove", onMove);
-    el.addEventListener("mouseleave", onLeave);
-    return () => {
-      el.removeEventListener("mousemove", onMove);
-      el.removeEventListener("mouseleave", onLeave);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [reducedMotion]);
-
-  const y = reducedMotion ? 0 : Math.min(scrollY, 800);
-  const pxA = pointer.x * 22;
-  const pyA = pointer.y * 16;
-  const pxB = pointer.x * -18;
-  const pyB = pointer.y * -12;
-  const washX = pointer.x * 6;
-  const washY = pointer.y * 4;
-
-  return (
-    <div ref={rootRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      {NEXT_DIVISIONS.map((d, i) => {
-        const active = d.id === division.id;
-        // Deterministic per-division blob placement so each division reads distinct.
-        const aTop = `${-160 + (i % 4) * 90}px`;
-        const aLeft = `${-120 + (i % 5) * 160}px`;
-        const bBottom = `${-140 + ((i + 2) % 4) * 80}px`;
-        const bRight = `${-100 + ((i + 3) % 5) * 150}px`;
-        return (
-          <div
-            key={d.id}
-            className="absolute inset-0 transition-opacity duration-[1600ms] ease-[cubic-bezier(.4,0,.2,1)] will-change-[opacity]"
-            style={{ opacity: active ? 1 : 0 }}
-          >
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `radial-gradient(60% 55% at ${20 + washX}% ${30 + washY}%, ${d.accent}22 0%, transparent 60%), radial-gradient(55% 50% at ${85 + washX}% ${75 + washY}%, #003FC71c 0%, transparent 65%)`,
-              }}
-            />
-            <div
-              className="hidden absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
-              style={{
-                backgroundColor: d.accent,
-                opacity: 0.38,
-                top: aTop,
-                left: aLeft,
-                transform: `translate3d(${y * 0.08 + pxA}px, ${y * -0.35 + pyA}px, 0) scale(${active ? 1 : 0.94})`,
-                transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
-              }}
-            />
-            <div
-              className="hidden absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
-              style={{
-                backgroundColor: BRAND.blue,
-                opacity: 0.34,
-                bottom: bBottom,
-                right: bRight,
-                transform: `translate3d(${y * -0.1 + pxB}px, ${y * 0.22 + pyB}px, 0) scale(${active ? 1 : 0.94})`,
-                transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
-              }}
-            />
-          </div>
-        );
-      })}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04),rgba(255,255,255,0)_90%)]" />
-    </div>
-  );
-}
-
-/** Oversized NEXT watermark with scroll parallax — mirrors the homepage signature. */
-function NextWatermark({ accent }: { accent: string }) {
-  const reducedMotion = useReducedMotion();
-  const [scrollY, setScrollY] = useState(0);
-  useEffect(() => {
-    if (reducedMotion) return;
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      setScrollY(window.scrollY);
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [reducedMotion]);
-  const y = reducedMotion ? 0 : Math.min(scrollY, 800);
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em] will-change-transform"
-      style={{
-        fontSize: "clamp(120px, 22vw, 320px)",
-        background: `linear-gradient(180deg, ${accent}00 0%, ${accent}14 35%, ${accent}05 75%, transparent 100%)`,
-        WebkitBackgroundClip: "text",
-        backgroundClip: "text",
-        color: "transparent",
-        mixBlendMode: "screen",
-        transform: `translate3d(0, ${y * 0.45}px, 0)`,
-        opacity: Math.max(0, 1 - y / 700),
-        WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
-        maskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
-      }}
-    >
-      NEXT 2026
-    </div>
-  );
-}
-
 /** Renders a division lockup on a light plate — the color lockups are navy artwork. */
 function LockupPlate({ division, className = "" }: { division: NextDivision; className?: string }) {
   return (
@@ -563,25 +300,6 @@ function LockupPlate({ division, className = "" }: { division: NextDivision; cla
         className="max-h-14 w-full object-contain"
         loading="lazy"
       />
-    </div>
-  );
-}
-
-function Fact({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="min-w-0">
-      <dt className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-white/80">
-        <Icon size={14} /> {label}
-      </dt>
-      <dd className="mt-0.5 font-medium">{value}</dd>
     </div>
   );
 }
@@ -698,7 +416,7 @@ function Pathways({ accent, divisionId }: { accent: string; divisionId: string }
 
 function DivisionDetail({ division }: { division: NextDivision }) {
   return (
-    <div className="mt-6 grid gap-6 rounded-md border border-border p-6 md:grid-cols-[240px_1fr]">
+    <div className="mt-6 grid gap-6 py-6 md:grid-cols-[240px_1fr]">
       <LockupPlate division={division} className="self-start" />
 
       <div>
@@ -765,7 +483,7 @@ function LondonStatus() {
       >
         <span>
           <span className="block font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-            In production · Job {LONDON_VENUE.job}
+            Issued signage · Job {LONDON_VENUE.job}
           </span>
           <span className="mt-1 block text-base font-semibold">London · {LONDON_VENUE.venue}</span>
         </span>
@@ -858,7 +576,7 @@ function PlaybookCta() {
 }
 
 /**
- * "Where everything lives" — the whole NEXT workspace in one grouped index,
+ * "Event directory" — the whole NEXT workspace in one grouped index,
  * driven by src/lib/next-workspace.ts so a new page can never be orphaned.
  */
 function WorkspaceDirectory() {
@@ -866,13 +584,13 @@ function WorkspaceDirectory() {
     <section className="mt-10" aria-labelledby="next-directory">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="next-directory" className="text-xl font-semibold tracking-tight">
-          Where everything lives
+          Event directory
         </h2>
         <span className="text-sm text-muted-foreground">London-only pages are marked</span>
       </div>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {NEXT_WORKSPACE_GROUPS.map((g) => (
-          <div key={g.id} className="rounded-2xl border border-border p-4">
+          <div key={g.id} className="border-t border-border pt-4">
             <div className="text-[11px] font-medium tracking-[0.14em] text-primary uppercase">
               {g.label}
             </div>

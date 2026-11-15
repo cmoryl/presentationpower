@@ -1,4 +1,7 @@
 # Roadmap
+## NEXT cohesive event workspace
+- [x] Added a supplied-artwork full-width NEXT masthead through the shared shell, with visible pinned global navigation, local section links and grouped All pages menu.
+- [x] Moved city editions first, removed the duplicate overview hero and unframed template/directory sections. Desktop pinned menu and All pages interaction verified; phone fits; six NEXT data/artwork tests pass. Existing city tools and issued facts preserved.
 ## Bowl Canva socials continuation — Nov 14
 - [x] Continued Set 4 posts 01–04 in Feed, Square and Story (12 Canva saves/cleaned JPGs). Reviewed originals and contact sheets, preserved logos/colours, restored post03 Story website, verified public campaign selection/enlargement/Save image and exact served/downloaded bytes; 11 tests pass and build OK.
 - [x] Continued Set 4 posts05–09 (15 Canva saves/cleaned native JPGs); supplied logos, colours and event copy preserved. Public post07 selection/enlargement and exact-byte download verified, phone fits and no page errors. Fifteen campaign/sequence tests pass; social-studio suite has one pre-existing stale Light projection-ID expectation (11/12 combined tests pass).
