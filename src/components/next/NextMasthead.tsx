@@ -24,7 +24,7 @@ export const NextMasthead = forwardRef<HTMLElement, NextMastheadProps>(function 
   const logo = nextLockupSuite("transperfect")?.wideWhite;
   return (
     <section ref={ref} data-next-masthead className={`next-masthead relative ${className}`} {...props}>
-      <div className="relative overflow-hidden">
+      <div className="next-masthead-scene relative overflow-hidden">
         <img src={ground} alt="" aria-hidden className="next-masthead-ground absolute inset-0 h-full w-full object-cover" />
         {location && <NextHeroPhoto key={location} location={location} />}
         <div className="relative mx-auto max-w-[1400px] px-6 py-9 sm:px-8 sm:py-12">

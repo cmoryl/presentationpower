@@ -1,4 +1,7 @@
 # Roadmap
+## NEXT photo-header composition review
+- [x] Give real event scenes more vertical space, remove competing artwork behind photos and keep headline copy away from people; show the scene below copy on phones without heavy face-darkening.
+- [x] Reviewed both desktop scenes with speakers visible and London on phone; images decode, phone fits and signed-out artwork fallback remains private-safe.
 ## Bowl brand animations area
 - [x] Move the supplied looping video out of the event homepage into the brand kit’s Animations area and add a newest-first Recent updates card linking directly to it.
 - [x] Verified homepage removal, Recent updates → Animations navigation, looping brand-area playback, MP4 download and phone fit; desktop section reviewed.
