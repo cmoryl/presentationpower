@@ -230,7 +230,7 @@
   },
   "mounted_v221": {
     "requested_at": "2026-11-15T22:09:00Z",
-    "status": "implemented_roundtrip_incomplete",
+    "status": "store_roundtrip_verified_stop_for_report",
     "architecture": "Run explicitly authorized first-party v221 application in isolated /element area with Lovable Cloud Firestore-shaped adapter; preserve React port.",
     "sequence": [
       "Inspect Store.use/db/snapArr and identity contract",
@@ -251,10 +251,14 @@
       "Real injected team account created project/material through v221 UI",
       "Name and hero words edited, saved and reopened from Cloud",
       "Versions panel saved one version; database readback confirms path",
-      "10 focused adapter/engine tests passed; latest preview build OK"
+      "10 focused adapter/engine tests passed; latest preview build OK",
+      "User confirmed issued SHA256 matches live v221 byte-for-byte",
+      "2026-11-15 reviewer UI approval passed after adapter test fixture status=review/contentBy=u_someone_else; named reviewer is not owner",
+      "Signoff persisted at signoffs/b8585e77-844e-410c-96e5-621ee32ac776/items/cd2yjs1qskjc: status approved, hash 1u1nrfc1koo2dy-p6",
+      "Approved lock and milestone visibly verified; two versions read back",
+      "Fresh session independently read persisted approved material; fresh UI navigation timed out, not certified"
     ],
     "unverified": [
-      "Reviewer approval/sign-off hash: requires a second authenticated approver; same last editor cannot approve when another approver exists",
       "Two-client realtime delivery, concurrent merge and role denial not yet end-to-end certified",
       "All 66 assertions not yet ported to Cloud tests"
     ],
@@ -265,6 +269,19 @@
       "Firestore transactions, where, add, acquire and docChanges not implemented; no observed core Store dependency on them"
     ],
     "verification_project": "0yppetn3e5gl",
-    "verification_material": "cd2yjs1qskjc"
+    "verification_material": "cd2yjs1qskjc",
+    "feature_gaps": [
+      "Presence requires room capability/ROOM.presence; not supplied, separate from database adapter",
+      "Exports, agent, sampling, downloads and skill publishing remain deferred"
+    ],
+    "realtime_caveat": "Bounded snapshot refetch is implemented, not heavy-concurrency equivalence; two-client editing remains uncertified.",
+    "signoff_evidence": {
+      "status": "approved",
+      "hash": "1u1nrfc1koo2dy-p6",
+      "versions": 2,
+      "fixture_attribution": "u_someone_else",
+      "scope": "verification material only; no genuine second-account edit asserted",
+      "source_rules_unchanged": true
+    }
   }
 }

@@ -17,15 +17,21 @@ The converter plan was abandoned. Its preceding turn already wrote 36 additive c
 ## Verified against the running application
 Using the real injected shared-team session, created project `0yppetn3e5gl` and material `cd2yjs1qskjc`, edited its name and hero words, waited for Saved, reopened it, and confirmed Cloud readback. Saved a version through the issued Versions panel; the panel showed one saved version and database readback confirmed its nested version path. Ten focused adapter/engine tests passed. Preview diagnostics report build OK.
 
-## Not yet verified — full round trip is incomplete
-Reviewer approval and its persisted sign-off hash have **not** passed. The unchanged source rejects approval by the last editor when another approver exists; a second authenticated approver is required to finish that check. No sign-off code was weakened. The attempted extended browser run did not finish; the persisted material remains Draft.
+## Reviewer sign-off verified — 15 November 2026
+The user confirmed the mounted SHA256 matches the live v221 build byte for byte. The verification-only material was missing the required Footer; adding it through the issued UI cleared preflight (nothing to fix, nine passed). Through the existing adapter, set only `status: "review"` and `contentBy: "u_someone_else"` on that test material, following the source multiuser fixture. This simulates another last editor; it is not evidence of two-account editing.
+
+The real signed-in account was a named reviewer, not the project owner. Clicking **Approve** and its confirmation in the unchanged application ran the genuine approval/sign-off path. Adapter readback confirmed material status `approved`, plus `signoffs/b8585e77-844e-410c-96e5-621ee32ac776/items/cd2yjs1qskjc` with `status: "approved"` and hash `1u1nrfc1koo2dy-p6`. The UI displayed **Locked while approved** and an **Approved** milestone. Version collection readback returned two versions (the earlier saved version plus the approval milestone). A fresh session independently read the persisted approved record; the additional fresh-session UI navigation check timed out and is not claimed as verified.
+
+No source approval rule, canonical hash function, adapter permission or production material was changed. Ten focused adapter/engine regression tests passed again. The approval screenshot was inspected.
+
+## Remaining verification limits
 
 Two-client realtime, concurrent updates and unauthorized write rejection are implemented but not end-to-end certified. The five adapter tests are not the 66-suite behavioral release gate. Reference passes do not certify this Cloud integration.
 
 ## Deliberately deferred / unmapped
-Exports, the agent, sampling and download capabilities are not connected; skill publishing is explicitly rejected. The source may still display their existing UI. Presence, upload/delete media, Firestore transactions, `where`, `add`, leases/`acquire` and `docChanges` are not supplied. No observed core Store round-trip requires these extended Firestore methods. Realtime refetches bounded snapshots rather than delivering Firestore document-change deltas.
+Exports, the agent, sampling and download capabilities are not connected; skill publishing is explicitly rejected. The source may still display their existing UI. Presence is a separate **feature gap**: `99z2-presence.js` requires the `room` capability and `ROOM.presence()`, not the database adapter. It remains dark intentionally; no presence-over-database implementation was added. Upload/delete media, Firestore transactions, `where`, `add`, leases/`acquire` and `docChanges` are not supplied. No observed core Store round-trip requires these extended Firestore methods. Realtime refetches bounded snapshots rather than delivering Firestore document-change deltas; heavy concurrent-edit equivalence remains uncertified until two-client editing is exercised.
 
 ## Scope and migrations
 No Bowl, NEXT, event, brand-kit or social-calendar area was changed. No existing material content was migrated. New schema SQL is preserved verbatim in `drizzle/migrations/0029_isolated_element_v221_store.sql` and `0030_element_v221_people_lookup.sql`.
 
-Stop here: do not connect exports, agent or skill downloads until the reviewer sign-off round trip passes.
+Stop here as requested: the reviewer sign-off round trip passed, but exports, agent, sampling, downloads and skill publishing remain deferred pending a separate request.
