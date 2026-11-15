@@ -1,8 +1,8 @@
 # Roadmap
 ## Isolated first-party v221 application
-- [ ] Adapter first: inspect exact Store/db/identity contract, isolated path documents and enforced project roles.
-- [ ] Verify real project → material → edit/save/reopen → version → reviewer sign-off hash round trip; stop for report.
-- [ ] Exports, agent and skill download remain deferred until store proof.
+- [x] Adapter implemented: inspected actual source; isolated path documents, atomic deep updates and SQL-enforced project roles.
+- [ ] Project/material/edit/save/reopen/version verified with real injected team session. Reviewer sign-off remains blocked on a second authenticated approver; do not weaken last-editor approval safeguards.
+- [ ] Exports, agent and skill download blocked until the full reviewer store proof.
 ## Ordered single-editor cutover (review-gated)
 - [x] STOPPED by user: converter direction abandoned. 36 additive recovery/conversion records already written; original content/routing unchanged; no further conversions.
 - [x] Steps 2–8 abandoned, not started.

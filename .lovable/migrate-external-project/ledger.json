@@ -230,7 +230,7 @@
   },
   "mounted_v221": {
     "requested_at": "2026-11-15T22:09:00Z",
-    "status": "adapter_first",
+    "status": "implemented_roundtrip_incomplete",
     "architecture": "Run explicitly authorized first-party v221 application in isolated /element area with Lovable Cloud Firestore-shaped adapter; preserve React port.",
     "sequence": [
       "Inspect Store.use/db/snapArr and identity contract",
@@ -244,6 +244,27 @@
       "events",
       "brand kits",
       "social calendars"
-    ]
+    ],
+    "verified": [
+      "Issued module-builder.html SHA256 3b6e7bf55a518cf330e191a47458696c7fcc3d2a1ddfd484ca1a97f9b6ce8a06 hosted unchanged",
+      "Opaque-origin sandbox mount; no React storage/state shared",
+      "Real injected team account created project/material through v221 UI",
+      "Name and hero words edited, saved and reopened from Cloud",
+      "Versions panel saved one version; database readback confirms path",
+      "10 focused adapter/engine tests passed; latest preview build OK"
+    ],
+    "unverified": [
+      "Reviewer approval/sign-off hash: requires a second authenticated approver; same last editor cannot approve when another approver exists",
+      "Two-client realtime delivery, concurrent merge and role denial not yet end-to-end certified",
+      "All 66 assertions not yet ported to Cloud tests"
+    ],
+    "surface_differences": [
+      "Source also uses collection.get(), learn and diag collections, beyond the eight listed families; mapped",
+      "Viewer own comments permitted as source specifies; other viewer writes rejected in SQL",
+      "meta/skill writes deliberately unavailable; exports/downloads/sample/agent capabilities not connected",
+      "Firestore transactions, where, add, acquire and docChanges not implemented; no observed core Store dependency on them"
+    ],
+    "verification_project": "0yppetn3e5gl",
+    "verification_material": "cd2yjs1qskjc"
   }
 }
