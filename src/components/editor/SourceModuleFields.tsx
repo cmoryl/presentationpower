@@ -1,11 +1,12 @@
 import { forwardRef } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/design-system/element";
-import { record, records, string, sourceImage, type ModuleData, type SourceField } from "@/lib/element-update/registry";
+import { record, records, string, sourceImage, sourceFieldVisible, type ModuleData, type SourceField } from "@/lib/element-update/registry";
 
 export interface SourceModuleFieldsProps { fields: SourceField[]; data: ModuleData; onChange: (data: ModuleData) => void; prefix: string; className?: string }
 export const SourceModuleFields = forwardRef<HTMLDivElement, SourceModuleFieldsProps>(function SourceModuleFieldsImpl({ fields, data, onChange, prefix, className = "" }, ref) {
   return <div ref={ref} className={`space-y-4 ${className}`}>{fields.map((field, fieldIndex) => {
+    if (!sourceFieldVisible(field, data)) return null;
     if (field.t === "head") return <h3 key={fieldIndex} className="border-t border-border pt-4 text-xs font-semibold uppercase text-muted-foreground">{field.l}</h3>;
     const key = field.k; if (!key || key === "logoTone") return null;
     const id = `${prefix}-${key}`; const value = data[key]; const patch = (next: unknown) => onChange({ ...data, [key]: next });

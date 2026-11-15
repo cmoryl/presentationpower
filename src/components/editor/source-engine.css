@@ -5001,7 +5001,7 @@
 
 /* agenda: stops sit below the intro; two columns read down, then across */
 .v221-canvas .gl .ly-ag .ag-stops{padding-top:40px;margin-top:8px}.v221-canvas .gl .ag-stops::before{top:18px}
-.v221-canvas .gl .ag-cols .ag-list{columns:auto;display:grid;grid-auto-flow:column;grid-template-rows:repeat(var(--r,2),auto);column-gap:34px}.v221-canvas .gl .ag-cols .ag-r:nth-child(1),.v221-canvas .gl .ag-cols .ag-r:nth-child(var(--r)){border-top:0}
+.v221-canvas .gl .ag-cols .ag-list{columns:auto;display:grid;grid-auto-flow:column;grid-template-rows:repeat(var(--r,2),auto);column-gap:34px}.v221-canvas .gl .ag-cols .ag-r:nth-child(1),.v221-canvas .gl .ag-cols .ag-r:nth-child(1){border-top:0}
 
 .v221-canvas .gl .ag-cols .ag-r{border-top:0;border-bottom:1px solid var(--dk-line)}.v221-canvas .gl .ag-cols .ag-r.last{border-bottom:0}
 /* tiers, open: the badge sits on the rule so every title starts at the same height */

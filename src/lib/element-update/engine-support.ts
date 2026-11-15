@@ -42,7 +42,7 @@ function qrSvg(link: string, size: number, ink: string, background: string) {
 // Supplied wordmark only; never revive the retired T+wordmark or invented client logos.
 const LOGO = { gl: "/brand-logos/tp-classic-stacked-color.svg", glRev: "/brand-logos/tp-classic-white.svg", glWhite: "/brand-logos/tp-classic-white.svg", tp: "/brand-logos/tp-black.svg", mark: "", markRev: "", markColor: "" };
 export const engineSupport = {
-  esc, cleanText: (value: unknown) => String(value ?? "").replace(/[\u0000-\u0008\u000c\u000e-\u001f]/g, ""),
+  esc, attrText: (value: unknown) => { const t = String(value ?? "").replace(/^[\s\-–—~]+/, "").trim(); return t ? `— ${t}` : ""; }, cleanText: (value: unknown) => String(value ?? "").replace(/[\u0000-\u0008\u000c\u000e-\u001f]/g, ""),
   clone: <T,>(value: T): T => JSON.parse(JSON.stringify(value)), uid: () => crypto.randomUUID(),
   imgSrc: (value: unknown) => resolveSourceImage(value) ?? "", hasImg: (value: unknown) => Boolean(resolveSourceImage(value)),
   cleanPhoto: (value: unknown) => resolveSourceImage(value) ? { ...asRecord(value) } : null,

@@ -1,21 +1,23 @@
-import sourceModules from "./modules.json";
-import options from "./module-options.json";
-import artwork from "./artwork.json";
+import { MODULES, SUBS, FORMATS, ROW_LAYOUTS } from "./engine.generated.js";
+import { resolveSourceImage } from "./image-resolver";
 import { importedSections } from "./catalog";
 
 export type ModuleData = Record<string, unknown>;
 export interface SourceModule { id?: string; type: string; data: ModuleData }
 export interface SourceLayout { modules: SourceModule[]; format?: string; [key: string]: unknown }
-export interface SourceField { k?: string; l: string; t?: string; o?: Array<[string, string]>; f?: SourceField[]; min?: number; max?: number; step?: number; unit?: string; opt?: boolean }
-export interface SourceDefinition { name: string; group: string; desc: string; fields: SourceField[]; def?: ModuleData; vk?: string }
-export const SOURCE_MODULES = sourceModules as unknown as Record<string, SourceDefinition>;
-export const SOURCE_FORMATS = options.formats;
+export interface SourceField { k?: string; l: string; t?: string; o?: Array<[string, string]>; f?: SourceField[]; min?: number; max?: number; step?: number; unit?: string; opt?: boolean; when?: (data: ModuleData) => boolean }
+export interface SourceDefinition { name: string; group: string; desc: string; fields: SourceField[]; def?: ModuleData; vk?: string; vk2?: string }
+export const SOURCE_MODULES: Record<string, SourceDefinition> = Object.fromEntries(Object.entries(MODULES).map(([key, definition]) => [key, { ...definition, def: definition.def() }]));
+export const SOURCE_SUBMODULES: Record<string, SourceDefinition> = Object.fromEntries(Object.entries(SUBS).map(([key, definition]) => [key, { ...definition, def: definition.def() }]));
+export const SOURCE_FORMATS = FORMATS;
+export function sourceFieldVisible(field: SourceField, data: ModuleData): boolean { return !field.when || field.when(data); }
+export function sourceRowColumns(layout: unknown): string[] { return ROW_LAYOUTS[string(layout)] ?? ROW_LAYOUTS["3"]; }
 export const record = (value: unknown): ModuleData => value && typeof value === "object" && !Array.isArray(value) ? value as ModuleData : {};
 export const string = (value: unknown): string => typeof value === "string" || typeof value === "number" ? String(value) : "";
 export const records = (value: unknown): ModuleData[] => Array.isArray(value) ? value.map(record) : [];
 
 // These need dedicated measured geometry; never disguise them as narrative rows.
-export const UNPORTED_MODULES = new Set(["footprint", "seriesChart", "heatmap", "funnel", "bullet", "typeDesign"]);
+export const UNPORTED_MODULES = new Set<string>();
 export function workingLayout(content: unknown): SourceLayout | undefined {
   const c = record(content); const layout = record(c.elementLayout ?? c.sourceLayout);
   if (!Array.isArray(layout.modules)) return undefined;
@@ -34,15 +36,11 @@ export function sourceLayoutPatch(content: ModuleData, layout: SourceLayout): Mo
   };
 }
 export function sourceImage(value: unknown): string | undefined {
-  const image = record(value); const key = string(image.elib);
-  const supplied = (artwork as Record<string, string>)[key];
-  if (supplied) return supplied;
-  const url = string(image.url ?? image.src ?? value);
-  return /^(https:\/\/|\/__l5e\/assets-v1\/)/.test(url) ? url : undefined;
+  return resolveSourceImage(value);
 }
 /** New blocks retain configuration but never copy example claims or people. */
-export function blankSourceModule(type: string, configuration?: ModuleData): SourceModule {
-  const definition = SOURCE_MODULES[type];
+export function blankSourceModule(type: string, configuration?: ModuleData, submodule = false): SourceModule {
+  const definition = (submodule ? SOURCE_SUBMODULES : SOURCE_MODULES)[type];
   const defaults = structuredClone({ ...definition?.def, ...configuration });
   function clean(fields: SourceField[], values: ModuleData): ModuleData {
     const out: ModuleData = {};
@@ -54,7 +52,7 @@ export function blankSourceModule(type: string, configuration?: ModuleData): Sou
       else if (field.t === "image") out[field.k] = null;
       else out[field.k] = "";
     }
-    if (type === "row") out.slots = [null, null, null];
+    if (type === "row") out.slots = Array.from({ length: sourceRowColumns(out.layout).length }, () => null);
     return out;
   }
   return { id: crypto.randomUUID(), type, data: clean(definition?.fields ?? [], defaults) };
@@ -69,19 +67,19 @@ export function splitSourcePages(layout: SourceLayout): SourceModule[][] {
 }
 export function sourceExportIssues(layout: SourceLayout): string[] {
   const issues = new Set<string>();
-  function inspect(modules: SourceModule[]) {
+  function inspect(modules: SourceModule[], submodules = false) {
     for (const module of modules) {
-      if (!SOURCE_MODULES[module.type] || UNPORTED_MODULES.has(module.type)) issues.add(`${SOURCE_MODULES[module.type]?.name ?? module.type}: layout not yet ported`);
-      if (module.type === "dataChart" && module.data.kind !== "bar") issues.add(`${string(module.data.kind)} chart geometry not yet ported`);
+      const definitions = submodules ? SOURCE_SUBMODULES : SOURCE_MODULES;
+      if (!definitions[module.type] || UNPORTED_MODULES.has(module.type)) issues.add(`${definitions[module.type]?.name ?? module.type}: layout not yet ported`);
       function imageCheck(value: unknown) {
         if (Array.isArray(value)) { value.forEach(imageCheck); return; }
         if (!value || typeof value !== "object") return;
         const data = record(value);
-        if (data.elib && !sourceImage(data)) issues.add(`Missing artwork: ${string(data.elib)}`);
+        if ((data.elib || data.id || data.lib) && !sourceImage(data)) issues.add(`Missing artwork: ${string(data.elib ?? data.id ?? data.lib)}`);
         Object.values(data).forEach(imageCheck);
       }
       imageCheck(module.data);
-      if (module.type === "row") inspect(records(module.data.slots).filter(slot => slot.type).map(slot => ({ type: string(slot.type), data: record(slot.data) })));
+      if (module.type === "row") inspect(records(module.data.slots).filter(slot => slot.kind || slot.type).map(slot => ({ type: string(slot.kind ?? slot.type), data: record(slot.data) })), true);
     }
   }
   inspect(layout.modules);

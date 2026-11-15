@@ -1,7 +1,7 @@
 import { createElement as dvCreateElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server.browser';
 import { engineSupport } from './engine-support';
-const { esc, cleanText, clone, uid, imgSrc, hasImg, cleanPhoto, photoImg, overlayCss, ic, LOGO, LOGO_AR, CUR_BRAND, DECK_MAP, QR, PROOF, spxOn } = engineSupport;
+const { esc, attrText, cleanText, clone, uid, imgSrc, hasImg, cleanPhoto, photoImg, overlayCss, ic, LOGO, CUR_BRAND, DECK_MAP, QR, PROOF, spxOn } = engineSupport;
 const __RE = {createElement:dvCreateElement};
 const __RDS = {renderToStaticMarkup};
 // Ported render-only definitions: 20-engine-modules.js

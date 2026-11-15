@@ -5,14 +5,14 @@
   "v221_correction": {
     "authority": "User-supplied ELEMENT v221 architecture brief, 2026-11-15 18:32 UTC",
     "previous_input": "Bundled output; not the 151-file editable source",
-    "source_package": "element-v221-source.zip \u2014 not attached at this audit",
-    "image_package": "element-v221-library-images.zip \u2014 all 698 images confirmed packaged and mapped; pending attachment only",
+    "source_package": "Received and safely inspected: 151 source JS files; no database/user exports",
+    "image_package": "Received and hosted: 698 files, 641 unique hashes with 57 identical-byte aliases; 128 earlier artwork mappings preserved",
     "priority_order": [
       "Shared field-definition renderer and effective source geometry",
       "698 hash-preserving original image mappings",
       "Templates label and legacy project-name migration"
     ],
-    "implementation_status": "Templates navigation uses shared compatibility metadata. Exact current/legacy project match and templates/spectrum spoken-name adapter implemented without rewriting records. Source project creation/resolution and goTo do not exist in the current app, so live membership and agent-command integration are not claimed.",
+    "implementation_status": "Shared source registry/render-only engine now supplies module controls with executable when(d), vk/vk2, 17 SUBS, asymmetric row tracks and all module variations. Existing source editor uses shared markup; no parallel app/store. Final cross-size families/signature/content-rules wrappers and exact style parity remain incomplete.",
     "verification_gate": "Inspect all source definitions in filename load order; import baked data/reader. Source signature without WARNING and 66 suites fails=0 remain unverified. The eight unrelated pre-existing failures are tracked separately, not an Element port gate, and remain unresolved/not waived."
   },
   "findings": [
@@ -99,7 +99,7 @@
     "role_testing": "Pure tests; no full live all-role audit"
   },
   "remaining_external_blockers": [
-    "Pending attachment of source and image packages; all 698 images are confirmed packaged and mapped, not an availability risk",
+    "Source package omits canvas.css, test.html and 66 regression suites; exact v221 style/release verification requires them",
     "Office and print-vendor production verification"
   ],
   "remaining_implementation": [
@@ -122,5 +122,19 @@
       "spectrum"
     ],
     "live_integration_limits": "No source project store or source goTo implementation is present; helpers ready for those adapters, not claimed as live migrated project behavior."
+  },
+  "v221_milestone": {
+    "tests": "24 focused tests passed; every source module variation renders without mutating its input",
+    "live": "Existing owned material: text placement hides overlay; full placement reveals overlay; saved/reopened full placement; zero browser errors",
+    "images": "All 698 originals uploaded unchanged; hashes and file keys wired; 641 unique hashes, no conflicting byte hashes",
+    "bake": "299 pieces/27 template fit records preserved and fresh-copy reader tested; reader not yet substituted into catalogue; runtime fit still required",
+    "limitations": [
+      "canvas.css is absent from the source package; scoped geometry recovered from earlier supplied bundled stylesheet, not certified v221 style parity",
+      "Final 99o families/99u signature/99x content-rules cross-size wrappers not yet ported; current nonprint reflow remains earlier source recipe",
+      "Project/review/version and source-agent adapters remain unported",
+      "No source tests directory or test.html supplied; 66-suite release gate cannot be run",
+      "Office/press certification not performed"
+    ],
+    "preservation": "Existing saved assets, event photos, kits, production gates, roles and native editors unchanged"
   }
 }

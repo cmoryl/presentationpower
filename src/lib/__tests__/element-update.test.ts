@@ -45,11 +45,11 @@ describe("supplied Element update preservation", () => {
     expect(workingLayout(patch)?.modules[0]?.data.title).toBe("After");
     expect(patch.title).toBe("After");
   });
-  it("blocks missing artwork and unported geometry rather than exporting substitute layouts", () => {
-    expect(sourceExportIssues({ modules: [{ type: "hero", data: { photo: { elib: "img/unavailable.jpg" } } }, { type: "footprint", data: {} }] })).toEqual(["Missing artwork: img/unavailable.jpg", "Global footprint: layout not yet ported"]);
+  it("blocks unresolved artwork while accepting the now-ported footprint renderer", () => {
+    expect(sourceExportIssues({ modules: [{ type: "hero", data: { photo: { elib: "img/unavailable.jpg" } } }, { type: "footprint", data: {} }] })).toEqual(["Missing artwork: img/unavailable.jpg"]);
   });
   it("new modules never populate fictional statistics or people", () => {
-    expect(blankSourceModule("kpis").data.items).toEqual([{ icon: "", value: "", caption: "" }, { icon: "", value: "", caption: "" }]);
+    expect(blankSourceModule("kpis").data.items).toEqual([{ icon: "", value: "", caption: "", delta: "" }, { icon: "", value: "", caption: "", delta: "" }]);
     expect(blankSourceModule("hero").data.title).toBe("");
     expect(blankSourceModule("team").data.items).toEqual([{ name: "", role: "", line: "", photo: null }, { name: "", role: "", line: "", photo: null }]);
   });

@@ -1,9 +1,9 @@
 # Roadmap
 ## Claude full Element update
 - [x] Corrected the migration ledger: the previous ZIP was bundled output; ELEMENT v221's ordered 151-file source and 698-image packages are the authoritative next inputs, not absent artwork.
-- [ ] Packages received and safely inspected: 151 ordered source files, 299 baked pieces/27 templates, and 698 original image mappings; complete field/render port and image hosting/verification.
-- [ ] Priority 1 — port the shared field renderer, conditional when(d) rules, vk/vk2 variants, SUBS/flexible rows, effective source renderers and baked reader into the existing editor. Source package received; render-only integration in progress, no bundle reverse-engineering.
-- [ ] Priority 2 — host the 698 original images and resolve assets.json hashes without changing material IDs. All 698 images confirmed packaged and fully mapped; package received; hash-preserving hosting in progress.
+- [x] Packages received and safely inspected: 151 ordered source files, 299 baked pieces/27 templates, and 698 original image mappings; shared field/module render port and image hosting completed; final cross-size/style parity remains below.
+- [ ] Priority 1 — port the shared field renderer, conditional when(d) rules, vk/vk2 variants, SUBS/flexible rows, effective source renderers and baked reader into the existing editor. Shared source fields/when/vk/vk2, 17 SUBS and all module variations integrated/tested; final cross-size family/signature/content wrappers and exact style verification unfinished.
+- [x] Priority 2 — host the 698 original images and resolve assets.json hashes without changing material IDs. All 698 images confirmed packaged and fully mapped; 698 originals hosted/mapped with 641 unique hashes and 57 identical aliases; previous 128 asset mappings preserved.
 - [x] Priority 3 — Templates label uses shared metadata; implemented exact current/legacy project-name lookup without rewriting saved names, preserving first live match and spectrum/nav-spx/order 4. Both templates/spectrum spoken aliases resolve to the same destination; 18 focused tests passed. No source project resolver/creation or goTo exists yet; connect the tested adapter when those capabilities are ported, not a rename blocker.
 - [x] Audited source process and aligned Build → modules/templates → saved work, role-aware navigation, selected variant configuration, material naming, undo/redo, recursive checks and proof delivery; authenticated reopen/phone/review-door verified. Full audit in docs/claude-build-process-audit.json; source project/review/version/agent parity remains explicitly incomplete.
 - [x] Inventoried and browser-walked all 38 supplied modules plus page breaks; integrated source controls, flexible rows, 14 sizes and source-template save/reopen/proof downloads in the live editor. Event photos, kits and native/original records preserved.
@@ -16,6 +16,8 @@
 - [ ] Connect source artwork: 274 drafts reference 698 hash-backed images existing in the artifact asset store; awaiting the announced original-image package, not replacement imagery.
 - [x] Verified source template editing/save/reopen, nested rows, module choices, social/slides entry points, PDF/flat-PPTX proof downloads and phone fit; eight source tests pass and build OK.
 - [ ] Verify full native/review/agent/press/Office parity; source/image attachment and exact renderer work remain incomplete. Eight unrelated pre-existing failures are tracked separately, not an Element port gate.
+- [x] v221 milestone verified: 24 focused tests passed, every module variation renders without mutating source, existing owned material conditional fields/save/reopen checked with zero page errors. No publishing.
+- [ ] Complete final cross-size source wrappers, catalogue bake-reader adoption and static audit-badge refresh; source package omits canvas.css/test.html/66 suites, so exact styling/release certification remains unverified.
 ## Separate pre-existing defects
 - [ ] Diagnose and resolve the eight Bowl, London-map export and light-mode surface guard failures listed by full test name in docs/claude-build-process-audit.json. None waived; tracked outside the Element port. No event facts, export contracts or artwork should be changed merely to satisfy stale assertions.
 ## Bowl brand-kit submenu
