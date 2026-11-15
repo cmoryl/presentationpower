@@ -2,15 +2,75 @@
   "source": "TransPerfect_ELEMENT.zip",
   "intent": "Integrate the supplied Claude update into the existing Element application, not replace its production services",
   "capabilities": [
-    {"capability":"Application code","source":"Single bundled index.html with inline JavaScript and CSS; no package.json or separate source modules","outcome":"Port into existing React/TanStack structure","status":"inspected","next_action":"Inventory and map screens and module variants before implementation"},
-    {"capability":"Module editing and layout","source":"MODULES, LIB_DESIGNS, responsive fitting and per-format controls","outcome":"Preserve supported editing capabilities through current governed registries","status":"pending","next_action":"Compare source definitions with current module and print registries"},
-    {"capability":"Projects, materials, versions and review","source":"Store supports localStorage and optional injected collection-style shared database","outcome":"Use existing Lovable Cloud auth and data ownership","status":"pending","next_action":"Map source records and review actions to current application tables"},
-    {"capability":"Schema and existing records","source":"No schema or standalone record export detected; embedded template content is present","outcome":"Preserve current Cloud records; do not substitute demo content for approved facts","status":"pending","next_action":"Classify embedded templates separately from saved user projects"},
-    {"capability":"Authentication and authorization","source":"Injected identity/owner checks and optional shared Store adapter","outcome":"Retain existing Element role enforcement","status":"pending","next_action":"Audit source actions against existing role authorities"},
-    {"capability":"Uploaded artwork","source":"378 client-logo files, 121 library images and seven sprite files","outcome":"Preserve original files and private client-asset handling","status":"inspected","next_action":"Deduplicate against current assets; resolve approximately 698 unmatched image references before claiming complete coverage"},
-    {"capability":"Exports","source":"PNG/JPG, editable PowerPoint, SVG, browser PDF and press-preparation controls","outcome":"Preserve existing QA, outlined print-master and colour-space contracts","status":"pending","next_action":"Port compatible exports; identify incompatible live-text/automatic CMYK behavior without silently adopting it"},
-    {"capability":"Agent and providers","source":"Agent tools and runtime integration hooks in bundled script","outcome":"Retain existing AI model registry and connected providers","status":"pending","next_action":"Inspect actual agent execution call sites and adapt to current gateway"},
-    {"capability":"Public endpoints, callbacks, webhooks and schedules","source":"No separate server files detected in archive","outcome":"Preserve all current Element endpoints and schedules","status":"pending","next_action":"Confirm runtime hooks do not represent missing external capabilities"},
-    {"capability":"Cutover and verification","source":"Existing production Element application","outcome":"No destructive replacement or automatic publication","status":"pending","next_action":"Review integration plan and verify complete representative editing and export flows"}
+    {
+      "capability": "Application code",
+      "source": "Single bundled index.html with inline JavaScript and CSS; no package.json or separate source modules",
+      "outcome": "Port into existing React/TanStack structure",
+      "status": "partial",
+      "next_action": "299 source records and saved layouts statically extracted; existing admin print curator offers native editable draft creation. Full project/build-area UI and renderer parity remain unfinished."
+    },
+    {
+      "capability": "Module editing and layout",
+      "source": "MODULES, LIB_DESIGNS, responsive fitting and per-format controls",
+      "outcome": "Preserve supported editing capabilities through current governed registries",
+      "status": "partial",
+      "next_action": "Supported narrative, statistics, quote and contact structures map to existing PrintSection renderers; other families and source variant geometry remain pending. Original layouts retained, not certified."
+    },
+    {
+      "capability": "Projects, materials, versions and review",
+      "source": "Store supports localStorage and optional injected collection-style shared database",
+      "outcome": "Use existing Lovable Cloud auth and data ownership",
+      "status": "partial",
+      "next_action": "Draft creation/reopening uses existing Cloud print_assets and curator. Source project-level materials/version/review UX remains to port; no saved project export supplied."
+    },
+    {
+      "capability": "Schema and existing records",
+      "source": "No schema or standalone record export detected; embedded template content is present",
+      "outcome": "Preserve current Cloud records; do not substitute demo content for approved facts",
+      "status": "partial",
+      "next_action": "Current records preserved; 299 sanitized template drafts separate from approved catalogue/Oracle. Source saved-project records absent."
+    },
+    {
+      "capability": "Authentication and authorization",
+      "source": "Injected identity/owner checks and optional shared Store adapter",
+      "outcome": "Retain existing Element role enforcement",
+      "status": "partial",
+      "next_action": "Existing admin route gate and Cloud ownership retained; full all-role integration audit pending."
+    },
+    {
+      "capability": "Uploaded artwork",
+      "source": "378 client-logo files, 121 library images and seven sprite files",
+      "outcome": "Preserve original files and private client-asset handling",
+      "status": "partial",
+      "next_action": "128 supplied library photographs/sprites imported unchanged. 274 templates reference unavailable artwork; 698 virtual blob paths need source bytes. 378 client logos remain in supplied archive, not publicly imported."
+    },
+    {
+      "capability": "Exports",
+      "source": "PNG/JPG, editable PowerPoint, SVG, browser PDF and press-preparation controls",
+      "outcome": "Preserve existing QA, outlined print-master and colour-space contracts",
+      "status": "pending",
+      "next_action": "Existing QA/export contracts retained unchanged; no source press/live-text or CMYK behavior adopted. Source layout overflow and export parity not certified."
+    },
+    {
+      "capability": "Agent and providers",
+      "source": "Agent tools and runtime integration hooks in bundled script",
+      "outcome": "Retain existing AI model registry and connected providers",
+      "status": "pending",
+      "next_action": "Source SAMPLE.json runtime content-review/agent hooks detected; existing model/provider registry unchanged. Structured source agent-tool parity remains to port."
+    },
+    {
+      "capability": "Public endpoints, callbacks, webhooks and schedules",
+      "source": "No separate server files detected in archive",
+      "outcome": "Preserve all current Element endpoints and schedules",
+      "status": "inspected",
+      "next_action": "Source uses injected Store collection adapter and SAMPLE sampling hooks, no standalone external server endpoint found. Current endpoints/schedules untouched."
+    },
+    {
+      "capability": "Cutover and verification",
+      "source": "Existing production Element application",
+      "outcome": "No destructive replacement or automatic publication",
+      "status": "partial",
+      "next_action": "Three preservation tests pass; authenticated draft create/reopen checked without page errors and temporary draft removed. Preview build OK. Full suite: 2794 pass, 8 fail; full edit/review/export/responsive integration not verified. No publication."
+    }
   ]
 }

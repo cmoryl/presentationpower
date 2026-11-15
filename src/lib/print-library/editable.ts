@@ -24,6 +24,7 @@ const rid = () => `sec-${Math.random().toString(36).slice(2, 10)}`;
 
 /** id prefix → library slug, longest prefix first. */
 const SOURCE_LIBRARIES: Array<[string, string]> = [
+  ["claude-update-", "claude-element-update"],
   ["legal-ebro-", "legal-ebrochures"],
   ["legal-", "legal-case-studies"],
   ["media-", "media-case-studies"],
@@ -433,6 +434,7 @@ export function toEditableContent(item: PrintLibraryItem): Rec | undefined {
 /** Provenance context stored alongside the editable copy. */
 export function editableContextFor(item: PrintLibraryItem): Rec {
   const ctx: Rec = { sourceLibrary: sourceLibraryFor(item.id) };
+  if (item.id.startsWith("claude-update-")) ctx["importReview"] = "pending";
   if (item.seedSlug) ctx["sourceSlug"] = item.seedSlug;
   if (item.sourceFile) ctx["sourceFile"] = item.sourceFile;
   if (item.collection) ctx["collection"] = item.collection;

@@ -1,7 +1,9 @@
 # Roadmap
 ## Claude full Element update
 - [x] Inspect the supplied archive safely and record detected capabilities and missing dependencies.
-- [ ] Review the integration plan, then map and port the supplied modular-template and build-area changes without replacing current saved work or event features.
+- [x] Approved plan; extracted 299 source-backed drafts and imported 128 supplied photographs/sprites into the existing admin curator; native copy/open/reopen verified, temporary test draft removed.
+- [ ] Finish source module/variant geometry, project/material/version/review UX and agent-tool integration; current draft mapping is partial, not full build parity.
+- [ ] Resolve missing source artwork: 274 drafts reference unavailable files (698 virtual blob paths); requires original image bytes from the Claude build.
 - [ ] Verify integrated editing, saving, review and export flows; resolve missing artwork/source dependencies or report them explicitly.
 ## Bowl brand-kit submenu
 - [x] Add a shared icon-led pinned section strip for existing brand sections on app/share views; remove the standalone Animations shortcut without changing content or downloads.

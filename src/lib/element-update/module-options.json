@@ -1,0 +1,1999 @@
+{
+  "families": {
+    "hero": {
+      "name": "Hero",
+      "group": "Open",
+      "vk": "layout",
+      "vk2": "scheme",
+      "desc": "Title block with photo placement, overlays, alignment and color schemes.",
+      "fields": [
+        {
+          "t": "head",
+          "l": "Words"
+        },
+        {
+          "k": "title",
+          "l": "Title",
+          "t": "textarea"
+        },
+        {
+          "k": "highlight",
+          "l": "Words to color (copy them from the title)"
+        },
+        {
+          "k": "lead",
+          "l": "Intro sentence",
+          "t": "textarea"
+        },
+        {
+          "k": "short",
+          "l": "Short title for social and ads"
+        },
+        {
+          "t": "head",
+          "l": "Photo"
+        },
+        {
+          "k": "layout",
+          "l": "Placement",
+          "t": "select",
+          "o": [
+            [
+              "text",
+              "No photo"
+            ],
+            [
+              "right",
+              "Photo right"
+            ],
+            [
+              "left",
+              "Photo left"
+            ],
+            [
+              "fade",
+              "Photo fading in"
+            ],
+            [
+              "full",
+              "Full-bleed photo"
+            ]
+          ]
+        },
+        {
+          "k": "photo",
+          "l": "Photo",
+          "t": "image"
+        },
+        {
+          "k": "photoWidth",
+          "l": "Photo width",
+          "t": "range",
+          "min": 30,
+          "max": 70,
+          "step": 2,
+          "unit": "%"
+        },
+        {
+          "k": "overlay",
+          "l": "Overlay color",
+          "t": "select",
+          "o": [
+            [
+              "navy",
+              "Navy"
+            ],
+            [
+              "indigo",
+              "Indigo"
+            ],
+            [
+              "cobalt",
+              "Cobalt"
+            ],
+            [
+              "signature",
+              "Violet to aqua"
+            ],
+            [
+              "white",
+              "White"
+            ],
+            [
+              "black",
+              "Black"
+            ],
+            [
+              "none",
+              "No overlay"
+            ]
+          ]
+        },
+        {
+          "k": "overlayStrength",
+          "l": "Overlay strength",
+          "t": "range",
+          "min": 0,
+          "max": 95,
+          "step": 5,
+          "unit": "%"
+        },
+        {
+          "k": "overlayDir",
+          "l": "Overlay shape",
+          "t": "select",
+          "o": [
+            [
+              "left",
+              "Strongest behind the text"
+            ],
+            [
+              "even",
+              "Even"
+            ],
+            [
+              "bottom",
+              "Strongest at the bottom"
+            ]
+          ]
+        },
+        {
+          "k": "words",
+          "l": "Words",
+          "t": "select",
+          "opt": true,
+          "o": [
+            [
+              "auto",
+              "Where the look puts them"
+            ],
+            [
+              "over",
+              "On the picture"
+            ]
+          ]
+        },
+        {
+          "k": "panel",
+          "l": "Panel behind the words",
+          "t": "select",
+          "o": [
+            [
+              "none",
+              "None"
+            ],
+            [
+              "light",
+              "Frosted, light"
+            ],
+            [
+              "dark",
+              "Frosted, dark"
+            ],
+            [
+              "card",
+              "White card"
+            ]
+          ]
+        },
+        {
+          "k": "logo",
+          "l": "Client logo",
+          "t": "image",
+          "lib": true
+        },
+        {
+          "k": "logoTone",
+          "l": "Logo colour",
+          "t": "select",
+          "o": [
+            [
+              "color",
+              "Original colours"
+            ],
+            [
+              "grey",
+              "Grey"
+            ],
+            [
+              "white",
+              "White"
+            ]
+          ]
+        },
+        {
+          "k": "logoW",
+          "l": "Logo width",
+          "t": "range",
+          "min": 70,
+          "max": 340,
+          "step": 10,
+          "unit": "px"
+        },
+        {
+          "k": "chip",
+          "l": "Floating figure on the photo"
+        },
+        {
+          "k": "chipSub",
+          "l": "Floating figure caption"
+        },
+        {
+          "t": "head",
+          "l": "Position"
+        },
+        {
+          "k": "align",
+          "l": "Text alignment",
+          "t": "select",
+          "o": [
+            [
+              "left",
+              "Left"
+            ],
+            [
+              "center",
+              "Centered"
+            ]
+          ]
+        },
+        {
+          "k": "valign",
+          "l": "Vertical position",
+          "t": "select",
+          "o": [
+            [
+              "top",
+              "Top"
+            ],
+            [
+              "center",
+              "Centered in the safe area"
+            ],
+            [
+              "bottom",
+              "Bottom"
+            ]
+          ]
+        },
+        {
+          "k": "safe",
+          "l": "Text safe margin",
+          "t": "select",
+          "o": [
+            [
+              "standard",
+              "Standard (32 px)"
+            ],
+            [
+              "roomy",
+              "Roomy (56 px)"
+            ],
+            [
+              "wide",
+              "Wide (80 px)"
+            ]
+          ]
+        },
+        {
+          "k": "width",
+          "l": "Text width",
+          "t": "select",
+          "o": [
+            [
+              "narrow",
+              "Narrow"
+            ],
+            [
+              "standard",
+              "Standard"
+            ],
+            [
+              "wide",
+              "Wide"
+            ]
+          ]
+        },
+        {
+          "k": "height",
+          "l": "Hero height",
+          "t": "select",
+          "o": [
+            [
+              "compact",
+              "Compact"
+            ],
+            [
+              "standard",
+              "Standard"
+            ],
+            [
+              "tall",
+              "Tall"
+            ],
+            [
+              "custom",
+              "Custom (drag the hero's bottom edge)"
+            ]
+          ]
+        },
+        {
+          "k": "heightPx",
+          "l": "Custom height",
+          "t": "range",
+          "min": 160,
+          "max": 1000,
+          "step": 4,
+          "unit": " px"
+        },
+        {
+          "t": "head",
+          "l": "Blend into the page"
+        },
+        {
+          "k": "fadeBottom",
+          "l": "Edge fade",
+          "t": "select",
+          "o": [
+            [
+              "auto",
+              "Match the background"
+            ],
+            [
+              "none",
+              "No fade"
+            ],
+            [
+              "soft",
+              "Soft fade"
+            ],
+            [
+              "long",
+              "Long fade"
+            ]
+          ]
+        },
+        {
+          "k": "fadeEdge",
+          "l": "Fade from",
+          "t": "select",
+          "o": [
+            [
+              "bottom",
+              "Bottom"
+            ],
+            [
+              "top",
+              "Top"
+            ],
+            [
+              "topbottom",
+              "Top and bottom"
+            ],
+            [
+              "sides",
+              "Both sides"
+            ],
+            [
+              "left",
+              "Left side"
+            ],
+            [
+              "right",
+              "Right side"
+            ],
+            [
+              "all",
+              "All edges"
+            ]
+          ]
+        },
+        {
+          "k": "overlap",
+          "l": "Next section overlaps the hero",
+          "t": "select",
+          "o": [
+            [
+              "auto",
+              "Automatic"
+            ],
+            [
+              "none",
+              "No overlap"
+            ],
+            [
+              "small",
+              "Small, 40 px"
+            ],
+            [
+              "standard",
+              "Standard, 72 px"
+            ],
+            [
+              "deep",
+              "Deep, 120 px"
+            ]
+          ]
+        },
+        {
+          "t": "head",
+          "l": "Color"
+        },
+        {
+          "k": "scheme",
+          "l": "Background",
+          "t": "select",
+          "o": [
+            [
+              "dark",
+              "Deep gradient"
+            ],
+            [
+              "navy",
+              "Navy"
+            ],
+            [
+              "indigo",
+              "Indigo glow"
+            ],
+            [
+              "cobalt",
+              "Cobalt"
+            ],
+            [
+              "signature",
+              "Violet to aqua"
+            ],
+            [
+              "light",
+              "White with aurora"
+            ],
+            [
+              "ice",
+              "Ice"
+            ]
+          ]
+        },
+        {
+          "k": "textColor",
+          "l": "Text color",
+          "t": "select",
+          "o": [
+            [
+              "auto",
+              "Automatic"
+            ],
+            [
+              "light",
+              "White"
+            ],
+            [
+              "dark",
+              "Navy"
+            ]
+          ]
+        },
+        {
+          "k": "accent",
+          "l": "Highlight color",
+          "t": "select",
+          "o": [
+            [
+              "auto",
+              "Automatic"
+            ],
+            [
+              "cobalt",
+              "Cobalt"
+            ],
+            [
+              "sky",
+              "Sky"
+            ],
+            [
+              "light-sky",
+              "Light sky"
+            ],
+            [
+              "aqua",
+              "Aqua"
+            ],
+            [
+              "violet",
+              "Violet"
+            ]
+          ]
+        }
+      ]
+    },
+    "kpis": {
+      "name": "KPI trio",
+      "group": "Proof",
+      "vk": "variant",
+      "desc": "Three headline results; cards, one bar or dark cards.",
+      "fields": [
+        {
+          "k": "variant",
+          "l": "Style",
+          "t": "select",
+          "o": [
+            [
+              "cards",
+              "White cards"
+            ],
+            [
+              "bar",
+              "Single bar"
+            ],
+            [
+              "dark",
+              "Navy cards"
+            ]
+          ]
+        },
+        {
+          "k": "items",
+          "l": "Results",
+          "t": "list",
+          "min": 2,
+          "max": 3,
+          "f": [
+            {
+              "k": "icon",
+              "l": "Icon",
+              "t": "icon"
+            },
+            {
+              "k": "value",
+              "l": "Value"
+            },
+            {
+              "k": "caption",
+              "l": "Caption"
+            }
+          ]
+        }
+      ]
+    },
+    "stats": {
+      "name": "Stat strip",
+      "group": "Proof",
+      "vk": "variant",
+      "desc": "3\u20135 icon stats: open, in cards, or on an ice band.",
+      "fields": [
+        {
+          "k": "variant",
+          "l": "Style",
+          "t": "select",
+          "o": [
+            [
+              "open",
+              "Open with hairlines"
+            ],
+            [
+              "cards",
+              "Cards"
+            ],
+            [
+              "band",
+              "Ice band"
+            ]
+          ]
+        },
+        {
+          "k": "items",
+          "l": "Stats",
+          "t": "list",
+          "min": 3,
+          "max": 5,
+          "f": [
+            {
+              "k": "icon",
+              "l": "Icon",
+              "t": "icon"
+            },
+            {
+              "k": "value",
+              "l": "Value"
+            },
+            {
+              "k": "caption",
+              "l": "Caption"
+            }
+          ]
+        }
+      ]
+    },
+    "capabilities": {
+      "name": "Capability grid",
+      "group": "Proof",
+      "vk": "variant",
+      "desc": "3\u20136 icon + verb cards: tray grid or open two-column list.",
+      "fields": [
+        {
+          "k": "variant",
+          "l": "Style",
+          "t": "select",
+          "o": [
+            [
+              "tray",
+              "Cards in a tray"
+            ],
+            [
+              "list",
+              "Open two-column list"
+            ]
+          ]
+        },
+        {
+          "k": "items",
+          "l": "Capabilities",
+          "t": "list",
+          "min": 3,
+          "max": 6,
+          "f": [
+            {
+              "k": "icon",
+              "l": "Icon",
+              "t": "icon"
+            },
+            {
+              "k": "title",
+              "l": "Verb"
+            },
+            {
+              "k": "text",
+              "l": "Line",
+              "t": "textarea"
+            }
+          ]
+        }
+      ]
+    },
+    "features": {
+      "name": "Icon feature row",
+      "group": "Proof",
+      "desc": "Centered label over 3\u20135 icon-and-line columns.",
+      "fields": [
+        {
+          "k": "label",
+          "l": "Label"
+        },
+        {
+          "k": "items",
+          "l": "Columns",
+          "t": "list",
+          "min": 3,
+          "max": 5,
+          "f": [
+            {
+              "k": "icon",
+              "l": "Icon",
+              "t": "icon"
+            },
+            {
+              "k": "text",
+              "l": "Line"
+            }
+          ]
+        }
+      ]
+    },
+    "storyRows": {
+      "name": "Challenge / Solution / Result",
+      "group": "Story",
+      "vk": "variant",
+      "desc": "Three-part story as rows, numbered steps or side-by-side cards.",
+      "fields": [
+        {
+          "k": "variant",
+          "l": "Style",
+          "t": "select",
+          "o": [
+            [
+              "rows",
+              "Rows with labels"
+            ],
+            [
+              "numbered",
+              "Numbered steps"
+            ],
+            [
+              "cards",
+              "Side-by-side columns"
+            ]
+          ]
+        },
+        {
+          "k": "items",
+          "l": "Rows",
+          "t": "list",
+          "min": 2,
+          "max": 6,
+          "f": [
+            {
+              "k": "icon",
+              "l": "Icon",
+              "t": "icon"
+            },
+            {
+              "k": "heading",
+              "l": "Heading"
+            },
+            {
+              "k": "text",
+              "l": "Paragraph",
+              "t": "textarea"
+            }
+          ]
+        }
+      ]
+    },
+    "storyColumns": {
+      "name": "Challenge / Approach / Impact",
+      "group": "Story",
+      "desc": "Three cards with intro and bullets. eBrochures.",
+      "fields": [
+        {
+          "k": "items",
+          "l": "Columns",
+          "t": "list",
+          "min": 3,
+          "max": 6,
+          "f": [
+            {
+              "k": "icon",
+              "l": "Icon",
+              "t": "icon"
+            },
+            {
+              "k": "heading",
+              "l": "Heading"
+            },
+            {
+              "k": "text",
+              "l": "Intro",
+              "t": "textarea"
+            },
+            {
+              "k": "bullets",
+              "l": "Bullets (one per line)",
+              "t": "textarea"
+            }
+          ]
+        }
+      ]
+    },
+    "quote": {
+      "name": "Quote band + snapshot",
+      "group": "Voice",
+      "vk": "side",
+      "desc": "Testimonial on a soft tint, optional proof card.",
+      "fields": [
+        {
+          "k": "quote",
+          "l": "Quote",
+          "t": "textarea"
+        },
+        {
+          "k": "attribution",
+          "l": "Attribution"
+        },
+        {
+          "k": "side",
+          "l": "Beside the quote",
+          "t": "select",
+          "o": [
+            [
+              "snapshot",
+              "Engagement Snapshot"
+            ],
+            [
+              "discover",
+              "Discover line + proof"
+            ],
+            [
+              "none",
+              "Nothing (full width)"
+            ]
+          ]
+        },
+        {
+          "k": "sideText",
+          "l": "Snapshot label or discover line",
+          "t": "textarea"
+        },
+        {
+          "k": "proof",
+          "l": "Proof points",
+          "t": "list",
+          "min": 0,
+          "max": 3,
+          "f": [
+            {
+              "k": "icon",
+              "l": "Icon",
+              "t": "icon"
+            },
+            {
+              "k": "text",
+              "l": "Text"
+            }
+          ]
+        }
+      ]
+    },
+    "quoteStats": {
+      "name": "Quote card + stat grid",
+      "group": "Voice",
+      "desc": "2\u00d72 stats beside a feature testimonial.",
+      "fields": [
+        {
+          "k": "items",
+          "l": "Stats",
+          "t": "list",
+          "min": 2,
+          "max": 4,
+          "f": [
+            {
+              "k": "icon",
+              "l": "Icon",
+              "t": "icon"
+            },
+            {
+              "k": "value",
+              "l": "Value"
+            },
+            {
+              "k": "caption",
+              "l": "Caption"
+            }
+          ]
+        },
+        {
+          "k": "quote",
+          "l": "Quote",
+          "t": "textarea"
+        },
+        {
+          "k": "client",
+          "l": "Client title"
+        },
+        {
+          "k": "attribution",
+          "l": "Attribution"
+        }
+      ]
+    },
+    "expert": {
+      "name": "Project stats + expert card",
+      "group": "Voice",
+      "desc": "Icon stat cards with a Talk-to-an-Expert card.",
+      "fields": [
+        {
+          "k": "label",
+          "l": "Section label"
+        },
+        {
+          "k": "items",
+          "l": "Stats",
+          "t": "list",
+          "min": 2,
+          "max": 4,
+          "f": [
+            {
+              "k": "icon",
+              "l": "Icon",
+              "t": "icon"
+            },
+            {
+              "k": "value",
+              "l": "Value"
+            },
+            {
+              "k": "caption",
+              "l": "Caption"
+            }
+          ]
+        },
+        {
+          "k": "title",
+          "l": "Card title"
+        },
+        {
+          "k": "line",
+          "l": "Card line",
+          "t": "textarea"
+        },
+        {
+          "k": "button",
+          "l": "Button"
+        }
+      ]
+    },
+    "cta": {
+      "name": "CTA bar",
+      "group": "Action",
+      "vk": "fill",
+      "desc": "G mark, title, sub-line and a Book a Demo pill.",
+      "fields": [
+        {
+          "k": "fill",
+          "l": "Fill",
+          "t": "select",
+          "o": [
+            [
+              "navy",
+              "Navy"
+            ],
+            [
+              "gradient",
+              "Violet to aqua gradient"
+            ],
+            [
+              "cobalt",
+              "Cobalt"
+            ]
+          ]
+        },
+        {
+          "k": "title",
+          "l": "Title"
+        },
+        {
+          "k": "sub",
+          "l": "Sub-line"
+        },
+        {
+          "k": "button",
+          "l": "Button"
+        }
+      ]
+    },
+    "footer": {
+      "name": "Footer",
+      "group": "Close",
+      "vk": "style",
+      "desc": "Wordmarks, URL and email. Always last.",
+      "fields": [
+        {
+          "k": "style",
+          "l": "Style",
+          "t": "select",
+          "o": [
+            [
+              "open",
+              "Open strip"
+            ],
+            [
+              "card",
+              "White card"
+            ]
+          ]
+        },
+        {
+          "k": "url",
+          "l": "URL"
+        },
+        {
+          "k": "email",
+          "l": "Email"
+        },
+        {
+          "k": "line",
+          "l": "Line beside the logo (a tagline)",
+          "opt": true
+        },
+        {
+          "k": "extra",
+          "l": "More contact details (social handles, offices)",
+          "opt": true
+        },
+        {
+          "k": "aboutHead",
+          "l": "About: its heading",
+          "opt": true
+        },
+        {
+          "k": "about",
+          "l": "About: a short paragraph above the contact row",
+          "t": "textarea",
+          "opt": true
+        }
+      ]
+    }
+  },
+  "designs": {
+    "hero": [
+      [
+        "No photo",
+        {
+          "layout": "text"
+        }
+      ],
+      [
+        "Photo right, arch frame",
+        {
+          "layout": "right",
+          "frame": "arch"
+        }
+      ],
+      [
+        "Photo left",
+        {
+          "layout": "left"
+        }
+      ],
+      [
+        "Photo fading in, light scheme",
+        {
+          "layout": "fade",
+          "scheme": "light"
+        }
+      ],
+      [
+        "Full-bleed photo",
+        {
+          "layout": "full"
+        }
+      ]
+    ],
+    "kpis": [
+      [
+        "White cards",
+        {
+          "variant": "cards"
+        }
+      ],
+      [
+        "Single bar",
+        {
+          "variant": "bar"
+        }
+      ],
+      [
+        "Navy cards",
+        {
+          "variant": "dark"
+        }
+      ],
+      [
+        "Stacked, hairlines",
+        {
+          "variant": "stacked"
+        }
+      ],
+      [
+        "Tinted tiles",
+        {
+          "variant": "tiles"
+        }
+      ]
+    ],
+    "stats": [
+      [
+        "Open with hairlines",
+        {
+          "variant": "open"
+        }
+      ],
+      [
+        "Cards",
+        {
+          "variant": "cards"
+        }
+      ],
+      [
+        "Ice band",
+        {
+          "variant": "band"
+        }
+      ],
+      [
+        "Rings",
+        {
+          "variant": "rings"
+        }
+      ],
+      [
+        "Two-column ledger",
+        {
+          "variant": "ledger"
+        }
+      ]
+    ],
+    "capabilities": [
+      [
+        "Cards in a tray",
+        {
+          "variant": "tray"
+        }
+      ],
+      [
+        "Open two-column list",
+        {
+          "variant": "list"
+        }
+      ],
+      [
+        "Numbered cards",
+        {
+          "variant": "numbered"
+        }
+      ],
+      [
+        "Icon columns",
+        {
+          "variant": "columns"
+        }
+      ],
+      [
+        "Chip strip",
+        {
+          "variant": "strip"
+        }
+      ]
+    ],
+    "features": [
+      [
+        "Icon columns",
+        {
+          "layout": "row"
+        }
+      ],
+      [
+        "Stacked list",
+        {
+          "layout": "stack"
+        }
+      ],
+      [
+        "Tinted tiles",
+        {
+          "layout": "tiles"
+        }
+      ],
+      [
+        "Navy band",
+        {
+          "layout": "dark"
+        }
+      ],
+      [
+        "Chip line",
+        {
+          "layout": "chips"
+        }
+      ]
+    ],
+    "storyRows": [
+      [
+        "Rows with labels",
+        {
+          "variant": "rows"
+        }
+      ],
+      [
+        "Numbered, display numerals",
+        {
+          "variant": "numbered",
+          "numeral": "display"
+        }
+      ],
+      [
+        "Side-by-side columns",
+        {
+          "variant": "cards"
+        }
+      ],
+      [
+        "Vertical timeline",
+        {
+          "variant": "timeline"
+        }
+      ],
+      [
+        "Heading beside text",
+        {
+          "variant": "split"
+        }
+      ]
+    ],
+    "storyColumns": [
+      [
+        "Three cards",
+        {
+          "layout": "cards"
+        }
+      ],
+      [
+        "Open columns",
+        {
+          "layout": "open"
+        }
+      ],
+      [
+        "Stacked rows",
+        {
+          "layout": "stacked"
+        }
+      ],
+      [
+        "Coloured headers",
+        {
+          "layout": "banded"
+        }
+      ],
+      [
+        "Display numerals",
+        {
+          "layout": "numbered"
+        }
+      ],
+      [
+        "Two text columns",
+        {
+          "layout": "flow"
+        }
+      ]
+    ],
+    "quote": [
+      [
+        "Engagement Snapshot",
+        {
+          "side": "snapshot"
+        }
+      ],
+      [
+        "Discover line + proof",
+        {
+          "side": "discover",
+          "sideText": "Discover how one glossary and one workflow keep every market on message."
+        }
+      ],
+      [
+        "Full width",
+        {
+          "side": "none"
+        }
+      ],
+      [
+        "Pull quote",
+        {
+          "side": "pull"
+        }
+      ],
+      [
+        "Quote with proof chips",
+        {
+          "side": "chips"
+        }
+      ]
+    ],
+    "quoteStats": [
+      [
+        "Stats beside the quote",
+        {
+          "layout": "side"
+        }
+      ],
+      [
+        "Quote beside the stats",
+        {
+          "layout": "quoteFirst"
+        }
+      ],
+      [
+        "Quote above a stat row",
+        {
+          "layout": "stacked"
+        }
+      ],
+      [
+        "Stats on a navy band",
+        {
+          "layout": "band"
+        }
+      ],
+      [
+        "Stat ledger beside the quote",
+        {
+          "layout": "ledger"
+        }
+      ]
+    ],
+    "expert": [
+      [
+        "Stats, card on the right",
+        {
+          "layout": "side"
+        }
+      ],
+      [
+        "Card on the left",
+        {
+          "layout": "cardLeft"
+        }
+      ],
+      [
+        "Stats row, card beneath",
+        {
+          "layout": "stacked"
+        }
+      ],
+      [
+        "Navy expert card",
+        {
+          "layout": "navy"
+        }
+      ],
+      [
+        "Stat ledger, card beside",
+        {
+          "layout": "open"
+        }
+      ]
+    ],
+    "cta": [
+      [
+        "Navy bar",
+        {
+          "fill": "navy"
+        }
+      ],
+      [
+        "Gradient bar",
+        {
+          "fill": "gradient"
+        }
+      ],
+      [
+        "Cobalt bar",
+        {
+          "fill": "cobalt"
+        }
+      ],
+      [
+        "Split, with a QR code",
+        {
+          "fill": "navy",
+          "layout": "split"
+        }
+      ],
+      [
+        "Centred stack",
+        {
+          "fill": "navy",
+          "layout": "centered"
+        }
+      ]
+    ],
+    "footer": [
+      [
+        "Open strip",
+        {
+          "style": "open"
+        }
+      ],
+      [
+        "White card",
+        {
+          "style": "card"
+        }
+      ],
+      [
+        "Open strip with QR code",
+        {
+          "style": "open",
+          "qr": "url"
+        }
+      ],
+      [
+        "Navy strip",
+        {
+          "style": "band"
+        }
+      ],
+      [
+        "Centred",
+        {
+          "style": "centered"
+        }
+      ]
+    ],
+    "numbersGrid": [
+      [
+        "Grid with platform card",
+        {
+          "variant": "card"
+        }
+      ],
+      [
+        "Grid only",
+        {
+          "variant": "grid"
+        }
+      ],
+      [
+        "Navy tiles",
+        {
+          "variant": "dark"
+        }
+      ],
+      [
+        "Figures in one line",
+        {
+          "variant": "inline"
+        }
+      ],
+      [
+        "Figure ledger",
+        {
+          "variant": "ledger"
+        }
+      ],
+      [
+        "Lead figure and four beside",
+        {
+          "variant": "bento"
+        }
+      ],
+      [
+        "Ruled grid",
+        {
+          "variant": "swiss"
+        }
+      ],
+      [
+        "Rising steps",
+        {
+          "variant": "stair"
+        }
+      ],
+      [
+        "Figures in rings",
+        {
+          "variant": "halo"
+        }
+      ]
+    ],
+    "stages": [
+      [
+        "Stages side by side",
+        {
+          "variant": "columns"
+        }
+      ],
+      [
+        "One stage in focus",
+        {
+          "variant": "focus"
+        }
+      ],
+      [
+        "Chevron steps",
+        {
+          "variant": "steps"
+        }
+      ],
+      [
+        "Down the page",
+        {
+          "variant": "vertical"
+        }
+      ],
+      [
+        "Cards with checklists",
+        {
+          "variant": "cards"
+        }
+      ]
+    ],
+    "footprint": [
+      [
+        "Map with city list",
+        {
+          "variant": "list"
+        }
+      ],
+      [
+        "Map with regional split",
+        {
+          "variant": "split"
+        }
+      ],
+      [
+        "Map with the figure only",
+        {
+          "variant": "headline"
+        }
+      ],
+      [
+        "Navy map",
+        {
+          "variant": "dark"
+        }
+      ],
+      [
+        "Small map, list beside",
+        {
+          "variant": "compact"
+        }
+      ]
+    ],
+    "bigMetric": [
+      [
+        "Figure left, drivers right",
+        {
+          "layout": "left"
+        }
+      ],
+      [
+        "Centred figure",
+        {
+          "layout": "centered"
+        }
+      ],
+      [
+        "Navy band",
+        {
+          "layout": "band"
+        }
+      ],
+      [
+        "Figure beside the bars",
+        {
+          "layout": "split"
+        }
+      ],
+      [
+        "Figure in a ring",
+        {
+          "layout": "ring"
+        }
+      ]
+    ],
+    "pillars": [
+      [
+        "Tall photo cards",
+        {
+          "layout": "photos"
+        }
+      ],
+      [
+        "Title over the photo",
+        {
+          "layout": "magazine"
+        }
+      ],
+      [
+        "Photo above a card",
+        {
+          "layout": "cards"
+        }
+      ],
+      [
+        "Numbered, no photos",
+        {
+          "layout": "text"
+        }
+      ],
+      [
+        "Stacked rows, photo left",
+        {
+          "layout": "rows"
+        }
+      ]
+    ],
+    "hub": [
+      [
+        "Hub between two lists",
+        {
+          "layout": "spokes"
+        }
+      ],
+      [
+        "Curved connectors",
+        {
+          "layout": "curved"
+        }
+      ],
+      [
+        "Navy hub",
+        {
+          "layout": "dark"
+        }
+      ],
+      [
+        "Hub beside the lists",
+        {
+          "layout": "list"
+        }
+      ],
+      [
+        "Compact row",
+        {
+          "layout": "compact"
+        }
+      ]
+    ],
+    "pipeline": [
+      [
+        "Steps on a line",
+        {
+          "layout": "line"
+        }
+      ],
+      [
+        "Tinted bracket bands",
+        {
+          "layout": "bands"
+        }
+      ],
+      [
+        "Chevron steps",
+        {
+          "layout": "chevrons"
+        }
+      ],
+      [
+        "Down the page",
+        {
+          "layout": "vertical"
+        }
+      ],
+      [
+        "Navy line",
+        {
+          "layout": "dark"
+        }
+      ]
+    ],
+    "logoWall": [
+      [
+        "Four columns",
+        {
+          "cols": "4"
+        }
+      ],
+      [
+        "Five columns",
+        {
+          "cols": "5"
+        }
+      ],
+      [
+        "Six columns",
+        {
+          "cols": "6"
+        }
+      ],
+      [
+        "Greyscale",
+        {
+          "cols": "5",
+          "tone": "grey"
+        }
+      ],
+      [
+        "White on navy",
+        {
+          "cols": "5",
+          "tone": "white"
+        }
+      ]
+    ],
+    "dataChart": [
+      [
+        "Bars",
+        {
+          "kind": "bar"
+        }
+      ],
+      [
+        "Line",
+        {
+          "kind": "line"
+        }
+      ],
+      [
+        "Donut",
+        {
+          "kind": "donut"
+        }
+      ],
+      [
+        "Horizontal bars",
+        {
+          "kind": "hbar"
+        }
+      ],
+      [
+        "Lollipops",
+        {
+          "kind": "lollipop"
+        }
+      ]
+    ],
+    "comparison": [
+      [
+        "Table",
+        {
+          "layout": "table"
+        }
+      ],
+      [
+        "Two columns as cards",
+        {
+          "layout": "cards"
+        }
+      ],
+      [
+        "Highlighted column in navy",
+        {
+          "layout": "dark"
+        }
+      ],
+      [
+        "Stacked pairs",
+        {
+          "layout": "pairs"
+        }
+      ],
+      [
+        "Before \u2192 after",
+        {
+          "layout": "arrows"
+        }
+      ]
+    ],
+    "timeline": [
+      [
+        "Across the page",
+        {
+          "direction": "across"
+        }
+      ],
+      [
+        "Down the page",
+        {
+          "direction": "down"
+        }
+      ],
+      [
+        "Cards along a line",
+        {
+          "direction": "cards"
+        }
+      ],
+      [
+        "Alternating sides",
+        {
+          "direction": "alternate"
+        }
+      ],
+      [
+        "Numbered rows",
+        {
+          "direction": "numbered"
+        }
+      ]
+    ],
+    "testimonials": [
+      [
+        "Three side by side",
+        {
+          "layout": "wall"
+        }
+      ],
+      [
+        "One under another",
+        {
+          "layout": "stacked"
+        }
+      ],
+      [
+        "Navy cards",
+        {
+          "layout": "dark"
+        }
+      ],
+      [
+        "One large, two small",
+        {
+          "layout": "featured"
+        }
+      ],
+      [
+        "Open strip",
+        {
+          "layout": "strip"
+        }
+      ]
+    ],
+    "team": [
+      [
+        "Portraits in a row",
+        {
+          "layout": "trio"
+        }
+      ],
+      [
+        "Rows with portrait left",
+        {
+          "layout": "list"
+        }
+      ],
+      [
+        "Cards",
+        {
+          "layout": "cards"
+        }
+      ],
+      [
+        "Navy cards",
+        {
+          "layout": "dark"
+        }
+      ],
+      [
+        "Large portrait, text beside",
+        {
+          "layout": "wide"
+        }
+      ]
+    ],
+    "tiers": [
+      [
+        "Columns",
+        {
+          "layout": "columns"
+        }
+      ],
+      [
+        "Stacked rows",
+        {
+          "layout": "stacked"
+        }
+      ],
+      [
+        "Featured tier in navy",
+        {
+          "layout": "dark"
+        }
+      ],
+      [
+        "Open, hairlines",
+        {
+          "layout": "minimal"
+        }
+      ],
+      [
+        "Outlined columns",
+        {
+          "layout": "outlined"
+        }
+      ]
+    ],
+    "checklist": [
+      [
+        "One column",
+        {
+          "cols": "1"
+        }
+      ],
+      [
+        "Two columns",
+        {
+          "cols": "2"
+        }
+      ],
+      [
+        "Tiles",
+        {
+          "cols": "tiles"
+        }
+      ],
+      [
+        "Numbered",
+        {
+          "cols": "numbered"
+        }
+      ],
+      [
+        "Navy band",
+        {
+          "cols": "band"
+        }
+      ]
+    ]
+  },
+  "formats": [
+    {
+      "id": "letter",
+      "n": "US Letter",
+      "w": 816,
+      "h": 1056,
+      "print": true
+    },
+    {
+      "id": "a4",
+      "n": "A4",
+      "w": 794,
+      "h": 1123,
+      "print": true
+    },
+    {
+      "id": "slide",
+      "n": "16:9 slide",
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "id": "square",
+      "n": "Square post (Instagram, LinkedIn)",
+      "w": 1080,
+      "h": 1080
+    },
+    {
+      "id": "portrait",
+      "n": "Portrait post (Instagram)",
+      "w": 1080,
+      "h": 1350
+    },
+    {
+      "id": "story",
+      "n": "Story / Reel",
+      "w": 1080,
+      "h": 1920
+    },
+    {
+      "id": "linkedin",
+      "n": "LinkedIn / Facebook link",
+      "w": 1200,
+      "h": 627
+    },
+    {
+      "id": "x",
+      "n": "X post",
+      "w": 1600,
+      "h": 900
+    },
+    {
+      "id": "email",
+      "n": "Email header",
+      "w": 600,
+      "h": 200
+    },
+    {
+      "id": "mrec",
+      "n": "Medium rectangle",
+      "w": 300,
+      "h": 250
+    },
+    {
+      "id": "halfpage",
+      "n": "Half page",
+      "w": 300,
+      "h": 600
+    },
+    {
+      "id": "leaderboard",
+      "n": "Leaderboard",
+      "w": 728,
+      "h": 90
+    },
+    {
+      "id": "billboard",
+      "n": "Billboard",
+      "w": 970,
+      "h": 250
+    },
+    {
+      "id": "mobile",
+      "n": "Mobile banner",
+      "w": 320,
+      "h": 50
+    }
+  ]
+}

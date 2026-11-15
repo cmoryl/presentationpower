@@ -94,13 +94,15 @@ export const Route = createFileRoute("/library/print")({
 
   head: () => ({
     meta: [
-      { title: "Print templates · Library" },
+      { title: "Print templates · TransPerfect Element" },
       {
         name: "description",
         content:
           "Print-ready design templates — Client Spotlights, Case Studies, e-Brochures, and Adaptor Briefs — rendered on the same brand engine as your decks.",
       },
       { property: "og:title", content: "Print templates · TransPerfect Element" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       {
         property: "og:description",
         content:

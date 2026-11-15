@@ -1,4 +1,5 @@
 import { BRAND } from "@/lib/brand-colors";
+import { ElementUpdateDrafts } from "@/components/print/ElementUpdateDrafts";
 import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -32,7 +33,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/print-library")({
-  head: () => ({ meta: [{ title: "Print library curator · Admin · TransPerfect Element" }] }),
+  head: () => ({ meta: [{ title: "Print library curator · Admin · TransPerfect Element" }, { name: "description", content: "Review imported template drafts and curate approved print variants in TransPerfect Element." }, { property: "og:title", content: "Print library curator · TransPerfect Element" }, { property: "og:description", content: "Review imported drafts and manage approved print templates." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: PrintLibraryCurator,
 });
 
@@ -154,6 +155,7 @@ function PrintLibraryCurator() {
       </header>
 
       <PrintKnowledgeSyncCard />
+      <details className="border-y border-border py-5"><summary className="cursor-pointer text-base font-semibold text-foreground">Claude update · 299 imported drafts</summary><ElementUpdateDrafts /></details>
 
       {/* Publish new snapshot */}
       <section className="rounded-2xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.03]">

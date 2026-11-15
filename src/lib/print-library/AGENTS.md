@@ -1,4 +1,5 @@
 # Print library
+- Imported Claude templates enter the existing admin curator as unapproved drafts, separate from the approved catalogue and Oracle ingestion, with untouched source records/layouts; editable copies retain pending review and never run the approved-demo truncator — why: extraction and compatibility mapping do not approve claims or certify source layout fidelity.
 
 - Curated print pieces with a supplied PDF (Life Sciences, Trial Interactive in `ti-print-library.ts`) render in "Original layout" (`content.layoutMode/original`, data from `scripts/lifesci-original-extract.py` → `src/lib/print-library/lifesci-original-layouts.json`, drawn by `OriginalPageLayout`); the library-layout fields stay in the same content — why: page-for-page fidelity while the cascade keeps reading the structured copy.
 - Print library Company / Product filters read `src/lib/print-library/item-tags.ts` (entry's own `company`/`product`, else names it carries, else "Not tagged") — why: one tagging rule for the library and the admin catalogue, never guessed.
