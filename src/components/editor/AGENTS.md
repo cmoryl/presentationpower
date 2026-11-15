@@ -1,3 +1,4 @@
 # Shared build experience
 
 - Build areas and editors share BuildWorkspaceNav/BuildWorkspaceHeader for cross-surface orientation; existing routes, saved-record adapters and renderer registries remain authoritative — why: adopting the supplied build must update the live experience without creating a second application or replacing saved work.
+- Build destinations and output doors come from build-workspace, with visibility determined by role-nav; /build starts work and /files resumes actual records, without inventing a parallel project store — why: the new process needs one navigation authority and must preserve existing ownership.

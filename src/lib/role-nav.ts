@@ -26,6 +26,7 @@ export function audienceFor(roles: readonly string[], isLoading: boolean): NavAu
 
 /** Elements items that build or govern the system rather than make a piece. */
 const AUTHORING_ITEMS = new Set([
+  "/social/modules",
   "/decks",
   "/library/print/modules",
   "/events/production",
@@ -33,6 +34,13 @@ const AUTHORING_ITEMS = new Set([
   "/social/presets",
   "/convert",
 ]);
+
+/** Build navigation uses the same role authority as the main menu. */
+export function showBuildDestination(id: string, a: NavAudience): boolean {
+  if (id === "review") return !a.isLoading && (a.isAdmin || a.isBrandReviewer);
+  if (id === "modules") return !a.isLoading && !a.createOnly;
+  return true;
+}
 
 export function showTopLink(to: string, a: NavAudience): boolean {
   if (to === "/admin") return a.isAdmin;

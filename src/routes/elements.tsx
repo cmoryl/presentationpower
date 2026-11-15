@@ -2,6 +2,9 @@ import { BRAND } from "@/lib/brand-colors";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Presentation, Printer, CalendarDays, Share2, ArrowRight, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { BuildWorkspaceNav } from "@/components/editor/BuildWorkspaceNav";
+import { audienceFor, showElementItem } from "@/lib/role-nav";
+import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
 import { ElementBrickRow, ElementBrickRail } from "@/components/brand/ElementBrickMotif";
 import { ThemedHeroVideo } from "@/components/hero/ThemedHeroVideo";
 import { showcaseArt } from "@/lib/showcase-art";
@@ -11,13 +14,13 @@ import heroElementsLight from "@/assets/hero-elements-light.mp4.asset.json";
 export const Route = createFileRoute("/elements")({
   head: () => ({
     meta: [
-      { title: "Elements · TransPerfect Element" },
+      { title: "Materials · TransPerfect Element" },
       {
         name: "description",
         content:
           "Every Element surface in one place — presentation, print, event, and social modules, governed by the TransPerfect brand system.",
       },
-      { property: "og:title", content: "Elements · TransPerfect Element" },
+      { property: "og:title", content: "Materials · TransPerfect Element" },
       {
         property: "og:description",
         content:
@@ -62,7 +65,7 @@ const SURFACES: Surface[] = [
     proof: ["Editable PPTX", "189 modules", "Style packs"],
     icon: Presentation,
     items: [
-      { label: "Slide modules", to: "/library" },
+      { label: "Element modules", to: "/library" },
       { label: "My decks", to: "/library/my" },
       { label: "All decks", to: "/decks" },
       { label: "Deck agent", to: "/agent" },
@@ -88,7 +91,7 @@ const SURFACES: Surface[] = [
       { label: "Case studies", to: "/library/print", search: { type: "case-study" } },
       { label: "Client spotlights", to: "/library/print", search: { type: "spotlight" } },
       { label: "E-brochures", to: "/library/print", search: { type: "ebrochure" } },
-      { label: "Section modules", to: "/library/print/modules" },
+      { label: "Issued modules", to: "/library/print/modules" },
     ],
   },
   {
@@ -125,6 +128,7 @@ const SURFACES: Surface[] = [
     items: [
       { label: "Social agent", to: "/social-agent" },
       { label: "Social assets", to: "/social" },
+      { label: "Compose with modules", to: "/social/modules" },
       { label: "New social asset", to: "/social/new" },
       { label: "Presets", to: "/social/presets" },
     ],
@@ -132,8 +136,10 @@ const SURFACES: Surface[] = [
 ];
 
 function ElementsLanding() {
+  const { roles, isLoading } = useWorkspacePersona(); const audience = audienceFor(roles, isLoading);
   return (
     <AppShell>
+      <BuildWorkspaceNav active="start" className="mb-4" />
       {/* ================= HERO ================= */}
       <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:py-10 lg:py-12 dark:bg-card">
         <ThemedHeroVideo dark={heroElementsDark.url} light={heroElementsLight.url} />
@@ -183,10 +189,10 @@ function ElementsLanding() {
 
             <div className="mt-6 flex flex-wrap items-center gap-2">
               <Link
-                to="/brief/new"
+                to="/build"
                 className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#03002C] transition hover:bg-[#E0E8F5]"
               >
-                Start from a brief <ArrowRight size={14} />
+                Open build workspace <ArrowRight size={14} />
               </Link>
             </div>
           </div>
@@ -271,7 +277,7 @@ function ElementsLanding() {
                     <p className="mt-3 text-[13.5px] leading-relaxed text-black/65">{s.copy}</p>
 
                     <ul className="mt-4 grid grid-cols-2 gap-1.5">
-                      {s.items.map((it) => (
+                      {s.items.filter(it => showElementItem(it.to, audience)).map((it) => (
                         <li key={`${it.to}:${it.label}`}>
                           <Link
                             to={it.to}

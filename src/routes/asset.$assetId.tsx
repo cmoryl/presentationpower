@@ -18,6 +18,7 @@ import { AppShell } from "@/components/AppShell";
 import { BuildWorkspaceNav } from "@/components/editor/BuildWorkspaceNav";
 import { SourceBuildEditor } from "@/components/editor/SourceBuildEditor";
 import { workingLayout, sourceLayoutPatch } from "@/lib/element-update/registry";
+import { sourceMaterialChannel } from "@/lib/element-update/process";
 import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
 import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { useDeckStore } from "@/lib/deck-store";
@@ -1173,15 +1174,17 @@ function AssetEditor() {
   const sourceBuild = workingLayout(rawContent);
   if (sourceBuild && (capabilities.isLoading || !capabilities.canAuthorSystem)) return <AppShell>{!capabilities.isLoading && <p className="py-8 text-sm text-muted-foreground">This material is awaiting review. Source editing is available to the design team.</p>}</AppShell>;
   if (sourceBuild) return <AppShell>
-    <BuildWorkspaceNav active="print" className="mb-4" />
+    <BuildWorkspaceNav active={sourceMaterialChannel(sourceBuild.format)} className="mb-4" />
     <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div><Link to="/library/print" className="text-sm text-muted-foreground">Print library</Link><h1 className="mt-2 text-2xl font-semibold text-foreground">{row.title}</h1></div>
     </div>
     <SourceBuildEditor layout={sourceBuild} title={row.title} saving={saving} dirty={dirty}
+      onRename={title => { pushHistory(); setRow({ ...row, title }); setDirty(true); }}
       onChange={next => patchContent(sourceLayoutPatch(rawContent, next) as Partial<CaseStudyContent>)}
       onSave={async () => {
         const current = rowRef.current;
         if (!current) throw new Error("This material is unavailable.");
+        if (!current.title.trim()) throw new Error("Add a material name before saving.");
         setSaving(true);
         try {
           const updated = await save({ data: { assetId: current.id, title: current.title, content: current.content as unknown as Record<string, unknown>, context: current.context as unknown as Record<string, unknown> } });

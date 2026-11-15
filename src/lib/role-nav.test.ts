@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { audienceFor, showElementItem, showTopLink } from "./role-nav";
+import { audienceFor, showElementItem, showTopLink, showBuildDestination } from "./role-nav";
 
 describe("role-split menu", () => {
   it("sales sees create entries, not authoring or admin", () => {
@@ -30,5 +30,17 @@ describe("role-split menu", () => {
     const a = audienceFor(["admin"], true);
     expect(showTopLink("/admin", a)).toBe(false);
     expect(showTopLink("/approvals", a)).toBe(false);
+  });
+  it("build navigation keeps source authoring away from create-only roles", () => {
+    const a = audienceFor(["sales"], false);
+    expect(showBuildDestination("modules", a)).toBe(false);
+    expect(showBuildDestination("print", a)).toBe(true);
+    expect(showElementItem("/social/modules", a)).toBe(false);
+  });
+  it("build review is visible only to confirmed reviewers", () => {
+    expect(showBuildDestination("review", audienceFor(["admin"], false))).toBe(true);
+    expect(showBuildDestination("review", audienceFor(["brand_reviewer"], false))).toBe(true);
+    expect(showBuildDestination("review", audienceFor(["editor"], false))).toBe(false);
+    expect(showBuildDestination("review", audienceFor(["admin"], true))).toBe(false);
   });
 });

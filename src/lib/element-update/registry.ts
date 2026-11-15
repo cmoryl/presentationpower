@@ -41,9 +41,9 @@ export function sourceImage(value: unknown): string | undefined {
   return /^(https:\/\/|\/__l5e\/assets-v1\/)/.test(url) ? url : undefined;
 }
 /** New blocks retain configuration but never copy example claims or people. */
-export function blankSourceModule(type: string): SourceModule {
+export function blankSourceModule(type: string, configuration?: ModuleData): SourceModule {
   const definition = SOURCE_MODULES[type];
-  const defaults = structuredClone(definition?.def ?? {});
+  const defaults = structuredClone({ ...definition?.def, ...configuration });
   function clean(fields: SourceField[], values: ModuleData): ModuleData {
     const out: ModuleData = {};
     for (const field of fields) {

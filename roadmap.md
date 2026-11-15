@@ -1,5 +1,6 @@
 # Roadmap
 ## Claude full Element update
+- [x] Audited source process and aligned Build → modules/templates → saved work, role-aware navigation, selected variant configuration, material naming, undo/redo, recursive checks and proof delivery; authenticated reopen/phone/review-door verified. Full audit in docs/claude-build-process-audit.json; source project/review/version/agent parity remains explicitly incomplete.
 - [x] Inventoried and browser-walked all 38 supplied modules plus page breaks; integrated source controls, flexible rows, 14 sizes and source-template save/reopen/proof downloads in the live editor. Event photos, kits and native/original records preserved.
 - [ ] Complete faithful module geometry and native slide/social replacement; six source families remain explicitly unported, other adaptations are not certified as exact. Missing source artwork remains an external blocker.
 - [x] Established the linked Claude build as the forward reference; updated live module/print/social headers, cross-surface navigation, print/slide editor navigation and horizontal inspector controls.

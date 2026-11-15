@@ -21,6 +21,7 @@ import {
   Rocket,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { BuildWorkspaceNav } from "@/components/editor/BuildWorkspaceNav";
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { listMyFiles, deleteMyFile, type MyFile, type MyFileKind } from "@/lib/my-files.functions";
 import { getSlideFileUrl } from "@/lib/slide-files.functions";
@@ -236,6 +237,7 @@ function MyFilesPage() {
 
   return (
     <AppShell>
+      <BuildWorkspaceNav active="work" className="mb-6" />
       <div>
         {/* ============ HERO ============ */}
         <section className="relative overflow-hidden rounded-3xl border border-black/10 bg-white px-7 py-9 shadow-sm dark:border-white/10 dark:bg-white/[0.04] sm:px-10 sm:py-12">

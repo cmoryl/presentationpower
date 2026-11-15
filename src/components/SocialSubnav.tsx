@@ -1,4 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
+import { audienceFor, showElementItem } from "@/lib/role-nav";
 
 // One social home: every social tool shares this tab strip (mounted by AppShell).
 const TABS = [
@@ -12,15 +14,17 @@ const TABS = [
 ] as const;
 
 export function SocialSubnav() {
+  const { roles, isLoading } = useWorkspacePersona(); const audience = audienceFor(roles, isLoading);
   const path = useRouterState({ select: (s) => s.location.pathname });
   // Guided demos and playbooks are full-screen stories; keep them unframed.
   const inSocial =
     path === "/social" || path.startsWith("/social/") || path.startsWith("/social-agent");
   if (!inSocial || path.startsWith("/social/demo/")) return null;
+  if (path === "/social" || path === "/social/modules") return null;
   return (
     <nav aria-label="Social tools" className="mb-4 border-b border-border">
       <ul className="flex gap-1 overflow-x-auto">
-        {TABS.map((t) => {
+        {TABS.filter(t => showElementItem(t.to, audience)).map((t) => {
           const active =
             "exact" in t ? path === t.to || path === `${t.to}/` : path.startsWith(t.to);
           return (

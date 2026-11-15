@@ -73,5 +73,38 @@
       "next_action": "Authenticated template title save/reopen and flexible-row editing verified. Walked 39 source entries, checked modules/social/slides entry points, downloaded PDF and PPTX proofs. Desktop/phone no page overflow or page errors; build OK. Eight source tests pass; full suite 415 files/2799 tests passed and same seven files/eight pre-existing failures remain. No publishing. Full replacement remains incomplete."
     }
   ],
-  "reference_url": "https://claude.ai/artifact/7WXARzAhxXMfoJppmzkDSs"
+  "reference_url": "https://claude.ai/artifact/7WXARzAhxXMfoJppmzkDSs",
+  "build_process_audit": {
+    "date": "2026-11-15",
+    "source_process": [
+      "projects/board",
+      "new material",
+      "module composition",
+      "size adaptation",
+      "preflight",
+      "review/changes/approved/delivered",
+      "versions/activity"
+    ],
+    "implemented": [
+      "/build entry point",
+      "shared role-aware build navigation",
+      "materials directory alignment",
+      "selected configuration retained without sample copy",
+      "material naming",
+      "layout undo/redo",
+      "recursive content checks",
+      "compose/checks/proofs controls",
+      "size-specific editor navigation",
+      "saved work reopen"
+    ],
+    "not_implemented": [
+      "Source project board and assignments",
+      "Project/material versions and activity",
+      "Source material approval/delivery state transitions",
+      "Exact renderer replacement",
+      "Native slide/social parity",
+      "Full cross-format copy coverage"
+    ],
+    "verification": "Authenticated build-to-module-to-editor-to-files-reopen verified; review door opens /approvals; mobile main-menu Build verified; no page errors or page overflow. Pure role tests passed; all-role authenticated testing not performed."
+  }
 }

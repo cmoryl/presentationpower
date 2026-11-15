@@ -1,0 +1,88 @@
+{
+  "date": "2026-11-15",
+  "reference": "https://claude.ai/artifact/7WXARzAhxXMfoJppmzkDSs",
+  "status": "Process/navigation alignment implemented; full source-build parity incomplete",
+  "findings": [
+    {
+      "area": "Navigation",
+      "finding": "Surface-first menus did not expose a common build/reuse/review process.",
+      "result": "Added /build, central destinations, role-aware shared navigation and updated materials/breadcrumbs."
+    },
+    {
+      "area": "Selected module variation",
+      "finding": "Use module discarded selected geometry and started defaults.",
+      "result": "Retains declared select/range configuration while clearing example claims/photos."
+    },
+    {
+      "area": "Editor process",
+      "finding": "No named build stages, editable material name or source-layout undo/redo.",
+      "result": "Compose, Checks, Proofs; material naming; layout undo/redo."
+    },
+    {
+      "area": "Checks",
+      "finding": "Empty/nested content could reach proofs.",
+      "result": "Recursive source checks block unfinished content; existing image/overflow checks retained."
+    },
+    {
+      "area": "Saved work",
+      "finding": "Source social/slide materials use existing print-asset adapter and are labelled Print in My work.",
+      "result": "Reopen through real saved records verified; editor channel follows size. Saved-file categorization still needs server-adapter migration."
+    },
+    {
+      "area": "Review",
+      "finding": "Claude has project-level stage transitions; Element source drafts do not write that queue.",
+      "result": "Existing /approvals preserved; no fake Submit/Approve/Delivered actions added. Source material review integration remains unported."
+    },
+    {
+      "area": "Projects and versions",
+      "finding": "Source project board, due dates, assignments, version/activity controls not integrated.",
+      "result": "Explicitly incomplete; no parallel local project store introduced."
+    },
+    {
+      "area": "Render/export/agents",
+      "finding": "Six families and source variant geometry remain unfinished; agents do not yet share source module tools.",
+      "result": "Missing/unported checks remain visible, proofs only, no production certification."
+    },
+    {
+      "area": "Events and brand kits",
+      "finding": "Existing private photos and issued kits must remain authoritative.",
+      "result": "No event photo, kit, rights or production data changed."
+    }
+  ],
+  "validation": {
+    "build": "OK",
+    "focused_tests": 21,
+    "full_suite": {
+      "passed_files": 416,
+      "failed_files": 7,
+      "passed_tests": 2807,
+      "failed_tests": 8,
+      "note": "Same eight pre-existing failures as prior run"
+    },
+    "authenticated_flow": [
+      "Build \u2192 modules",
+      "Variation \u2192 blank material with selected configuration",
+      "Empty title blocks PDF",
+      "Undo/redo",
+      "Save",
+      "My work \u2192 reopen",
+      "Story size \u2192 Social navigation",
+      "Review \u2192 /approvals",
+      "Phone main-menu Build"
+    ],
+    "page_errors": [],
+    "mobile_page_overflow": false,
+    "role_testing": "Pure tests; no full live all-role audit"
+  },
+  "remaining_external_blockers": [
+    "Unavailable source artwork affecting 274 templates",
+    "Office and print-vendor production verification"
+  ],
+  "remaining_implementation": [
+    "Source project/material/approval/version integration",
+    "Exact module geometry",
+    "Native social/slide renderer parity",
+    "Saved-file format categorization",
+    "Agent and cross-format source-copy coverage"
+  ]
+}

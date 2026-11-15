@@ -19,7 +19,8 @@ export const SourceModuleLibrary = forwardRef<HTMLElement, SourceModuleLibraryPr
     for (const item of ELEMENT_UPDATE_ITEMS) for (const module of workingLayout(item.content)?.modules ?? []) {
       const rows = map.get(module.type) ?? [];
       const key = SOURCE_MODULES[module.type]?.vk;
-      if (!rows.some(row => JSON.stringify(key ? row.data[key] : row.data) === JSON.stringify(key ? module.data[key] : module.data))) rows.push(module);
+      const signature = (m: SourceModule) => JSON.stringify((SOURCE_MODULES[m.type]?.fields ?? []).filter(f => f.t === "select" || f.t === "range").map(f => f.k ? m.data[f.k] : undefined));
+      if (!rows.some(row => signature(row) === signature(module))) rows.push(module);
       map.set(module.type, rows);
     }
     return map;
@@ -30,7 +31,7 @@ export const SourceModuleLibrary = forwardRef<HTMLElement, SourceModuleLibraryPr
   async function open() {
     setBusy(true); setError(null);
     try {
-      const module = blankSourceModule(selected); // Start without sample numbers, claims or people.
+      const module = blankSourceModule(selected, sample.data); // Retain selected geometry, never sample claims or people.
       const title = `${definition?.name ?? selected} · new material`;
       const row = await create({ data: { kind: "ebrochure", title, brandModeId: "bm-enterprise", content: { title, sourceLayout: { format, modules: [module] }, importReview: "pending" }, context: { sourceLibrary: "claude-element-update", importReview: "pending" } } });
       await navigate({ to: "/asset/$assetId", params: { assetId: row.id } });

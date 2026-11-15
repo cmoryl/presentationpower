@@ -16,6 +16,7 @@ import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as ApprovalsRouteImport } from './routes/approvals'
 import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BuildRouteImport } from './routes/build'
 import { Route as ConvertRouteImport } from './routes/convert'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DemosRouteImport } from './routes/demos'
@@ -295,6 +296,11 @@ const AtlasRoute = AtlasRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuildRoute = BuildRouteImport.update({
+  id: '/build',
+  path: '/build',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConvertRoute = ConvertRouteImport.update({
@@ -1571,6 +1577,7 @@ export interface FileRoutesByFullPath {
   '/approvals': typeof ApprovalsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/build': typeof BuildRoute
   '/convert': typeof ConvertRoute
   '/dashboard': typeof DashboardRoute
   '/demos': typeof DemosRoute
@@ -1824,6 +1831,7 @@ export interface FileRoutesByTo {
   '/approvals': typeof ApprovalsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/build': typeof BuildRoute
   '/convert': typeof ConvertRoute
   '/dashboard': typeof DashboardRoute
   '/demos': typeof DemosRoute
@@ -2076,6 +2084,7 @@ export interface FileRoutesById {
   '/approvals': typeof ApprovalsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/build': typeof BuildRoute
   '/convert': typeof ConvertRoute
   '/dashboard': typeof DashboardRoute
   '/demos': typeof DemosRoute
@@ -2332,6 +2341,7 @@ export interface FileRouteTypes {
     | '/approvals'
     | '/atlas'
     | '/auth'
+    | '/build'
     | '/convert'
     | '/dashboard'
     | '/demos'
@@ -2585,6 +2595,7 @@ export interface FileRouteTypes {
     | '/approvals'
     | '/atlas'
     | '/auth'
+    | '/build'
     | '/convert'
     | '/dashboard'
     | '/demos'
@@ -2836,6 +2847,7 @@ export interface FileRouteTypes {
     | '/approvals'
     | '/atlas'
     | '/auth'
+    | '/build'
     | '/convert'
     | '/dashboard'
     | '/demos'
@@ -3091,6 +3103,7 @@ export interface RootRouteChildren {
   ApprovalsRoute: typeof ApprovalsRoute
   AtlasRoute: typeof AtlasRoute
   AuthRoute: typeof AuthRoute
+  BuildRoute: typeof BuildRoute
   ConvertRoute: typeof ConvertRoute
   DashboardRoute: typeof DashboardRoute
   DemosRoute: typeof DemosRoute
@@ -3259,6 +3272,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/build': {
+      id: '/build'
+      path: '/build'
+      fullPath: '/build'
+      preLoaderRoute: typeof BuildRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/convert': {
@@ -5283,6 +5303,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApprovalsRoute: ApprovalsRoute,
   AtlasRoute: AtlasRoute,
   AuthRoute: AuthRoute,
+  BuildRoute: BuildRoute,
   ConvertRoute: ConvertRoute,
   DashboardRoute: DashboardRoute,
   DemosRoute: DemosRoute,

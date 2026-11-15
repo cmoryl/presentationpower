@@ -39,9 +39,9 @@ const PRESENTATION_ITEMS: Item[] = [
  */
 const PRINT_ITEMS: Item[] = [
   { to: "/library/print", label: "Print templates", icon: <Printer size={12} /> },
-  { to: "/library/print/modules", label: "Modules", icon: <FileText size={12} /> },
+  { to: "/library/print/modules", label: "Issued modules", icon: <FileText size={12} /> },
   { to: "/library/print/heroes", label: "Hero gallery", icon: <Image size={12} /> },
-  { to: "/library", label: "Presentation modules", icon: <Layers size={12} />, exact: true },
+  { to: "/library", label: "Element modules", icon: <Layers size={12} />, exact: true },
   { to: "/library/my", label: "My library", icon: <Bookmark size={12} /> },
 ];
 

@@ -124,11 +124,11 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
   const nav = [
     { to: "/", label: "Home" },
     { to: "/dashboard", label: dashboardLabel },
-    { to: "/brief/new", label: "Create" },
-    { to: "/elements", label: "Elements" },
+    { to: "/build", label: "Build" },
+    { to: "/elements", label: "Materials" },
     { to: "/demos", label: "Demos" },
 
-    { to: "/files", label: "My files" },
+    { to: "/files", label: "My work" },
     ...BRAND_REVIEW_LINKS,
     { to: "/admin", label: "Admin" },
   ] as const;
@@ -147,14 +147,14 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
     items: ReadonlyArray<{ to: string; label: string; search?: Record<string, string> }>;
   }> = [
     {
-      label: "Presentation",
+      label: "Modules & slides",
       to: "/library",
       items: [
         { to: "/agent", label: "Deck agent" },
 
-        { to: "/library", label: "Slide modules" },
+        { to: "/library", label: "Element modules" },
         { to: "/library/my", label: "My decks" },
-        { to: "/decks", label: "All decks" },
+        { to: "/decks", label: "Slide materials" },
         { to: "/admin/canvas", label: "Canvas creator" },
       ],
     },
@@ -164,7 +164,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
       items: [
         { to: "/print-agent", label: "Print agent" },
         { to: "/library/print", label: "Print templates" },
-        { to: "/library/print/modules", label: "Section modules" },
+        { to: "/library/print/modules", label: "Issued print modules" },
       ],
     },
     {
@@ -184,6 +184,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
       items: [
         { to: "/social-agent", label: "Social agent" },
         { to: "/social", label: "Social assets" },
+        { to: "/social/modules", label: "Compose a social material" },
         { to: "/social/new", label: "New social asset" },
         { to: "/social/presets", label: "Presets" },
         { to: "/signatures", label: "Email signatures" },
