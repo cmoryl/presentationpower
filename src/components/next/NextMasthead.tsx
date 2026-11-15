@@ -6,6 +6,8 @@ import { nextLockupSuite } from "@/lib/next-event-logos";
 import { isNextWorkspacePath, nextWorkspacePageFor } from "@/lib/next-workspace";
 import ground from "@/assets/next-workspace/issued-cover-ground.jpg";
 import { NextSubnav } from "./NextSubnav";
+import { NextHeroPhoto } from "./NextHeroPhoto";
+import { nextHeroLocation } from "@/lib/next-hero-photos";
 import "./next-workspace.css";
 
 export interface NextMastheadProps extends HTMLAttributes<HTMLElement> {}
@@ -18,11 +20,13 @@ export const NextMasthead = forwardRef<HTMLElement, NextMastheadProps>(function 
   if (!isNextWorkspacePath(pathname)) return null;
   const home = pathname.replace(/\/+$/, "") === "/events/next";
   const current = nextWorkspacePageFor(pathname);
+  const location = nextHeroLocation(pathname);
   const logo = nextLockupSuite("transperfect")?.wideWhite;
   return (
     <section ref={ref} data-next-masthead className={`next-masthead relative ${className}`} {...props}>
       <div className="relative overflow-hidden">
         <img src={ground} alt="" aria-hidden className="next-masthead-ground absolute inset-0 h-full w-full object-cover" />
+        {location && <NextHeroPhoto key={location} location={location} />}
         <div className="relative mx-auto max-w-[1400px] px-6 py-9 sm:px-8 sm:py-12">
           <Link to="/events/next" aria-label="TransPerfect NEXT — event home" className="inline-block max-w-full">
             {logo && <img src={logo.url} alt="TransPerfect NEXT" className="h-auto w-[340px] max-w-full sm:w-[440px]" />}

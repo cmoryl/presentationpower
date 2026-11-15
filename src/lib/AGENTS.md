@@ -1,5 +1,7 @@
 # Events, kiosks, signage, venue maps
 
+- NEXT location masthead photos resolve city-specific private references for signed-in staff and the existing approved-and-marketing-cleared guide feed for visitors; shared pages retain issued artwork — why: human event headers must not expose uncleared attendees or mix cities.
+
 - Non-NEXT web references use the source-dated event-web-references catalogue and private event-photos storage; EventWebReferences signs short-lived viewing links and excludes photos from exports — why: public availability does not establish reuse rights or event/year identity.
 
 - NEXT opens with main event information, then a Locations chooser; shared specialist tools stay under Resources and venue editing is opt-in — why: the event hierarchy must precede production settings without changing access enforcement.

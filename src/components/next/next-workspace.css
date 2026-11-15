@@ -3,6 +3,15 @@
   color: var(--tp-white);
 }
 .next-masthead-ground { opacity: .38; }
+.next-hero-photo { left: 30%; }
+.next-hero-photo img { object-position: center 58%; }
+.next-hero-photo-shade { background: linear-gradient(90deg, var(--tp-ink), color-mix(in srgb, var(--tp-ink) 80%, transparent) 28%, color-mix(in srgb, var(--tp-ink) 20%, transparent) 75%); }
+.next-masthead:has(.next-hero-photo) .next-masthead-copy { max-width: 38rem; }
+.next-hero-photo-credit { color: var(--tp-white); background: color-mix(in srgb, var(--tp-ink) 80%, transparent); padding: .2rem .4rem; }
+@media (max-width: 640px) {
+  .next-hero-photo { left: 0; }
+  .next-hero-photo-shade { background: color-mix(in srgb, var(--tp-ink) 72%, transparent); }
+}
 .next-site-nav { background: var(--tp-ink); color: var(--tp-white); }
 .next-site-nav a:focus-visible { outline: 2px solid var(--tp-aqua); outline-offset: -3px; }
 .next-site-link { border-bottom: 3px solid transparent; }

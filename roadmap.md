@@ -1,4 +1,7 @@
 # Roadmap
+## NEXT location photo headers
+- [x] Add inspected London and San Francisco event photographs behind city headers, retaining navigation and issued artwork on shared pages.
+- [x] Verified signed-in London/San Francisco photographs, enlargement-free header rendering, phone fit and signed-out London privacy; five tests pass. Public photo headers await marketing clearance (none currently approved).
 ## 2026 other-event photo and signage research
 - [x] Search official event sites and dated recaps; inspect and preserve 13 sourced NeXus/Hackathon, LegalNEXT and Legalweek references privately, excluding historical site imagery.
 - [x] Add source-linked private references to event homes and supplied kits; retain pending rights, recap-cover labels and existing NEXT libraries.
