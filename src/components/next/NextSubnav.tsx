@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { BookOpen, CalendarDays, Compass, Flag, LayoutGrid, MapPin, Signpost, X } from "lucide-react";
+import { BookOpen, Building2, CalendarDays, Compass, FileText, Flag, Images, Layers, LayoutGrid, Map, MapPin, Route, Signpost, Stamp, X } from "lucide-react";
 import { Button } from "@/design-system/element";
 import {
   NEXT_WORKSPACE_GROUPS, NEXT_WORKSPACE_PAGES, isNextWorkspacePath,
@@ -17,6 +17,16 @@ const CITY_STEPS: Array<{ label: string; to: NextWorkspacePath; hash?: string }>
   { label: "Sign schedule", to: "/events/next/city" },
   { label: "City templates", to: "/events/next/city", hash: "city-templates" },
 ];
+
+function locationPageIcon(path: string) {
+  if (path.endsWith("/maps")) return Map;
+  if (path.endsWith("/photos")) return Images;
+  if (path.endsWith("/template")) return Layers;
+  if (path.endsWith("/revise")) return Stamp;
+  if (path.endsWith("/booklet")) return BookOpen;
+  if (path.endsWith("/california")) return Signpost;
+  return Building2;
+}
 
 /** Registry-driven global sections and local siblings, visible before scrolling. */
 export function NextSubnav() {
@@ -72,13 +82,13 @@ export function NextSubnav() {
             <Button variant="ghost" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-controls="next-all-pages" className="my-auto ml-2 h-12 text-inherit hover:bg-white/10 hover:text-inherit">{open ? <X /> : <LayoutGrid />}All pages</Button>
           </div>
         </nav>
-        <nav aria-label="NEXT section pages" className="next-site-secondary border-b border-border">
-          <div className="mx-auto flex max-w-[1400px] gap-5 overflow-x-auto px-6 sm:px-8">
+        <nav aria-label="NEXT section pages" className={`${locationPage ? "next-location-nav" : "next-site-secondary"} border-b border-border`}>
+          <div className={`mx-auto flex max-w-[1400px] overflow-x-auto px-6 sm:px-8 ${locationPage ? "gap-1" : "gap-5"}`}>
             {locationPage ? <>
-              <Link to="/events/next/locations" data-active={!city} className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">Venue directory</Link>
+              <Link to="/events/next/locations" data-active={!city} aria-current={!city ? "page" : undefined} className="next-location-link"><MapPin aria-hidden />Venue directory</Link>
               {locations.map((l) => {
                 const first = l.pages.find((p) => p.group === l.group.id);
-                return first ? <Link key={l.group.id} to={first.to} data-active={city?.group.id === l.group.id} className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">{GROUP_LABELS[l.group.id]}</Link> : null;
+                return first ? <Link key={l.group.id} to={first.to} data-active={city?.group.id === l.group.id} className="next-location-link"><Building2 aria-hidden />{GROUP_LABELS[l.group.id]}</Link> : null;
               })}
             </> : home ? <>
               <Link to="/events/next" hash="editions" className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">City editions</Link>
@@ -87,9 +97,12 @@ export function NextSubnav() {
             </> : nextWorkspaceMenu(groupId).filter((p) => p.to !== "/events/next").map((p) => <Link key={p.to} to={p.to} data-active={menuPath === p.to} aria-current={menuPath === p.to ? "page" : undefined} className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">{p.label}</Link>)}
           </div>
         </nav>
-        {city && <nav aria-label={`${GROUP_LABELS[city.group.id]} location pages`} className="next-site-secondary border-b border-border">
-          <div className="mx-auto flex max-w-[1400px] gap-5 overflow-x-auto px-6 sm:px-8">
-            {city.pages.map((p) => <Link key={p.to} to={p.to} data-active={current?.to === p.to} aria-current={current?.to === p.to ? "page" : undefined} className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">{p.label}</Link>)}
+        {city && <nav aria-label={`${GROUP_LABELS[city.group.id]} location pages`} className="next-location-tools border-b border-border">
+          <div className="mx-auto flex max-w-[1400px] gap-1 overflow-x-auto px-6 sm:px-8">
+            {city.pages.map((p) => {
+              const Icon = locationPageIcon(p.to);
+              return <Link key={p.to} to={p.to} data-active={current?.to === p.to} aria-current={current?.to === p.to ? "page" : undefined} className="next-location-tool"><Icon aria-hidden />{p.label}</Link>;
+            })}
           </div>
         </nav>}
         {open && <div id="next-all-pages" className="next-site-secondary max-h-[60vh] overflow-y-auto border-b border-border shadow-lg">
@@ -109,9 +122,12 @@ export function NextSubnav() {
           </div>
         </div>}
       </div>
-      {(showSteps || folded.length > 1) && <nav aria-label={showSteps ? "Plan a new city — steps" : "NEXT subsection pages"} className="next-site-secondary border-b border-border">
-        <div className="mx-auto flex max-w-[1400px] gap-5 overflow-x-auto px-6 py-3 sm:px-8">
-          {showSteps ? CITY_STEPS.map((s, i) => <Link key={s.label} to={s.to} hash={s.hash} className="shrink-0 text-xs font-medium hover:underline">{i + 1}. {s.label}</Link>)
+      {(showSteps || folded.length > 1) && <nav aria-label={showSteps ? "Plan a new city — steps" : "NEXT subsection pages"} className="next-location-tools border-b border-border">
+        <div className="mx-auto flex max-w-[1400px] gap-1 overflow-x-auto px-6 sm:px-8">
+          {showSteps ? CITY_STEPS.map((s, i) => {
+            const Icon = [Building2, Map, FileText, Layers][i] ?? Route;
+            return <Link key={s.label} to={s.to} hash={s.hash} className="next-location-tool"><Icon aria-hidden /><span className="text-muted-foreground">{i + 1}.</span>{s.label}</Link>;
+          })
             : folded.map((p) => <Link key={p.to} to={p.to} aria-current={current?.to === p.to ? "page" : undefined} className="shrink-0 text-xs hover:underline">{p.label}</Link>)}
         </div>
       </nav>}
