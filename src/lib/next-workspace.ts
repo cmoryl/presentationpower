@@ -312,6 +312,18 @@ export function nextWorkspaceMenu(id: NextWorkspaceGroupId): NextWorkspacePage[]
   return nextWorkspaceGroup(id).filter((p) => !p.navAs);
 }
 
+/** City sections stay in the registry, but share one top-level Locations tab. */
+export function nextWorkspaceLocations() {
+  return NEXT_WORKSPACE_GROUPS.filter((g) => g.id === "london" || g.id === "san-francisco").map((group) => ({
+    group,
+    pages: NEXT_WORKSPACE_PAGES.filter((p) => p.group === group.id || (group.id === "london" && p.scope === "london")),
+  }));
+}
+
+export function isNextLocationPage(page: NextWorkspacePage | null): boolean {
+  return !!page && (page.group === "london" || page.group === "san-francisco" || page.scope === "london" || page.to === "/events/next/locations" || page.to === "/events/next/venues");
+}
+
 /** The menu item that stays underlined for a page (itself, or its parent). */
 export function nextWorkspaceMenuPath(page: NextWorkspacePage | null): NextWorkspacePath | null {
   return page ? (page.navAs ?? page.to) : null;
