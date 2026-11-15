@@ -2,7 +2,8 @@
 ## Isolated first-party v221 application
 - [x] Adapter implemented: inspected actual source; isolated path documents, atomic deep updates and SQL-enforced project roles.
 - [x] Project/material/edit/save/reopen/version/reviewer sign-off verified with real injected team session and user-authorized simulated other-editor attribution on the test material only; approved hash persisted, two versions read back. No approval rule changed.
-- [ ] Connect and verify issued single-size PDF, multi-size ZIP and project editable-files ZIP downloads; report file names, sizes and openability.
+- [x] Verified real single-size PDF (689,028 bytes), eight-size ZIP (36,158,655 bytes) and project editable-files ZIP (27,165,891 bytes) reached disk and opened. No Too heavy or could-not-draw report; PPTX/DOCX opened in LibreOffice, SVG parsed; native Microsoft/Adobe fidelity remains uncertified. Evidence in docs/element-v221-mounted-store.md.
+- [x] Corrected anchor false-success: download requested but rejected as unconfirmed; real PDF download and warning verified. Native-writer test harness and cancellation/failure tests passed; actual OS picker interaction remains manual verification. Sixteen focused tests pass.
 - [ ] Cloud-backed 66-suite private release gate is a subsequent milestone, not certified by export checks; presence follows it. Agent/sampling await Chris's explicit provider and budget authorization.
 - [ ] Two-client concurrent editing/realtime remains uncertified; presence is a separate missing room-capability feature, not a database adapter gap.
 ## Ordered single-editor cutover (review-gated)

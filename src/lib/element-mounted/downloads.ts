@@ -35,7 +35,10 @@ export async function savePreparedDownload(file: PreparedDownload): Promise<void
     } finally {
       setTimeout(() => URL.revokeObjectURL(url), 30_000);
     }
+    // Anchor downloads have no completion API: never report an observed save.
+    throw { code: 'download_unconfirmed', message: 'The browser download was requested, but saving could not be confirmed. Check your Downloads folder.' };
   } catch (error) {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'download_unconfirmed') throw error;
     if (error instanceof DOMException && error.name === 'AbortError') {
       throw { code: 'download_cancelled', message: 'Download cancelled' };
     }
