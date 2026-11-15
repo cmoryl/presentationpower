@@ -1,4 +1,7 @@
 # Roadmap
+## Bowl supplied logo animation
+- [x] Add the original uploaded rotation video to the Bowl event home with looping muted playback, pause/play and original MP4 download; respect reduced-motion preferences.
+- [x] Verified public playback, pause/play, loop wrap, phone fit and byte-identical original MP4 download; desktop video inspected and page check passed.
 ## Event-card photographs
 - [x] Populate NEXT London/San Francisco, NeXus, Hackathon, Legalweek and LegalNEXT cards from existing private event references; preserve Bowl artwork because its game has not occurred.
 - [x] Verified all six signed-in card images decode and match their events; desktop reviewed and phone fit passed. Bowl retains approved artwork; researched photos remain private and Legalweek is labelled a recap cover.
