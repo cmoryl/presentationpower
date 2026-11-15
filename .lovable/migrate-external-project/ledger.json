@@ -8,7 +8,7 @@
       "source": "element-v221-source.zip",
       "outcome": "Port into the existing React editor; evaluate when(d), vk/vk2 and SUBS, then share one stack across formats",
       "status": "shared_fields_and_module_renderers_implemented_partial_parity",
-      "next_action": "All 39 module definitions and 17 SUBS from reviewed ordered render-only source integrated; conditionals and module variations tested. Complete final cross-size families/signature/content-rules wrappers and v221 style parity; no parallel app/store."
+      "next_action": "Shared fields, when/vk/vk2, 39 module definitions and 17 SUBS integrated; authoritative canvas installed and 24 focused tests pass. Finish final cross-size wrappers and source project/agent parity; reference harness is not React certification."
     },
     {
       "capability": "698 library images",
@@ -39,7 +39,7 @@
       "source": "MODULES, LIB_DESIGNS, responsive fitting and per-format controls",
       "outcome": "Preserve supported editing capabilities through current governed registries",
       "status": "partial",
-      "next_action": "Inventoried all 38 families plus pagebreak, preserving literal fields/defaults. All 39 library choices walked in the browser; controls, nested rows, add/remove/duplicate/reorder and 14 sizes integrated. Renderer is an initial React adaptation, not exact Claude parity. Six families explicitly unported; other variant details still need faithful geometry."
+      "next_action": "All 39 definitions/17 SUBS and variations ported; authoritative scoped canvas now installed. Complete final cross-size families/signature/content wrappers and exact React visual verification. Do not report six families as unported; base definitions are present."
     },
     {
       "capability": "Projects, materials, versions and review",
@@ -141,11 +141,7 @@
   },
   "styles_and_tests_package": {
     "source": "element-v221-styles-and-tests.zip",
-    "status": "pending_attachment",
-    "checked_locations": [
-      "/mnt/user-uploads/",
-      "/tmp/user-uploads/"
-    ],
-    "next_action": "Use supplied canvas.css as module styling authority, scope chrome.css to applicable editor chrome, inspect the named priority suites and run all 66 supplied suites after safe archive inspection. The announced third ZIP is not present in either upload location on 2026-11-15."
+    "status": "canvas_integrated_reference_suites_exercised_partial_verification",
+    "next_action": "Authoritative scoped canvas installed; chrome retained reference-only. All 66 reference suites exercised: 58 clean, 8 incomplete/failing (see docs/claude-v221-styles-audit.json). 24 React port tests pass; final cross-size/source-project parity and release gate remain unverified."
   }
 }

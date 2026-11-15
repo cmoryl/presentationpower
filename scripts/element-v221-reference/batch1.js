@@ -1,0 +1,37 @@
+const {chromium}=require('playwright');const fs=require('fs');const R=[];function ok(n,c,d){R.push((c?'PASS ':'FAIL ')+n+(d!==undefined?' — '+d:''))}
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1440,height:900}});const L=__dirname+'/../libs/';
+await p.route(/cdn\.jsdelivr\.net/,r=>r.abort());await p.route(/fonts\.(googleapis|gstatic)/,r=>r.abort());
+await p.goto('file://'+__dirname+'/test.html');await p.evaluate(()=>localStorage.clear());await p.reload();await p.waitForTimeout(1200);
+await p.click('.sp-hero button:has-text("Open the example project")');await p.waitForTimeout(1500);
+await p.click('.mcard:has(.mn:text-is("Fernwood & Vale case study"))');await p.waitForTimeout(1500);
+const r=await p.evaluate(()=>{const T=__T;return {t:T.ELIB.map(x=>JSON.stringify(x)).filter(s=>/\bAl\b/.test(s)).length}});
+ok('no library piece carries the Al typo',r.t===0,r.t);
+const q=await p.evaluate(()=>{const T=__T;const m=T.mat();const mk=(t)=>{const mm=JSON.parse(JSON.stringify(m));mm.modules[0].data=Object.assign({},mm.modules[0].data,t);return T.preflight(mm,false).list.map(x=>x[0]+': '+x[1]).join(' | ')};
+ const key=Object.keys(m.modules[0].data).find(k=>typeof m.modules[0].data[k]==='string');
+ return {al:mk({[key]:'Al-driven localization with Generative Al'}),mail:mk({[key]:'Write to info@transperrfect.com or www.transperfect.legal.com'}),okc:mk({[key]:'Write to games@transperfect.com or www.transperfectlegal.com'}),jaz:mk({[key]:'Al Jazeera covers it'}),partner:mk({[key]:'info@extremereach.com, https://dataforce.ai, www.linkedin.com, globallink@translations.com'}),master:mk({[key]:'Element Solutions Proposal — Master'})}});
+ok('Al for AI is a spelling error',/Spelling:[^|]*Al/.test(q.al),q.al.slice(0,200));
+ok('a misspelt or foreign contact domain is flagged',/Contact detail outside/.test(q.mail)&&/transperrfect/.test(q.mail),q.mail.slice(0,240));
+ok('TransPerfect domains pass',!/Contact detail outside/.test(q.okc),q.okc.slice(0,160));
+ok('partner and legacy domains are not flagged',!/Contact detail outside/.test(q.partner),q.partner.slice(0,120));
+ok('Al Jazeera is not flagged',!/Spelling:[^|]*Al/.test(q.jaz));
+ok('a title ending in Master is flagged',/ends in “Master”/.test(q.master),q.master.slice(0,200));
+const r2=await p.evaluate(()=>{const T=__T;const k=(v,c,l)=>T.withLang(l||'en',()=>({kind:T.statVizKind({value:v,caption:c}),svg:(T.statViz({value:v,caption:c},{w:300,h:300})||{html:''}).html||''}));
+ const ring=(h)=>{const m=/stroke-dasharray="([\d.]+)/.exec(h);return m?+m[1]:null};
+ return {en:k('99.9 %','uptime'),de:k('99,9 %','Verfügbarkeit','de'),de12:k('12,5 %','weniger Kosten','de'),mult:k('3,5×','schneller','de'),ar:k('٦٠٪','نمو','ar'),ar2:k('٢٠٠+','لغة','ar'),hi:k('९५%','सटीकता','hi'),k1:k('1.234','Sprachen','de')}});
+ok('English percent is a ring',r2.en.kind==='ring',r2.en.kind);
+ok('German 3,5× is a multiplier',r2.mult.kind==='multiplier',r2.mult.kind);
+ok('Arabic ٦٠٪ is a ring',r2.ar.kind==='ring',r2.ar.kind);
+ok('Hindi ९५% is a ring',r2.hi.kind==='ring',r2.hi.kind);
+const d1=await p.evaluate(()=>{const T=__T;const f=(v,l)=>T.withLang(l,()=>{const s=T.statViz({value:v,caption:'x'},{w:300,h:300});const h=s&&(s.html||s);const m=/stroke-dasharray="([\d.]+)/.exec(String(h));return m?+m[1]:null});return [f('99,9 %','de'),f('99.9 %','en'),f('12,5 %','de'),f('12.5 %','en')]});
+ok('decimal comma gives the same ring as the point',d1[0]===d1[1]&&d1[2]===d1[3]&&d1[0]!==null,d1.join(' / '));
+
+const ar=await p.evaluate(async()=>{const T=__T;const pc=T.ELIB.find(x=>x.id==='kb-media-anime-expertise');const lay=T.pieceLayout(pc);const m=T.mat();m.modules=JSON.parse(JSON.stringify(lay.modules));m.brand=pc.brand;m.client=pc.client;m.rebuiltFrom={id:pc.id};T.redraw();
+ const f=T.fmtById('square');const conv=s=>String(s).replace(/\d/g,d=>String.fromCharCode(0x660+ +d));const mods=JSON.parse(JSON.stringify(m.modules));
+ const walk=o=>{if(Array.isArray(o))o.forEach(walk);else if(o&&typeof o==='object'){for(const k in o){if(typeof o[k]==='string'&&/^[\d.,+%×x ]{1,8}$/.test(o[k].trim())&&/\d/.test(o[k]))o[k]=conv(o[k]);else walk(o[k])}}};mods.forEach(x=>walk(x.data));
+ const h=document.createElement('div');h.style.cssText='position:absolute;left:0;top:0';document.body.appendChild(h);h.innerHTML=T.withLang('ar',()=>T.fmtHTML(mods,f,false));const fr=h.firstElementChild;T.fitFrame(fr);const b=[...fr.querySelectorAll('.big')].filter(e=>e.getBoundingClientRect().width>0).map(e=>e.textContent.trim());h.remove();return b});
+ok('Arabic-Indic digits still give the square its big number',ar.length===1&&/[٠-٩]/.test(ar[0]),ar.join());
+const he=await p.evaluate(()=>__T.LANGS.find(l=>l[0]==='he'));
+ok('Hebrew quotes open with “ and close with ”',he[4]==='“'&&he[5]==='”',he.join(' '));
+const ko=await p.evaluate(()=>{const d=document.createElement('div');d.className='gl';d.lang='ko';d.textContent='x';document.body.appendChild(d);const w=getComputedStyle(d).wordBreak;d.remove();return w});
+ok('Korean keeps words whole at a line end',ko==='keep-all',ko);
+R.forEach(x=>console.log(x));console.log(R.filter(x=>x.startsWith('FAIL')).length?'FAILED':'ok');await b.close()})();

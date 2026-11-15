@@ -1,0 +1,92 @@
+/* v218: the Division library, to look at and press. */
+const { chromium } = require("playwright");
+const R = [];
+function ok(n, c, d) { R.push((c ? "PASS " : "FAIL ") + n + (d !== undefined ? " — " + String(d).slice(0, 220) : "")); }
+process.on("unhandledRejection", (e) => { R.forEach((x) => console.log(x)); console.log("CRASH", String((e && e.stack) || e).slice(0, 500)); process.exit(1); });
+(async () => {
+  const b = await chromium.launch();
+  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
+  await ctx.route(/fonts\.(googleapis|gstatic)|cdn\.jsdelivr|cdnjs/, (r) => r.abort());
+  const p = await ctx.newPage();
+  const errs = [];
+  p.on("pageerror", (e) => errs.push(e.message.slice(0, 160)));
+  await p.goto("file://" + __dirname + "/test.html#as=chris");
+  await p.waitForTimeout(2300);
+  await p.evaluate(() => __T.go("library"));
+  await p.waitForTimeout(3200);
+  const st = () => p.evaluate(() => ({ type: document.getElementById("el-type").value, year: document.getElementById("el-year").value, cards: document.querySelectorAll(".el-card").length, chips: document.querySelectorAll(".elx-chip").length, segs: document.querySelectorAll(".elx-seg").length, yrs: document.querySelectorAll(".elx-yr").length, onChip: [].map.call(document.querySelectorAll(".elx-chip.on"), (x) => x.textContent).join("|"), onYr: [].map.call(document.querySelectorAll(".elx-yr.on"), (x) => x.getAttribute("data-elx")).join("|"), focus: document.activeElement.getAttribute("data-elx") }));
+  let s = await st();
+  const all = s.cards;
+  const first = await p.evaluate(() => { const o = [...document.querySelectorAll("#el-type option")].filter((x) => x.value !== "all"); const sum = [...document.querySelectorAll(".elx-chip b")].reduce((a, x) => a + +x.textContent, 0); const sh = [...document.querySelectorAll(".el-folder .elx-share > i")].map((x) => x.style.width); return { opts: o.length, sum, total: __T.ELIB.length, folders: document.querySelectorAll(".el-folder").length, shares: sh.length, widest: sh.filter((w) => w === "100%").length, order: [...document.querySelector(".el-main").children].map((c) => c.className.split(" ")[0]).join(",") }; });
+  ok("at a glance: one key and one segment for every type on show, and their counts add up to the Library", s.chips === first.opts && s.segs === first.opts && first.sum === first.total && s.chips >= 5, s.chips + " types, " + first.sum + " of " + first.total);
+  ok("it sits between the filters and the pieces", /el-filters,elx-glance,el-groups/.test(first.order), first.order);
+  ok("every brand in the list shows its share, measured against the largest", first.shares === first.folders && first.widest === 2, first.shares + " bars, " + first.widest + " full");
+  await p.click('[data-elx="t:eBrochure"]');
+  await p.waitForTimeout(1500);
+  s = await st();
+  const eb = s.cards;
+  ok("pressing a type shows only that type, and the drop-down agrees", s.type === "eBrochure" && eb > 0 && eb < all && /^eBrochure/.test(s.onChip) && s.focus === "t:eBrochure", eb + " of " + all);
+  ok("the keyboard stays on the key that was pressed, and it reads as pressed", await p.evaluate(() => document.activeElement.getAttribute("aria-pressed") === "true"));
+  await p.click('[data-elx="y:2025"]');
+  await p.waitForTimeout(1500);
+  s = await st();
+  ok("pressing a year narrows it further", s.year === "2025" && s.cards > 0 && s.cards < eb && s.onYr === "y:2025", s.cards + " of " + eb);
+  await p.selectOption("#el-type", "all");
+  await p.waitForTimeout(1200);
+  s = await st();
+  ok("the drop-downs and the picture stay in step both ways", s.type === "all" && s.onChip === "" && s.onYr === "y:2025", JSON.stringify([s.type, s.onChip, s.onYr]));
+  await p.click('[data-elx="y:2025"]');
+  await p.waitForTimeout(1500);
+  s = await st();
+  ok("pressing it again shows everything", s.year === "all" && s.cards === all && s.onYr === "", s.cards + " of " + all);
+  /* cards */
+  await p.waitForTimeout(1500);
+  const card = p.locator(".el-card").nth(1);
+  await card.scrollIntoViewIfNeeded();
+  const before = await card.evaluate((c) => { const sc = c.querySelector(".lp-scale"); return { t: sc ? sc.style.transform : null, top: Math.round(c.querySelector(".el-pic").getBoundingClientRect().top) }; });
+  await card.hover();
+  await p.waitForTimeout(3600);
+  const during = await card.evaluate((c) => { const sc = c.querySelector(".lp-scale"); const th = sc.parentNode.getBoundingClientRect(), r = sc.getBoundingClientRect(); return { t: sc.style.transform, top: Math.round(c.querySelector(".el-pic").getBoundingClientRect().top), foot: Math.round(r.bottom - th.bottom), open: getComputedStyle(c.querySelector(".el-pic"), "::after").opacity, shadow: getComputedStyle(c.querySelector(".el-pic")).boxShadow !== "none" }; });
+  ok("under the pointer a card lifts, says Open, and its page runs down to its foot", /^scale\(/.test(before.t) && /^translateY\(-\d+px\) scale\(/.test(during.t) && during.top < before.top && Math.abs(during.foot) <= 3 && during.open === "1" && during.shadow, JSON.stringify(during));
+  await p.mouse.move(700, 120);
+  await p.waitForTimeout(900);
+  const after = await card.evaluate((c) => c.querySelector(".lp-scale").style.transform);
+  ok("moving away puts the page back at its top", after === before.t, after);
+  /* the heading being read */
+  await p.evaluate(() => window.scrollTo(0, 1800));
+  await p.waitForTimeout(700);
+  const head = await p.evaluate(() => { const hs = [...document.querySelectorAll(".el-gh")]; const bar = document.querySelector(".bcbar") || document.querySelector(".top"); const under = bar.getBoundingClientRect().bottom; const stuck = hs.filter((x) => Math.abs(x.getBoundingClientRect().top - under) <= 2); return { stuck: stuck.length, text: stuck[0] ? stuck[0].querySelector("span").textContent : "", under: Math.round(under) }; });
+  ok("the heading of the year being read stays at the top of the window", head.stuck === 1 && /^\d{4}$/.test(head.text), JSON.stringify(head));
+  /* opening still works, and the picture is not in the way of the reader */
+  await p.evaluate(() => window.scrollTo(0, 0));
+  await p.click(".el-card >> nth=0");
+  await p.waitForTimeout(1800);
+  ok("a card still opens the piece", await p.evaluate(() => !!document.getElementById("el-detail") && !!__T.S().elOpen));
+  await p.keyboard.press("Escape");
+  await p.waitForTimeout(600);
+  /* less motion */
+  const q = await ctx.newPage();
+  await q.emulateMedia({ reducedMotion: "reduce" });
+  await q.goto("file://" + __dirname + "/test.html#as=sam");
+  await q.waitForTimeout(2300);
+  await q.evaluate(() => __T.go("library"));
+  await q.waitForTimeout(3200);
+  const qc = q.locator(".el-card").nth(1);
+  await qc.hover();
+  await q.waitForTimeout(1200);
+  const calm = await qc.evaluate((c) => ({ t: c.querySelector(".lp-scale").style.transform, glance: !!document.querySelector(".elx-glance") }));
+  ok("for people who ask for less motion the page stays still; a viewer gets the same picture of the Library", /^scale\(/.test(calm.t) && calm.glance, calm.t);
+  /* phone */
+  const ph = await b.newContext({ viewport: { width: 390, height: 800 } });
+  const m = await ph.newPage();
+  await m.goto("file://" + __dirname + "/test.html#as=chris");
+  await m.waitForTimeout(2300);
+  await m.evaluate(() => __T.go("library"));
+  await m.waitForTimeout(3000);
+  const phone = await m.evaluate(() => ({ sw: document.documentElement.scrollWidth, cols: getComputedStyle(document.querySelector(".elx-glance")).gridTemplateColumns.split(" ").length, chip: Math.round(document.querySelector(".elx-chip").getBoundingClientRect().height) }));
+  ok("on a phone the picture stacks and nothing pushes the page sideways", phone.sw <= 390 && phone.cols === 1, JSON.stringify(phone));
+  ok("no page errors", errs.length === 0, errs.slice(0, 3).join(" | "));
+  R.forEach((x) => console.log(x));
+  console.log(R.some((x) => x.startsWith("FAIL")) ? "SUITE FAIL" : "SUITE PASS");
+  await b.close();
+})();

@@ -1,9 +1,9 @@
 .source-sheet { color: var(--foreground); background: var(--background); font-family: var(--font-sans); letter-spacing: 0; }
 .source-sheet .source-module { min-width: 0; padding: 24px 32px; overflow-wrap: anywhere; }
-.source-sheet h2 { font-size: 25px; font-weight: 700; line-height: 1.15; margin: 0 0 16px; }
-.source-sheet h3 { font-size: 16px; font-weight: 650; line-height: 1.3; margin: 0 0 8px; }
-.source-sheet p, .source-sheet li { font-size: 13px; line-height: 1.4; margin: 0 0 8px; white-space: pre-line; }
-.source-sheet small, .source-sheet cite { display: block; font-size: 11px; line-height: 1.4; }
+.source-sheet h2:not(.v221-canvas *) { font-size: 25px; font-weight: 700; line-height: 1.15; margin: 0 0 16px; }
+.source-sheet h3:not(.v221-canvas *) { font-size: 16px; font-weight: 650; line-height: 1.3; margin: 0 0 8px; }
+.source-sheet p:not(.v221-canvas *), .source-sheet li:not(.v221-canvas *) { font-size: 13px; line-height: 1.4; margin: 0 0 8px; white-space: pre-line; }
+.source-sheet small:not(.v221-canvas *), .source-sheet cite:not(.v221-canvas *) { display: block; font-size: 11px; line-height: 1.4; }
 .source-sheet .source-eyebrow { font-size: 10px; font-weight: 650; text-transform: uppercase; margin-bottom: 10px; }
 .source-sheet .source-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(145px, 100%), 1fr)); gap: 16px; }
 .source-sheet .source-cols-1 { grid-template-columns: 1fr; }
@@ -18,8 +18,8 @@
 .source-sheet .source-style-bar { gap: 0; border-block: 2px solid var(--primary); }
 .source-sheet .source-style-bar .source-stat { border: 0; border-right: 1px solid var(--border); border-radius: 0; }
 .source-sheet .source-style-dark .source-stat, .source-sheet .source-cta-dark { background: var(--foreground); color: var(--background); }
-.source-sheet blockquote { border-left: 3px solid var(--primary); margin: 0; padding: 20px 24px; background: var(--muted); }
-.source-sheet blockquote p { font-size: 21px; line-height: 1.3; }
+.source-sheet blockquote:not(.v221-canvas *) { border-left: 3px solid var(--primary); margin: 0; padding: 20px 24px; background: var(--muted); }
+.source-sheet blockquote p:not(.v221-canvas *) { font-size: 21px; line-height: 1.3; }
 .source-sheet .source-cta { padding: 24px; border-radius: var(--radius-sm); }
 .source-sheet .source-cta-label { display: inline-block; margin-top: 8px; padding: 8px 12px; background: var(--primary); color: var(--primary-foreground); font-size: 12px; font-weight: 600; }
 .source-sheet .source-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; border-top: 1px solid var(--border); padding-top: 16px; font-size: 11px; }
@@ -42,8 +42,8 @@
 .source-sheet .source-featured { border: 2px solid var(--primary); }
 .source-sheet .source-checklist { list-style: none; padding: 0; }
 .source-sheet .source-checklist li { display: flex; gap: 12px; align-items: start; }
-.source-sheet table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.source-sheet th, .source-sheet td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; }
+.source-sheet table:not(.v221-canvas *) { width: 100%; border-collapse: collapse; font-size: 12px; }
+.source-sheet th:not(.v221-canvas *), .source-sheet td:not(.v221-canvas *) { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; }
 .source-sheet .source-chart-row { display: grid; grid-template-columns: 70px 1fr 60px; gap: 12px; align-items: center; font-size: 12px; margin-bottom: 12px; }
 .source-sheet .source-chart-bar { height: 20px; background: var(--primary); }
 .source-sheet .source-note { margin-top: 16px; font-size: 10px; }

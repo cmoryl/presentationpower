@@ -1,0 +1,26 @@
+const {chromium}=require('playwright');const R=[];function ok(n,c,d){R.push((c?'PASS ':'FAIL ')+n+(d!==undefined?' — '+d:''))}
+process.on('unhandledRejection',e=>{R.forEach(x=>console.log(x));console.log('CRASH',String(e).slice(0,300));process.exit(1)});
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1300,height:1000}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file://'+__dirname+'/test.html');await p.evaluate(()=>localStorage.clear());await p.reload();await p.waitForTimeout(1000);
+const nav=await p.evaluate(()=>[...document.querySelectorAll('#appnav button')].map(b=>b.textContent));
+ok('header has a Modules link after Library',nav.join('|').includes('Library|Modules')&&nav.join('|').includes('Templates|Help'),nav.join('|'));
+await p.click('#appnav .nav-mx');await p.waitForTimeout(1500);
+ok('Modules opens the module examples page',await p.isVisible('h1:text-is("Module examples")'));
+const c=await p.evaluate(()=>[document.querySelectorAll('.mx-mod').length,document.querySelectorAll('.mx-var').length,Object.keys(__T.MODULES||{}).length]);
+ok('every module is listed',c[0]>=20,JSON.stringify(c));
+ok('each module shows its variations',c[1]>=c[0]*4,JSON.stringify(c));
+const drawn=await p.evaluate(()=>document.querySelectorAll('.mx-pic .lp-thumb').length);ok('pictures draw as they come into view',drawn>0,drawn);
+await p.click('.mx-var >> nth=1 >> .mx-pic');await p.waitForTimeout(700);
+const big=await p.evaluate(()=>{const d=document.querySelector('.mx-modal');const t=d&&d.querySelector('.mx-big .lp-thumb');const sm=document.querySelector('.mx-var .lp-thumb');return d?{w:t?t.getBoundingClientRect().width:0,sw:sm.getBoundingClientRect().width,cap:d.querySelector('.mx-big-cap').textContent}:null});
+ok('clicking a picture opens it larger',!!big&&big.w>big.sw*1.5,JSON.stringify(big));
+await p.screenshot({path:__dirname+'/../shots/mx-large.png'});
+await p.keyboard.press('ArrowRight');await p.waitForTimeout(400);
+const cap2=await p.textContent('.mx-big-cap');ok('arrow keys step through the variations',cap2!==big.cap&&/3 of/.test(cap2),cap2);
+await p.keyboard.press('Escape');await p.waitForTimeout(300);if(await p.$('#scrim'))await p.click('.mx-modal .btn.primary');await p.waitForTimeout(300);
+ok('the larger view closes',!(await p.$('#scrim')));
+await p.click('.mx-groups .seg:has-text("Proof")');await p.waitForTimeout(600);
+const g=await p.evaluate(()=>[...document.querySelectorAll('.mx-gh span')].map(x=>x.textContent));ok('a group filter shows only that group',g.length===1&&g[0]==='Proof',g.join(','));
+await p.fill('#mx-q','zzzz');await p.waitForTimeout(400);ok('a search with no match says so',/No module matches/.test(await p.textContent('.mx-body')));
+await p.fill('#mx-q','');await p.click('#appnav .nav-lib');await p.waitForTimeout(800);ok('Library still opens from the header',await p.isVisible('h1:text-is("Division library")'));
+ok('no script errors',!errs.length,errs.slice(0,2).join(' | '));
+R.forEach(x=>console.log(x));const f=R.filter(x=>x.startsWith('FAIL')).length;console.log(f?f+' FAILED':'ALL PASS');await b.close()})();

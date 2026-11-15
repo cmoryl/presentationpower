@@ -1,0 +1,519 @@
+{
+  "date": "2026-11-15",
+  "package": "element-v221-styles-and-tests.zip",
+  "received": true,
+  "canvas_bytes": 430855,
+  "chrome_bytes": 236416,
+  "canvas_sha256": "835f4adcf2def8edd38a0c84d4eba0147fd716cc0a085ffd411c4792c101ab85",
+  "implemented": [
+    "Authoritative canvas stylesheet, scoped to v221-canvas",
+    "Canvas-only default variables extracted from chrome; existing application shell unchanged",
+    "Packaged Geist and zero tracking adaptations",
+    "Browser-invalid nth-child(var(--r)) selector excluded; unchanged original retained",
+    "Approximate legacy typography excludes v221 canvas",
+    "All 66 original suites retained as behavioral specifications"
+  ],
+  "reference_harness": {
+    "environment": "Isolated supplied mock test.html, external network blocked except pinned local export dependencies; Python-bundled Chromium via shim",
+    "total": 66,
+    "clean": 58,
+    "not_clean": 8,
+    "results": [
+      {
+        "suite": "advanceD.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 12,
+        "issues": []
+      },
+      {
+        "suite": "audit.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 17,
+        "issues": []
+      },
+      {
+        "suite": "batch1.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 10,
+        "issues": []
+      },
+      {
+        "suite": "editable.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 11,
+        "issues": []
+      },
+      {
+        "suite": "editorpolish.js",
+        "exit": 1,
+        "fails": 0,
+        "seconds": 1,
+        "issues": []
+      },
+      {
+        "suite": "exportpro.js",
+        "exit": 1,
+        "fails": 1,
+        "seconds": 9,
+        "issues": [
+          "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/bigphoto.jpg'"
+        ]
+      },
+      {
+        "suite": "help.js",
+        "exit": 1,
+        "fails": 1,
+        "seconds": 4,
+        "issues": [
+          "CRASH Error: ENOENT: no such file or directory, open '/tmp/v221-styles/pkg2/suites/module-builder.html'"
+        ]
+      },
+      {
+        "suite": "hero.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 11,
+        "issues": []
+      },
+      {
+        "suite": "herofade.js",
+        "exit": 1,
+        "fails": 0,
+        "seconds": 5,
+        "issues": []
+      },
+      {
+        "suite": "herosafe.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 12,
+        "issues": []
+      },
+      {
+        "suite": "herosize.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 42,
+        "issues": []
+      },
+      {
+        "suite": "journey.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 15,
+        "issues": []
+      },
+      {
+        "suite": "landing.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 57,
+        "issues": []
+      },
+      {
+        "suite": "library.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 16,
+        "issues": []
+      },
+      {
+        "suite": "mx.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 4,
+        "issues": []
+      },
+      {
+        "suite": "mxnew.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 27,
+        "issues": []
+      },
+      {
+        "suite": "mxspx.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 14,
+        "issues": []
+      },
+      {
+        "suite": "mxtest.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 10,
+        "issues": []
+      },
+      {
+        "suite": "navtest.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 28,
+        "issues": []
+      },
+      {
+        "suite": "output.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 38,
+        "issues": []
+      },
+      {
+        "suite": "pages.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 41,
+        "issues": []
+      },
+      {
+        "suite": "presence.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 16,
+        "issues": []
+      },
+      {
+        "suite": "printsystem.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 10,
+        "issues": []
+      },
+      {
+        "suite": "retention2.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 91,
+        "issues": []
+      },
+      {
+        "suite": "review.js",
+        "exit": 1,
+        "fails": 1,
+        "seconds": 8,
+        "issues": [
+          "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/pa.jpg'"
+        ]
+      },
+      {
+        "suite": "reviewmode.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 91,
+        "issues": []
+      },
+      {
+        "suite": "roles.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 39,
+        "issues": []
+      },
+      {
+        "suite": "sequences.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 48,
+        "issues": []
+      },
+      {
+        "suite": "signature.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 16,
+        "issues": []
+      },
+      {
+        "suite": "sizephoto.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 18,
+        "issues": []
+      },
+      {
+        "suite": "sotest.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 18,
+        "issues": []
+      },
+      {
+        "suite": "spbriefs.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 15,
+        "issues": []
+      },
+      {
+        "suite": "spectrum.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 9,
+        "issues": []
+      },
+      {
+        "suite": "spproj.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 7,
+        "issues": []
+      },
+      {
+        "suite": "spxl.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 39,
+        "issues": []
+      },
+      {
+        "suite": "visual.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 47,
+        "issues": []
+      },
+      {
+        "suite": "visual2.js",
+        "exit": 1,
+        "fails": 1,
+        "seconds": 9,
+        "issues": [
+          "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/pa-hi.jpg'"
+        ]
+      },
+      {
+        "suite": "btt.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 13,
+        "issues": []
+      },
+      {
+        "suite": "breakhunt.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 11,
+        "issues": []
+      },
+      {
+        "suite": "curate.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 13,
+        "issues": []
+      },
+      {
+        "suite": "lpdl.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 13,
+        "issues": []
+      },
+      {
+        "suite": "vscan.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 6,
+        "issues": []
+      },
+      {
+        "suite": "libview.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 31,
+        "issues": []
+      },
+      {
+        "suite": "herofit.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 14,
+        "issues": []
+      },
+      {
+        "suite": "curator.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 5,
+        "issues": []
+      },
+      {
+        "suite": "designlogic.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 23,
+        "issues": []
+      },
+      {
+        "suite": "rebuildclean.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 23,
+        "issues": []
+      },
+      {
+        "suite": "multiuser.js",
+        "exit": 124,
+        "fails": 1,
+        "seconds": 240,
+        "issues": [
+          "Harness timed out at 240 seconds"
+        ]
+      },
+      {
+        "suite": "secfix.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 20,
+        "issues": []
+      },
+      {
+        "suite": "v200.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 5,
+        "issues": []
+      },
+      {
+        "suite": "v201.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 91,
+        "issues": []
+      },
+      {
+        "suite": "v202.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 10,
+        "issues": []
+      },
+      {
+        "suite": "v204.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 72,
+        "issues": []
+      },
+      {
+        "suite": "v205.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 22,
+        "issues": []
+      },
+      {
+        "suite": "v207.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 10,
+        "issues": []
+      },
+      {
+        "suite": "v208.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 12,
+        "issues": []
+      },
+      {
+        "suite": "v209.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 24,
+        "issues": []
+      },
+      {
+        "suite": "v211.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 44,
+        "issues": []
+      },
+      {
+        "suite": "v212.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 30,
+        "issues": []
+      },
+      {
+        "suite": "v213.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 72,
+        "issues": []
+      },
+      {
+        "suite": "v214.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 30,
+        "issues": []
+      },
+      {
+        "suite": "v215.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 33,
+        "issues": []
+      },
+      {
+        "suite": "v216.js",
+        "exit": 1,
+        "fails": 3,
+        "seconds": 81,
+        "issues": [
+          "FAIL Stop stops it: nothing after that point is made \u2014 {\"busy\":false,\"btn\":\"Send\",\"last\":\"Done.\",\"made\":true}",
+          "FAIL the module the agent added is brought into view and outlined",
+          "CRASH Error: ENOENT: no such file or directory, stat '/tmp/v221-styles/pkg2/suites/photo.jpg'"
+        ]
+      },
+      {
+        "suite": "v218.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 41,
+        "issues": []
+      },
+      {
+        "suite": "v219.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 163,
+        "issues": []
+      },
+      {
+        "suite": "v221.js",
+        "exit": 0,
+        "fails": 0,
+        "seconds": 27,
+        "issues": []
+      }
+    ],
+    "interpretation": "Reference results do not certify React parity. Missing fixtures and source mock-store behavior failures remain explicit."
+  },
+  "react_verification": {
+    "focused_tests": 24,
+    "passed": 24,
+    "desktop_canvas": true,
+    "phone_canvas_width": 390,
+    "story_row_icon_tiles": 0,
+    "story_row_color_bar": true,
+    "hero_type_px": 44,
+    "page_errors": [],
+    "saved_material_end_to_end": "Not verified this turn: injected session produced empty gated page; auth-session --self found no matching requesting-user account. Browser inspection used actual React components on a disposable DOM only, no records changed."
+  },
+  "remaining": [
+    "Final family/signature/content wrappers for cross-size rendering",
+    "Source project/material/review/agent parity and corresponding React behavior assertions",
+    "Complete reference release gate: missing photo/build/axe fixtures, multiuser timeout and v216 source-harness failures",
+    "Office openability and exact source export parity"
+  ],
+  "pre_existing_defects": "Eight unrelated Bowl/London-map/light-mode failures remain separately tracked; not an Element port gate."
+}

@@ -1,0 +1,34 @@
+const {chromium}=require('playwright');const fs=require('fs');const R=[];function ok(n,c,d){R.push((c?'PASS ':'FAIL ')+n+(d!==undefined?' — '+d:''))}
+process.on('unhandledRejection',e=>{R.forEach(x=>console.log(x));console.log('CRASH',String(e).slice(0,300));process.exit(1)});
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1500,height:1000}});const errs=[];p.on('pageerror',e=>errs.push(e.message+' @ '+(e.stack||'').split('\n').slice(1,4).join(' ')));
+const L=__dirname+'/../libs/';const map={'html-to-image':L+'html-to-image-1.11.11/package/dist/html-to-image.js','jspdf':L+'jspdf-2.5.1/package/dist/jspdf.umd.min.js','jszip':L+'jszip-3.10.1/package/dist/jszip.min.js','pptxgenjs':L+'pptxgenjs-3.12.0/package/dist/pptxgen.bundle.js','docx@':L+'docx-8.5.0/package/build/index.umd.js'};
+await p.route(/cdn\.jsdelivr\.net/,r=>{const u=r.request().url();const k=Object.keys(map).find(k=>u.includes(k));if(!k)return r.abort();r.fulfill({status:200,contentType:'application/javascript',headers:{'Access-Control-Allow-Origin':'*'},body:fs.readFileSync(map[k])})});
+await p.goto('file://'+__dirname+'/test.html');await p.evaluate(()=>localStorage.clear());await p.reload();await p.waitForTimeout(900);
+await p.click('text=Open the example project');await p.waitForTimeout(1500);await p.click('.mcard:has(.mn:text-is("Fernwood & Vale case study"))');await p.waitForTimeout(1500);
+const grab=async(label,ext)=>{await p.click('button:has-text("Export")');await p.waitForTimeout(300);await p.click('.pop button:has-text("'+label+'")');
+ if(await p.isVisible('#export-anyway').catch(()=>false)){await p.click('#export-anyway')}
+ await p.waitForFunction(e=>(window.__saved||[]).some(n=>n.endsWith(e)),ext,{timeout:60000});
+ const b64=await p.evaluate(async e=>{const i=window.__saved.findIndex(n=>n.endsWith(e));const bl=window.__blobs[i];const a=new Uint8Array(await bl.arrayBuffer());let s='';for(let j=0;j<a.length;j+=32768)s+=String.fromCharCode.apply(null,a.subarray(j,j+32768));return [window.__saved[i],btoa(s)]},ext);
+ fs.writeFileSync(__dirname+'/../exports/'+b64[0],Buffer.from(b64[1],'base64'));return b64[0]};
+const svg=await grab('for Illustrator','.svg');ok('Illustrator export saved',!!svg,svg);
+const pptx=await grab('as PowerPoint','.pptx');ok('PowerPoint export saved',!!pptx,pptx);
+const docx=await grab('Word document','.docx');ok('Word export saved',!!docx,docx);
+fs.writeFileSync(__dirname+'/../exports/names.json',JSON.stringify({svg,pptx,docx}));
+const X=__dirname+'/../exports/';const cp=require('child_process');
+const S=fs.readFileSync(X+svg,'utf8');
+ok('SVG has one group per module',(S.match(/<g id="/g)||[]).length===6,(S.match(/<g id="[^"]*"/g)||[]).join(','));
+ok('SVG text is live, not outlined (Geist first, then fallbacks)',/<tspan[^>]*font-family="Geist, [^"]*Arial, Helvetica, sans-serif"[^>]*>How Fernwood &amp; Vale launched/.test(S));
+ok('SVG keeps the gradient fills as vectors',/<linearGradient/.test(S));
+ok('SVG icons are vectors with resolved colours',/<path/.test(S)&&!/currentColor/.test(S));
+const slide=cp.execSync('unzip -p "'+X+pptx+'" ppt/slides/slide1.xml').toString();
+ok('PowerPoint slide has editable text in Geist',slide.includes('How Fernwood')&&slide.includes('<a:latin typeface="Geist"'));
+ok('PowerPoint slide has shapes and pictures',/prstGeom prst="roundRect"/.test(slide)&&/<p:pic>/.test(slide));
+const pres=cp.execSync('unzip -p "'+X+pptx+'" ppt/presentation.xml').toString();
+ok('PowerPoint slide is the page size (8.5 × 11 in)',/<p:sldSz cx="7772400" cy="10058400"/.test(pres),(pres.match(/<p:sldSz[^>]*>/)||[''])[0]);
+const doc=cp.execSync('unzip -p "'+X+docx+'" word/document.xml').toString();
+ok('Word carries the headline as live text',/How Fernwood/.test(doc));
+ok('Word text sits in positioned frames',(doc.match(/<w:framePr /g)||[]).length>=10,(doc.match(/<w:framePr /g)||[]).length);
+ok('Word page art is a picture behind the text',/behindDoc="1"/.test(doc)&&(doc.match(/<pic:pic/g)||[]).length>=1);
+ok('Word keeps the KPI figures',/6 weeks[\s\S]*31%/.test(doc.replace(/<[^>]+>/g,'')));
+ok('no page errors',!errs.length,errs.join(' | ').slice(0,300));
+R.forEach(x=>console.log(x));console.log(R.some(x=>x.startsWith('FAIL'))?'':'no errors');await b.close()})();
