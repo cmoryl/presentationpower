@@ -1,5 +1,7 @@
 # Events, kiosks, signage, venue maps
 
+- NEXT opens with main event information, then a Locations chooser; shared specialist tools stay under Resources and venue editing is opt-in — why: the event hierarchy must precede production settings without changing access enforcement.
+
 - London revision history transfers bounded JSON snapshot pages; maps use only the newest snapshot — why: accumulated artwork exceeds the serializer's response limit when history is expanded in one request.
 
 - Generated map SVG downloads (including ZIP entries) and PDF/PNG inputs pass through `selfContainedSvg` before delivery; SVG logos are nested vector paths with unique IDs, raster images embedded, and missing assets block export — why: Illustrator cannot reliably resolve linked web logos and proofs must not silently lose them. Issued source files remain byte-for-byte unchanged.

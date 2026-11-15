@@ -1,4 +1,7 @@
 # Roadmap
+## NEXT main event → locations flow
+- [x] Put main NEXT information first, simplify shared navigation, and open Locations as a visual chooser with venue editing separate.
+- [x] Verified main event → Locations → London, phone fit and opt-in venue details; existing access enforcement and links preserved. Full all-role access audit remains outside this navigation change.
 ## NEXT cohesive event workspace
 - [x] Added a supplied-artwork full-width NEXT masthead through the shared shell, with visible pinned global navigation, local section links and grouped All pages menu.
 - [x] Moved city editions first, removed the duplicate overview hero and unframed template/directory sections. Desktop pinned menu and All pages interaction verified; phone fits; six NEXT data/artwork tests pass. Existing city tools and issued facts preserved.

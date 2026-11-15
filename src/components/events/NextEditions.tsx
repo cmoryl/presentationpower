@@ -8,6 +8,8 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
 import { NEXT_CITY_SERIES, type NextCityStop } from "@/lib/next-event";
+import ground from "@/assets/next-workspace/issued-cover-ground.jpg";
+import { nextLockupSuite } from "@/lib/next-event-logos";
 
 const EDITION_ROUTES: Record<string, "/events/next/london" | "/events/next/san-francisco"> = {
   london: "/events/next/london",
@@ -27,10 +29,10 @@ function EditionCard({ stop, status }: { stop: NextCityStop; status: keyof typeo
   const to = EDITION_ROUTES[stop.id];
   const body = (
     <>
-      <span
-        className={`block h-1.5 w-full ${status === "live" ? "bg-[#003FC7]" : status === "past" ? "bg-[#666666]" : "bg-[#03002C]"}`}
-        aria-hidden
-      />
+      <span className="relative flex aspect-[16/6] items-center justify-center overflow-hidden p-7">
+        <img src={ground} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <img src={nextLockupSuite("transperfect")?.wideWhite?.url} alt="TransPerfect NEXT" className="relative w-full max-w-64 object-contain" />
+      </span>
       <span className="flex flex-1 flex-col p-5">
         <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-muted-foreground">
           {STATUS_LABEL[status]}
@@ -42,8 +44,8 @@ function EditionCard({ stop, status }: { stop: NextCityStop; status: keyof typeo
           {[stop.venue, stop.datesLabel].filter(Boolean).join(" · ") || stop.country}
         </span>
         {to ? (
-          <span className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#003FC7]">
-            Open edition <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+          <span className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary">
+            Open event <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
           </span>
         ) : null}
       </span>
@@ -68,17 +70,14 @@ export function NextEditions() {
 
   return (
     <section className="mt-12" aria-labelledby="next-editions">
-      <h2 id="next-editions" className="text-xl font-semibold tracking-tight">
-        Editions
+      <h2 id="next-editions" className="text-xl font-semibold">
+        Location events
       </h2>
-      <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-        Go into a location edition to work on its venue, divisions and assets.
-      </p>
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {current.length > 0 && <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {current.map(({ stop, status }) => (
           <EditionCard key={stop.id} stop={stop} status={status} />
         ))}
-      </div>
+      </div>}
 
       <h3 className="mt-8 text-sm font-semibold">Past editions</h3>
       {past.length ? (

@@ -30,13 +30,12 @@ export const NextMasthead = forwardRef<HTMLElement, NextMastheadProps>(function 
           <div className="mt-6 flex flex-wrap items-end justify-between gap-6">
             <div className="next-masthead-copy max-w-2xl">
               <p className="mb-2 text-xs font-medium uppercase">{home ? "Event workspace · 2026" : "Event workspace"}</p>
-              {home ? <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">TransPerfect NEXT events</h1>
+              {home ? <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">TransPerfect NEXT</h1>
                 : <p className="text-3xl font-semibold leading-tight sm:text-4xl">{current?.label ?? "NEXT event assets"}</p>}
-              <p className="mt-3 text-sm leading-relaxed opacity-85">{home ? "City editions · Division templates · On-site assets" : current?.purpose}</p>
+              <p className="mt-3 text-sm leading-relaxed opacity-85">{home ? "Main event · Location events" : current?.purpose}</p>
             </div>
             {home && <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg"><Link to="/events/next" hash="editions">City editions <ArrowRight /></Link></Button>
-              <Button asChild size="lg" variant="secondary"><Link to="/events/next/brand-kit">Master brand kit <ArrowRight /></Link></Button>
+              <Button asChild size="lg"><Link to="/events/next/locations">Explore locations <ArrowRight /></Link></Button>
             </div>}
           </div>
           {children}

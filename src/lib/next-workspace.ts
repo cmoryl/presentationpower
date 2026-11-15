@@ -106,8 +106,8 @@ export const NEXT_WORKSPACE_GROUPS: Array<{
 export const NEXT_WORKSPACE_PAGES: NextWorkspacePage[] = [
   {
     to: "/events/next",
-    label: "NEXT home",
-    purpose: "Every NEXT design in one index, by division and format.",
+    label: "Main event",
+    purpose: "TransPerfect NEXT event information, shared brand resources and location events.",
     group: "plan",
     scope: "every-city",
   },
@@ -134,8 +134,8 @@ export const NEXT_WORKSPACE_PAGES: NextWorkspacePage[] = [
   },
   {
     to: "/events/next/locations",
-    label: "Venues & floor-plan standards",
-    purpose: "The editable record per location and the one floor-plan format every city uses.",
+    label: "Locations",
+    purpose: "Choose a NEXT location to open its event information and local materials.",
     group: "plan",
     scope: "every-city",
     detail: "The delegate guide and practical pages read this record.",

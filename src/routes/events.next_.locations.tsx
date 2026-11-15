@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { NextEditions } from "@/components/events/NextEditions";
+import { Button } from "@/design-system/element";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { supabase } from "@/integrations/supabase/client";
 import { GUIDE_IMAGES, guideImage } from "@/lib/next-guide-theme";
@@ -54,13 +56,13 @@ import {
 export const Route = createFileRoute("/events/next_/locations")({
   head: () => ({
     meta: [
-      { title: "NEXT venue pages — real address, map, opening times and photo" },
+      { title: "NEXT locations · TransPerfect Element" },
       {
         name: "description",
         content:
-          "One editable venue record per NEXT location: address, map position, opening times, how to get there and the venue photograph. The delegate guide reads its practical page straight from here.",
+          "Explore TransPerfect NEXT location events, including London and San Francisco, with their venue information and event materials.",
       },
-      { property: "og:title", content: "NEXT venue pages" },
+      { property: "og:title", content: "TransPerfect NEXT locations" },
       {
         property: "og:description",
         content:
@@ -85,6 +87,7 @@ const primary =
 const PHOTO_BUCKET = "venue-photos";
 
 function VenuePagesRoute() {
+  const [editingVenue, setEditingVenue] = useState(false);
   const userId = useSessionUser();
   const fetchVenues = useServerFn(listVenuePages);
   const writeVenue = useServerFn(saveVenuePage);
@@ -238,12 +241,13 @@ function VenuePagesRoute() {
           <ArrowLeft className="h-4 w-4" /> Events
         </Link>
 
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#03002C]">Venues &amp; floor-plan standards</h1>
-        <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-[#666]">
-          One record per location: address, where it sits on the map, when each area opens, how to
-          get there and the photograph of the building. The delegate guide reads its practical page
-          from here, so a correction made once reaches the printed guide.
-        </p>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+          <h1 className="text-3xl font-semibold">NEXT locations</h1>
+          <Button variant="outline" onClick={() => setEditingVenue((v) => !v)} aria-expanded={editingVenue} aria-controls="next-venue-records">{editingVenue ? "Close venue details" : "Manage venue details"}</Button>
+        </div>
+        <NextEditions />
+        <div id="next-venue-records" hidden={!editingVenue}>
+        <h2 className="mt-8 text-2xl font-semibold">Venue details & floor-plan standards</h2>
 
         {!userId && (
           <p className="mt-4 rounded-xl bg-[#FFEB66]/40 px-4 py-3 text-sm text-[#03002C]">
@@ -691,6 +695,7 @@ function VenuePagesRoute() {
               )}
             </section>
           </div>
+        </div>
         </div>
       </div>
     </AppShell>

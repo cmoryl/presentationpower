@@ -12,6 +12,8 @@ import {
   CalendarDays,
   ChevronRight,
   IdCard,
+  MapPin,
+  BookOpen,
   Search,
 } from "lucide-react";
 import {
@@ -31,6 +33,7 @@ import { loadNextRegistry } from "@/lib/next-event";
 import { NextEditions } from "@/components/events/NextEditions";
 import { RegistryCard } from "@/components/next/NextRegistry";
 import { LONDON_VENUE } from "@/lib/next-london-signage";
+import { Button } from "@/design-system/element";
 
 import {
   NEXT_WORKSPACE_GROUPS,
@@ -80,21 +83,27 @@ function NextHub() {
 
   return (
     <div className="mx-auto w-full next-workspace-content max-w-[1200px] px-3 pb-24 pt-3 sm:px-6">
-      <div id="editions" tabIndex={-1} className="scroll-mt-40 outline-none">
-        <NextEditions />
-      </div>
-
-      <MasterDesignSystem division={division} onSelect={setDivisionId} />
-
-
-
-      <LondonStatus />
-
-      <CitySeries />
-
-      <PlaybookCta />
-
-      <WorkspaceDirectory />
+      <section id="event-info" className="py-9 sm:py-12" aria-labelledby="next-event-info">
+        <p className="text-xs font-medium uppercase text-muted-foreground">Main event</p>
+        <h2 id="next-event-info" className="mt-3 text-3xl font-semibold">TransPerfect NEXT</h2>
+        <p className="mt-4 max-w-3xl text-base leading-relaxed text-muted-foreground">{NEXT_DIVISIONS[0].body}</p>
+        <div className="mt-7 flex flex-wrap gap-3">
+          <Button asChild size="lg"><Link to="/events/next/locations"><MapPin />Explore locations<ArrowRight /></Link></Button>
+          <Button asChild variant="outline" size="lg"><Link to="/events/next/brand-kit"><BookOpen />Main event brand kit</Link></Button>
+        </div>
+      </section>
+      <section className="border-t border-border py-8" aria-labelledby="next-location-intro">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div><h2 id="next-location-intro" className="text-2xl font-semibold">Location events</h2><p className="mt-2 text-sm text-muted-foreground">London · San Francisco · City Series</p></div>
+          <Button asChild variant="outline"><Link to="/events/next/locations">View locations<ArrowRight /></Link></Button>
+        </div>
+      </section>
+      <details className="border-t border-border py-6">
+        <summary className="cursor-pointer text-lg font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Shared event templates & resources</summary>
+        <MasterDesignSystem division={division} onSelect={setDivisionId} />
+        <PlaybookCta />
+        <WorkspaceDirectory />
+      </details>
     </div>
   );
 }

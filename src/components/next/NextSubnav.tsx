@@ -63,7 +63,7 @@ export function NextSubnav() {
     return () => { ro.disconnect(); window.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
   }, [pathname]);
   if (!isNextWorkspacePath(pathname)) return null;
-  const showSteps = menuPath === "/events/next/city" || pathname === "/events/next/locations";
+  const showSteps = menuPath === "/events/next/city";
   return (
     <>
       <div ref={sentinel} aria-hidden className="h-px" />
@@ -71,32 +71,16 @@ export function NextSubnav() {
       <div ref={nav} data-next-site-nav className={`next-site-nav z-20 ${stuck ? "next-site-nav--stuck fixed inset-x-0" : "relative"}`} style={stuck ? { top } : undefined}>
         <nav aria-label="NEXT sections" className="next-site-nav-row overflow-x-auto">
           <div className="mx-auto flex w-max min-w-full justify-center px-3 sm:px-6">
-            <Link to="/events/next" data-active={home} aria-current={home ? "page" : undefined} className="next-site-link flex min-w-20 flex-col items-center gap-2 px-4 py-4 text-xs font-semibold"><Flag className="size-5" />Overview</Link>
-            {NEXT_WORKSPACE_GROUPS.filter((g) => g.id !== "london" && g.id !== "san-francisco").map((g) => {
-              const Icon = GROUP_ICONS[g.id];
-              const destination = nextWorkspaceMenu(g.id).find((p) => p.to !== "/events/next");
-              if (!destination) return null;
-              return <Link key={g.id} to={destination.to} data-active={!home && !locationPage && groupId === g.id} aria-current={!home && !locationPage && groupId === g.id ? "page" : undefined} className="next-site-link flex min-w-24 flex-col items-center gap-2 px-4 py-4 text-xs font-semibold"><Icon className="size-5" />{GROUP_LABELS[g.id]}</Link>;
-            })}
+            <Link to="/events/next" data-active={home} aria-current={home ? "page" : undefined} className="next-site-link flex min-w-20 flex-col items-center gap-2 px-4 py-4 text-xs font-semibold"><Flag className="size-5" />Main event</Link>
             <Link to="/events/next/locations" data-active={locationPage} aria-current={locationPage ? "page" : undefined} className="next-site-link flex min-w-24 flex-col items-center gap-2 px-4 py-4 text-xs font-semibold"><MapPin className="size-5" />Locations</Link>
-            <Button variant="ghost" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-controls="next-all-pages" className="my-auto ml-2 h-12 text-inherit hover:bg-white/10 hover:text-inherit">{open ? <X /> : <LayoutGrid />}All pages</Button>
+            <Button variant="ghost" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-controls="next-all-pages" className="my-auto ml-2 h-12 text-inherit hover:bg-white/10 hover:text-inherit">{open ? <X /> : <LayoutGrid />}Resources</Button>
           </div>
         </nav>
-        <nav aria-label="NEXT section pages" className={`${locationPage ? "next-location-nav" : "next-site-secondary"} border-b border-border`}>
-          <div className={`mx-auto flex max-w-[1400px] overflow-x-auto px-6 sm:px-8 ${locationPage ? "gap-1" : "gap-5"}`}>
-            {locationPage ? <>
-              <Link to="/events/next/locations" data-active={!city} aria-current={!city ? "page" : undefined} className="next-location-link"><MapPin aria-hidden />Venue directory</Link>
-              {locations.map((l) => {
-                const first = l.pages.find((p) => p.group === l.group.id);
-                return first ? <Link key={l.group.id} to={first.to} data-active={city?.group.id === l.group.id} className="next-location-link"><Building2 aria-hidden />{GROUP_LABELS[l.group.id]}</Link> : null;
-              })}
-            </> : home ? <>
-              <Link to="/events/next" hash="editions" className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">City editions</Link>
-              <Link to="/events/next" hash="master-system" className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">Division templates</Link>
-              <Link to="/events/next" hash="next-directory" className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">Event directory</Link>
-            </> : nextWorkspaceMenu(groupId).filter((p) => p.to !== "/events/next").map((p) => <Link key={p.to} to={p.to} data-active={menuPath === p.to} aria-current={menuPath === p.to ? "page" : undefined} className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">{p.label}</Link>)}
+        {!home && !city && !locationPage && <nav aria-label="NEXT section pages" className="next-site-secondary border-b border-border">
+          <div className="mx-auto flex max-w-[1400px] gap-5 overflow-x-auto px-6 sm:px-8">
+            {nextWorkspaceMenu(groupId).filter((p) => p.to !== "/events/next").map((p) => <Link key={p.to} to={p.to} data-active={menuPath === p.to} aria-current={menuPath === p.to ? "page" : undefined} className="shrink-0 border-b-2 border-transparent py-3 text-xs font-medium">{p.label}</Link>)}
           </div>
-        </nav>
+        </nav>}
         {city && <nav aria-label={`${GROUP_LABELS[city.group.id]} location pages`} className="next-location-tools border-b border-border">
           <div className="mx-auto flex max-w-[1400px] gap-1 overflow-x-auto px-6 sm:px-8">
             {city.pages.map((p) => {
@@ -122,7 +106,7 @@ export function NextSubnav() {
           </div>
         </div>}
       </div>
-      {(showSteps || folded.length > 1) && <nav aria-label={showSteps ? "Plan a new city — steps" : "NEXT subsection pages"} className="next-location-tools border-b border-border">
+      {(showSteps || (!locationPage && folded.length > 1)) && <nav aria-label={showSteps ? "Plan a new city — steps" : "NEXT subsection pages"} className="next-location-tools border-b border-border">
         <div className="mx-auto flex max-w-[1400px] gap-1 overflow-x-auto px-6 sm:px-8">
           {showSteps ? CITY_STEPS.map((s, i) => {
             const Icon = [Building2, Map, FileText, Layers][i] ?? Route;
