@@ -95,8 +95,8 @@ export function StadiumPage() {
           <summary className="cursor-pointer text-sm font-semibold">Archived illustrative 3D study · not location-accurate</summary>
           <div className="pt-4"><SjbStadiumViewer /></div>
         </details>
-        <details className="border-t border-border pt-4">
-        <summary className="cursor-pointer text-sm font-semibold">Separate BoothHUB stadium model · unchanged</summary>
+        <div className="space-y-3 border-t border-border pt-4">
+        <h3 className="text-lg font-semibold">BoothHUB stadium model</h3>
         {STADIUM_READY ? (
         <iframe
           src={STADIUM_URL}
@@ -115,7 +115,7 @@ export function StadiumPage() {
           </div>
         )}
         <p className="text-xs text-muted-foreground">Separate existing model, unchanged. Its survey provenance, site alignment and current conversion accuracy have not been verified.</p>
-        </details>
+        </div>
         </section>
       </div>
     </SjbShell>
