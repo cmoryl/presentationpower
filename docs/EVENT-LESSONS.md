@@ -1,5 +1,11 @@
 # Event lessons log
 
+### 2026-11-15 — A current event homepage can display another year's photographs
+**Context:** NeXus/Hackathon London and LegalNEXT 2026 web reference search.
+**What happened:** the Hackathon 2026 site uses stage photos visibly labelled Barcelona '25; NeXus uses an Athens-named photograph. Legalweek recap media are video covers rather than full photographs.
+**Rule now:** inspect the actual pictured event branding before associating a photograph with city/year; label retrieved video covers separately and preserve rights-pending references privately.
+**Enforced by:** source register `docs/EVENT-WEB-REFERENCES-2026.md`, visual contact-sheet review and event reference separation tests.
+
 ### 2026-11-14 — Source-map field paint must not show through a 3D overlay
 **Context:** Interactive Bowl source-map reconstruction.
 **What happened:** the illustrated map contained a skewed copy of the field; a correctly proportioned 3D field left duplicate yard lines visible beside it.

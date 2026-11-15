@@ -1,6 +1,7 @@
 import { ApprovedGradients } from "@/components/brand/ApprovedGradients";
 import { gradientsForKit } from "@/lib/approved-gradients";
 import { KitSignList } from "@/components/events/KitSignList";
+import { EventWebReferences } from "@/components/events/EventWebReferences";
 import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Download, FileText } from "lucide-react";
@@ -167,6 +168,7 @@ function KitPage() {
       )}
 
       <KitSignList kit={kit.id} />
+      <EventWebReferences eventId={event.id} />
 
       {groups.map((g) => (
         <section key={g} className="mt-10">

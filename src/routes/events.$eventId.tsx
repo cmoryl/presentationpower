@@ -10,6 +10,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, CircleDashed } from "lucide-react"
 
 import { AppShell } from "@/components/AppShell";
 import { EventTimeline } from "@/components/events/EventTimeline";
+import { EventWebReferences } from "@/components/events/EventWebReferences";
 import { SjbRecentUpdates } from "@/components/events/SjbRecentUpdates";
 import { SjbHero } from "@/components/events/SjbHero";
 import { SjbEventAreas } from "@/components/events/SjbEventAreas";
@@ -254,6 +255,7 @@ function EventHome() {
             )}
           </section>
         )}
+        {tab === "overview" && <EventWebReferences eventId={eventId} />}
         </>)}
       </div>
     </AppShell>

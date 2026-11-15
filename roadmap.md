@@ -1,4 +1,8 @@
 # Roadmap
+## 2026 other-event photo and signage research
+- [x] Search official event sites and dated recaps; inspect and preserve 13 sourced NeXus/Hackathon, LegalNEXT and Legalweek references privately, excluding historical site imagery.
+- [x] Add source-linked private references to event homes and supplied kits; retain pending rights, recap-cover labels and existing NEXT libraries.
+- [ ] Public/marketing reuse: waits on rights-owner and participant clearance; no researched photograph is cleared by this work.
 ## NEXT main event → locations flow
 - [x] Put main NEXT information first, simplify shared navigation, and open Locations as a visual chooser with venue editing separate.
 - [x] Verified main event → Locations → London, phone fit and opt-in venue details; existing access enforcement and links preserved. Full all-role access audit remains outside this navigation change.
