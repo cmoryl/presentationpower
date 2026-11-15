@@ -4,7 +4,7 @@
 }
 .next-masthead-ground { opacity: .38; }
 .next-hero-photo { left: 30%; }
-.next-hero-photo img { object-position: center 58%; }
+.next-hero-photo img { object-position: center 35%; }
 .next-hero-photo-shade { background: linear-gradient(90deg, var(--tp-ink), color-mix(in srgb, var(--tp-ink) 80%, transparent) 28%, color-mix(in srgb, var(--tp-ink) 20%, transparent) 75%); }
 .next-masthead:has(.next-hero-photo) .next-masthead-copy { max-width: 38rem; }
 .next-hero-photo-credit { color: var(--tp-white); background: color-mix(in srgb, var(--tp-ink) 80%, transparent); padding: .2rem .4rem; }
