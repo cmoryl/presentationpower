@@ -36,7 +36,6 @@ import { getPlaybookImagery } from "@/lib/playbook-imagery";
 import { SOCIAL_FORMATS, KIT_PROFILES } from "@/lib/social-formats";
 import { useFavorites } from "@/lib/favorites";
 import { EventHubCards } from "@/components/events/EventHubCards";
-import { SavedKitsSection } from "@/components/campaigns/SavedKitsSection";
 
 export const Route = createFileRoute("/events/")({
   head: () => ({
@@ -54,6 +53,7 @@ export const Route = createFileRoute("/events/")({
           "Industry-standard event playbooks with live demo kits, phased timelines, and one-click generation.",
       },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://presentationpower.lovable.app/events" }],
   }),
@@ -150,14 +150,10 @@ function EventsView() {
       </header>
 
       <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6 lg:px-8">
-        {/* Your saved kits (signed-in, non-empty only) */}
-        <SavedKitsSection surface="event" />
-
         <section id="your-events" className="space-y-5">
           <SectionHead
-            eyebrow="Your events"
-            title="Every event, one home each"
-            desc="Open an event to find its checklist, maps, schedule, agendas, signage and badges in one place."
+            eyebrow="Event workspace"
+            title="Recent events"
           />
           <EventHubCards />
         </section>

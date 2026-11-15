@@ -1,45 +1,49 @@
-// "Your events" row on the Events page: every event as one card with its
-// progress, plus "Start a new event" at the end.
+// Event workspaces, using registered facts rather than saved kit drafts.
 
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Map, Plus } from "lucide-react";
+import { ArrowRight, CalendarDays, MapPin, Plus } from "lucide-react";
 
 import { listStartedEvents } from "@/lib/event-intake.functions";
-import { summarizeIntake, type IntakeRow } from "@/lib/event-intake";
-import { BUILT_IN_EVENTS, readinessProgress } from "@/lib/event-registry";
+import { BUILT_IN_EVENTS } from "@/lib/event-registry";
 import { SJB_EVENT, SJB_LOGOS } from "@/lib/san-juan-bowl";
+import { nextLockupSuite } from "@/lib/next-event-logos";
+import { Button } from "@/design-system/element";
+import ground from "@/assets/next-workspace/issued-cover-ground.jpg";
+import { NEXT_EVENT } from "@/lib/next-event";
+import { SF_VENUE } from "@/lib/next-sf-event";
 
-type Card = { id: string; name: string; line: string; ready: number; total: number };
+type Card = { id: string; name: string; line: string; dates: string };
 
 const cardCls =
-  "group flex flex-col rounded-2xl border border-black/10 bg-white p-5 transition hover:border-[#003FC7] hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.3)]";
+  "group flex min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-card text-card-foreground transition hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 export function EventHubCards() {
   const list = useServerFn(listStartedEvents);
   const started = useQuery({ queryKey: ["started-events"], queryFn: () => list(), retry: false });
+  const eventDates: Record<string, string> = {
+    [SJB_EVENT.id]: SJB_EVENT.kickoffUtc,
+    london: NEXT_EVENT.startDate,
+    "san-francisco": SF_VENUE.startDate,
+  };
 
   const cards: Card[] = [
-    ...BUILT_IN_EVENTS.map((e) => {
-      const p = readinessProgress(e.readiness ?? []);
-      return { id: e.id, name: e.name, line: [e.venue, e.dates].join(" · "), ...p };
+    ...[...BUILT_IN_EVENTS].sort((a, b) => (eventDates[b.id] ?? "").localeCompare(eventDates[a.id] ?? "")).map((e) => {
+      return { id: e.id, name: e.name, line: [e.venue, e.city].filter(Boolean).join(" · "), dates: e.dates };
     }),
     ...(started.data?.events ?? []).map((e) => {
-      const rows = (started.data?.intake ?? []).filter((r) => r.event_id === e.event_id) as IntakeRow[];
-      const s = summarizeIntake(rows);
       return {
         id: e.event_id,
         name: e.name,
-        line: [e.venue, e.city, e.dates_label].filter(Boolean).join(" · "),
-        ready: s.received,
-        total: s.total,
+        line: [e.venue, e.city].filter(Boolean).join(" · "),
+        dates: e.dates_label ?? "",
       };
     }),
   ];
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {cards.map((c) => (
         <Link
           key={c.id}
@@ -50,36 +54,28 @@ export function EventHubCards() {
               : { to: "/events/$eventId" as const, params: { eventId: c.id } })}
           className={cardCls}
         >
-          {c.id === SJB_EVENT.id ? (
-            <img src={SJB_LOGOS[0].svg} alt={`${SJB_EVENT.shortName} official logo`} className="h-24 w-24 object-contain" />
-          ) : <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#03002C]/10 text-[#03002C] dark:bg-card"><Map size={16} /></span>}
-          <div className="mt-4 text-lg font-semibold text-[#03002C]">{c.name}</div>
-          <p className="mt-1 flex-1 text-sm text-[#03002C]/70">{c.line}</p>
-          {c.id === SJB_EVENT.id && <p className="mt-2 text-xs text-muted-foreground">Complete brand kit · Brand guide · Logo downloads</p>}
-          <div className="mt-4">
-            <div className="h-1.5 overflow-hidden rounded-full bg-[#03002C]/10 dark:bg-card">
-              <div className="h-full bg-primary" style={{ width: `${c.total ? (c.ready / c.total) * 100 : 0}%` }} />
-            </div>
-            <div className="mt-2 flex items-center justify-between text-[11px] text-[#03002C]/65">
-              <span>
-                {c.ready} of {c.total} ready
-              </span>
-              <span className="inline-flex items-center gap-1 font-medium text-[#003FC7]">
-                Open <ArrowRight size={12} />
-              </span>
+          <div className="relative flex aspect-[16/7] items-center justify-center overflow-hidden border-b border-border bg-muted p-6">
+            {c.id === "london" || c.id === "san-francisco" ? <>
+              <img src={ground} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              <img src={nextLockupSuite("transperfect")?.wideWhite?.url} alt="TransPerfect NEXT" className="relative w-full max-w-64 object-contain" />
+            </> : c.id === SJB_EVENT.id ? (
+              <img src={SJB_LOGOS[0].svg} alt={`${SJB_EVENT.shortName} official logo`} className="h-full w-full object-contain" />
+            ) : <CalendarDays className="h-12 w-12 text-muted-foreground" />}
+          </div>
+          <div className="flex flex-1 flex-col gap-3 p-5">
+            <h3 className="text-lg font-semibold leading-snug">{c.name}</h3>
+            <p className="flex items-start gap-2 text-sm text-muted-foreground"><MapPin size={15} className="mt-0.5 shrink-0" />{c.line || "Venue to be confirmed"}</p>
+            <p className="flex items-center gap-2 text-sm text-muted-foreground"><CalendarDays size={15} className="shrink-0" />{c.dates || "Dates to be confirmed"}</p>
+            <div className="mt-auto flex items-center justify-between border-t border-border pt-4">
+              <span className="text-xs text-muted-foreground">Event workspace</span>
+              <span className="inline-flex items-center gap-2 text-sm font-medium text-primary">Open event <ArrowRight size={16} /></span>
             </div>
           </div>
         </Link>
       ))}
-      <Link to="/events/next/start" className={`${cardCls} border-dashed border-[#03002C]/25`}>
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-[#003FC7]">
-          <Plus size={16} />
-        </span>
-        <div className="mt-4 text-lg font-semibold text-[#03002C]">Start a new event</div>
-        <p className="mt-1 flex-1 text-sm text-[#03002C]/70">
-          Sets up the checklist, an empty map set and a web search for the venue.
-        </p>
-      </Link>
+      <div className="flex items-center sm:col-span-2 lg:col-span-3">
+        <Button asChild variant="outline"><Link to="/events/next/start"><Plus size={16} />Start a new event</Link></Button>
+      </div>
     </div>
   );
 }
