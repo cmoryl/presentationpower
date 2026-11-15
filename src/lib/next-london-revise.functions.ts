@@ -66,17 +66,23 @@ function toRevision(row: Row): LondonRevision {
   };
 }
 
-/** Full revision history, newest first. */
+/** Bounded snapshot pages, newest first, without RPC object expansion. */
 export const listLondonRevisions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
+  .validator((input: unknown) => z.object({ beforeRev: z.number().int().positive().optional() }).parse(input ?? {}))
+  .handler(async ({ data: input, context }) => {
+    let query = context.supabase
       .from(TABLE)
       .select(COLUMNS)
-      .order("rev", { ascending: false })
-      .limit(200);
+      .order("rev", { ascending: false });
+    if (input.beforeRev !== undefined) query = query.lt("rev", input.beforeRev);
+    const { data, error } = await query.limit(10);
     if (error) throw new Error(`Could not read the revision history: ${error.message}`);
-    return { revisions: (data ?? []).map((r) => toRevision(r as Row)) };
+    const revisions = (data ?? []).map((r) => toRevision(r as Row));
+    return {
+      revisionsJson: JSON.stringify(revisions),
+      nextBeforeRev: revisions.length === 10 ? revisions.at(-1)?.rev ?? null : null,
+    };
   });
 
 /**

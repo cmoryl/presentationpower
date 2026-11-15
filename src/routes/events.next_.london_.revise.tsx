@@ -79,6 +79,7 @@ import {
   type LondonRevision,
 } from "@/lib/next-london-revise";
 import { listLondonRevisions, publishLondonRevision } from "@/lib/next-london-revise.functions";
+import { loadLondonRevisionHistory } from "@/lib/next-london-revision-history";
 import { announceLondonRevision } from "@/lib/next-london-revision-live";
 
 /** Millimetres as inches — signage specs read in both units. */
@@ -350,8 +351,8 @@ function LondonRevisePage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetchRevisions({});
-      setRevisions(res.revisions);
+      const history = await loadLondonRevisionHistory(fetchRevisions);
+      setRevisions(history);
       setHistoryError(null);
     } catch (err) {
       setHistoryError(err instanceof Error ? err.message : "Could not load the revision history.");

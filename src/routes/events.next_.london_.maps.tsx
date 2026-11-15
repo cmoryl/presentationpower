@@ -75,6 +75,7 @@ import { LondonBespokePanel } from "@/components/events/LondonBespokePanel";
 import { bespokeAreas, bespokeUnitsOnFloor } from "@/lib/next-london-bespoke";
 import { effectiveLondonPanels } from "@/lib/next-london-revise";
 import { listLondonRevisions } from "@/lib/next-london-revise.functions";
+import { readLondonRevisionPage } from "@/lib/next-london-revision-history";
 import {
   LONDON_PANELS,
   LONDON_VENUE,
@@ -256,10 +257,10 @@ function LondonMapsPage() {
   useEffect(() => {
     if (!userId) return;
     let live = true;
-    fetchRevisions({})
+    fetchRevisions({ data: {} })
       .then((res) => {
         if (!live) return;
-        const inForce = effectiveLondonPanels(res.revisions);
+        const inForce = effectiveLondonPanels(readLondonRevisionPage(res));
         if (inForce.length) setPanels(inForce);
       })
       .catch(() => {
