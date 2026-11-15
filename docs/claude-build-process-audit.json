@@ -13,7 +13,8 @@
       "Templates label and legacy project-name migration"
     ],
     "implementation_status": "Shared source registry/render-only engine now supplies module controls with executable when(d), vk/vk2, 17 SUBS, asymmetric row tracks and all module variations. Existing source editor uses shared markup; no parallel app/store. Final cross-size families/signature/content-rules wrappers and exact style parity remain incomplete.",
-    "verification_gate": "Inspect all source definitions in filename load order; import baked data/reader. Source signature without WARNING and 66 suites fails=0 remain unverified. The eight unrelated pre-existing failures are tracked separately, not an Element port gate, and remain unresolved/not waived."
+    "verification_gate": "Inspect all source definitions in filename load order; import baked data/reader. Source signature without WARNING and 66 suites fails=0 remain unverified. The eight unrelated pre-existing failures are tracked separately, not an Element port gate, and remain unresolved/not waived.",
+    "styles_and_tests_package": "Announced by user; not yet present in either upload location on 2026-11-15. canvas.css is the styling authority, not recovered bundle CSS; inspect v216/v218/v219/v221/multiuser/spxl/navtest/mxtest before integration."
   },
   "findings": [
     {
@@ -99,7 +100,7 @@
     "role_testing": "Pure tests; no full live all-role audit"
   },
   "remaining_external_blockers": [
-    "Source package omits canvas.css, test.html and 66 regression suites; exact v221 style/release verification requires them",
+    "Pending attachment of announced element-v221-styles-and-tests.zip; authoritative canvas.css/chrome.css, harness and 66 suites cannot yet be inspected or run",
     "Office and print-vendor production verification"
   ],
   "remaining_implementation": [
@@ -136,5 +137,11 @@
       "Office/press certification not performed"
     ],
     "preservation": "Existing saved assets, event photos, kits, production gates, roles and native editors unchanged"
+  },
+  "export_state": {
+    "previous_verified_state": "Verified one saved/reopened quote through real PDF and flat PowerPoint proof downloads. Missing artwork, unported geometry, missing images and page overflow block source proofs. Native deck, outlined press master and production export paths remain unchanged; Office openability and exact source export parity unverified.",
+    "current": "Verified one saved/reopened quote through real PDF and flat PowerPoint proof downloads. All 698 referenced library images are now hosted and resolved, removing the library-artwork availability blocker; per-material image loading and page overflow checks still block unsafe source proofs. Final cross-size geometry/style parity remains unfinished. Native deck, outlined press master and production export paths remain unchanged; Office openability and exact source export parity unverified.",
+    "office_openability": "unverified",
+    "exact_export_parity": "unverified"
   }
 }

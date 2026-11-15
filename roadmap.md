@@ -1,5 +1,7 @@
 # Roadmap
 ## Claude full Element update
+- [x] Restore Exports verification history and current state separately from artwork; library-artwork availability resolved, Office/exact export parity still unverified.
+- [ ] Apply authoritative canvas.css/chrome.css and inspect/run the 66 source suites, starting with v216/v218/v219/v221/multiuser/spxl/navtest/mxtest — blocked on the announced element-v221-styles-and-tests.zip attachment, absent from both upload locations.
 - [x] Corrected the migration ledger: the previous ZIP was bundled output; ELEMENT v221's ordered 151-file source and 698-image packages are the authoritative next inputs, not absent artwork.
 - [x] Packages received and safely inspected: 151 ordered source files, 299 baked pieces/27 templates, and 698 original image mappings; shared field/module render port and image hosting completed; final cross-size/style parity remains below.
 - [ ] Priority 1 — port the shared field renderer, conditional when(d) rules, vk/vk2 variants, SUBS/flexible rows, effective source renderers and baked reader into the existing editor. Shared source fields/when/vk/vk2, 17 SUBS and all module variations integrated/tested; final cross-size family/signature/content wrappers and exact style verification unfinished.
@@ -7,17 +9,17 @@
 - [x] Priority 3 — Templates label uses shared metadata; implemented exact current/legacy project-name lookup without rewriting saved names, preserving first live match and spectrum/nav-spx/order 4. Both templates/spectrum spoken aliases resolve to the same destination; 18 focused tests passed. No source project resolver/creation or goTo exists yet; connect the tested adapter when those capabilities are ported, not a rename blocker.
 - [x] Audited source process and aligned Build → modules/templates → saved work, role-aware navigation, selected variant configuration, material naming, undo/redo, recursive checks and proof delivery; authenticated reopen/phone/review-door verified. Full audit in docs/claude-build-process-audit.json; source project/review/version/agent parity remains explicitly incomplete.
 - [x] Inventoried and browser-walked all 38 supplied modules plus page breaks; integrated source controls, flexible rows, 14 sizes and source-template save/reopen/proof downloads in the live editor. Event photos, kits and native/original records preserved.
-- [ ] Complete faithful module geometry and native slide/social replacement; six source families remain explicitly unported, other adaptations are not certified as exact. Await authoritative source and image packages; image bytes exist upstream.
+- [ ] Complete faithful cross-size geometry and native slide/social replacement; all module definitions are ported, final wrappers/style parity are not certified as exact. Source and image packages received; authoritative styling/tests await the third attachment.
 - [x] Established the linked Claude build as the forward reference; updated live module/print/social headers, cross-surface navigation, print/slide editor navigation and horizontal inspector controls.
 - [ ] Complete exact source editor, module-variant and project/material parity; current shared-workspace adoption is a first pass, not the whole Claude build.
 - [x] Inspect the supplied archive safely and record detected capabilities and missing dependencies.
 - [x] Approved plan; extracted 299 source-backed drafts and imported 128 supplied photographs/sprites into the existing admin curator; native copy/open/reopen verified, temporary test draft removed.
 - [ ] Finish source module/variant geometry, project/material/version/review UX and agent-tool integration; current draft mapping is partial, not full build parity.
-- [ ] Connect source artwork: 274 drafts reference 698 hash-backed images existing in the artifact asset store; awaiting the announced original-image package, not replacement imagery.
+- [x] Connect 698 referenced source images with original filename/hash aliases preserved; static catalogue audit badges still need recalculation.
 - [x] Verified source template editing/save/reopen, nested rows, module choices, social/slides entry points, PDF/flat-PPTX proof downloads and phone fit; eight source tests pass and build OK.
-- [ ] Verify full native/review/agent/press/Office parity; source/image attachment and exact renderer work remain incomplete. Eight unrelated pre-existing failures are tracked separately, not an Element port gate.
+- [ ] Verify full native/review/agent/press/Office parity; exact renderer and verification work remain incomplete. Eight unrelated pre-existing failures are tracked separately, not an Element port gate.
 - [x] v221 milestone verified: 24 focused tests passed, every module variation renders without mutating source, existing owned material conditional fields/save/reopen checked with zero page errors. No publishing.
-- [ ] Complete final cross-size source wrappers, catalogue bake-reader adoption and static audit-badge refresh; source package omits canvas.css/test.html/66 suites, so exact styling/release certification remains unverified.
+- [ ] Complete final cross-size source wrappers, catalogue bake-reader adoption and static audit-badge refresh; the third styles/tests package is announced but not yet attached, so exact styling/release certification remains unverified.
 ## Separate pre-existing defects
 - [ ] Diagnose and resolve the eight Bowl, London-map export and light-mode surface guard failures listed by full test name in docs/claude-build-process-audit.json. None waived; tracked outside the Element port. No event facts, export contracts or artwork should be changed merely to satisfy stale assertions.
 ## Bowl brand-kit submenu

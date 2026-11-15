@@ -66,15 +66,16 @@
       "capability": "Uploaded artwork",
       "source": "378 client-logo files, 121 library images and seven sprite files",
       "outcome": "Preserve original files and private client-asset handling",
-      "status": "partial",
-      "next_action": "698 original image files and assets.json received; hash-preserving hosting in progress. Existing private logos/photos remain unchanged."
+      "status": "hosted_and_mapped",
+      "next_action": "128 photographs/sprites imported unchanged; all 698 referenced library images hosted unchanged with 641 unique hashes and 57 byte-identical filename aliases preserved. Existing private logos/photos remain unchanged; verify representative template pictures and downloads."
     },
     {
       "capability": "Exports",
       "source": "PNG/JPG, editable PowerPoint, SVG, browser PDF and press-preparation controls",
       "outcome": "Preserve existing QA, outlined print-master and colour-space contracts",
       "status": "partial",
-      "next_action": "Existing outlined press/native-deck safeguards retained. Source downloads remain digital/flat proofs; verify source rendering, images and overflow before delivery."
+      "next_action": "Verified one saved/reopened quote through real PDF and flat PowerPoint proof downloads. All 698 referenced library images are now hosted and resolved, removing the library-artwork availability blocker; per-material image loading and page overflow checks still block unsafe source proofs. Final cross-size geometry/style parity remains unfinished. Native deck, outlined press master and production export paths remain unchanged; Office openability and exact source export parity unverified.",
+      "previous_verified_state": "Verified one saved/reopened quote through real PDF and flat PowerPoint proof downloads. Missing artwork, unported geometry, missing images and page overflow block source proofs. Native deck, outlined press master and production export paths remain unchanged; Office openability and exact source export parity unverified."
     },
     {
       "capability": "Agent and providers",
@@ -137,5 +138,14 @@
     "count": 8,
     "status": "unresolved; not waived",
     "scope": "Bowl, London map exports and light-mode surface guard; tracked separately and not an Element port gate"
+  },
+  "styles_and_tests_package": {
+    "source": "element-v221-styles-and-tests.zip",
+    "status": "pending_attachment",
+    "checked_locations": [
+      "/mnt/user-uploads/",
+      "/tmp/user-uploads/"
+    ],
+    "next_action": "Use supplied canvas.css as module styling authority, scope chrome.css to applicable editor chrome, inspect the named priority suites and run all 66 supplied suites after safe archive inspection. The announced third ZIP is not present in either upload location on 2026-11-15."
   }
 }
