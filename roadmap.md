@@ -1,4 +1,7 @@
 # Roadmap
+## Ordered single-editor cutover (review-gated)
+- [ ] Step 1 only: convert existing Element materials alongside permanently intact originals; report clean/partial/failed coverage and exact unsupported constructs. No routing/editor changes.
+- [ ] Steps 2–8: blocked pending Step 1 review; full ordered sequence recorded in migration ledger.
 ## Claude full Element update
 - [x] Restore Exports verification history and current state separately from artwork; library-artwork availability resolved, Office/exact export parity still unverified.
 - [x] Received styles/tests package; applied scoped authoritative canvas, preserved chrome as reference and all 66 specifications. Exercised all 66 reference suites: aggregate 64 clean after six fixture/dependency reruns; one environment-blocked suite and one reference assertion failure; 24 earlier React tests pass. Detailed limits in docs/claude-v221-styles-audit.json.

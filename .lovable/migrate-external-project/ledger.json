@@ -143,5 +143,77 @@
     "source": "element-v221-styles-and-tests.zip",
     "status": "canvas_integrated_reference_suites_exercised_partial_verification",
     "next_action": "Authoritative scoped canvas installed; chrome retained reference-only. All 66 reference suites exercised: 58 clean, 8 incomplete/failing (see docs/claude-v221-styles-audit.json). 24 React port tests pass; final cross-size/source-project parity and release gate remain unverified."
+  },
+  "single_editor_cutover": {
+    "requested_at": "2026-11-15T21:57:00Z",
+    "target": "One v221 editor for Element materials; no parallel legacy editor after coverage-gated retirement.",
+    "active_step": 1,
+    "guardrails": [
+      "Keep original stored content permanently intact; write converted layout alongside it.",
+      "Step 1 does not alter workingLayout routing or legacy Studio editor.",
+      "Exclude Bowl, NEXT, events, brand kits and social calendars at every step.",
+      "Never loosen signCanon, sameApproval, signedAsStored or writeSignoff.",
+      "Port relevant assertions from 66 source suites into application tests; reference results are not React certification.",
+      "Stop after Step 1 coverage report for review; steps 2\u20138 are not authorized."
+    ],
+    "steps": [
+      {
+        "step": 1,
+        "name": "Non-destructive stored-content converter and exact clean/partial/failed coverage report",
+        "status": "in_progress"
+      },
+      {
+        "step": 2,
+        "name": "Coverage-gated retirement of legacy editor; route all materials to SourceBuildEditor, retain originals",
+        "status": "awaiting_review"
+      },
+      {
+        "step": 3,
+        "name": "Hosted image picker over 698 images using existing hashes and elib references",
+        "status": "not_started"
+      },
+      {
+        "step": 4,
+        "name": "Cross-size storyFacts, budget/six families, sequences, five signature moves/division signature and content rules",
+        "source": [
+          "99n-facts.js",
+          "99o-families.js",
+          "99p-sequences.js",
+          "99u-signature.js",
+          "99x-content-rules.js"
+        ],
+        "status": "not_started"
+      },
+      {
+        "step": 5,
+        "name": "Substitute baked reader into catalogue: 299 pieces and 27 templates",
+        "status": "not_started"
+      },
+      {
+        "step": 6,
+        "name": "Projects/material board, stages, versions/activity and unchanged sign-off logic",
+        "source": [
+          "97-signoff.js",
+          "99zy8-example-stages.js"
+        ],
+        "status": "not_started"
+      },
+      {
+        "step": 7,
+        "name": "Agent area/live feed/pictures/edit and field-definition setOption",
+        "source": [
+          "99zy3-agent-area.js",
+          "99zy4-agent-live.js",
+          "99zy6-agent-pictures.js",
+          "99zz1-agent-edit.js"
+        ],
+        "status": "not_started"
+      },
+      {
+        "step": 8,
+        "name": "Apply chrome.css scoped only to Element build navigation, agent drawer and library",
+        "status": "not_started"
+      }
+    ]
   }
 }

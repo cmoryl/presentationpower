@@ -1,0 +1,873 @@
+{
+  "step": 1,
+  "verified_at": "2026-11-15T22:09:35.195Z",
+  "scope": "All existing public.print_assets Element materials; no decks, event/kit/calendar tables or registries changed.",
+  "counts": {
+    "clean": 15,
+    "partial": 20,
+    "failed": 1,
+    "excluded": 0
+  },
+  "total": 36,
+  "existing_v221": 3,
+  "definitions": {
+    "clean": "All recognized native content mapped without recorded gaps, or existing v221 working stack preserved; NOT exact visual, export or approval certification.",
+    "partial": "A module stack exists but explicit content/geometry/format/settings constructs remain unsupported.",
+    "failed": "No safe module stack generated; original retained and exact reason recorded."
+  },
+  "verification": {
+    "all_originals_unchanged": true,
+    "stored_ts_parity": true,
+    "render_exceptions": [
+      "source-0: render exception"
+    ],
+    "routing_changed": false,
+    "legacy_editor_changed": false,
+    "excluded_areas_changed": false
+  },
+  "materials": [
+    {
+      "id": "00fcd693-1d4b-46e1-930e-079c2823341d",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: hero-photo-fade"
+        },
+        {
+          "path": "content.modules[0].heightPct",
+          "construct": "native module heightPct not preserved by mapping"
+        },
+        {
+          "path": "content.modules[1].variantId",
+          "construct": "native geometry variant: contact-cta-band"
+        },
+        {
+          "path": "context.pageSize",
+          "construct": "unsupported native format: Custom"
+        }
+      ],
+      "module_count": 2,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "026878ce-c98e-4f94-a1e6-440663258b09",
+      "kind": "ebrochure",
+      "status": "clean",
+      "basis": "existing_v221",
+      "issues": [],
+      "module_count": 1,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "03a0b37f-68c0-4d11-9bad-c91de7d84599",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: narrative-numbered-arc"
+        },
+        {
+          "path": "content.contentFit",
+          "construct": "unmapped native construct"
+        },
+        {
+          "path": "content.heroMedia.imageUrl",
+          "construct": "stored expiring signed URL requires durable private-image resolution"
+        },
+        {
+          "path": "context.density",
+          "construct": "native editor/layout setting not mapped"
+        },
+        {
+          "path": "context.editorMode",
+          "construct": "native editor/layout setting not mapped"
+        }
+      ],
+      "module_count": 6,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "083220f3-a0ce-4bf3-ae34-05122f593ce8",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "native",
+      "issues": [],
+      "module_count": 6,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "1691f4d3-66d9-41f8-af6b-471d75659675",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: hero-type-stack"
+        },
+        {
+          "path": "content.modules[1].variantId",
+          "construct": "native geometry variant: table-spec-rows"
+        },
+        {
+          "path": "content.modules[1].rows",
+          "construct": "native module rows not preserved by mapping"
+        },
+        {
+          "path": "content.modules[1]",
+          "construct": "table converted to labelled rows, not equivalent table semantics"
+        },
+        {
+          "path": "context.pageSize",
+          "construct": "unsupported native format: Custom"
+        }
+      ],
+      "module_count": 2,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "1a926527-f229-4e63-90ef-d575a377eae9",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "existing_v221",
+      "issues": [],
+      "module_count": 7,
+      "original_unchanged": true,
+      "render_exceptions": [
+        "source-0: render exception"
+      ]
+    },
+    {
+      "id": "1cb26316-5e78-4c4b-8f9e-89ed07e6b660",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: hero-photo-fade"
+        },
+        {
+          "path": "content.modules[0].heightPct",
+          "construct": "native module heightPct not preserved by mapping"
+        },
+        {
+          "path": "content.modules[1].variantId",
+          "construct": "native geometry variant: contact-cta-band"
+        },
+        {
+          "path": "context.pageSize",
+          "construct": "unsupported native format: Custom"
+        }
+      ],
+      "module_count": 3,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "1ffb0e54-8303-40c9-9044-18b48667fcdc",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: hero-photo-band"
+        },
+        {
+          "path": "content.modules[1].variantId",
+          "construct": "native geometry variant: narrative-tri-card"
+        },
+        {
+          "path": "content.modules[2].variantId",
+          "construct": "native geometry variant: stat-callout-row-portrait"
+        },
+        {
+          "path": "content.modules[3].variantId",
+          "construct": "native geometry variant: contact-cta-band"
+        }
+      ],
+      "module_count": 5,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "2d6c917d-b32a-4867-a129-286cdd17b366",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "native",
+      "issues": [],
+      "module_count": 6,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "36b8e661-c645-4c20-b6ba-035c12838052",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: hero-type-stack"
+        },
+        {
+          "path": "content.modules[1].variantId",
+          "construct": "native geometry variant: table-spec-rows"
+        },
+        {
+          "path": "content.modules[1].rows",
+          "construct": "native module rows not preserved by mapping"
+        },
+        {
+          "path": "content.modules[1]",
+          "construct": "table converted to labelled rows, not equivalent table semantics"
+        },
+        {
+          "path": "context.pageSize",
+          "construct": "unsupported native format: Custom"
+        }
+      ],
+      "module_count": 2,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "3ad0646e-3d0c-4ebd-9a9b-fd5654d778d9",
+      "kind": "spotlight",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.heroMedia.blendMode",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.heightPct",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.overlayOpacity",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.scrim",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.washStrength",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "context.contentFit",
+          "construct": "native editor/layout setting not mapped"
+        },
+        {
+          "path": "context.cta",
+          "construct": "native editor/layout setting not mapped"
+        },
+        {
+          "path": "context.density",
+          "construct": "native editor/layout setting not mapped"
+        }
+      ],
+      "module_count": 5,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "401df075-9a62-46e7-9333-628077009f93",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: hero-photo-fade"
+        },
+        {
+          "path": "content.modules[0].heightPct",
+          "construct": "native module heightPct not preserved by mapping"
+        },
+        {
+          "path": "content.modules[1].variantId",
+          "construct": "native geometry variant: contact-cta-band"
+        },
+        {
+          "path": "context.pageSize",
+          "construct": "unsupported native format: Custom"
+        }
+      ],
+      "module_count": 2,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "483cf124-842b-4891-aa5d-a596b029dc50",
+      "kind": "case-study",
+      "status": "failed",
+      "basis": "original_geometry",
+      "issues": [
+        {
+          "path": "content.original",
+          "construct": "absolute-position text/runs, vector shapes and image geometry have no module-stack mapping"
+        }
+      ],
+      "module_count": 0,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "4e2aa3bc-113a-4eec-897d-6bbcda1aa7d9",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "native",
+      "issues": [],
+      "module_count": 1,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "5829f620-1f9c-4d28-8920-fb104817db6b",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "native",
+      "issues": [],
+      "module_count": 6,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "5f16ea05-8ccd-45b0-a1e0-5e248ae80f21",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: hero-photo-band"
+        },
+        {
+          "path": "content.modules[0].meta",
+          "construct": "native module meta not preserved by mapping"
+        }
+      ],
+      "module_count": 2,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "680889dc-f44b-4667-9833-6a7ff7007dc2",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.heroTitleType",
+          "construct": "unmapped native construct"
+        },
+        {
+          "path": "content.heroMedia.adjust",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.aspect",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.focalY",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.heightPct",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "context.editorMode",
+          "construct": "native editor/layout setting not mapped"
+        }
+      ],
+      "module_count": 6,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "69476814-9bd2-4956-a49f-ae41e2b97265",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "native",
+      "issues": [],
+      "module_count": 1,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "69492c35-0a66-4ebe-8341-357bde35d204",
+      "kind": "ebrochure",
+      "status": "clean",
+      "basis": "existing_v221",
+      "issues": [],
+      "module_count": 1,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "7ddb60fb-a352-4675-8ff1-718464b1d052",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: expertise-credential-pills"
+        },
+        {
+          "path": "content.modules[1].variantId",
+          "construct": "native geometry variant: quote-inline-compact"
+        },
+        {
+          "path": "content.moduleSlots",
+          "construct": "unmapped native construct"
+        },
+        {
+          "path": "content.heroMedia.adjust",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.aspect",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.autoScrim",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.autoScrimThreshold",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.blendMode",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.heightPct",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.overlayOpacity",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.scrim",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.scrimOpacity",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.variants",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.washStrength",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.imageUrl",
+          "construct": "stored expiring signed URL requires durable private-image resolution"
+        },
+        {
+          "path": "context.cta",
+          "construct": "native editor/layout setting not mapped"
+        }
+      ],
+      "module_count": 5,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "92ca61df-0664-4c88-85a4-d36f406a27c0",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "native",
+      "issues": [],
+      "module_count": 6,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "955ee94e-e9dc-4d0a-86b2-09259c690533",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "native",
+      "issues": [],
+      "module_count": 6,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "a94ec3b6-f1c3-48d8-9884-25080d355915",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: stat-callout-row-portrait"
+        },
+        {
+          "path": "content.heroMedia.aspect",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.autoScrim",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.autoScrimThreshold",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.blendMode",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.heightPct",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.overlayOpacity",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.scrim",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.scrimOpacity",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.washStrength",
+          "construct": "native photo crop/treatment not mapped"
+        }
+      ],
+      "module_count": 7,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "af712011-0f81-4566-8122-1e11edb93c2f",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "native",
+      "issues": [],
+      "module_count": 6,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "c802ab47-cdc8-427f-8c1b-9b024bfb6933",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "native",
+      "issues": [],
+      "module_count": 6,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "c979568b-3d7c-45a8-8018-66394ae18f24",
+      "kind": "ebrochure",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.contentFit",
+          "construct": "unmapped native construct"
+        },
+        {
+          "path": "content.moduleSlots",
+          "construct": "unmapped native construct"
+        },
+        {
+          "path": "content.heroMedia.heightPct",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.imageUrl",
+          "construct": "stored expiring signed URL requires durable private-image resolution"
+        },
+        {
+          "path": "context.density",
+          "construct": "native editor/layout setting not mapped"
+        },
+        {
+          "path": "context.editorMode",
+          "construct": "native editor/layout setting not mapped"
+        }
+      ],
+      "module_count": 4,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "c9d667fc-b981-46a7-9d13-31bb4a2a6883",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: hero-type-stack"
+        },
+        {
+          "path": "content.modules[1].variantId",
+          "construct": "native geometry variant: table-spec-rows"
+        },
+        {
+          "path": "content.modules[1].rows",
+          "construct": "native module rows not preserved by mapping"
+        },
+        {
+          "path": "content.modules[1]",
+          "construct": "table converted to labelled rows, not equivalent table semantics"
+        },
+        {
+          "path": "context.pageSize",
+          "construct": "unsupported native format: Custom"
+        }
+      ],
+      "module_count": 3,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "d9b739d4-6c76-4837-a154-8fd8e9492494",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "native",
+      "issues": [],
+      "module_count": 6,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "e4a87368-d34f-44cf-b825-ddc8cd95838d",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "native",
+      "issues": [],
+      "module_count": 1,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "e6bfad27-aac9-459e-8c55-9a84d4f5bf68",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: hero-photo-fade"
+        },
+        {
+          "path": "content.modules[0].heightPct",
+          "construct": "native module heightPct not preserved by mapping"
+        },
+        {
+          "path": "content.modules[1].variantId",
+          "construct": "native geometry variant: contact-cta-band"
+        },
+        {
+          "path": "context.pageSize",
+          "construct": "unsupported native format: Custom"
+        }
+      ],
+      "module_count": 2,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "e9783d74-a3ec-4a8b-9481-f3234e81fd61",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: hero-type-stack"
+        },
+        {
+          "path": "content.modules[1].variantId",
+          "construct": "native geometry variant: table-spec-rows"
+        },
+        {
+          "path": "content.modules[1].rows",
+          "construct": "native module rows not preserved by mapping"
+        },
+        {
+          "path": "content.modules[1]",
+          "construct": "table converted to labelled rows, not equivalent table semantics"
+        },
+        {
+          "path": "context.pageSize",
+          "construct": "unsupported native format: Custom"
+        }
+      ],
+      "module_count": 2,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "ea9dea23-8638-4848-9c9f-c8e8bcd0f9ea",
+      "kind": "ebrochure",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: narrative-tri-card"
+        },
+        {
+          "path": "content.contentFit",
+          "construct": "unmapped native construct"
+        },
+        {
+          "path": "content.heroMedia.imageUrl",
+          "construct": "stored expiring signed URL requires durable private-image resolution"
+        },
+        {
+          "path": "context.density",
+          "construct": "native editor/layout setting not mapped"
+        },
+        {
+          "path": "context.editorMode",
+          "construct": "native editor/layout setting not mapped"
+        }
+      ],
+      "module_count": 7,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "ec855752-fea4-422e-ab7f-3b4d0c69f1ac",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: stat-callout-row-portrait"
+        },
+        {
+          "path": "content.modules[1].variantId",
+          "construct": "native geometry variant: expertise-credential-pills"
+        }
+      ],
+      "module_count": 3,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "f3382ecf-aa97-4a14-b0ff-6b6799e9f005",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.heroMedia.aspect",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.autoScrim",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.autoScrimThreshold",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.blendMode",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.heightPct",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.overlayOpacity",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.scrim",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.scrimOpacity",
+          "construct": "native photo crop/treatment not mapped"
+        },
+        {
+          "path": "content.heroMedia.washStrength",
+          "construct": "native photo crop/treatment not mapped"
+        }
+      ],
+      "module_count": 6,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "f4fe212d-38b8-4ffe-bc6e-13e517ef1a5d",
+      "kind": "case-study",
+      "status": "partial",
+      "basis": "native",
+      "issues": [
+        {
+          "path": "content.modules[0].variantId",
+          "construct": "native geometry variant: hero-type-stack"
+        },
+        {
+          "path": "content.modules[1].variantId",
+          "construct": "native geometry variant: table-spec-rows"
+        },
+        {
+          "path": "content.modules[1].rows",
+          "construct": "native module rows not preserved by mapping"
+        },
+        {
+          "path": "content.modules[1]",
+          "construct": "table converted to labelled rows, not equivalent table semantics"
+        },
+        {
+          "path": "context.pageSize",
+          "construct": "unsupported native format: Custom"
+        }
+      ],
+      "module_count": 3,
+      "original_unchanged": true,
+      "render_exceptions": []
+    },
+    {
+      "id": "f7eba8ff-8df3-4779-b6ec-84307776be6a",
+      "kind": "case-study",
+      "status": "clean",
+      "basis": "native",
+      "issues": [],
+      "module_count": 6,
+      "original_unchanged": true,
+      "render_exceptions": []
+    }
+  ]
+}

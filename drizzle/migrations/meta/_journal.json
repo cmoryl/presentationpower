@@ -190,6 +190,20 @@
       "when": 1794583173401,
       "tag": "0026_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1794780349965,
+      "tag": "0027_element_v221_step1_recovery_and_conversion",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1794780422072,
+      "tag": "0028_element_v221_step1_converter",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,11 @@
+{
+  "hero": {"type":"hero","data":{"title":"$title","lead":"$summary","eyebrow":"$eyebrow","photo":"$imageUrl"}},
+  "stats": {"type":"stats","data":{"items":{"each":"items","map":{"value":{"join":["$value","$unit"],"separator":""},"caption":{"join":["$label","$caption"],"separator":" — "},"delta":"$delta","icon":"$icon"}}}},
+  "quote": {"type":"quote","data":{"quote":"$text","attribution":{"join":["$author","$role","$company"],"separator":" · "}}},
+  "narrative": {"type":"storyRows","data":{"items":{"each":"items","map":{"heading":"$heading","text":{"join":["$body",{"joinPath":"bullets","separator":"\n"}],"separator":"\n"},"icon":"$icon"}}}},
+  "expertise": {"type":"features","data":{"label":"$title","items":{"each":"items","map":{"text":"$label","icon":"$icon"}}}},
+  "feature-list": {"type":"capabilities","data":{"items":{"each":"items","map":{"title":"$verb","text":"$body","icon":"$icon"}}}},
+  "contact": {"type":"cta","data":{"title":"$title","sub":{"join":["$body","$name","$role","$email","$phone"],"separator":"\n"},"button":"$ctaLabel","link":"$url"}},
+  "table": {"type":"typeDesign","data":{"title":"$title","layout":"rows","items":{"each":"rows","map":{"heading":"$label","text":{"join":["$value","$caption"],"separator":"\n"}}}}},
+  "logo-grid": {"type":"logoWall","data":{"title":"$title","eyebrow":"$eyebrow","logos":{"each":"items","map":{"name":"$name","photo":"$url"}}}}
+}

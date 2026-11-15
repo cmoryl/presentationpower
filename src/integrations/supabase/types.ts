@@ -4625,6 +4625,8 @@ export type Database = {
           status: string
           title: string
           updated_at: string
+          v221_conversion: Json | null
+          v221_original_content: Json | null
           verified_at: string | null
           verified_by: string | null
         }
@@ -4648,6 +4650,8 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
+          v221_conversion?: Json | null
+          v221_original_content?: Json | null
           verified_at?: string | null
           verified_by?: string | null
         }
@@ -4671,6 +4675,8 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+          v221_conversion?: Json | null
+          v221_original_content?: Json | null
           verified_at?: string | null
           verified_by?: string | null
         }
@@ -6162,6 +6168,12 @@ export type Database = {
         }
         Returns: string
       }
+      v221_convert_native: {
+        Args: { c: Json; ctx: Json; kind: string; rules: Json }
+        Returns: Json
+      }
+      v221_map: { Args: { d: Json; r: Json }; Returns: Json }
+      v221_nonempty: { Args: { v: Json }; Returns: boolean }
     }
     Enums: {
       app_role:
