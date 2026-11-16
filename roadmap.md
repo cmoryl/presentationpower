@@ -1,6 +1,6 @@
 # Roadmap
 ## Portable brand-kit data export
-- [ ] Execute all six kit factories and every registered brand-guide factory; serialize unchanged document content to docs/brand-kit-export.json with absolute sibling image URLs, per-document counts and explicit resolution errors. No content changes or ELEMENT import.
+- [x] Execute all six kit factories and every registered brand-guide factory; serialize unchanged document content to docs/brand-kit-export.json with absolute sibling image URLs, per-document counts and explicit resolution errors. No content changes or ELEMENT import.
 ## Isolated first-party v221 application
 - [x] Adapter implemented: inspected actual source; isolated path documents, atomic deep updates and SQL-enforced project roles.
 - [x] Project/material/edit/save/reopen/version/reviewer sign-off verified with real injected team session and user-authorized simulated other-editor attribution on the test material only; approved hash persisted, two versions read back. No approval rule changed.
