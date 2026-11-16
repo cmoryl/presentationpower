@@ -15,7 +15,7 @@ def jpeg(b):
         else: out+=seg
         i+=2+L
     return bytes(out)
-DROP={b'tEXt',b'zTXt',b'iTXt',b'eXIf',b'caBX',b'tIME'}
+DROP={b'tEXt',b'zTXt',b'iTXt',b'eXIf',b'caBX',b'jumb',b'tIME'}
 def png(b):
     if b[:8]!=b'\x89PNG\r\n\x1a\n': return b
     out=bytearray(b[:8]); i=8
