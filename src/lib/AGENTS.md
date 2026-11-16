@@ -2,16 +2,11 @@
 
 - NEXT location masthead photos resolve city-specific private references for signed-in staff and the existing approved-and-marketing-cleared guide feed for visitors; shared pages retain issued artwork — why: human event headers must not expose uncleared attendees or mix cities.
 
-- Non-NEXT web references use the source-dated event-web-references catalogue and private event-photos storage; EventWebReferences signs short-lived viewing links and excludes photos from exports — why: public availability does not establish reuse rights or event/year identity.
-
 - NEXT opens with main event information, then a Locations chooser; shared specialist tools stay under Resources and venue editing is opt-in — why: the event hierarchy must precede production settings without changing access enforcement.
 
 - London revision history transfers bounded JSON snapshot pages; maps use only the newest snapshot — why: accumulated artwork exceeds the serializer's response limit when history is expanded in one request.
 
 - Generated map SVG downloads (including ZIP entries) and PDF/PNG inputs pass through `selfContainedSvg` before delivery; SVG logos are nested vector paths with unique IDs, raster images embedded, and missing assets block export — why: Illustrator cannot reliably resolve linked web logos and proofs must not silently lose them. Issued source files remain byte-for-byte unchanged.
-
-- Map previews reuse `PlanZoomFrame` for zoom, pan and an accessible enlarged dialog — why: venue and event pages should share the same inspection controls without altering exports.
-- San Francisco event map displays use `SF_ISSUED_MAPS` and `SfIssuedMaps` for the supplied SF_Maps3 set (floor 3, then floors 4+5); PDF/AI originals stay unchanged and prior editable drafts remain stored but not displayed — why: re-rendering the final designer artwork would change its labels, colours and composition. Hotel capacity data remains a separate reference.
 
 - QEII symbol cleanup applies only to the issued QEII floor IDs; imported venues retain every symbol path — why: restroom heads also resemble structural pillar dots.
 
@@ -36,8 +31,8 @@
 - Booth↔BoothHub pairing lives in `event_booths` (bundled `SF_BOOTH_FALLBACK` is offline-only); saved kiosks push PNG proofs to `booth_art`, served to BoothHub by `/api/public/booths/$event` — why: one list, and 3D always shows the latest saved art.
 - Designer-supplied NEXT division templates join the registry only via `src/lib/next-supplied-templates.ts` (live desk files via `DIVISION_LIVE_SIGNS` with a `preview`) — why: the assets listing, division tiles and counts all read `loadNextRegistry()`, so one entry shows everywhere.
 - Re-sized signs are their own layout id `<face>~<w>x<h>` (inches), resolved by `liveLayoutById` via `resizedSignLayout` (ground stretched via `native.bgBox`, pieces re-flowed via `LivePart.rx/ry/rs`); artwork files always come from the base id — why: saves, approvals and exports keep working per size without duplicating supplied files.
-- New venue spots with artwork are submitted from the event page (`VenueAssetSubmissions`) into `venue_sign_spots` (live file in private `venue-artwork` bucket, artboards read from the file, AI brief in `review`); artboard sizes never fill `w_in/h_in` — why: sizes come only from the site survey.
 - Outside-designer files follow one layout, naming rule and version in `src/lib/next-designer-pack.ts` (ZIP, guide PDF, vendor packs read it) — why: every hand-off surface must match.
 - Event floor maps are edited only at `/events/next/maps/$eventId`; other pages show them read-only with `EventMapView`, drawn by `src/lib/event-floor-plan.ts` — why: two map editors drifted apart.
 - Event floor room names break onto two lines when one line would fill over 60% of the room (its air-wall cut outline when it has one); saved names always win — why: rooms in shared halls must not print names wider than the room.
 - NeXus London '26 and the GlobalLink Hackathon London '26 are separate built-in events, each with its own supplied kit (`KIT_EVENT` maps kit → event); files are CDN copies listed in `src/lib/supplied-kits/*.json`, shown by the one data-driven `/events/kits/$kitId` page via `src/lib/supplied-event-kits.ts` — why: new supplied kits add a manifest, not a new page.
+- Event web-reference, map-preview, SF issued-map and venue-spot submission component rules live in `src/components/events/AGENTS.md`.
