@@ -46,7 +46,7 @@ describe('Bowl social page selection', () => {
     const projections = SJB_SOCIAL_STUDIO_DESIGNS.filter(d => d.name === 'Bowl projections');
     expect(projections.filter(d => d.collectionId === 'set2').map(d => d.id)).toEqual(['1350', '1440', '1920'].map(size => sjbProjection('night', size).id));
     expect(projections.filter(d => d.collectionId === 'set4').map(d => d.id)).toEqual(['1350', '1440', '1920'].map(size => sjbProjection('blue', size).id));
-    expect(projections.filter(d => d.collectionId === 'light').map(d => d.id)).toEqual(['DAHbGphpmdo', 'DAHaqTn7K_0', 'DAHaqTaPWRc']);
+    expect(projections.filter(d => d.collectionId === 'light').map(d => d.id)).toEqual(['DAHbGphpmdo', 'DAHbHAPFncM', 'DAHbHH46WSc']);
     expect(projections.filter(d => d.height === 1440)).toHaveLength(3);
     expect(projections.some(d => d.collectionId === 'dark')).toBe(false);
   });
