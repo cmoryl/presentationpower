@@ -45,8 +45,8 @@ export const SJB_RECENT_UPDATES: SjbRecentUpdate[] = [
     link: { to: "/events/san-juan-bowl/tshirts" },
   },
   {
-    title: "Attendee badges · live Canva files",
-    detail: "Five badge looks, each with its own Canva file and Open in Canva link.",
+    title: "Attendee badge · working final",
+    detail: "One double-sided design from Canva, with PNG and JPG downloads.",
     date: "Nov 13, 2026",
     image: badgeFront.url,
     link: { to: "/events/san-juan-bowl/badges" },

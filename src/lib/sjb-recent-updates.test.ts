@@ -12,7 +12,7 @@ describe("Bowl recent updates bar", () => {
   });
 
   it("shows the newest work first and every card has artwork", () => {
-    expect(SJB_RECENT_UPDATES[0]?.title).toBe("T-shirt studio comps");
+    expect(SJB_RECENT_UPDATES[0]?.title).toBe("Logo animation");
     const dated = SJB_RECENT_UPDATES.filter((u) => u.date).map((u) => Date.parse(u.date!));
     expect(dated.length).toBeGreaterThan(3);
     dated.forEach((time, i) => {

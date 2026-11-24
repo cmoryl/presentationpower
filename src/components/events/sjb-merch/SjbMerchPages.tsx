@@ -2,26 +2,20 @@ import { SjbShirtPhotos } from "./SjbShirtPhotos";
 import liveFront from "@/assets/sjb-badges/sjb-badge-live-front.png.asset.json";
 import dlPng from "@/assets/sjb-badges/sjb-badge-download.png.asset.json";
 import dlJpg from "@/assets/sjb-badges/sjb-badge-download.jpg.asset.json";
-import { useState } from "react";
-import { Button } from "@/design-system/element";
-import { SJB_ATTENDEE_TYPES, SJB_BADGE_SIZE, SJB_SHIRT_COMPS } from "@/lib/sjb-merch-comps";
-import { SjbShirt } from "./SjbMerchArt";
-import { SJB_BADGE_STYLES, SjbStyledBadge } from "./SjbBadgeStyles";
+import { SJB_BADGE_SIZE } from "@/lib/sjb-merch-comps";
 
 function CompNote() {
   return <p className="mt-2 max-w-3xl text-sm text-muted-foreground">These are <strong>comps</strong> — design directions to choose finals from, not print-ready files. Names are samples; every date, venue and matchup comes from the announced event facts.</p>;
 }
 
 export function SjbBadgesPage() {
-  const [type, setType] = useState(SJB_ATTENDEE_TYPES[0]!.id);
-  const t = SJB_ATTENDEE_TYPES.find((x) => x.id === type)!;
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
       <h1 className="text-3xl font-semibold text-foreground">San Juan Bowl attendee badges</h1>
-      <CompNote />
+      <p className="mt-2 max-w-3xl text-sm text-muted-foreground">The badge in use is the <strong>working final</strong> in Canva: one design printed on both sides. The pictures and the PNG/JPG downloads are exports of that design — proofs, not a vector print master.</p>
       <p className="mt-1 text-sm text-muted-foreground">Size: {SJB_BADGE_SIZE.trimW} × {SJB_BADGE_SIZE.trimH} in plastic badge with dual hanging slots (same stock as NEXT), {SJB_BADGE_SIZE.bleed} in bleed. Printed double-sided with the same design.</p>
       <section aria-labelledby="badge-live" className="mt-8">
-        <h2 id="badge-live" className="text-xl font-semibold text-foreground">Live Canva template (working final)</h2>
+        <h2 id="badge-live" className="text-xl font-semibold text-foreground">Working final badge</h2>
         <p className="text-sm text-muted-foreground">The badge as it stands in Canva. One design printed on both sides. Pictures are preview size; edit the design in Canva.</p>
         <div className="mt-4 grid max-w-xl grid-cols-2 gap-6">
           <figure><img src={liveFront.url} alt="Bowl badge front: shield logo over a lit stadium, TEAM VS TEAM, December 16, 2026 at Hiram Bithorn Stadium" className="w-full rounded-md shadow-sm" /><figcaption className="mt-2 text-sm text-muted-foreground">Front</figcaption></figure>
@@ -29,25 +23,6 @@ export function SjbBadgesPage() {
         </div>
         <div className="mt-3 flex flex-wrap gap-4 text-sm font-medium"><a href={dlPng.url} download="san-juan-bowl-badge.png" className="text-primary underline">Download PNG</a><a href={dlJpg.url} download="san-juan-bowl-badge.jpg" className="text-primary underline">Download JPG</a></div>
         <a href="https://www.canva.com/design/DAHa0AG00r0/23QlIdva1RcuPop2ZHjfxA/edit" target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm font-medium text-primary underline">Open in Canva</a>
-      </section>
-      <div role="group" aria-label="Attendee type" className="mt-6 flex flex-wrap gap-2">
-        {SJB_ATTENDEE_TYPES.map((a) => <Button key={a.id} size="sm" variant={a.id === type ? "default" : "outline"} aria-pressed={a.id === type} onClick={() => setType(a.id)}>{a.label}</Button>)}
-      </div>
-      <section aria-labelledby="badge-styles" className="mt-10">
-        <h2 id="badge-styles" className="text-xl font-semibold text-foreground">Styles in the live layout</h2>
-        <p className="text-sm text-muted-foreground">Same layout as your live Canva badge, dressed in each campaign look. Pick an attendee type above to see every style change.</p>
-        <div className="mt-6 space-y-10">
-          {SJB_BADGE_STYLES.map((st) => (
-            <div key={st.id}>
-              <h3 className="text-lg font-semibold text-foreground">{st.name}</h3>
-              <p className="text-sm text-muted-foreground">{st.idea}</p>
-              <a href={st.canva} target="_blank" rel="noreferrer" className="mt-1 inline-block text-sm font-medium text-primary underline">Open {st.name.split(" · ")[0]} in Canva</a>
-              <div className="mt-3 grid max-w-xl grid-cols-2 gap-6">
-                {(["front", "back"] as const).map((s) => <figure key={s}><SjbStyledBadge style={st} type={t} side={s} /><figcaption className="mt-2 text-sm capitalize text-muted-foreground">{s}</figcaption></figure>)}
-              </div>
-            </div>
-          ))}
-        </div>
       </section>
     </main>
   );
