@@ -22,7 +22,9 @@ describe("Bowl lanyards", () => {
     expect(SJB_COLORS.some((c) => String(c.hex) === "#E03C31")).toBe(false);
     expect(SJB_LANYARD_COLOURWAYS.find((w) => w.id === "red")?.material.hex).toBe("#E03C31");
   });
-  it("has no print file until one is supplied", () => {
-    expect(SJB_LANYARD_FILES.pdf).toBeUndefined();
+  it("serves the supplied template files unchanged", () => {
+    expect(SJB_LANYARD_FILES.pdf).toMatch(/SJB_lanyard_template\.pdf$/);
+    expect(SJB_LANYARD_FILES.ai).toMatch(/SJB_lanyard_template\.ai$/);
+    expect(SJB_LANYARD_FILES.preview).toMatch(/\.svg$/);
   });
 });

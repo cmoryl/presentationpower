@@ -1,3 +1,6 @@
+import lanyardPdf from "@/assets/sjb-lanyards/SJB_lanyard_template.pdf.asset.json";
+import lanyardAi from "@/assets/sjb-lanyards/SJB_lanyard_template.ai.asset.json";
+import lanyardPreview from "@/assets/sjb-lanyards/sjb-lanyards-preview.svg.asset.json";
 // San Juan Bowl lanyards: five colourways, 3/4 inch wide. Bowl inks come from
 // SJB_COLORS; Red is lanyard-only and deliberately not in the Bowl palette.
 import { SJB_COLORS } from "@/lib/san-juan-bowl";
@@ -31,11 +34,15 @@ export const SJB_LANYARD_COLOURWAYS: SjbLanyardColourway[] = [
 ];
 
 /**
- * Print file for the lanyards. Add `pdf` (sjb-lanyards-pms.pdf, spot-colour PDF)
- * and `preview` URLs here when supplied; the download button and preview appear
- * automatically.
+ * The supplied lanyard template (live designer file). The PDF and AI are served
+ * byte-for-byte; the preview is a vector SVG converted from that same PDF, so the
+ * page shows the exact artwork instead of a redrawn swatch.
  */
-export const SJB_LANYARD_FILES: { pdf?: string; preview?: string } = {};
+export const SJB_LANYARD_FILES: { pdf?: string; ai?: string; preview?: string } = {
+  pdf: lanyardPdf.url,
+  ai: lanyardAi.url,
+  preview: lanyardPreview.url,
+};
 
 export const SJB_LANYARDS = {
   title: "Lanyards",
