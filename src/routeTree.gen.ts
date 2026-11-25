@@ -117,6 +117,7 @@ import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsPillarsRouteImport } from './routes/events.pillars'
 import { Route as EventsPresetsRouteImport } from './routes/events.presets'
 import { Route as EventsProductionRouteImport } from './routes/events.production'
+import { Route as ExportGuideImagesRouteImport } from './routes/export.guide-images'
 import { Route as ForAdminRouteImport } from './routes/for.admin'
 import { Route as ForMarketingRouteImport } from './routes/for.marketing'
 import { Route as ForSalesRouteImport } from './routes/for.sales'
@@ -806,6 +807,11 @@ const EventsProductionRoute = EventsProductionRouteImport.update({
   id: '/production',
   path: '/production',
   getParentRoute: () => EventsRoute,
+} as any)
+const ExportGuideImagesRoute = ExportGuideImagesRouteImport.update({
+  id: '/export/guide-images',
+  path: '/export/guide-images',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ForAdminRoute = ForAdminRouteImport.update({
   id: '/for/admin',
@@ -1679,6 +1685,7 @@ export interface FileRoutesByFullPath {
   '/events/pillars': typeof EventsPillarsRoute
   '/events/presets': typeof EventsPresetsRoute
   '/events/production': typeof EventsProductionRoute
+  '/export/guide-images': typeof ExportGuideImagesRoute
   '/for/admin': typeof ForAdminRoute
   '/for/marketing': typeof ForMarketingRoute
   '/for/sales': typeof ForSalesRoute
@@ -1931,6 +1938,7 @@ export interface FileRoutesByTo {
   '/events/pillars': typeof EventsPillarsRoute
   '/events/presets': typeof EventsPresetsRoute
   '/events/production': typeof EventsProductionRoute
+  '/export/guide-images': typeof ExportGuideImagesRoute
   '/for/admin': typeof ForAdminRoute
   '/for/marketing': typeof ForMarketingRoute
   '/for/sales': typeof ForSalesRoute
@@ -2188,6 +2196,7 @@ export interface FileRoutesById {
   '/events/pillars': typeof EventsPillarsRoute
   '/events/presets': typeof EventsPresetsRoute
   '/events/production': typeof EventsProductionRoute
+  '/export/guide-images': typeof ExportGuideImagesRoute
   '/for/admin': typeof ForAdminRoute
   '/for/marketing': typeof ForMarketingRoute
   '/for/sales': typeof ForSalesRoute
@@ -2446,6 +2455,7 @@ export interface FileRouteTypes {
     | '/events/pillars'
     | '/events/presets'
     | '/events/production'
+    | '/export/guide-images'
     | '/for/admin'
     | '/for/marketing'
     | '/for/sales'
@@ -2698,6 +2708,7 @@ export interface FileRouteTypes {
     | '/events/pillars'
     | '/events/presets'
     | '/events/production'
+    | '/export/guide-images'
     | '/for/admin'
     | '/for/marketing'
     | '/for/sales'
@@ -2954,6 +2965,7 @@ export interface FileRouteTypes {
     | '/events/pillars'
     | '/events/presets'
     | '/events/production'
+    | '/export/guide-images'
     | '/for/admin'
     | '/for/marketing'
     | '/for/sales'
@@ -3169,6 +3181,7 @@ export interface RootRouteChildren {
   DevSocialSweepRoute: typeof DevSocialSweepRoute
   DevUxDebugRoute: typeof DevUxDebugRoute
   EventsAgentThreadIdRoute: typeof EventsAgentThreadIdRoute
+  ExportGuideImagesRoute: typeof ExportGuideImagesRoute
   ForAdminRoute: typeof ForAdminRoute
   ForMarketingRoute: typeof ForMarketingRoute
   ForSalesRoute: typeof ForSalesRoute
@@ -3993,6 +4006,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/events/production'
       preLoaderRoute: typeof EventsProductionRouteImport
       parentRoute: typeof EventsRoute
+    }
+    '/export/guide-images': {
+      id: '/export/guide-images'
+      path: '/export/guide-images'
+      fullPath: '/export/guide-images'
+      preLoaderRoute: typeof ExportGuideImagesRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/for/admin': {
       id: '/for/admin'
@@ -5378,6 +5398,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevSocialSweepRoute: DevSocialSweepRoute,
   DevUxDebugRoute: DevUxDebugRoute,
   EventsAgentThreadIdRoute: EventsAgentThreadIdRoute,
+  ExportGuideImagesRoute: ExportGuideImagesRoute,
   ForAdminRoute: ForAdminRoute,
   ForMarketingRoute: ForMarketingRoute,
   ForSalesRoute: ForSalesRoute,
