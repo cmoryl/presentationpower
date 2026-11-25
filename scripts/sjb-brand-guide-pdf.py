@@ -17,8 +17,9 @@ from reportlab.lib.utils import ImageReader
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = "/tmp/sjb"
 ORIGIN = "https://transperfectelement.lovable.app"
-VERSION, RELEASED = "1.0", "22 October 2026"
+VERSION, RELEASED = "1.1", "25 November 2026"
 HISTORY = [
+    ("1.1", "25 November 2026", ["Press edition: online-guide link removed from the cover; arched-lettering and curved-lettering/palm pages removed (merch only); downloads cut to the logos, small mark, lockups and construction sheet."]),
     ("2.0", "22 October 2026", ["Updated single-colour Black, Navy and White masters (AI/EPS/SVG/PNG as supplied).",
                                 "Added arched lettering only (Black, Navy, White) — limited use, by approval only; not an official Bowl logo.",
                                 "Logo usage rules: main logo on light, white outline on dark; navy preferred for one colour; black or white when only those are available.",
@@ -101,8 +102,6 @@ c.setFont("G", 10.5); c.setFillColor("#FFFFFF"); c.drawString(M, H - 212, "Hiram
 c.setFont("GB", 9); c.setFillColor(GOLD); c.drawString(M, 60, f"Version {VERSION} · Released {RELEASED}")
 c.setFont("G", 10); c.setFillColor("#FFFFFF")
 para("Every image in this guide is the supplied artwork. Blue links open or download the live files — always use the latest from the live kit.", M, H - 240, 300, 10, color="#FFFFFF")
-c.setFont("GB", 10); c.setFillColor(GOLD); _t = "Open the brand guide online (no sign-in)  \u2197"
-c.drawString(M, 230, _t); c.linkURL(ORIGIN + "/share/san-juan-bowl", (M, 228, M + c.stringWidth(_t, "GB", 10), 240))
 c.showPage()
 
 # 2 logo variants
@@ -137,22 +136,23 @@ para("Navy is preferred when we get to choose the one colour. If only black and 
 link("Framed and earlier single-colour files (ZIP)", URL["1c-pack.zip"], M, 44, 9)
 c.showPage()
 
-# 3b arched lettering only
-head("Lettering only (arched)", "Logo pieces")
-c.setFillColor("#FFF6CC"); c.setStrokeColor(GOLD); c.rect(M, H - 112, W - 2 * M, 32, stroke=1, fill=1)
-c.setFillColor(INK); c.setFont("GB", 11); c.drawString(M + 12, H - 101, "Limited use, by approval only. This is not an official Bowl logo.")
-arch = [("u-sjb-san-juan-lettering-black", "#FFFFFF", "Black — light backgrounds", [("AI", "u-sjb-san-juan-lettering_black.ai"), ("EPS", "u-sjb-san-juan-lettering_black.eps")]),
-        ("u-sjb-san-juan-lettering-Navy", "#FFFFFF", "Navy — light backgrounds (preferred)", [("SVG", "u-sjb-san-juan-lettering_Navy.svg"), ("EPS", "u-sjb-san-juan-lettering_Navy.eps")]),
-        ("u-sjb-san-juan-lettering-white", NAVY, "White — dark backgrounds", [("SVG", "u-sjb-san-juan-lettering_white.svg"), ("EPS", "u-sjb-san-juan-lettering_white.eps")])]
-cw = (W - 2 * M - 40) / 3
-for i, (n, bg, lab, files) in enumerate(arch):
-    x = M + i * (cw + 20)
-    img(n + ".png", x, 230, cw, 200, bg)
-    c.setFillColor(INK); c.setFont("GB", 9.5); c.drawString(x, 214, lab)
-    nx = x
-    for t, fn in files + [("PNG", n + ".png")]: nx = link(t, URL[fn], nx, 198, 8.5)
-para("The arched TRANSPERFECT / SAN JUAN / BOWL wording from the logo, without the badge, as supplied with transparent backgrounds. Ask the brand team before using it; never re-set, stretch or flatten the arch.", M, 160, W - 2 * M, 9)
-c.showPage()
+# 3b arched lettering only — withdrawn from the press edition (merch only)
+if False:
+  head("Lettering only (arched)", "Logo pieces")
+  c.setFillColor("#FFF6CC"); c.setStrokeColor(GOLD); c.rect(M, H - 112, W - 2 * M, 32, stroke=1, fill=1)
+  c.setFillColor(INK); c.setFont("GB", 11); c.drawString(M + 12, H - 101, "Limited use, by approval only. This is not an official Bowl logo.")
+  arch = [("u-sjb-san-juan-lettering-black", "#FFFFFF", "Black — light backgrounds", [("AI", "u-sjb-san-juan-lettering_black.ai"), ("EPS", "u-sjb-san-juan-lettering_black.eps")]),
+          ("u-sjb-san-juan-lettering-Navy", "#FFFFFF", "Navy — light backgrounds (preferred)", [("SVG", "u-sjb-san-juan-lettering_Navy.svg"), ("EPS", "u-sjb-san-juan-lettering_Navy.eps")]),
+          ("u-sjb-san-juan-lettering-white", NAVY, "White — dark backgrounds", [("SVG", "u-sjb-san-juan-lettering_white.svg"), ("EPS", "u-sjb-san-juan-lettering_white.eps")])]
+  cw = (W - 2 * M - 40) / 3
+  for i, (n, bg, lab, files) in enumerate(arch):
+      x = M + i * (cw + 20)
+      img(n + ".png", x, 230, cw, 200, bg)
+      c.setFillColor(INK); c.setFont("GB", 9.5); c.drawString(x, 214, lab)
+      nx = x
+      for t, fn in files + [("PNG", n + ".png")]: nx = link(t, URL[fn], nx, 198, 8.5)
+  para("The arched TRANSPERFECT / SAN JUAN / BOWL wording from the logo, without the badge, as supplied with transparent backgrounds. Ask the brand team before using it; never re-set, stretch or flatten the arch.", M, 160, W - 2 * M, 9)
+  c.showPage()
 
 D = os.path.join(ROOT, "public/downloads")
 def local(rel): return Image.open(os.path.join(D, rel))
@@ -160,22 +160,23 @@ def dl(rel): return ORIGIN + "/downloads/" + rel
 
 # 14 curved lettering + palms
 import urllib.request, io
-head("Curved lettering and palm trees", "Logo pieces")
-curved = {k: ORIGIN + json.load(open(os.path.join(ROOT, f"src/assets/sjb/curved-lettering.{k}.asset.json")))["url"] for k in ("svg", "ai", "png")}
-cv = Image.open(io.BytesIO(urllib.request.urlopen(urllib.request.Request(curved["png"], headers={"User-Agent": "Mozilla/5.0"})).read())).convert("RGBA")
-img(cv, M, 250, 300, 190, NAVY)
-c.setFont("GB", 10); c.setFillColor(INK); c.drawString(M, 232, "Curved SAN JUAN BOWL — on navy")
-nx = link("SVG", curved["svg"], M, 216, 8.5); nx = link("AI", curved["ai"], nx, 216, 8.5); link("PNG", curved["png"], nx, 216, 8.5)
-para("The badge's own arched lettering. Use as supplied — never retype, re-curve or stretch.", M, 196, 300, 8.5)
-palms = [("sjb-palms-pair", "Palm pair, full colour"), ("sjb-palms-pair-1color", "Palm pair, one colour"), ("sjb-palm-left", "Left palm"), ("sjb-palm-right", "Right palm")]
-pw = (W - M - (M + 330) - 12) / 2
-for i, (pid, lab) in enumerate(palms):
-    x = M + 330 + (i % 2) * (pw + 12); y = 330 - (i // 2) * 150
-    img(local(f"sjb-palms/{pid}-2400.png"), x, y, pw, 110, "#F2F2F2")
-    c.setFont("GB", 9.5); c.setFillColor(INK); c.drawString(x, y - 13, lab)
-    nx = link("SVG", dl(f"sjb-palms/{pid}.svg"), x, y - 27, 8); link("PNG 2400", dl(f"sjb-palms/{pid}-2400.png"), nx, y - 27, 8)
-para("Palms are taken from the logo. Use as supplied; only the one-colour file may be recoloured.", M + 330, 120, W - 2 * M - 330, 8.5)
-c.showPage()
+if False:  # withdrawn from the press edition (merch only)
+  head("Curved lettering and palm trees", "Logo pieces")
+  curved = {k: ORIGIN + json.load(open(os.path.join(ROOT, f"src/assets/sjb/curved-lettering.{k}.asset.json")))["url"] for k in ("svg", "ai", "png")}
+  cv = Image.open(io.BytesIO(urllib.request.urlopen(urllib.request.Request(curved["png"], headers={"User-Agent": "Mozilla/5.0"})).read())).convert("RGBA")
+  img(cv, M, 250, 300, 190, NAVY)
+  c.setFont("GB", 10); c.setFillColor(INK); c.drawString(M, 232, "Curved SAN JUAN BOWL — on navy")
+  nx = link("SVG", curved["svg"], M, 216, 8.5); nx = link("AI", curved["ai"], nx, 216, 8.5); link("PNG", curved["png"], nx, 216, 8.5)
+  para("The badge's own arched lettering. Use as supplied — never retype, re-curve or stretch.", M, 196, 300, 8.5)
+  palms = [("sjb-palms-pair", "Palm pair, full colour"), ("sjb-palms-pair-1color", "Palm pair, one colour"), ("sjb-palm-left", "Left palm"), ("sjb-palm-right", "Right palm")]
+  pw = (W - M - (M + 330) - 12) / 2
+  for i, (pid, lab) in enumerate(palms):
+      x = M + 330 + (i % 2) * (pw + 12); y = 330 - (i // 2) * 150
+      img(local(f"sjb-palms/{pid}-2400.png"), x, y, pw, 110, "#F2F2F2")
+      c.setFont("GB", 9.5); c.setFillColor(INK); c.drawString(x, y - 13, lab)
+      nx = link("SVG", dl(f"sjb-palms/{pid}.svg"), x, y - 27, 8); link("PNG 2400", dl(f"sjb-palms/{pid}-2400.png"), nx, y - 27, 8)
+  para("Palms are taken from the logo. Use as supplied; only the one-colour file may be recoloured.", M + 330, 120, W - 2 * M - 330, 8.5)
+  c.showPage()
 
 # 4 clear space & minimum size
 head("Clear space and minimum size", "Construction")
@@ -303,21 +304,11 @@ para("Lockup dates read DATE TBC until the date is confirmed — replace only th
 c.showPage()
 
 # 16 downloads index
-head("All downloads", "Downloads")
+head("Press downloads", "Downloads")
 rows = [("Full-colour logo", ["sjb-logo-color.svg", "sjb-logo-color.png"]), ("Dark-background logo", ["sjb-logo-dark.svg", "sjb-logo-dark.png"]),
-        ("Single-colour logos", ["1c-pack.zip"]), ("Original drawing components", ["original-components.zip"]),
-        ("Lettering pieces", ["transperfect-lettering.svg", "san-juan-lettering.svg", "bowl-lettering.svg"]),
-        ("Badge scene pieces", ["scene-banner.svg", "scene-fortress.svg", "scene-football.svg", "scene-palmL.svg", "scene-palmR.svg", "scene-bird.svg", "scene-clouds.svg", "scene-sky.svg", "scene-base.svg", "scene-trim.svg", "scene-ribbon-stars.svg", "waves-sun-trim.svg"]),
-        ]
-for k, v in [("sjb-palms-pair.svg", "sjb-palms/sjb-palms-pair.svg"), ("sjb-palms-pair-1color.svg", "sjb-palms/sjb-palms-pair-1color.svg"), ("sjb-palm-left.svg", "sjb-palms/sjb-palm-left.svg"), ("sjb-palm-right.svg", "sjb-palms/sjb-palm-right.svg"),
-             ("sjb-mark-pack.zip", "sjb-mark/sjb-mark-pack.zip"), ("sjb-lockups-pack.zip", "sjb-lockups/sjb-lockups-pack.zip")]:
-    URL[k] = dl(v)
-URL["curved-lettering.svg"], URL["curved-lettering.ai"] = curved["svg"], curved["ai"]
-rows[2] = ("Single-colour logos", ["u-sjb-1c-Navy.svg", "u-sjb-1c-Navy.eps", "u-sjb-1c-black.ai", "u-sjb-1c-black.eps", "u-sjb-1c-white.svg", "u-sjb-1c-white.eps", "1c-pack.zip"])
-rows += [("Arched lettering (approval only)", ["u-sjb-san-juan-lettering_black.ai", "u-sjb-san-juan-lettering_Navy.svg", "u-sjb-san-juan-lettering_Navy.eps", "u-sjb-san-juan-lettering_white.svg", "u-sjb-san-juan-lettering_white.eps"]),
-         ("Curved lettering", ["curved-lettering.svg", "curved-lettering.ai"]),
-         ("Palm trees", ["sjb-palms-pair.svg", "sjb-palms-pair-1color.svg", "sjb-palm-left.svg", "sjb-palm-right.svg"]),
-         ("Small-size mark and lockups", ["sjb-mark-pack.zip", "sjb-lockups-pack.zip"])]
+        ("Single-colour logos", ["u-sjb-1c-Navy.svg", "u-sjb-1c-Navy.eps", "u-sjb-1c-black.ai", "u-sjb-1c-black.eps", "u-sjb-1c-white.svg", "u-sjb-1c-white.eps", "1c-pack.zip"]),
+        ("Small-size mark and lockups", ["sjb-mark-pack.zip", "sjb-lockups-pack.zip"])]
+URL["sjb-mark-pack.zip"], URL["sjb-lockups-pack.zip"] = dl("sjb-mark/sjb-mark-pack.zip"), dl("sjb-lockups/sjb-lockups-pack.zip")
 y = H - 104
 for lab, files in rows:
     c.setFont("GB", 10); c.setFillColor(INK); c.drawString(M, y, lab); x = M + 190
