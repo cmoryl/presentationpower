@@ -297,12 +297,20 @@ function PrintCenterPage() {
               {assetsQuery.data?.length ?? 0} saved
             </h2>
           </div>
+          <div className="flex items-center gap-2">
+          <Link
+            to="/element"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary hover:text-primary-foreground"
+          >
+            Open in Claude build <ArrowRight size={12} />
+          </Link>
           <Link
             to="/asset/new"
             className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]/85 dark:bg-primary dark:text-primary-foreground"
           >
             <Sparkles size={12} /> Start blank
           </Link>
+          </div>
         </div>
 
         {assetsQuery.isLoading ? (
