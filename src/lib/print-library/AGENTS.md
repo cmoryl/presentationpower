@@ -1,4 +1,5 @@
 # Print library
+- The print workspace leads with shared Claude modules/templates and the isolated /element door; keep issued documents in a separate reference shelf with their existing renderers and approvals — why: adoption must not rewrite issued originals or imply source-example approval.
 - Imported Claude templates are available to authoring roles in the live print workspace and admin curator as unapproved drafts, separate from the approved catalogue and Oracle ingestion, with untouched source records/layouts; editable copies retain pending review and never run the approved-demo truncator — why: adopting the source editor does not approve claims or certify source layout fidelity.
 
 - Curated print pieces with a supplied PDF (Life Sciences, Trial Interactive in `ti-print-library.ts`) render in "Original layout" (`content.layoutMode/original`, data from `scripts/lifesci-original-extract.py` → `src/lib/print-library/lifesci-original-layouts.json`, drawn by `OriginalPageLayout`); the library-layout fields stay in the same content — why: page-for-page fidelity while the cascade keeps reading the structured copy.

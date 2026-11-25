@@ -1,4 +1,4 @@
-import { BRAND } from "@/lib/brand-colors";
+import { Button } from "@/design-system/element";
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { companyOf, productOf, tagCounts } from "@/lib/print-library/item-tags";
@@ -118,7 +118,6 @@ export function PrintLibraryBrowser({
   const setQuery = (v: string) => patch({ query: v });
   const setSubId = (v: string | null) => patch({ subId: v });
   const [open, setOpen] = useState<PrintLibraryItem | null>(null);
-  const [divisionPickerOpen, setDivisionPickerOpen] = useState(true);
   const { isAdmin } = useIsAdmin();
   const { overrides } = useModuleOverrides("library");
 
@@ -184,553 +183,44 @@ export function PrintLibraryBrowser({
   if (!brand) return null;
 
   return (
-    <section className="mt-10">
-      {/* Breadcrumb path — sticky so any level is one click away, no scrolling */}
-      <nav
-        aria-label="Print library path"
-        className="sticky top-2 z-30 flex flex-wrap items-center gap-1.5 rounded-md border border-black/10 bg-white/85 px-2 py-1.5 text-xs shadow-sm backdrop-blur"
-      >
-        <button
-          type="button"
-          onClick={() => {
-            setTypeId(null);
-            setCollection("All");
-            setSubId(null);
-            setQuery("");
-          }}
-          className="inline-flex items-center gap-1.5 rounded-md border border-black/10 bg-white px-3 py-1 font-medium text-[#03002C] hover:border-black/30"
-        >
-          <FolderOpen size={12} /> Print library
-        </button>
-
-        {/* Division crumb — switch division inline */}
-        <ChevronRight size={12} className="text-black/30" aria-hidden />
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white pl-3 pr-1 py-1 font-medium text-[#03002C]">
-          <span
-            aria-hidden
-            className="inline-block h-2 w-2 rounded-full ring-1 ring-black/10"
-            style={{ background: brand.tokens.accent }}
-          />
-          <select
-            aria-label="Division"
-            value={divisionId}
-            onChange={(e) => {
-              onDivisionChange(e.target.value);
-              setCollection("All");
-              setSubId(null);
-              setDivisionPickerOpen(false);
-            }}
-            className="max-w-[13rem] cursor-pointer truncate bg-transparent pr-1 text-xs font-medium text-[#03002C] outline-none"
-          >
-            {divisions.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.name}
-              </option>
-            ))}
-          </select>
-        </span>
-
-        {/* Section crumb (practice / product family) */}
-        {subsections.length > 0 ? (
-          <>
-            <ChevronRight size={12} className="text-black/30" aria-hidden />
-            <select
-              aria-label="Section"
-              value={parentSub?.id ?? ""}
-              onChange={(e) => setSubId(e.target.value || null)}
-              className={
-                "cursor-pointer rounded-md px-3 py-1 text-xs font-medium outline-none " +
-                (parentSub
-                  ? "bg-[#03002C] text-white"
-                  : "border border-black/10 bg-white text-black/60")
-              }
-            >
-              <option value="">All sections</option>
-              {subsections.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
+    <section className="mt-6 text-foreground" aria-label="Issued print library">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+        <div className="min-w-0"><h2 className="text-xl font-semibold">Issued library</h2><p className="mt-1 text-sm text-muted-foreground">{brand.name}</p></div>
+        <Button asChild variant="outline" size="sm"><Link to="/library/print/modules"><FileText size={14} />Section modules</Link></Button>
+      </div>
+      <div className="grid items-start gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+        <aside className="space-y-5 lg:sticky lg:top-20" aria-label="Library folders">
+          <label className="block text-xs font-medium text-muted-foreground">Division
+            <select aria-label="Division" value={divisionId} onChange={e => { onDivisionChange(e.target.value); setCollection("All"); setSubId(null); }} className="mt-2 h-9 w-full rounded-md border border-input bg-background px-2 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-ring">
+              {divisions.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
             </select>
-          </>
-        ) : null}
-
-        {/* Product crumb (nested children, e.g. the GlobalLink suite) */}
-        {parentSub?.children?.length ? (
-          <>
-            <ChevronRight size={12} className="text-black/30" aria-hidden />
-            <select
-              aria-label="Product"
-              value={activeSub && activeSub.id !== parentSub.id ? activeSub.id : ""}
-              onChange={(e) => setSubId(e.target.value || parentSub.id)}
-              className="cursor-pointer rounded-md border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[#03002C] outline-none"
-              style={
-                activeSub && activeSub.id !== parentSub.id
-                  ? { background: `color-mix(in oklab, ${brand.tokens.accent} 26%, white)` }
-                  : undefined
-              }
-            >
-              <option value="">All {parentSub.label}</option>
-              {parentSub.children.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
-          </>
-        ) : null}
-
-        {/* Print type crumb */}
-        <ChevronRight size={12} className="text-black/30" aria-hidden />
-        <select
-          aria-label="Print type"
-          value={typeId ?? ""}
-          onChange={(e) => {
-            setTypeId((e.target.value || null) as PrintTypeId | null);
-            setCollection("All");
-          }}
-          className={
-            "cursor-pointer rounded-md px-3 py-1 text-xs font-medium outline-none " +
-            (typeId ? "bg-[#03002C] text-white" : "border border-black/10 bg-white text-black/60")
-          }
-        >
-          <option value="">All print types</option>
-          {PRINT_TYPES.map((t) => (
-            <option key={t.id} value={t.id}>
-              {printTypeMeta(t.id).plural}
-            </option>
-          ))}
-        </select>
-
-        {/* Collection crumb */}
-        {typeId && collections.length > 1 ? (
-          <>
-            <ChevronRight size={12} className="text-black/30" aria-hidden />
-            <select
-              aria-label="Collection"
-              value={collection}
-              onChange={(e) => setCollection(e.target.value)}
-              className="cursor-pointer rounded-md border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/70 outline-none"
-            >
-              {collections.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </>
-        ) : null}
-
-        {/* Company / sub-brand and product family tags */}
-        {([
-          ["Company", company, companies, (v: string) => patch({ company: v })],
-          ["Product", product, products, (v: string) => patch({ product: v })],
-        ] as const).map(([label, value, opts, set]) =>
-          opts.length > 1 || value !== "All" ? (
-            <select
-              key={label}
-              aria-label={`${label} filter`}
-              value={value}
-              onChange={(e) => set(e.target.value)}
-              className={
-                "cursor-pointer rounded-md px-3 py-1 text-xs font-medium outline-none " +
-                (value !== "All" ? "bg-[#03002C] text-white" : "border border-black/10 bg-white text-black/60")
-              }
-            >
-              <option value="All">All {label === "Company" ? "companies" : "products"}</option>
-              {opts.map(([v, n]) => (
-                <option key={v} value={v}>
-                  {v} ({n})
-                </option>
-              ))}
-            </select>
-          ) : null,
-        )}
-
-        <span className="ml-auto flex items-center gap-1.5">
-          <span className="rounded-md border border-black/10 bg-white px-2.5 py-1 text-[11px] font-medium text-black/55">
-            {items.length} showing
-          </span>
-          <Link
-            to="/library/print/modules"
-            className="inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-3 py-1 font-medium text-[#03002C] hover:border-black/40"
-          >
-            <FileText size={12} /> Section modules
-          </Link>
-        </span>
-      </nav>
-
-      {/* Division nav → division hero → print-type sub-folders, one seamless band */}
-      <div
-        className="mt-4 overflow-hidden rounded-[28px] border shadow-sm"
-        style={{
-          borderColor: `color-mix(in oklab, ${brand.tokens.accent} 34%, transparent)`,
-          background: `linear-gradient(180deg, color-mix(in oklab, ${brand.tokens.accent} 16%, white) 0%, color-mix(in oklab, ${brand.tokens.accent} 7%, white) 42%, white 100%)`,
-        }}
-      >
-        {/* Division nav — aligned card grid, no ragged tab wrapping */}
-        <div
-          className="px-4 pt-4 sm:px-6"
-          style={{
-            borderBottom: divisionPickerOpen
-              ? `1px solid color-mix(in oklab, ${brand.tokens.accent} 26%, transparent)`
-              : undefined,
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => setDivisionPickerOpen((v) => !v)}
-            className="mb-2.5 flex w-full items-baseline justify-between gap-3 text-left"
-            aria-expanded={divisionPickerOpen}
-            aria-controls="division-picker-grid"
-          >
-            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-black/45">
-              Choose a division
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-[11px] text-black/40">
-              {divisions.length} divisions
-              <ChevronDown
-                size={14}
-                className={`transition-transform duration-300 ${divisionPickerOpen ? "rotate-180" : ""}`}
-                aria-hidden
-              />
-            </span>
-          </button>
-          <div
-            id="division-picker-grid"
-            className={`grid transition-all duration-300 ease-out ${
-              divisionPickerOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-            }`}
-          >
-            <div className="overflow-hidden">
-              <div
-                className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-                role="tablist"
-                aria-label="Divisions"
-              >
-                {divisions.map((b) => {
-                  const active = b.id === divisionId;
-                  const n = curatedCount(b.id);
-                  return (
-                    <button
-                      key={b.id}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      onClick={() => {
-                        onDivisionChange(b.id);
-                        setCollection("All");
-                        setSubId(null);
-                        setDivisionPickerOpen(false);
-                      }}
-                      className={
-                        "group relative flex min-w-0 items-center gap-2.5 overflow-hidden rounded-xl border px-3 py-2.5 text-left transition " +
-                        (active
-                          ? "border-transparent bg-white shadow-md"
-                          : "border-black/10 bg-white/70 hover:border-black/25 hover:bg-white")
-                      }
-                      style={
-                        active
-                          ? {
-                              boxShadow: `0 1px 0 rgba(0,0,0,0.04), 0 0 0 2px color-mix(in oklab, ${b.tokens.accent} 62%, transparent)`,
-                            }
-                          : undefined
-                      }
-                    >
-                      <span
-                        aria-hidden
-                        className="absolute inset-y-0 left-0 w-1"
-                        style={{
-                          background: b.tokens.accent,
-                          opacity: active ? 1 : 0.35,
-                        }}
-                      />
-                      <span
-                        aria-hidden
-                        className="ml-1 inline-block h-2.5 w-2.5 shrink-0 rounded-full ring-1 ring-black/10"
-                        style={{ background: b.tokens.accent }}
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span
-                          className={
-                            "block truncate text-xs font-semibold " +
-                            (active ? "text-[#03002C]" : "text-[#03002C]/75")
-                          }
-                        >
-                          {b.name}
-                        </span>
-                        <span className="block text-[10px] text-black/45">
-                          {n > 0
-                            ? `${n} ready-made · ${PRINT_TYPES.length} blank`
-                            : `${PRINT_TYPES.length} blank templates`}
-                        </span>
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+          </label>
+          <nav aria-label="Print types" className="flex gap-1 overflow-x-auto lg:flex-col">
+            <Button variant={typeId === null ? "secondary" : "ghost"} className="shrink-0 justify-between text-sm lg:w-full" aria-pressed={typeId === null} onClick={() => { setTypeId(null); setCollection("All"); }}><span className="flex flex-wrap items-center gap-2"><FolderOpen size={15} />All print types</span><span className="font-mono text-xs text-muted-foreground">{itemsForDivision(divisionId).length}</span></Button>
+            {PRINT_TYPES.map(t => <Button key={t.id} variant={typeId === t.id ? "secondary" : "ghost"} className="shrink-0 justify-between text-sm lg:w-full" aria-pressed={typeId === t.id} onClick={() => { setTypeId(t.id); setCollection("All"); }}><span className="flex flex-wrap items-center gap-2"><FileText size={15} />{t.plural}</span><span className="font-mono text-xs text-muted-foreground">{itemsForDivisionType(divisionId,t.id).length}</span></Button>)}
+          </nav>
+          {subsections.length > 0 && <label className="block text-xs font-medium text-muted-foreground">Section<select aria-label="Section" value={parentSub?.id ?? ""} onChange={e => setSubId(e.target.value || null)} className="mt-2 h-9 w-full rounded-md border border-input bg-background px-2 text-sm text-foreground"><option value="">All sections</option>{subsections.map(section => <option key={section.id} value={section.id}>{section.label}</option>)}</select></label>}
+          {parentSub?.children?.length ? <label className="block text-xs font-medium text-muted-foreground">Product<select aria-label="Product" value={activeSub && activeSub.id !== parentSub.id ? activeSub.id : ""} onChange={e => setSubId(e.target.value || parentSub.id)} className="mt-2 h-9 w-full rounded-md border border-input bg-background px-2 text-sm text-foreground"><option value="">All {parentSub.label}</option>{parentSub.children.map(child => <option key={child.id} value={child.id}>{child.label}</option>)}</select></label> : null}
+        </aside>
+        <div className="min-w-0">
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-input bg-background px-3"><Search size={15} className="shrink-0 text-muted-foreground" /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search issued library" aria-label="Search print library" className="min-w-0 flex-1 bg-transparent py-2 text-sm outline-none" />{query && <Button variant="ghost" size="icon" aria-label="Clear search" title="Clear search" onClick={() => setQuery("")}><X size={14} /></Button>}</label>
+            <span role="status" className="text-sm text-muted-foreground">{items.length} {items.length === 1 ? "piece" : "pieces"}</span>
           </div>
-        </div>
-
-        {/* Division hero */}
-        <div className="flex flex-wrap items-end justify-between gap-4 px-6 pt-6">
-          <div className="min-w-0">
-            <div
-              className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.24em]"
-              style={{ color: `color-mix(in oklab, ${brand.tokens.accent} 72%, #03002C)` }}
-            >
-              <span
-                aria-hidden
-                className="inline-block h-1.5 w-6 rounded-full"
-                style={{ background: brand.tokens.accent }}
-              />
-              Division shelf
-            </div>
-            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.02em] text-[#03002C] sm:text-[28px]">
-              {brand.name}
-            </h2>
-            <p className="mt-1 max-w-xl text-sm text-black/55">
-              {curatedCount(divisionId) > 0
-                ? `${curatedCount(divisionId)} ready-made assets plus ${PRINT_TYPES.length} blank templates, all branded for ${brand.name}.`
-                : `${PRINT_TYPES.length} blank templates ready to brand for ${brand.name}.`}
-            </p>
+          <div className="mb-5 flex flex-wrap items-center gap-2">
+            {typeId && collections.length > 0 && <select aria-label="Collection" value={collection} onChange={e => setCollection(e.target.value)} className="h-9 max-w-full rounded-md border border-input bg-background px-2 text-sm"><option value="All">All collections</option>{collections.filter(c => c !== "All").map(c => <option key={c} value={c}>{c}</option>)}</select>}
+            {([
+              ["Company", company, companies, (v: string) => patch({ company: v })],
+              ["Product", product, products, (v: string) => patch({ product: v })],
+            ] as const).map(([label,value,opts,set]) => opts.length > 1 || value !== "All" ? <select key={label} aria-label={`${label} filter`} value={value} onChange={e => set(e.target.value)} className="h-9 max-w-full rounded-md border border-input bg-background px-2 text-sm"><option value="All">All {label === "Company" ? "companies" : "products"}</option>{opts.map(([v,n]) => <option key={v} value={v}>{v} ({n})</option>)}</select> : null)}
           </div>
-          <div className="flex items-center gap-2">
-            {typeId ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setTypeId(null);
-                  setCollection("All");
-                }}
-                className="rounded-md border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/35"
-              >
-                All print types
-              </button>
-            ) : null}
-            <span
-              className="rounded-md px-3 py-1.5 text-xs font-semibold text-white"
-              style={{ background: BRAND.ink }}
-            >
-              {items.length} showing
-            </span>
+          <DivisionPageTemplates divisionId={divisionId} />
+          <div className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
+            {items.map(item => <PrintItemCard key={item.id} item={item} brand={brand} renderPreview={renderPreview} onPreview={() => setOpen(item)} canEditMaster={isAdmin} />)}
           </div>
-        </div>
-
-        {/* Division sub-sections (practices / product suite) */}
-        {subsections.length > 0 ? (
-          <div className="mt-4 px-6">
-            <div className="mb-2 flex items-baseline justify-between gap-3">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-black/45">
-                {brand.name} sections
-              </span>
-              {activeSub ? (
-                <button
-                  type="button"
-                  onClick={() => setSubId(null)}
-                  className="text-[11px] font-medium text-black/50 underline-offset-2 hover:underline"
-                >
-                  Clear section
-                </button>
-              ) : null}
-            </div>
-            <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Sub-sections">
-              {subsections.map((s) => {
-                const active = parentSub?.id === s.id;
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={active}
-                    title={s.blurb}
-                    onClick={() => setSubId(active ? null : s.id)}
-                    className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold transition ${
-                      active
-                        ? "border-transparent bg-[#03002C] text-white"
-                        : "border-black/15 bg-white text-[#03002C] hover:border-black/40"
-                    }`}
-                  >
-                    <span
-                      aria-hidden
-                      className="inline-block h-2 w-2 rounded-full"
-                      style={{ background: brand.tokens.accent }}
-                    />
-                    {s.label}
-                    {s.children ? (
-                      <span className={active ? "text-white/60" : "text-black/40"}>
-                        {s.children.length}
-                      </span>
-                    ) : null}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Nested products, e.g. the GlobalLink suite */}
-            {parentSub?.children ? (
-              <div
-                className="mt-2 flex flex-wrap gap-1.5 border-l-2 pl-3"
-                style={{
-                  borderColor: `color-mix(in oklab, ${brand.tokens.accent} 45%, transparent)`,
-                }}
-              >
-                {parentSub.children.map((c) => {
-                  const active = subId === c.id;
-                  return (
-                    <button
-                      key={c.id}
-                      type="button"
-                      aria-pressed={active}
-                      title={c.blurb}
-                      onClick={() => setSubId(active ? parentSub.id : c.id)}
-                      className={`rounded-md border px-2.5 py-1 text-[11px] font-medium transition ${
-                        active
-                          ? "border-transparent text-[#03002C]"
-                          : "border-black/12 bg-white/70 text-black/65 hover:border-black/30"
-                      }`}
-                      style={
-                        active
-                          ? { background: `color-mix(in oklab, ${brand.tokens.accent} 26%, white)` }
-                          : undefined
-                      }
-                    >
-                      {c.label}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-
-        {/* Print-type sub-folders — nested inside the division band */}
-        <div className="mt-5 grid grid-cols-1 gap-3 px-6 pb-6 sm:grid-cols-2 xl:grid-cols-4">
-          {PRINT_TYPES.map((t) => {
-            const all = itemsForDivisionType(divisionId, t.id);
-            const curated = all.filter((i) => i.source === "curated").length;
-            const active = typeId === t.id;
-            return (
-              <button
-                key={t.id}
-                type="button"
-                aria-pressed={active}
-                onClick={() => {
-                  setTypeId(active ? null : t.id);
-                  setCollection("All");
-                }}
-                className={
-                  "relative overflow-hidden rounded-2xl border bg-white p-4 pt-5 text-left transition " +
-                  (active ? "shadow-md" : "border-black/10 hover:-translate-y-0.5 hover:shadow-md")
-                }
-                style={
-                  active
-                    ? {
-                        borderColor: `color-mix(in oklab, ${brand.tokens.accent} 55%, transparent)`,
-                        background: `linear-gradient(180deg, color-mix(in oklab, ${brand.tokens.accent} 10%, white), white 70%)`,
-                      }
-                    : undefined
-                }
-              >
-                <span
-                  aria-hidden
-                  className="absolute inset-x-0 top-0 h-1"
-                  style={{
-                    background: brand.tokens.accent,
-                    opacity: active ? 1 : 0.35,
-                  }}
-                />
-                <div className="flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.18em] text-black/50">
-                    <FileText size={12} /> {t.plural}
-                  </span>
-                  <span
-                    className="rounded-md px-2 py-0.5 text-[10px] font-semibold text-[#03002C]"
-                    style={{
-                      background: `color-mix(in oklab, ${brand.tokens.accent} 18%, white)`,
-                    }}
-                  >
-                    {all.length}
-                  </span>
-                </div>
-                <h3 className="mt-2 text-base font-semibold text-[#03002C]">{t.label}</h3>
-                <p className="mt-1 line-clamp-2 text-xs text-black/55">{t.tagline}</p>
-                <p className="mt-2 text-[11px] text-black/45">
-                  1 blank template
-                  {curated > 0 ? ` · ${curated} ready-made in ${brand.name}` : ""}
-                </p>
-              </button>
-            );
-          })}
+          {items.length === 0 && <div className="border-y border-border py-12 text-center"><p className="text-sm text-muted-foreground">No pieces match these filters.</p><Button variant="outline" size="sm" className="mt-4" onClick={() => patch({ typeId: null, collection: "All", query: "", subId: null, company: "All", product: "All" })}>Clear filters</Button></div>}
         </div>
       </div>
-
-      {/* Collection sub-folders + search */}
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-1.5">
-          {typeId && collections.length > 1
-            ? ["All", ...collections].map((c) => {
-                const active = c === collection;
-                const n =
-                  c === "All"
-                    ? itemsForDivisionType(divisionId, typeId).length
-                    : itemsForDivisionType(divisionId, typeId).filter(
-                        (i) => (i.collection ?? "General") === c,
-                      ).length;
-                return (
-                  <button
-                    key={c}
-                    type="button"
-                    aria-pressed={active}
-                    onClick={() => setCollection(c)}
-                    className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition ${
-                      active
-                        ? "border-transparent bg-[#03002C] text-white"
-                        : "border-black/15 bg-white text-[#03002C] hover:border-black/40"
-                    }`}
-                  >
-                    {c}
-                    <span className={active ? "text-white/60" : "text-black/40"}>{n}</span>
-                  </button>
-                );
-              })
-            : null}
-        </div>
-        <label className="inline-flex items-center gap-2 rounded-md border border-black/15 bg-white px-3 py-1.5">
-          <Search size={12} className="text-black/40" aria-hidden />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search this shelf"
-            aria-label="Search print library"
-            className="w-48 bg-transparent text-xs text-[#03002C] outline-none placeholder:text-black/35"
-          />
-        </label>
-      </div>
-
-      {/* Saved page templates for this division — reuse a real piece as-is */}
-      <DivisionPageTemplates divisionId={divisionId} />
-
-      {/* Preview cards */}
-      <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {items.map((item) => (
-          <PrintItemCard
-            key={item.id}
-            item={item}
-            brand={brand}
-            renderPreview={renderPreview}
-            onPreview={() => setOpen(item)}
-            canEditMaster={isAdmin}
-          />
-        ))}
-      </div>
-
-      {items.length === 0 ? (
-        <div className="mt-5 rounded-2xl border border-dashed border-black/15 bg-white p-10 text-center text-sm text-black/55">
-          Nothing in this folder yet — clear the search or pick another print type.
-        </div>
-      ) : null}
 
       {open ? (
         <ItemPreviewOverlay
@@ -755,24 +245,24 @@ function DivisionPageTemplates({ divisionId }: { divisionId: string }) {
   const rows = templates.filter((t) => !t.division_id || t.division_id === divisionId);
   if (rows.length === 0) return null;
   return (
-    <div className="mt-6 rounded-2xl border border-[#003FC7]/20 bg-[#003FC7]/[0.03] p-4">
-      <button
+    <div className="mb-6 border-y border-border py-3">
+      <Button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-3 text-left"
+        variant="ghost" className="flex h-auto w-full items-center justify-between gap-3 px-0 text-left"
       >
-        <div className="flex items-baseline gap-3">
-          <h3 className="text-sm font-semibold text-[#03002C]">Page templates</h3>
-          <span className="text-[11px] text-black/45">{rows.length} captured from real pieces</span>
+        <div className="flex flex-wrap items-baseline gap-3">
+          <h3 className="text-sm font-semibold text-foreground">Page templates</h3>
+          <span className="text-[11px] text-muted-foreground">{rows.length} captured from real pieces</span>
         </div>
         <span
-          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/70 text-[#03002C] transition-transform duration-200"
+          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-foreground transition-transform duration-200"
           style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
         >
           <ChevronDown size={14} />
         </span>
-      </button>
+      </Button>
       {open ? (
         <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {rows.map((t) => (
@@ -809,12 +299,12 @@ function PrintItemCard({
   const liveArt = isTemplate || docArt;
   const pageCount = pageCountOf(item);
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:border-[#003FC7]/50 hover:shadow-md">
-      <button
+    <article className="group flex min-w-0 flex-col">
+      <Button
         type="button"
         onClick={onPreview}
         aria-label={`Preview ${item.title}`}
-        className={`relative block w-full overflow-hidden text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] ${docArt ? "bg-white" : "bg-[#0b0a2a]"}`}
+        variant="ghost" className="relative block h-auto w-full overflow-hidden rounded-md border border-border bg-muted p-0 text-left hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
         style={{ height: 0, paddingBottom: "62.5%" }}
       >
         {isTemplate ? (
@@ -839,54 +329,31 @@ function PrintItemCard({
             style={{ objectPosition: `${item.focal?.x ?? 50}% ${item.focal?.y ?? 50}%` }}
           />
         ) : null}
-        {/* Accent strip only (like modules) — no gradient wash over live page art. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 z-10 h-1.5"
-          style={{ background: brand.tokens.primary }}
-        />
-        {!liveArt ? (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
-            style={{
-              background: `linear-gradient(180deg, ${brand.tokens.primary}00 0%, ${brand.tokens.primary}B0 100%)`,
-            }}
-          />
-        ) : null}
-
-        <span className="absolute left-3 top-3 z-20 inline-flex items-center gap-1 rounded-md bg-white/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#03002C]">
+        <span className="absolute left-3 top-3 z-20 inline-flex items-center gap-1 rounded-md bg-background px-2 py-0.5 text-[10px] font-medium uppercase tracking-normal text-foreground">
           {isTemplate ? "Blank template" : (item.collection ?? "Ready-made")}
         </span>
         {multiPage ? (
-          <span className="absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-md bg-[#03002C]/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white">
+          <span className="absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-md bg-foreground px-2 py-0.5 text-[10px] font-medium uppercase tracking-normal text-white">
             {pageCount} pages
           </span>
         ) : null}
-        {!liveArt ? (
-          <h3 className="absolute inset-x-3 bottom-3 line-clamp-2 text-sm font-semibold leading-tight text-white">
-            {item.title}
-          </h3>
-        ) : null}
-      </button>
+      </Button>
 
-      <div className="flex flex-1 flex-col p-4">
-        <div className="text-[11px] uppercase tracking-[0.18em] text-black/45">
+      <div className="flex flex-1 flex-col pt-3">
+        <div className="text-[11px] uppercase tracking-normal text-muted-foreground">
           {printTypeMeta(item.kind).label}
         </div>
-        {liveArt ? (
-          <h3 className="mt-1 text-base font-semibold text-[#03002C]">{item.title}</h3>
-        ) : null}
-        <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-black/60">{item.blurb}</p>
+        <h3 className="mt-1 text-sm font-semibold leading-snug text-foreground">{item.title}</h3>
+        <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-muted-foreground">{item.blurb}</p>
 
         {item.stats?.length ? (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {safeList(item.stats).map((s, i) => (
               <span
                 key={`${s.label}-${i}`}
-                className="inline-flex items-baseline gap-1 rounded-md border border-black/10 bg-black/[0.02] px-2 py-0.5 text-[10px] text-black/60"
+                className="inline-flex items-baseline gap-1 rounded-md border border-border bg-muted px-2 py-0.5 text-[10px] text-muted-foreground"
               >
-                <strong className="text-[11px] font-semibold text-[#03002C]">
+                <strong className="text-[11px] font-semibold text-foreground">
                   {s.value}
                   {s.unit ?? ""}
                 </strong>
@@ -896,25 +363,24 @@ function PrintItemCard({
           </div>
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-2 pt-4">
-          <button
+        <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
+          <Button
             type="button"
             onClick={onPreview}
-            className="inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
+            variant="outline" size="sm"
           >
             Preview
-          </button>
-          <div className="flex items-center gap-2">
+          </Button>
+          <div className="flex flex-wrap items-center gap-2">
             {canEditMaster ? <EditMasterLink itemId={item.id} /> : null}
             {!isTemplate && (item.kind === "ebrochure" || item.kind === "case-study") ? (
-              <Link
+              <Button asChild variant="outline" size="sm"><Link
                 to="/convert"
                 search={{ print: item.id }}
                 title="Use this piece in social posts, other print sizes and a slide deck"
-                className="inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
               >
                 Social &amp; slides
-              </Link>
+              </Link></Button>
             ) : null}
             {isTemplate ? (
               <UseTemplateAction item={item} brand={brand} />
@@ -934,7 +400,7 @@ function EditMasterLink({ itemId }: { itemId: string }) {
     <Link
       to="/admin/print-library/$itemId"
       params={{ itemId }}
-      className="inline-flex items-center gap-1.5 rounded-md border border-[#003FC7]/40 bg-white px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/[0.06]"
+      className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-background px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/[0.06]"
     >
       <Pencil size={12} /> Edit master
     </Link>
@@ -971,7 +437,7 @@ function UseTemplateAction({ item, brand }: { item: PrintLibraryItem; brand: Bra
     <Link
       to="/asset/new"
       search={{ kind: item.kind, brandModeId: brand.id }}
-      className="inline-flex items-center gap-1.5 rounded-md bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
+      className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary/85"
     >
       Use template <ArrowRight size={12} />
     </Link>
@@ -1027,14 +493,14 @@ function CopyItemButton({ item, label }: { item: PrintLibraryItem; label?: strin
   };
 
   return (
-    <button
+    <Button
       type="button"
       disabled={busy}
       onClick={() => void makeCopy()}
-      className="inline-flex items-center gap-1.5 rounded-md bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85 disabled:opacity-60"
+      className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary/85 disabled:opacity-60"
     >
       <Copy size={12} /> {busy ? "Opening…" : (label ?? "Use this template")}
-    </button>
+    </Button>
   );
 }
 
@@ -1072,17 +538,17 @@ function ItemPreviewOverlayInner({
       onClick={onClose}
     >
       <div
-        className={`relative flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden ${isTemplate ? "max-w-[1600px]" : "max-w-[1100px]"} rounded-2xl bg-[#f5f5f2] shadow-2xl sm:max-h-[calc(100vh-3rem)]`}
+        className={`relative flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden ${isTemplate ? "max-w-[1600px]" : "max-w-[1100px]"} rounded-md bg-background shadow-2xl sm:max-h-[calc(100vh-3rem)]`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-4 border-b border-black/10 bg-[#f5f5f2] px-6 pb-4 pt-6">
+        <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-4 border-b border-border bg-background px-6 pb-4 pt-6">
           <div className="min-w-0">
-            <div className="text-xs uppercase tracking-[0.24em] text-black/50">
+            <div className="text-xs uppercase tracking-normal text-muted-foreground">
               {brand.name} · {printTypeMeta(item.kind).label}
               {item.collection ? ` · ${item.collection}` : ""}
             </div>
-            <h2 className="mt-1 text-2xl font-semibold text-[#03002C]">{item.title}</h2>
-            <p className="mt-1 max-w-2xl text-sm text-black/60">{item.blurb}</p>
+            <h2 className="mt-1 text-2xl font-semibold text-foreground">{item.title}</h2>
+            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{item.blurb}</p>
           </div>
           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
             {canEditMaster ? <EditMasterLink itemId={item.id} /> : null}
@@ -1092,14 +558,14 @@ function ItemPreviewOverlayInner({
               <CopyItemButton item={item} />
             )}
 
-            <button
+            <Button
               type="button"
               onClick={onClose}
               aria-label="Close preview"
-              className="rounded-full border border-black/15 bg-white p-2 text-icon-muted hover:border-black/40"
+              className="rounded-full border border-input bg-background p-2 text-icon-muted hover:border-primary/50"
             >
               <X size={14} />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -1123,10 +589,10 @@ function ItemPreviewOverlayInner({
 function PreviewFrame({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-black/50">
+      <div className="mb-2 font-mono text-[10px] uppercase tracking-normal text-muted-foreground">
         {label}
       </div>
-      <div className="overflow-hidden rounded-2xl border border-black/10 shadow-xl">{children}</div>
+      <div className="overflow-hidden rounded-md border border-border shadow-xl">{children}</div>
     </div>
   );
 }

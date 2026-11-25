@@ -1,4 +1,7 @@
 # Roadmap
+## Claude-first print library
+- [x] Claude modules and 299 templates are the default authoring library, with a prominent /element workspace door; issued originals remain separate and unchanged.
+- [x] Issued-reference shelf uses Claude folder/grid chrome; signed-in filters, preview, phone no-overflow and actual Claude Projects entry verified. Thirty source tests pass; this does not replace every legacy renderer or certify full parity.
 ## Build-error audit — 25 November
 - [x] Fixed source-editor OVC dependency; all 299 templates × 14 sizes render without changing source; sibling optional dependencies inspected.
 - [x] Full suite: 2,855 passed, 6 existing failures retained; invalid public icon imports corrected; signed-in saved editor/libraries/Claude mount checked. Audit and limits in docs/build-audit-2026-11-25.md.

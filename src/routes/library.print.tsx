@@ -2,6 +2,7 @@ import { createPortal } from "react-dom";
 import { BuildWorkspaceHeader } from "@/components/editor/BuildWorkspaceHeader";
 import { Button } from "@/design-system/element";
 import { ElementUpdateDrafts } from "@/components/print/ElementUpdateDrafts";
+import { SourceModuleLibrary } from "@/components/editor/SourceModuleLibrary";
 import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
 import { ApprovedPrintFrame } from "@/components/print/ApprovedPrintFrame";
 import { approvePrintDemoContent } from "@/lib/print-library/demo-approve";
@@ -265,13 +266,13 @@ function PrintCenterPage() {
 
   return (
     <AppShell>
-      <BuildWorkspaceHeader active="print" title="Print library"><LibrarySubnav active="/library/print" /></BuildWorkspaceHeader>
+      <BuildWorkspaceHeader active="print" title="Print library" actions={capabilities.canAuthorSystem ? <Button asChild><Link to="/element">Open Claude workspace <ArrowRight size={15} /></Link></Button> : undefined}><LibrarySubnav active="/library/print" /></BuildWorkspaceHeader>
 
       {capabilities.canAuthorSystem && !capabilities.isLoading && <div className="mb-6 flex flex-wrap gap-2" role="tablist" aria-label="Print template collections">
-        <Button role="tab" aria-selected={templateView === "source"} variant={templateView === "source" ? "default" : "outline"} onClick={() => setTemplateView("source")}>Element templates</Button>
-        <Button role="tab" aria-selected={templateView === "issued"} variant={templateView === "issued" ? "default" : "outline"} onClick={() => setTemplateView("issued")}>Issued library</Button>
+        <Button role="tab" aria-selected={templateView === "source"} variant={templateView === "source" ? "default" : "outline"} onClick={() => setTemplateView("source")}>Claude modules &amp; templates</Button>
+        <Button role="tab" aria-selected={templateView === "issued"} variant={templateView === "issued" ? "default" : "outline"} onClick={() => setTemplateView("issued")}>Issued originals</Button>
       </div>}
-      {capabilities.canAuthorSystem && !capabilities.isLoading && templateView === "source" ? <ElementUpdateDrafts /> : <PrintLibraryBrowser
+      {capabilities.canAuthorSystem && !capabilities.isLoading && templateView === "source" ? <><SourceModuleLibrary /><ElementUpdateDrafts /></> : <PrintLibraryBrowser
         brandModes={brandModes}
         divisionId={previewBrandId}
         onDivisionChange={setPreviewBrandId}
@@ -281,10 +282,10 @@ function PrintCenterPage() {
       />}
 
       {/* Approved shelf */}
-      {isAuthed === true && previewBrand ? <ApprovedShelf brand={previewBrand} /> : null}
+      {isAuthed === true && previewBrand && (!capabilities.canAuthorSystem || templateView === "issued") ? <ApprovedShelf brand={previewBrand} /> : null}
 
       {/* Approved division hero imagery */}
-      {isAuthed === true && previewBrand ? <DivisionHeroShelf brand={previewBrand} /> : null}
+      {isAuthed === true && previewBrand && (!capabilities.canAuthorSystem || templateView === "issued") ? <DivisionHeroShelf brand={previewBrand} /> : null}
 
       {/* My print assets */}
       <section className="mt-14">
