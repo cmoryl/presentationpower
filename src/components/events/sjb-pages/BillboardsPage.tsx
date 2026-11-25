@@ -48,10 +48,10 @@ export function BillboardsPage() {
           {SJB_BILLBOARD_BANNERS.filter(b => lang === "all" || b.lang === lang).map(b => <figure key={b.id} className="space-y-3">
             <Dialog>
               <DialogTrigger asChild><Button variant="ghost" className="h-auto w-full p-0 hover:bg-transparent" aria-label={`Enlarge banner ${b.w} × ${b.h} ${b.lang}`}><img src={b.image} width={b.w} height={b.h} alt={b.alt} className="h-auto w-full rounded-sm border border-border" /></Button></DialogTrigger>
-              <DialogContent className="max-w-[min(96vw,1600px)] p-3"><DialogTitle className="text-sm">Billboard banner · {b.w.toLocaleString()} × {b.h.toLocaleString()}</DialogTitle><img src={b.image} alt={b.alt} className="max-h-[85vh] w-full object-contain" /></DialogContent>
+              <DialogContent className="max-w-[min(96vw,1600px)] p-3"><DialogTitle className="text-sm">{b.look} · {b.w.toLocaleString()} × {b.h.toLocaleString()}</DialogTitle><img src={b.image} alt={b.alt} className="max-h-[85vh] w-full object-contain" /></DialogContent>
             </Dialog>
             <figcaption className="flex flex-wrap items-center gap-2 text-sm">
-              <span className="mr-auto"><strong>Billboard banner</strong><span className="block text-xs text-muted-foreground">{b.lang === "en" ? "English" : "Español"} · {b.w.toLocaleString()} × {b.h.toLocaleString()}</span></span>
+              <span className="mr-auto"><strong>{b.look}</strong><span className="block text-xs text-muted-foreground">{b.lang === "en" ? "English" : "Español"} · {b.w.toLocaleString()} × {b.h.toLocaleString()}</span></span>
               <Button asChild variant="outline" size="sm"><a href={b.image} download={b.download}><Download className="size-4" />PNG</a></Button>
               <Button asChild variant="ghost" size="sm"><a href={b.edit} target="_blank" rel="noreferrer"><ExternalLink className="size-4" />Canva</a></Button>
             </figcaption>
