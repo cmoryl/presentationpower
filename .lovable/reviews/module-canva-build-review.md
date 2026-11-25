@@ -35,7 +35,7 @@ There are currently three working paths:
 
 ## Recommended implementation order
 
-1. **Agree the source of truth for Canva-related work.** Element-first with optional Canva handoff is the recommended default; Canva-master work requires explicit return/review rules.
+1. **Confirmed source of truth (25 November): Element-first.** Build and approve new modular work in Claude/Element; send checked editable files to Canva only when needed. Existing Canva-led event work remains unchanged.
 2. **Finish the real workspace verification gate.** Run the private Cloud-backed suites and two-client checks. Keep missing assistant/presence capabilities clearly separate.
 3. **Consolidate creation and reopening.** Main authoring doors should reach the real Claude workflow; existing work should remain identifiable and recoverable. Do not overwrite or automatically migrate issued pieces.
 4. **Validate representative materials.** Check text, photo crops, typography, required-size layouts, reopened saves and reviewer decisions. A no-crash sweep is not visual certification.

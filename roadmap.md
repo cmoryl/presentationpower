@@ -1,7 +1,7 @@
 # Roadmap
 ## Whole-build module and Canva reevaluation
 - [x] Reviewed competing module/edit/save/review/export paths; findings and recommended sequence in .lovable/reviews/module-canva-build-review.md. No app behavior or saved records changed.
-- [ ] Confirm Element-first, Canva-first or per-project design authority before implementation; waiting on the user's Canva-role choice.
+- [x] User confirmed Element-first: new modular work is built and approved in Claude/Element; Canva receives checked editable handoffs only when needed.
 ## Claude-first print library
 - [x] Claude modules and 299 templates are the default authoring library, with a prominent /element workspace door; issued originals remain separate and unchanged.
 - [x] Issued-reference shelf uses Claude folder/grid chrome; signed-in filters, preview, phone no-overflow and actual Claude Projects entry verified. Thirty source tests pass; this does not replace every legacy renderer or certify full parity.
