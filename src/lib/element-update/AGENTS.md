@@ -1,4 +1,5 @@
 # Source build adoption
+- Supply renderer globals through engineSupport and test photo-bearing templates across every size — why: default-only previews miss dependencies reached by actual saved artwork.
 - Use the authoritative ordered v221 source, inspect every later definition/wrapper before porting a function, and import baked data plus its reader rather than baking — why: the former HTML archive is bundled output and earlier definitions are intentionally superseded.
 - Generate shared editor controls from fields with module-local when(d) evaluation and vk/vk2 variants; integrate SUBS and derive-based sizes on the same working stack — why: separate module forms and size documents lose the source process.
 - Resolve supplied image hashes through the original asset mapping without changing saved material IDs; preserve spectrum/spx internal keys during display-name migrations — why: artwork wiring and the Templates rename must not orphan saved work.

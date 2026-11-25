@@ -1,4 +1,7 @@
 # Roadmap
+## Build-error audit — 25 November
+- [x] Fixed source-editor OVC dependency; all 299 templates × 14 sizes render without changing source; sibling optional dependencies inspected.
+- [x] Full suite: 2,855 passed, 6 existing failures retained; invalid public icon imports corrected; signed-in saved editor/libraries/Claude mount checked. Audit and limits in docs/build-audit-2026-11-25.md.
 ## Portable brand-kit data export
 - [x] Execute all six kit factories and every registered brand-guide factory; serialize unchanged document content to docs/brand-kit-export.json with absolute sibling image URLs, per-document counts and explicit resolution errors. No content changes or ELEMENT import.
 ## Isolated first-party v221 application

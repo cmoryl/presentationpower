@@ -15,7 +15,7 @@ import {
 } from "@/lib/ai-core";
 import { ICON_LIBRARY, parseIconRef } from "@/lib/icon-library";
 import { BRAND_MODES } from "@/lib/taxonomy";
-import manifest from "../../public/icon-library/manifest.json";
+import manifest from "@/assets/icon-library/manifest.json";
 
 const Input = z.object({
   brandModeId: z.string(),

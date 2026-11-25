@@ -18,10 +18,12 @@ function photoImg(value: unknown, cls: string) {
   return `<img class="${esc(cls)}" src="${esc(src)}" alt="${esc(p.alt)}" style="object-position:${fx}% ${fy}%;transform:scale(${zoom});transform-origin:${fx}% ${fy}%">`;
 }
 const rgb = (hex: string) => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)).join(",");
+const overlayColors = { navy: BRAND.ink, indigo: BRAND.ink, cobalt: BRAND.blue, white: BRAND.white, black: BRAND.ink, signature: SPECTRUM.stages[2].brand };
+const OVC = Object.fromEntries(Object.entries(overlayColors).map(([key, color]) => [key, rgb(color)]));
 function overlayCss(kind: string, strength: unknown, direction: string) {
   if (kind === "none") return "";
   const s = bounded(strength, 55, 0, 95) / 100;
-  const color = { navy: BRAND.ink, indigo: BRAND.ink, cobalt: BRAND.blue, white: BRAND.white, black: BRAND.ink, signature: SPECTRUM.stages[2].brand }[kind] ?? BRAND.ink;
+  const color = overlayColors[kind as keyof typeof overlayColors] ?? BRAND.ink;
   const c = rgb(color);
   if (direction === "left" || direction === "bottom") return `linear-gradient(${direction === "left" ? 90 : 0}deg,rgba(${c},${s}) 0%,rgba(${c},${s * .55}) 45%,rgba(${c},${s * .05}) 100%)`;
   return `rgba(${c},${s})`;
@@ -46,6 +48,6 @@ export const engineSupport = {
   clone: <T,>(value: T): T => JSON.parse(JSON.stringify(value)), uid: () => crypto.randomUUID(),
   imgSrc: (value: unknown) => resolveSourceImage(value) ?? "", hasImg: (value: unknown) => Boolean(resolveSourceImage(value)),
   cleanPhoto: (value: unknown) => resolveSourceImage(value) ? { ...asRecord(value) } : null,
-  photoImg, overlayCss, ic, LOGO, LOGO_AR: { gl: 4.5, mark: 1 }, CUR_BRAND: { name: "TransPerfect", short: "TransPerfect", endorse: false },
+  photoImg, overlayCss, OVC, ic, LOGO, LOGO_AR: { gl: 4.5, mark: 1 }, CUR_BRAND: { name: "TransPerfect", short: "TransPerfect", endorse: false },
   DECK_MAP: worldMap.url, QR: { svg: qrSvg }, PROOF: [] as unknown[], spxOn: () => true,
 };
