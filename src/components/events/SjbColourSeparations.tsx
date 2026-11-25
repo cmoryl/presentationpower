@@ -144,6 +144,7 @@ function PlateCard({ plate }: { plate: SjbSeparation }) {
           <dt className="font-medium text-foreground">HEX</dt><dd className="break-all">{plate.hexCode}</dd>
           <dt className="font-medium text-foreground">CMYK</dt><dd>{plate.cmyk}</dd>
           <dt className="font-medium text-foreground">RGB</dt><dd>{plate.rgb}</dd>
+          <dt className="font-medium text-foreground">Pantone</dt><dd>{plate.pantone} <span className="block text-[11px]">Nearest coated match</span></dd>
         </dl>
         <p className="text-xs text-muted-foreground">{plate.role}</p>
         <div className="flex gap-3 text-xs font-semibold">

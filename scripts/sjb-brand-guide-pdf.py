@@ -36,10 +36,11 @@ for f in glob.glob(os.path.join(ROOT, "src/assets/san-juan-bowl/**/*.asset.json"
     URL[os.path.basename(f)[:-11]] = ORIGIN + json.load(open(f))["url"]
 
 NAVY, SKY, GOLD, INK = "#0D0E21", "#00AAE7", "#FFD600", "#0D0E21"
-COLORS = [("Bowl Navy", NAVY, "13 · 14 · 33", "87 · 81 · 55 · 75", "Badge, outlines and dark backgrounds"),
-          ("Caribbean Sky", SKY, "0 · 170 · 231", "86 · 8 · 0 · 0", "Sky, waves and accent fills"),
-          ("Banner Gold", GOLD, "255 · 214 · 0", "0 · 14 · 100 · 0", "Banner, sun and highlights"),
-          ("White", "#FFFFFF", "255 · 255 · 255", "0 · 0 · 0 · 0", "Type and artwork on navy")]
+# Mirrors SJB_COLORS (src/lib/san-juan-bowl.ts); Pantone = nearest coated match.
+COLORS = [("Bowl Navy", NAVY, "13 · 14 · 33", "87 · 81 · 55 · 75", "Badge, outlines and dark backgrounds", "PANTONE 532 C (alt. Black 6 C)"),
+          ("Caribbean Sky", SKY, "0 · 170 · 231", "86 · 8 · 0 · 0", "Sky, waves and accent fills", "PANTONE 2995 C (alt. 299 C)"),
+          ("Banner Gold", GOLD, "255 · 214 · 0", "0 · 14 · 100 · 0", "Banner, sun and highlights", "PANTONE 109 C (alt. 108 C, 115 C)"),
+          ("White", "#FFFFFF", "255 · 255 · 255", "0 · 0 · 0 · 0", "Type and artwork on navy", "None (paper / white ink)")]
 
 W, H = landscape(letter)
 M = 48
@@ -237,17 +238,18 @@ c.showPage()
 # 9 colour
 head("Colour", "Colour")
 cw = (W - 2 * M - 36) / 4
-for i, (n, hx, rgb, cmyk, role) in enumerate(COLORS):
+for i, (n, hx, rgb, cmyk, role, pms) in enumerate(COLORS):
     x = M + i * (cw + 12)
     c.setFillColor(hx); c.setStrokeColor("#D9DCE5"); c.rect(x, 300, cw, 140, stroke=1, fill=1)
     c.setFillColor(INK); c.setFont("GB", 11); c.drawString(x, 280, n)
     c.setFont("G", 9)
-    for j, l in enumerate([f"HEX  {hx}", f"RGB  {rgb}", f"CMYK  {cmyk}"]): c.drawString(x, 262 - j * 14, l)
-    para(role, x, 214, cw, 8.5, color="#444444")
+    for j, l in enumerate([f"HEX  {hx}", f"RGB  {rgb}", f"CMYK  {cmyk}", f"PMS  {pms}"]): c.drawString(x, 262 - j * 14, l)
+    if not pms.startswith("None"): c.setFont("G", 7); c.setFillColor("#666666"); c.drawString(x, 210, "Nearest coated match"); c.setFillColor(INK)
+    para(role, x, 198, cw, 8.5, color="#444444")
 y = 170
 for n in ["HEX, RGB and HSL values are exact, taken from the supplied artwork — use them as-is on screen and web.",
           "CMYK values are the inks set in the master EPS/AI files, so they match what the vector files print. They are not proofed: always run a vendor proof before print and adjust on press if needed.",
-          "Pantone (spot) references are matched by the print vendor from the supplied artwork — never substitute a guessed swatch.",
+          "Pantone references are the nearest coated matches to the master CMYK builds. Confirm against a physical Pantone book or the vendor's proof before production.",
           "Body text on San Juan Bowl print is solid black (100K), same as every TransPerfect print piece."]:
     y = para("•  " + n, M, y, W - 2 * M, 9) - 3
 c.showPage()

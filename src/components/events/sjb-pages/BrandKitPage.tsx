@@ -10,6 +10,7 @@ import masterKit from "@/assets/sjb/master-logo-kit.zip.asset.json";
 import brandGuide from "@/assets/sjb/brand-guide.pdf.asset.json";
 import { BrandKitPdfExport } from "@/components/brand/BrandKitPdfExport";
 import { SjbLettering } from "@/components/events/SjbLettering";
+import { SjbLanyards } from "@/components/events/SjbLanyards";
 import { SjbLogoAnimation } from "@/components/events/SjbLogoAnimation";
 import { BrandKitSectionNav } from "@/components/brand/BrandKitSectionNav";
 import { SJB_LETTERING_SPEC_VISIBLE } from "@/components/events/SjbShare";
@@ -28,6 +29,8 @@ import {
   SJB_CLEAR_SPACE,
   SJB_COLOR_NOTES,
   SJB_COLORS,
+  SJB_PANTONE_LABEL,
+  sjbPantoneText,
   SJB_CONSTRUCTION,
   SJB_EVENT,
   SJB_LOGOS,
@@ -46,7 +49,7 @@ import {
 
 
 const card = "border-t border-border bg-background py-5";
-const BRAND_SECTIONS = [["animations", "Animations"], ["applications", "Applications"], ["bowl-logos", "Logos"], ["bowl-colours", "Colours"], ["bowl-pairings", "Colour balance"], ["bowl-typography", "Typography"], ["bowl-naming", "Naming"], ["bowl-construction", "Construction"], ["bowl-production", "Production"]] as const;
+const BRAND_SECTIONS = [["animations", "Animations"], ["applications", "Applications"], ["bowl-logos", "Logos"], ["bowl-colours", "Colours"], ["bowl-pairings", "Colour balance"], ["bowl-lanyards", "Lanyards"], ["bowl-typography", "Typography"], ["bowl-naming", "Naming"], ["bowl-construction", "Construction"], ["bowl-production", "Production"]] as const;
 
 /** Backgrounds offered in the per-variant preview switcher. */
 const PREVIEW_BGS = [
@@ -535,14 +538,14 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
                         ["RGB", c.rgb],
                         ["HSL", c.hsl],
                         ["CMYK", c.cmyk],
-                        ["Pantone", "Vendor-matched"],
+                        ["Pantone", sjbPantoneText(c)],
                       ] as const
                     ).map(([label, value]) => (
                       <tr key={label} className="border-t border-[#03002C]/8">
                         <td className="w-20 py-1.5 pr-2 text-[11px] font-semibold uppercase tracking-wide text-[#666666]">
                           {label}
                         </td>
-                        <td className="py-1.5 font-mono text-[12px]">{value}</td>
+                        <td className="py-1.5 font-mono text-[12px]">{value}{label === "Pantone" && c.pantone && <span className="block font-sans text-[11px] text-[#666666]">{SJB_PANTONE_LABEL}</span>}</td>
                         <td className="py-1.5 text-right">
                           {label !== "Pantone" && <CopyCode value={value} label={`${c.name} ${label}`} />}
                         </td>
@@ -612,6 +615,8 @@ export function SjbBrandKitBody({ embedded = false }: { embedded?: boolean }) {
             })}
           </div>
         </section>
+
+        <SjbLanyards />
 
         <section id="bowl-typography" className="space-y-3">
           <h2 className="text-[17px] font-bold">Typography</h2>

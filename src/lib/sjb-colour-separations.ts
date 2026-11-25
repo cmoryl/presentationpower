@@ -14,7 +14,7 @@ import goldPng from "@/assets/san-juan-bowl/separations/sjb-separation-gold-2400
 import whiteSvg from "@/assets/san-juan-bowl/separations/sjb-separation-white.svg.asset.json";
 import whitePng from "@/assets/san-juan-bowl/separations/sjb-separation-white-2400.png.asset.json";
 import pack from "@/assets/san-juan-bowl/separations/sjb-colour-separations-v1.0.zip.asset.json";
-import { SJB_COLORS, SJB_LOGOS } from "@/lib/san-juan-bowl";
+import { SJB_COLORS, SJB_LOGOS, sjbPantoneText } from "@/lib/san-juan-bowl";
 
 /** One ink of the badge, held as its own editable layer. */
 export interface SjbSeparation {
@@ -28,6 +28,7 @@ export interface SjbSeparation {
   role: string;
   cmyk: string;
   rgb: string;
+  pantone: string;
   hexCode: string;
   svg: string;
   png: string;
@@ -53,6 +54,7 @@ export const SJB_SEPARATIONS: SjbSeparation[] = PLATES.map((p) => {
     role: color.role,
     cmyk: color.cmyk,
     rgb: color.rgb,
+    pantone: sjbPantoneText(color),
     hexCode: color.hex,
     svg: p.svg,
     png: p.png,
@@ -74,7 +76,7 @@ export const SJB_SEPARATION_SOURCE = {
 export const SJB_SEPARATION_NOTES = [
   "These are ink separations of the badge — one layer per Bowl colour. They are not CMYK process separations: the artwork is built from four brand inks, not from cyan, magenta, yellow and black.",
   "CMYK values are the working builds set in the master vector files. They are unproofed: always run a vendor proof before print and adjust on press if needed.",
-  "Pantone (spot) references are matched by the print vendor from the supplied artwork — never substitute a guessed swatch.",
+  "Pantone references are the nearest coated matches to the master CMYK builds. Confirm against a physical Pantone book or the vendor's proof before production.",
   `${SJB_SEPARATION_SOURCE.unpaintedShapes} unpainted source contours (${SJB_SEPARATION_SOURCE.totalShapes - SJB_SEPARATION_SOURCE.keptShapes} of ${SJB_SEPARATION_SOURCE.totalShapes} shapes) carry no ink and are left out of the plates; they stay in the original master and are not a white underlay or a knock-out layer.`,
   "White is a real ink here, not the absence of one: it carries the clouds, the palm highlights, the stars and the lettering on the dark ground. Never drop it to save a pass.",
   "Bodies of text on Bowl print stay solid black (100K), same as every TransPerfect print piece. The separations above describe the badge only.",

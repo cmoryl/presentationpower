@@ -37,13 +37,24 @@ export const SJB_EVENT = {
  * Colours read from the supplied logo file, not picked by eye.
  * HEX/RGB/HSL are exact. CMYK values are standard-conversion working builds
  * for coated stock — unproofed, so vendors must proof before print. Pantone
- * references are matched by the vendor from the supplied artwork, never guessed.
+ * values are the nearest coated matches (SJB_PANTONE_LABEL); confirm on a proof.
  */
+/** Label shown next to every Bowl Pantone reference. */
+export const SJB_PANTONE_LABEL = "Nearest coated match";
+
+/** "PANTONE 532 C (alt. Black 6 C)", or the paper/white-ink note for White. */
+export function sjbPantoneText(c: { pantone: string | null; pantoneAlternates: readonly string[] }): string {
+  if (!c.pantone) return "None (paper / white ink)";
+  return c.pantoneAlternates.length ? `${c.pantone} (alt. ${c.pantoneAlternates.join(", ")})` : c.pantone;
+}
+
 export const SJB_COLORS = [
   {
     id: "navy",
     name: "Bowl Navy",
     hex: "#0D0E21",
+    pantone: "PANTONE 532 C" as string | null,
+    pantoneAlternates: ["Black 6 C"] as readonly string[],
     rgb: "13 · 14 · 33",
     hsl: "237° · 43% · 9%",
     cmyk: "87 · 81 · 55 · 75",
@@ -54,6 +65,8 @@ export const SJB_COLORS = [
     id: "sky",
     name: "Caribbean Sky",
     hex: "#00AAE7",
+    pantone: "PANTONE 2995 C" as string | null,
+    pantoneAlternates: ["299 C"] as readonly string[],
     rgb: "0 · 170 · 231",
     hsl: "196° · 100% · 45%",
     cmyk: "86 · 8 · 0 · 0",
@@ -64,6 +77,8 @@ export const SJB_COLORS = [
     id: "gold",
     name: "Banner Gold",
     hex: "#FFD600",
+    pantone: "PANTONE 109 C" as string | null,
+    pantoneAlternates: ["108 C", "115 C"] as readonly string[],
     rgb: "255 · 214 · 0",
     hsl: "50° · 100% · 50%",
     cmyk: "0 · 14 · 100 · 0",
@@ -74,6 +89,8 @@ export const SJB_COLORS = [
     id: "white",
     name: "White",
     hex: "#FFFFFF",
+    pantone: null as string | null,
+    pantoneAlternates: [] as readonly string[],
     rgb: "255 · 255 · 255",
     hsl: "0° · 0% · 100%",
     cmyk: "0 · 0 · 0 · 0",
@@ -85,7 +102,7 @@ export const SJB_COLORS = [
 export const SJB_COLOR_NOTES = [
   "HEX, RGB and HSL values are exact, taken from the supplied artwork — use them as-is on screen and web.",
   "CMYK values are the inks set in the master EPS/AI files, so they match what the vector files print. They are not proofed: always run a vendor proof before print and adjust on press if needed.",
-  "Pantone (spot) references are matched by the print vendor from the supplied artwork — never substitute a guessed swatch.",
+  "Pantone references are the nearest coated matches to the master CMYK builds. Confirm against a physical Pantone book or the vendor's proof before production.",
   "Body text on San Juan Bowl print is solid black (100K), same as every TransPerfect print piece.",
 ];
 

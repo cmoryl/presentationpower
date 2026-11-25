@@ -24,6 +24,8 @@ import {
   SJB_MISUSE,
   SJB_TYPE_NOTE,
   type SjbMisuseDemo,
+  SJB_PANTONE_LABEL,
+  sjbPantoneText,
 } from "@/lib/san-juan-bowl";
 import curvedAi from "@/assets/sjb/curved-lettering.ai.asset.json";
 import curvedSvg from "@/assets/sjb/curved-lettering.svg.asset.json";
@@ -117,7 +119,7 @@ export function SjbGuideSections({ withSingleColour = true, withLayers = true }:
               <div className="p-4 text-sm">
                 <p className="font-semibold text-foreground">{c.name}</p>
                 <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-muted-foreground">
-                  <dt className="font-medium text-foreground">Pantone</dt><dd>Matched by vendor</dd>
+                  <dt className="font-medium text-foreground">Pantone</dt><dd>{sjbPantoneText(c)}{c.pantone && <span className="block text-xs">{SJB_PANTONE_LABEL}</span>}</dd>
                   <dt className="font-medium text-foreground">CMYK</dt><dd>{c.cmyk}</dd>
                   <dt className="font-medium text-foreground">RGB</dt><dd>{c.rgb}</dd>
                   <dt className="font-medium text-foreground">Web</dt><dd>{c.hex}</dd>

@@ -351,6 +351,11 @@ function sanJuanBowlEntry(): EventEntry {
             link: { to: "/events/san-juan-bowl/brand-kit" },
           },
           {
+            label: "Lanyards",
+            detail: "3/4 inch lanyards in five colourways with Pantone material and imprint colours.",
+            link: { to: "/events/san-juan-bowl/brand-kit", hash: "bowl-lanyards" },
+          },
+          {
             label: "Stadium 3D view",
             detail: "Hiram Bithorn Stadium, San Juan — the interactive BoothHUB stadium and field.",
             link: { to: "/events/san-juan-bowl/stadium" },

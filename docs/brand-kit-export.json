@@ -3799,7 +3799,7 @@
           "paragraphs": [
             "HEX, RGB and HSL values are exact, taken from the supplied artwork — use them as-is on screen and web.",
             "CMYK values are the inks set in the master EPS/AI files, so they match what the vector files print. They are not proofed: always run a vendor proof before print and adjust on press if needed.",
-            "Pantone (spot) references are matched by the print vendor from the supplied artwork — never substitute a guessed swatch.",
+            "Pantone references are the nearest coated matches to the master CMYK builds. Confirm against a physical Pantone book or the vendor's proof before production.",
             "Body text on San Juan Bowl print is solid black (100K), same as every TransPerfect print piece.",
             "Suggested balance: navy 60% · white 25% · sky 10% · gold 5%",
             "White on Bowl Navy: 19.1:1 contrast.",
@@ -3815,22 +3815,22 @@
             {
               "name": "Bowl Navy",
               "hex": "#0D0E21",
-              "detail": "RGB 13 · 14 · 33 · CMYK 87 · 81 · 55 · 75 (proof first) · Badge, outlines and dark backgrounds"
+              "detail": "RGB 13 · 14 · 33 · CMYK 87 · 81 · 55 · 75 (proof first) · Pantone PANTONE 532 C (alt. Black 6 C) (Nearest coated match) · Badge, outlines and dark backgrounds"
             },
             {
               "name": "Caribbean Sky",
               "hex": "#00AAE7",
-              "detail": "RGB 0 · 170 · 231 · CMYK 86 · 8 · 0 · 0 (proof first) · Sky, waves and accent fills"
+              "detail": "RGB 0 · 170 · 231 · CMYK 86 · 8 · 0 · 0 (proof first) · Pantone PANTONE 2995 C (alt. 299 C) (Nearest coated match) · Sky, waves and accent fills"
             },
             {
               "name": "Banner Gold",
               "hex": "#FFD600",
-              "detail": "RGB 255 · 214 · 0 · CMYK 0 · 14 · 100 · 0 (proof first) · Banner, sun and highlights"
+              "detail": "RGB 255 · 214 · 0 · CMYK 0 · 14 · 100 · 0 (proof first) · Pantone PANTONE 109 C (alt. 108 C, 115 C) (Nearest coated match) · Banner, sun and highlights"
             },
             {
               "name": "White",
               "hex": "#FFFFFF",
-              "detail": "RGB 255 · 255 · 255 · CMYK 0 · 0 · 0 · 0 (proof first) · Type and artwork on navy"
+              "detail": "RGB 255 · 255 · 255 · CMYK 0 · 0 · 0 · 0 (proof first) · Pantone None (paper / white ink) · Type and artwork on navy"
             }
           ]
         },
