@@ -354,7 +354,7 @@ function sanJuanBowlEntry(): EventEntry {
           {
             label: "Lanyards",
             detail: "3/4 inch lanyards in five colourways with Pantone material and imprint colours.",
-            link: { to: "/events/san-juan-bowl/brand-kit", hash: "bowl-lanyards" },
+            link: { to: "/events/san-juan-bowl/badges", hash: "bowl-lanyards" },
           },
           {
             label: "Stadium 3D view",
