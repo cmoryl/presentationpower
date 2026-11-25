@@ -9,6 +9,7 @@ import stadiumHome from "@/assets/sjb-stadium/stadium-night-wide-16x9.jpg";
 import { KIT_RELEASES } from "./brand-kit-releases";
 import { selectedBillboardArtwork } from "./sjb-selected-billboards";
 import animationPreview from "@/assets/san-juan-bowl/bowl-logo-animation-preview.jpg.asset.json";
+import emailBanner from "@/assets/sjb/sjb-email-player-en.png.asset.json";
 
 export interface SjbRecentUpdate {
   title: string;
@@ -30,6 +31,13 @@ const bowlKitDate = new Date(`${bowlKit.released}T00:00:00Z`).toLocaleDateString
 });
 
 export const SJB_RECENT_UPDATES: SjbRecentUpdate[] = [
+  {
+    title: "Email banners",
+    detail: "Six approved banners live in Canva — three artwork looks in English and Spanish, 800 × 350, with PNG downloads.",
+    date: "Nov 25, 2026",
+    image: emailBanner.url,
+    link: { to: "/events/san-juan-bowl/email-banners" },
+  },
   {
     title: "Logo animation",
     detail: "Seamless 360° rotating logo, with looping playback and original video download in the brand kit.",

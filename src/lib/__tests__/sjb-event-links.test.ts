@@ -18,7 +18,11 @@ describe("Bowl event isolation", () => {
   });
 
   it("keeps unbuilt Bowl signs, badges and pillars unavailable", () => {
-    expect(SJB_EVENT_AREAS.find((area) => area.id === "production")?.tools).toEqual([]);
+    // Badges and T-shirts are built pages now; on-site signs and pillars are not,
+    // so the production area must stay limited to what actually exists.
+    expect(SJB_EVENT_AREAS.find((area) => area.id === "production")?.tools.map((t) => t.link.to)).toEqual([
+      "/events/san-juan-bowl/badges", "/events/san-juan-bowl/tshirts",
+    ]);
     expect(builtInEvent("san-juan-bowl")?.tabs.find((tab) => tab.id === "badges")?.tools).toEqual([]);
     expect(builtInEvent("san-juan-bowl")?.tabs.find((tab) => tab.id === "signage")?.tools.map((tool) => tool.link.to)).toEqual([
       "/events/san-juan-bowl/billboards", "/share/san-juan-bowl/billboards",

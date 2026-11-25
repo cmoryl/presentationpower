@@ -10,6 +10,7 @@ describe("San Juan Bowl official announcement", () => {
       "/events/san-juan-bowl/brand-kit/guide",
       "/events/san-juan-bowl/brand-kit/single-colour",
       "/share/san-juan-bowl",
+      "/events/san-juan-bowl/email-banners",
     ]);
   });
   it("uses the announced inaugural date in the event directory", () => {

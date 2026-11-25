@@ -202,6 +202,7 @@ import { Route as EventsNextVenuesRouteImport } from './routes/events.next_.venu
 import { Route as EventsSanJuanBowlBadgesRouteImport } from './routes/events.san-juan-bowl_.badges'
 import { Route as EventsSanJuanBowlBillboardsRouteImport } from './routes/events.san-juan-bowl_.billboards'
 import { Route as EventsSanJuanBowlBrandKitRouteImport } from './routes/events.san-juan-bowl_.brand-kit'
+import { Route as EventsSanJuanBowlEmailBannersRouteImport } from './routes/events.san-juan-bowl_.email-banners'
 import { Route as EventsSanJuanBowlSocialRouteImport } from './routes/events.san-juan-bowl_.social'
 import { Route as EventsSanJuanBowlSocialCalendarRouteImport } from './routes/events.san-juan-bowl_.social-calendar'
 import { Route as EventsSanJuanBowlStadiumRouteImport } from './routes/events.san-juan-bowl_.stadium'
@@ -1239,6 +1240,12 @@ const EventsSanJuanBowlBrandKitRoute =
     path: '/san-juan-bowl/brand-kit',
     getParentRoute: () => EventsRoute,
   } as any)
+const EventsSanJuanBowlEmailBannersRoute =
+  EventsSanJuanBowlEmailBannersRouteImport.update({
+    id: '/san-juan-bowl_/email-banners',
+    path: '/san-juan-bowl/email-banners',
+    getParentRoute: () => EventsRoute,
+  } as any)
 const EventsSanJuanBowlSocialRoute = EventsSanJuanBowlSocialRouteImport.update({
   id: '/san-juan-bowl_/social',
   path: '/san-juan-bowl/social',
@@ -1774,6 +1781,7 @@ export interface FileRoutesByFullPath {
   '/events/san-juan-bowl/badges': typeof EventsSanJuanBowlBadgesRoute
   '/events/san-juan-bowl/billboards': typeof EventsSanJuanBowlBillboardsRoute
   '/events/san-juan-bowl/brand-kit': typeof EventsSanJuanBowlBrandKitRoute
+  '/events/san-juan-bowl/email-banners': typeof EventsSanJuanBowlEmailBannersRoute
   '/events/san-juan-bowl/social': typeof EventsSanJuanBowlSocialRoute
   '/events/san-juan-bowl/social-calendar': typeof EventsSanJuanBowlSocialCalendarRoute
   '/events/san-juan-bowl/stadium': typeof EventsSanJuanBowlStadiumRoute
@@ -2027,6 +2035,7 @@ export interface FileRoutesByTo {
   '/events/san-juan-bowl/badges': typeof EventsSanJuanBowlBadgesRoute
   '/events/san-juan-bowl/billboards': typeof EventsSanJuanBowlBillboardsRoute
   '/events/san-juan-bowl/brand-kit': typeof EventsSanJuanBowlBrandKitRoute
+  '/events/san-juan-bowl/email-banners': typeof EventsSanJuanBowlEmailBannersRoute
   '/events/san-juan-bowl/social': typeof EventsSanJuanBowlSocialRoute
   '/events/san-juan-bowl/social-calendar': typeof EventsSanJuanBowlSocialCalendarRoute
   '/events/san-juan-bowl/stadium': typeof EventsSanJuanBowlStadiumRoute
@@ -2285,6 +2294,7 @@ export interface FileRoutesById {
   '/events/san-juan-bowl_/badges': typeof EventsSanJuanBowlBadgesRoute
   '/events/san-juan-bowl_/billboards': typeof EventsSanJuanBowlBillboardsRoute
   '/events/san-juan-bowl_/brand-kit': typeof EventsSanJuanBowlBrandKitRoute
+  '/events/san-juan-bowl_/email-banners': typeof EventsSanJuanBowlEmailBannersRoute
   '/events/san-juan-bowl_/social': typeof EventsSanJuanBowlSocialRoute
   '/events/san-juan-bowl_/social-calendar': typeof EventsSanJuanBowlSocialCalendarRoute
   '/events/san-juan-bowl_/stadium': typeof EventsSanJuanBowlStadiumRoute
@@ -2544,6 +2554,7 @@ export interface FileRouteTypes {
     | '/events/san-juan-bowl/badges'
     | '/events/san-juan-bowl/billboards'
     | '/events/san-juan-bowl/brand-kit'
+    | '/events/san-juan-bowl/email-banners'
     | '/events/san-juan-bowl/social'
     | '/events/san-juan-bowl/social-calendar'
     | '/events/san-juan-bowl/stadium'
@@ -2797,6 +2808,7 @@ export interface FileRouteTypes {
     | '/events/san-juan-bowl/badges'
     | '/events/san-juan-bowl/billboards'
     | '/events/san-juan-bowl/brand-kit'
+    | '/events/san-juan-bowl/email-banners'
     | '/events/san-juan-bowl/social'
     | '/events/san-juan-bowl/social-calendar'
     | '/events/san-juan-bowl/stadium'
@@ -3054,6 +3066,7 @@ export interface FileRouteTypes {
     | '/events/san-juan-bowl_/badges'
     | '/events/san-juan-bowl_/billboards'
     | '/events/san-juan-bowl_/brand-kit'
+    | '/events/san-juan-bowl_/email-banners'
     | '/events/san-juan-bowl_/social'
     | '/events/san-juan-bowl_/social-calendar'
     | '/events/san-juan-bowl_/stadium'
@@ -4602,6 +4615,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsSanJuanBowlBrandKitRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/san-juan-bowl_/email-banners': {
+      id: '/events/san-juan-bowl_/email-banners'
+      path: '/san-juan-bowl/email-banners'
+      fullPath: '/events/san-juan-bowl/email-banners'
+      preLoaderRoute: typeof EventsSanJuanBowlEmailBannersRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/san-juan-bowl_/social': {
       id: '/events/san-juan-bowl_/social'
       path: '/san-juan-bowl/social'
@@ -5161,6 +5181,7 @@ interface EventsRouteChildren {
   EventsSanJuanBowlBadgesRoute: typeof EventsSanJuanBowlBadgesRoute
   EventsSanJuanBowlBillboardsRoute: typeof EventsSanJuanBowlBillboardsRoute
   EventsSanJuanBowlBrandKitRoute: typeof EventsSanJuanBowlBrandKitRoute
+  EventsSanJuanBowlEmailBannersRoute: typeof EventsSanJuanBowlEmailBannersRoute
   EventsSanJuanBowlSocialRoute: typeof EventsSanJuanBowlSocialRoute
   EventsSanJuanBowlSocialCalendarRoute: typeof EventsSanJuanBowlSocialCalendarRoute
   EventsSanJuanBowlStadiumRoute: typeof EventsSanJuanBowlStadiumRoute
@@ -5230,6 +5251,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsSanJuanBowlBadgesRoute: EventsSanJuanBowlBadgesRoute,
   EventsSanJuanBowlBillboardsRoute: EventsSanJuanBowlBillboardsRoute,
   EventsSanJuanBowlBrandKitRoute: EventsSanJuanBowlBrandKitRoute,
+  EventsSanJuanBowlEmailBannersRoute: EventsSanJuanBowlEmailBannersRoute,
   EventsSanJuanBowlSocialRoute: EventsSanJuanBowlSocialRoute,
   EventsSanJuanBowlSocialCalendarRoute: EventsSanJuanBowlSocialCalendarRoute,
   EventsSanJuanBowlStadiumRoute: EventsSanJuanBowlStadiumRoute,

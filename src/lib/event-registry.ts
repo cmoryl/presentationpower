@@ -340,6 +340,7 @@ function sanJuanBowlEntry(): EventEntry {
           { label: "Full brand guide", detail: "Logo selection, colours, typography, usage restrictions and logo don’ts.", link: { to: "/events/san-juan-bowl/brand-kit/guide" } },
           { label: "Single-colour logos", detail: "Supplied navy, black and white variants; arched lettering is limited use, approval only and not an official Bowl logo.", link: { to: "/events/san-juan-bowl/brand-kit/single-colour" } },
           { label: "Public brand kit & share link", detail: "The same established guidelines and downloads, without sign-in or the Element menu.", link: { to: "/share/san-juan-bowl" } },
+          { label: "Email banners", detail: "Six approved banners live in Canva: three artwork looks in English and Spanish, 800 × 350, with PNG downloads.", link: { to: "/events/san-juan-bowl/email-banners" } },
         ],
       },
       {
@@ -524,6 +525,7 @@ export const SJB_EVENT_AREAS: EventAreaGroup[] = [
       { label: "Social posts", detail: "Every campaign set, with picture and Illustrator downloads.", link: { to: "/events/san-juan-bowl/social" } },
       { label: "Social calendar", detail: "Every planned post by date, with dark and light Canva and Illustrator files.", link: { to: "/events/san-juan-bowl/social-calendar" } },
       { label: "Digital billboards", detail: "English and Spanish roadside boards with examples.", link: { to: "/events/san-juan-bowl/billboards" } },
+      { label: "Email banners", detail: "Six approved banners in Canva — three looks, English and Spanish, with PNG downloads.", link: { to: "/events/san-juan-bowl/email-banners" } },
     ],
   },
   {
