@@ -419,6 +419,7 @@ function Library() {
   // Persisted for the tab session: the catalog loads in chunks, and a data
   // remount used to silently drop an in-progress selection mid-click.
   const [selectMode, setSelectMode] = useState(false);
+  const [showLegacy, setShowLegacy] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const selectHydrated = useRef(false);
   useEffect(() => {
@@ -921,6 +922,28 @@ function Library() {
 
         <SourceModuleLibrary />
 
+        <section aria-labelledby="legacy-slide-variants" className="mt-10 border-t border-border pt-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 id="legacy-slide-variants" className="text-base font-semibold text-foreground">
+                Earlier slide variants
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                The previous deck module catalogue, kept for existing decks. New work uses the Element modules above.
+              </p>
+            </div>
+            <button
+              type="button"
+              aria-expanded={showLegacy}
+              onClick={() => setShowLegacy((v) => !v)}
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {showLegacy ? "Hide earlier variants" : "Show earlier variants"}
+            </button>
+          </div>
+        </section>
+
+        {showLegacy && (<>
         <div className="sticky top-0 z-20 -mx-2 rounded-2xl border border-black/10 bg-white/85 px-3 py-3 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-[#05041A]/80">
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative min-w-[220px] flex-1">
@@ -1631,6 +1654,7 @@ function Library() {
             />
           );
         })()}
+        </>)}
       </AppShell>
     </LibraryPackProvider>
   );
