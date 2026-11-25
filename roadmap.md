@@ -9,7 +9,8 @@
 - [ ] Cloud-backed 66-suite private release gate is a subsequent milestone, not certified by export checks; presence follows it. Agent/sampling await Chris's explicit provider and budget authorization.
 - [ ] Two-client concurrent editing/realtime remains uncertified; presence is a separate missing room-capability feature, not a database adapter gap.
 ## Ordered single-editor cutover (review-gated)
-- [x] STOPPED by user: converter direction abandoned. 36 additive recovery/conversion records already written; original content/routing unchanged; no further conversions.
+- [x] Restarted with Chris's approval (25 Nov 2026) as copies only: all 36 saved pieces have a conversion beside an unchanged original — 15 clean, 20 partial (114 recorded gaps), 1 failed (Baxter original-layout piece). Nothing routes to the copies.
+- [ ] Owner review of conversion results before any editor uses them.
 - [x] Steps 2–8 abandoned, not started.
 ## Claude full Element update
 - [x] Restore Exports verification history and current state separately from artwork; library-artwork availability resolved, Office/exact export parity still unverified.
