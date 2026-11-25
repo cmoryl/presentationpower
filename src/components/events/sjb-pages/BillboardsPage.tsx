@@ -4,6 +4,7 @@ import { SjbLink, SjbShareLinkButton, SjbShell } from "@/components/events/SjbSh
 import { Button } from "@/design-system/element";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { SJB_BILLBOARD_RESEARCH } from "@/lib/sjb-billboards";
+import { SJB_BILLBOARD_BANNERS } from "@/lib/sjb-billboard-banners";
 import { useCanvaSynced } from "@/lib/use-canva-sync";
 import { SJB_SELECTED_BILLBOARDS, selectedBillboardArtwork, selectedBillboardScene } from "@/lib/sjb-selected-billboards";
 
@@ -18,7 +19,7 @@ export function BillboardsPage() {
       <header className="space-y-3">
         <SjbLink page="event" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="size-4" />San Juan Bowl</SjbLink>
         <h1 className="text-3xl font-semibold leading-tight">San Juan Bowl digital billboards</h1>
-        <p className="text-sm text-muted-foreground">Selected campaign artwork · 840 × 400 and 1,728 × 512 · digital-display files, not print masters.</p>
+        <p className="text-sm text-muted-foreground">Selected campaign artwork · 840 × 400, 840 × 720, 1,472 × 1,280 and 1,728 × 512 · digital-display files, not print masters.</p>
         <SjbShareLinkButton />
       </header>
       <section aria-labelledby="bb-controls" className="flex flex-wrap items-center gap-4">
@@ -36,6 +37,22 @@ export function BillboardsPage() {
             <figcaption className="flex flex-wrap items-center gap-2 text-sm">
               <span className="mr-auto"><strong>{b.label}</strong><span className="block text-xs text-muted-foreground">{b.lang === "en" ? "English" : "Español"} · {b.w.toLocaleString()} × {b.h}</span></span>
               <Button asChild variant="outline" size="sm"><a href={art(b.id)} download><Download className="size-4" />PNG</a></Button>
+              <Button asChild variant="ghost" size="sm"><a href={b.edit} target="_blank" rel="noreferrer"><ExternalLink className="size-4" />Canva</a></Button>
+            </figcaption>
+          </figure>)}
+        </div>
+      </section>
+      <section aria-labelledby="bb-banners" className="space-y-6">
+        <h2 id="bb-banners" className="text-xl font-semibold">Digital billboard banners</h2>
+        <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2">
+          {SJB_BILLBOARD_BANNERS.filter(b => lang === "all" || b.lang === lang).map(b => <figure key={b.id} className="space-y-3">
+            <Dialog>
+              <DialogTrigger asChild><Button variant="ghost" className="h-auto w-full p-0 hover:bg-transparent" aria-label={`Enlarge banner ${b.w} × ${b.h} ${b.lang}`}><img src={b.image} width={b.w} height={b.h} alt={b.alt} className="h-auto w-full rounded-sm border border-border" /></Button></DialogTrigger>
+              <DialogContent className="max-w-[min(96vw,1600px)] p-3"><DialogTitle className="text-sm">Billboard banner · {b.w.toLocaleString()} × {b.h.toLocaleString()}</DialogTitle><img src={b.image} alt={b.alt} className="max-h-[85vh] w-full object-contain" /></DialogContent>
+            </Dialog>
+            <figcaption className="flex flex-wrap items-center gap-2 text-sm">
+              <span className="mr-auto"><strong>Billboard banner</strong><span className="block text-xs text-muted-foreground">{b.lang === "en" ? "English" : "Español"} · {b.w.toLocaleString()} × {b.h.toLocaleString()}</span></span>
+              <Button asChild variant="outline" size="sm"><a href={b.image} download={b.download}><Download className="size-4" />PNG</a></Button>
               <Button asChild variant="ghost" size="sm"><a href={b.edit} target="_blank" rel="noreferrer"><ExternalLink className="size-4" />Canva</a></Button>
             </figcaption>
           </figure>)}
