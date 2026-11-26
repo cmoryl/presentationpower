@@ -955,14 +955,14 @@ function Library() {
                 className="w-full rounded-md border border-input bg-background px-3 py-2 pr-8 text-sm shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
               />
               {q && (
-                <button
+                <Button variant="ghost" size="sm"
                   type="button"
                   onClick={() => setQ("")}
                   aria-label="Clear search"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:bg-black/5 hover:text-black"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
                 >
                   ✕
-                </button>
+                </Button>
               )}
             </div>
             <select
@@ -990,21 +990,21 @@ function Library() {
               <option value="pinned-first">Pinned first</option>
               <option value="most-used">Most used by you</option>
             </select>
-            <button
+            <Button variant="ghost" size="sm"
               type="button"
               onClick={() => setPinnedOnly((v) => !v)}
               aria-pressed={pinnedOnly}
               title={pins.size > 0 ? `${pins.size} pinned` : "No pins yet — star a card"}
               className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs transition ${
                 pinnedOnly
-                  ? "border-amber-500 bg-amber-400/20 text-amber-900"
-                  : "border-input bg-background text-foreground hover:border-amber-400 hover:text-amber-800"
+                  ? "border-primary bg-secondary text-secondary-foreground"
+                  : "border-input bg-background text-foreground hover:border-primary"
               }`}
             >
-              <Star size={12} className={pinnedOnly ? "fill-amber-500 text-amber-600" : ""} />
+              <Star size={12} className={pinnedOnly ? "fill-current text-primary" : ""} />
               Pinned{pins.size > 0 ? ` · ${pins.size}` : ""}
-            </button>
-            <button
+            </Button>
+            <Button variant="ghost" size="sm"
               type="button"
               onClick={() => {
                 // Never call another setter *inside* the updater: React invokes
@@ -1018,20 +1018,20 @@ function Library() {
               title="Pick multiple modules, then build a deck from the selection"
               className={`rounded-md border px-3 py-1.5 text-xs transition ${
                 selectMode
-                  ? "border-[#003FC7] bg-primary text-white"
-                  : "border-input bg-background text-foreground hover:border-black/30 hover:text-black"
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-input bg-background text-foreground hover:border-ring hover:text-foreground"
               }`}
             >
               {selectMode ? "✓ Selecting" : "☐ Select modules"}
-            </button>
+            </Button>
             <span className="ml-auto text-xs tabular-nums text-muted-foreground">
               {filtered.length} of {allEntries.length}
             </span>
           </div>
 
-          <details className="group mt-2 border-t border-border pt-2 dark:border-white/10">
+          <details className="group mt-2 border-t border-border pt-2 dark:border-border">
             <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 transition group-open:border-[#003FC7] group-open:text-primary">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 transition group-open:border-primary group-open:text-primary">
                 Filters &amp; view
                 {familyIds.size + tagIds.size > 0 ? ` · ${familyIds.size + tagIds.size}` : ""}
                 <span aria-hidden className="transition group-open:rotate-180">
@@ -1052,13 +1052,13 @@ function Library() {
                       clearFilters();
                     }
                   }}
-                  className="cursor-pointer rounded-md border border-input bg-background px-3 py-1.5 text-foreground hover:border-black/30 hover:text-black"
+                  className="cursor-pointer rounded-md border border-input bg-background px-3 py-1.5 text-foreground hover:border-ring hover:text-foreground"
                 >
                   Clear filters
                 </span>
               )}
               {scopeBrand && (
-                <span className="rounded-md bg-black/5 px-3 py-1 text-[11px] text-foreground">
+                <span className="rounded-md bg-muted px-3 py-1 text-[11px] text-foreground">
                   {preferred.size} preferred · {restricted.size} family restrictions
                 </span>
               )}
@@ -1067,55 +1067,55 @@ function Library() {
             <div className="mt-3 space-y-3">
               <div className="flex flex-wrap items-center gap-2">
                 <div className="inline-flex overflow-hidden rounded-md border border-input bg-background text-xs">
-                  <button
+                  <Button variant="ghost" size="sm"
                     type="button"
                     onClick={() => setMode("light")}
-                    className={`px-3 py-1.5 ${mode === "light" ? "bg-primary text-white" : "text-muted-foreground hover:text-black"}`}
+                    className={`px-3 py-1.5 ${mode === "light" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
                     aria-pressed={mode === "light"}
                   >
                     ☀︎ Light
-                  </button>
-                  <button
+                  </Button>
+                  <Button variant="ghost" size="sm"
                     type="button"
                     onClick={() => setMode("dark")}
-                    className={`px-3 py-1.5 ${mode === "dark" ? "bg-primary text-white" : "text-muted-foreground hover:text-black"}`}
+                    className={`px-3 py-1.5 ${mode === "dark" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
                     aria-pressed={mode === "dark"}
                   >
                     ☾ Dark
-                  </button>
-                  <button
+                  </Button>
+                  <Button variant="ghost" size="sm"
                     type="button"
                     onClick={() => setMode("ab")}
-                    className={`px-3 py-1.5 ${mode === "ab" ? "bg-primary text-white" : "text-muted-foreground hover:text-black"}`}
+                    className={`px-3 py-1.5 ${mode === "ab" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
                     aria-pressed={mode === "ab"}
                     title="Compare light vs dark side-by-side"
                   >
                     ⇋ A/B
-                  </button>
+                  </Button>
                 </div>
                 <div
                   className="inline-flex overflow-hidden rounded-md border border-input bg-background text-xs"
                   role="group"
                   aria-label="Card density"
                 >
-                  <button
+                  <Button variant="ghost" size="sm"
                     type="button"
                     onClick={() => setDensity("comfortable")}
-                    className={`px-3 py-1.5 ${density === "comfortable" ? "bg-primary text-white" : "text-muted-foreground hover:text-black"}`}
+                    className={`px-3 py-1.5 ${density === "comfortable" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
                     aria-pressed={density === "comfortable"}
                     title="Comfortable cards with full metadata"
                   >
                     ▦ Cards
-                  </button>
-                  <button
+                  </Button>
+                  <Button variant="ghost" size="sm"
                     type="button"
                     onClick={() => setDensity("thumb")}
-                    className={`px-3 py-1.5 ${density === "thumb" ? "bg-primary text-white" : "text-muted-foreground hover:text-black"}`}
+                    className={`px-3 py-1.5 ${density === "thumb" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
                     aria-pressed={density === "thumb"}
                     title="Compact thumbnails — pick modules faster"
                   >
                     ▨ Thumbs
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -1126,20 +1126,20 @@ function Library() {
                 {moduleFamilies.map((mf) => {
                   const on = familyIds.has(mf.id);
                   return (
-                    <button
+                    <Button variant="ghost" size="sm"
                       key={mf.id}
                       type="button"
                       onClick={() => setFamilyIds((s) => toggle(s, mf.id))}
                       aria-pressed={on}
                       className={`rounded-md border px-3 py-1 text-xs transition ${
                         on
-                          ? "border-[#05041A] bg-primary text-white shadow-sm"
-                          : "border-input bg-background text-foreground hover:border-black/30 hover:text-black"
+                          ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                          : "border-input bg-background text-foreground hover:border-ring hover:text-foreground"
                       }`}
                       title={mf.name}
                     >
                       {mf.name}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -1151,19 +1151,19 @@ function Library() {
                 {STRUCTURAL_TAGS.map((t) => {
                   const on = tagIds.has(t.id);
                   return (
-                    <button
+                    <Button variant="ghost" size="sm"
                       key={t.id}
                       type="button"
                       onClick={() => setTagIds((s) => toggle(s, t.id))}
                       aria-pressed={on}
                       className={`rounded-md border px-3 py-1 text-xs transition ${
                         on
-                          ? "border-[#003FC7] bg-primary text-white shadow-sm"
-                          : "border-input bg-background text-foreground hover:border-[#003FC7]/40 hover:text-black"
+                          ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                          : "border-input bg-background text-foreground hover:border-primary/40 hover:text-foreground"
                       }`}
                     >
                       {t.label}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
