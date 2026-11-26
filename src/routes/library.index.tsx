@@ -1,3 +1,4 @@
+import { Button } from "@/design-system/element";
 import { BRAND } from "@/lib/brand-colors";
 import { BuildWorkspaceHeader } from "@/components/editor/BuildWorkspaceHeader";
 import { SourceModuleLibrary } from "@/components/editor/SourceModuleLibrary";
@@ -932,33 +933,33 @@ function Library() {
                 The previous deck module catalogue, kept for existing decks. New work uses the Element modules above.
               </p>
             </div>
-            <button
-              type="button"
+            <Button
+              variant="outline"
               aria-expanded={showLegacy}
               onClick={() => setShowLegacy((v) => !v)}
               className="rounded-md border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {showLegacy ? "Hide earlier variants" : "Show earlier variants"}
-            </button>
+            </Button>
           </div>
         </section>
 
         {showLegacy && (<>
-        <div className="sticky top-0 z-20 -mx-2 rounded-2xl border border-black/10 bg-white/85 px-3 py-3 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-[#05041A]/80">
+        <div className="sticky top-[var(--app-header-h)] z-20 mt-4 border-y border-border bg-background/95 py-3 backdrop-blur-sm">
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative min-w-[220px] flex-1">
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search modules by name, id, family…"
-                className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 pr-8 text-sm shadow-sm focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/20"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 pr-8 text-sm shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
               />
               {q && (
                 <button
                   type="button"
                   onClick={() => setQ("")}
                   aria-label="Clear search"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-black/40 hover:bg-black/5 hover:text-black"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:bg-black/5 hover:text-black"
                 >
                   ✕
                 </button>
@@ -968,7 +969,7 @@ function Library() {
               aria-label="Scope Brand"
               value={scopeBrandId}
               onChange={(e) => setScopeBrandId(e.target.value)}
-              className="rounded-lg border border-black/15 bg-white px-2.5 py-2 text-xs text-black/70"
+              className="rounded-md border border-input bg-background px-2.5 py-2 text-xs text-foreground"
               title="Filter to what's in-scope for a brand"
             >
               <option value="all">Any brand scope</option>
@@ -982,7 +983,7 @@ function Library() {
               aria-label="Sort"
               value={sort}
               onChange={(e) => setSort(e.target.value as typeof sort)}
-              className="rounded-lg border border-black/15 bg-white px-2.5 py-2 text-xs text-black/70"
+              className="rounded-md border border-input bg-background px-2.5 py-2 text-xs text-foreground"
               title="Sort variants"
             >
               <option value="default">Sort: default</option>
@@ -997,7 +998,7 @@ function Library() {
               className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs transition ${
                 pinnedOnly
                   ? "border-amber-500 bg-amber-400/20 text-amber-900"
-                  : "border-black/15 bg-white text-black/70 hover:border-amber-400 hover:text-amber-800"
+                  : "border-input bg-background text-foreground hover:border-amber-400 hover:text-amber-800"
               }`}
             >
               <Star size={12} className={pinnedOnly ? "fill-amber-500 text-amber-600" : ""} />
@@ -1017,20 +1018,20 @@ function Library() {
               title="Pick multiple modules, then build a deck from the selection"
               className={`rounded-md border px-3 py-1.5 text-xs transition ${
                 selectMode
-                  ? "border-[#003FC7] bg-[#003FC7] text-white"
-                  : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
+                  ? "border-[#003FC7] bg-primary text-white"
+                  : "border-input bg-background text-foreground hover:border-black/30 hover:text-black"
               }`}
             >
               {selectMode ? "✓ Selecting" : "☐ Select modules"}
             </button>
-            <span className="ml-auto text-xs tabular-nums text-black/50">
+            <span className="ml-auto text-xs tabular-nums text-muted-foreground">
               {filtered.length} of {allEntries.length}
             </span>
           </div>
 
-          <details className="group mt-2 border-t border-black/5 pt-2 dark:border-white/10">
-            <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 text-xs text-black/60">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-3 py-1.5 transition group-open:border-[#003FC7] group-open:text-[#003FC7]">
+          <details className="group mt-2 border-t border-border pt-2 dark:border-white/10">
+            <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 transition group-open:border-[#003FC7] group-open:text-primary">
                 Filters &amp; view
                 {familyIds.size + tagIds.size > 0 ? ` · ${familyIds.size + tagIds.size}` : ""}
                 <span aria-hidden className="transition group-open:rotate-180">
@@ -1051,13 +1052,13 @@ function Library() {
                       clearFilters();
                     }
                   }}
-                  className="cursor-pointer rounded-md border border-black/15 bg-white px-3 py-1.5 text-black/70 hover:border-black/30 hover:text-black"
+                  className="cursor-pointer rounded-md border border-input bg-background px-3 py-1.5 text-foreground hover:border-black/30 hover:text-black"
                 >
                   Clear filters
                 </span>
               )}
               {scopeBrand && (
-                <span className="rounded-md bg-black/5 px-3 py-1 text-[11px] text-black/70">
+                <span className="rounded-md bg-black/5 px-3 py-1 text-[11px] text-foreground">
                   {preferred.size} preferred · {restricted.size} family restrictions
                 </span>
               )}
@@ -1065,11 +1066,11 @@ function Library() {
 
             <div className="mt-3 space-y-3">
               <div className="flex flex-wrap items-center gap-2">
-                <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
+                <div className="inline-flex overflow-hidden rounded-md border border-input bg-background text-xs">
                   <button
                     type="button"
                     onClick={() => setMode("light")}
-                    className={`px-3 py-1.5 ${mode === "light" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                    className={`px-3 py-1.5 ${mode === "light" ? "bg-primary text-white" : "text-muted-foreground hover:text-black"}`}
                     aria-pressed={mode === "light"}
                   >
                     ☀︎ Light
@@ -1077,7 +1078,7 @@ function Library() {
                   <button
                     type="button"
                     onClick={() => setMode("dark")}
-                    className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                    className={`px-3 py-1.5 ${mode === "dark" ? "bg-primary text-white" : "text-muted-foreground hover:text-black"}`}
                     aria-pressed={mode === "dark"}
                   >
                     ☾ Dark
@@ -1085,7 +1086,7 @@ function Library() {
                   <button
                     type="button"
                     onClick={() => setMode("ab")}
-                    className={`px-3 py-1.5 ${mode === "ab" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                    className={`px-3 py-1.5 ${mode === "ab" ? "bg-primary text-white" : "text-muted-foreground hover:text-black"}`}
                     aria-pressed={mode === "ab"}
                     title="Compare light vs dark side-by-side"
                   >
@@ -1093,14 +1094,14 @@ function Library() {
                   </button>
                 </div>
                 <div
-                  className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs"
+                  className="inline-flex overflow-hidden rounded-md border border-input bg-background text-xs"
                   role="group"
                   aria-label="Card density"
                 >
                   <button
                     type="button"
                     onClick={() => setDensity("comfortable")}
-                    className={`px-3 py-1.5 ${density === "comfortable" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                    className={`px-3 py-1.5 ${density === "comfortable" ? "bg-primary text-white" : "text-muted-foreground hover:text-black"}`}
                     aria-pressed={density === "comfortable"}
                     title="Comfortable cards with full metadata"
                   >
@@ -1109,7 +1110,7 @@ function Library() {
                   <button
                     type="button"
                     onClick={() => setDensity("thumb")}
-                    className={`px-3 py-1.5 ${density === "thumb" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                    className={`px-3 py-1.5 ${density === "thumb" ? "bg-primary text-white" : "text-muted-foreground hover:text-black"}`}
                     aria-pressed={density === "thumb"}
                     title="Compact thumbnails — pick modules faster"
                   >
@@ -1119,7 +1120,7 @@ function Library() {
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                   Family
                 </span>
                 {moduleFamilies.map((mf) => {
@@ -1132,8 +1133,8 @@ function Library() {
                       aria-pressed={on}
                       className={`rounded-md border px-3 py-1 text-xs transition ${
                         on
-                          ? "border-[#05041A] bg-[#05041A] text-white shadow-sm"
-                          : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
+                          ? "border-[#05041A] bg-primary text-white shadow-sm"
+                          : "border-input bg-background text-foreground hover:border-black/30 hover:text-black"
                       }`}
                       title={mf.name}
                     >
@@ -1144,7 +1145,7 @@ function Library() {
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                   Structure
                 </span>
                 {STRUCTURAL_TAGS.map((t) => {
@@ -1157,8 +1158,8 @@ function Library() {
                       aria-pressed={on}
                       className={`rounded-md border px-3 py-1 text-xs transition ${
                         on
-                          ? "border-[#003FC7] bg-[#003FC7] text-white shadow-sm"
-                          : "border-black/15 bg-white text-black/70 hover:border-[#003FC7]/40 hover:text-black"
+                          ? "border-[#003FC7] bg-primary text-white shadow-sm"
+                          : "border-input bg-background text-foreground hover:border-[#003FC7]/40 hover:text-black"
                       }`}
                     >
                       {t.label}
@@ -1191,7 +1192,7 @@ function Library() {
                     {coverage.failing.map((r) => (
                       <li
                         key={r.brandId}
-                        className="rounded-xl border border-amber-300/60 bg-white/70 p-3"
+                        className="rounded-xl border border-amber-300/60 bg-background/70 p-3"
                       >
                         <div className="flex items-baseline justify-between gap-3">
                           <span className="font-semibold text-amber-950">{r.brandName}</span>
@@ -1213,7 +1214,7 @@ function Library() {
                                 state === "ok"
                                   ? "border-emerald-300/70 bg-emerald-50 text-emerald-900"
                                   : state === "skipped"
-                                    ? "border-black/10 bg-white/60 text-black/50"
+                                    ? "border-border bg-background/60 text-muted-foreground"
                                     : "border-amber-400/70 bg-amber-100 text-amber-950";
                               const title = m.note
                                 ? `${OVERLAY_SLOT_LABELS[slot]} — ${m.note}`
@@ -1281,7 +1282,7 @@ function Library() {
           A curator edits a module's sample content while seeing it in the
           approved style it will ship in. Industry recipes filter the grid;
           legacy looks stay resolvable in the compatibility drawer. */}
-        <details className="group mt-8 rounded-2xl border border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.03]">
+        <details className="group mt-8 rounded-2xl border border-border bg-background dark:border-white/10 dark:bg-background/[0.03]">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4">
             <div className="min-w-0">
               <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
@@ -1300,20 +1301,20 @@ function Library() {
                   {activePack.swatch.map((c) => (
                     <span
                       key={c}
-                      className="h-3.5 w-3.5 rounded-full ring-1 ring-black/10"
+                      className="h-3.5 w-3.5 rounded-md ring-1 ring-black/10"
                       style={{ background: c }}
                     />
                   ))}
                 </span>
               )}
-              <span className="flex h-6 w-6 items-center justify-center rounded-full border border-black/15 text-[10px] text-black/50 transition group-open:rotate-180 dark:border-white/20 dark:text-white/50">
+              <span className="flex h-6 w-6 items-center justify-center rounded-md border border-input text-[10px] text-muted-foreground transition group-open:rotate-180 dark:border-white/20 dark:text-white/50">
                 ▾
               </span>
             </div>
           </summary>
-          <div className="border-t border-black/10 px-5 py-5 dark:border-white/10">
+          <div className="border-t border-border px-5 py-5 dark:border-white/10">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#003FC7]/20 bg-primary/[0.04] px-3 py-2">
-              <p className="text-[12px] text-black/60 dark:text-white/60">
+              <p className="text-[12px] text-muted-foreground dark:text-white/60">
                 One master background directory — 28 core languages (S01–S28) + 30 industry systems
                 (R01–R30), 2,552 authored compositions.
               </p>
@@ -1351,15 +1352,15 @@ function Library() {
         </details>
 
         {filtered.length === 0 ? (
-          <div className="mt-10 rounded-3xl border border-dashed border-black/15 bg-white/60 px-6 py-10 sm:px-10">
+          <div className="mt-10 rounded-3xl border border-dashed border-input bg-background/60 px-6 py-10 sm:px-10">
             <div className="mx-auto max-w-2xl text-center">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#03002C]/5 text-2xl dark:bg-card">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-md bg-[#03002C]/5 text-2xl dark:bg-card">
                 ⌕
               </div>
               <h3 className="text-lg font-semibold text-[#03002C]">
                 No modules match those filters
               </h3>
-              <p className="mt-2 text-sm text-black/60">
+              <p className="mt-2 text-sm text-muted-foreground">
                 The library holds {moduleVariants.length} approved variants — the current
                 combination is just too narrow. Loosen one thing below, or start from an example.
               </p>
@@ -1368,14 +1369,14 @@ function Library() {
             {/* Active filters — remove them one at a time */}
             {hasFilters && (
               <div className="mx-auto mt-6 flex max-w-2xl flex-wrap items-center justify-center gap-2">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                   Active
                 </span>
                 {q.trim() && (
                   <button
                     type="button"
                     onClick={() => setQ("")}
-                    className="rounded-md border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                    className="rounded-md border border-input bg-background px-3 py-1 text-xs text-foreground hover:border-black/35"
                   >
                     “{q.trim()}” ✕
                   </button>
@@ -1385,7 +1386,7 @@ function Library() {
                     key={id}
                     type="button"
                     onClick={() => setFamilyIds((s) => toggle(s, id))}
-                    className="rounded-md border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                    className="rounded-md border border-input bg-background px-3 py-1 text-xs text-foreground hover:border-black/35"
                   >
                     {byId(moduleFamilies, id)?.name ?? id} ✕
                   </button>
@@ -1395,7 +1396,7 @@ function Library() {
                     key={t.id}
                     type="button"
                     onClick={() => setTagIds((s) => toggle(s, t.id))}
-                    className="rounded-md border border-[#003FC7]/30 bg-white px-3 py-1 text-xs text-[#003FC7] hover:border-[#003FC7]"
+                    className="rounded-md border border-[#003FC7]/30 bg-background px-3 py-1 text-xs text-primary hover:border-[#003FC7]"
                   >
                     {t.label} ✕
                   </button>
@@ -1404,7 +1405,7 @@ function Library() {
                   <button
                     type="button"
                     onClick={() => setPinnedOnly(false)}
-                    className="rounded-md border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                    className="rounded-md border border-input bg-background px-3 py-1 text-xs text-foreground hover:border-black/35"
                   >
                     Pinned only ✕
                   </button>
@@ -1413,7 +1414,7 @@ function Library() {
                   <button
                     type="button"
                     onClick={() => setScopeBrandId("all")}
-                    className="rounded-md border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                    className="rounded-md border border-input bg-background px-3 py-1 text-xs text-foreground hover:border-black/35"
                   >
                     Scope: {brandModes.find((b) => b.id === scopeBrandId)?.name ?? scopeBrandId} ✕
                   </button>
@@ -1424,7 +1425,7 @@ function Library() {
             {/* One-click relaxations, ranked by how many results they bring back */}
             {emptyHelp && emptyHelp.relax.length > 0 && (
               <div className="mx-auto mt-7 max-w-2xl">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                   Try this
                 </div>
                 <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -1433,10 +1434,10 @@ function Library() {
                       key={r.key}
                       type="button"
                       onClick={r.apply}
-                      className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm text-[#03002C] transition hover:border-[#003FC7]/50 hover:shadow-sm"
+                      className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-background px-4 py-3 text-left text-sm text-[#03002C] transition hover:border-[#003FC7]/50 hover:shadow-sm"
                     >
                       <span>{r.label}</span>
-                      <span className="shrink-0 rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-[#003FC7]">
+                      <span className="shrink-0 rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-primary">
                         {r.count} result{r.count === 1 ? "" : "s"}
                       </span>
                     </button>
@@ -1451,7 +1452,7 @@ function Library() {
                 <div className="mx-auto mt-7 max-w-2xl grid gap-5 sm:grid-cols-2">
                   {emptyHelp.exampleSearches.length > 0 && (
                     <div>
-                      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                         Example searches
                       </div>
                       <div className="mt-2 flex flex-wrap gap-2">
@@ -1463,7 +1464,7 @@ function Library() {
                               clearFilters();
                               setQ(term);
                             }}
-                            className="rounded-md border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-[#003FC7]/50 hover:text-[#003FC7]"
+                            className="rounded-md border border-input bg-background px-3 py-1 text-xs text-foreground hover:border-[#003FC7]/50 hover:text-primary"
                           >
                             {term}
                           </button>
@@ -1473,7 +1474,7 @@ function Library() {
                   )}
                   {emptyHelp.exampleFamilies.length > 0 && (
                     <div>
-                      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                         Browse a family
                       </div>
                       <div className="mt-2 flex flex-wrap gap-2">
@@ -1485,10 +1486,10 @@ function Library() {
                               clearFilters();
                               setFamilyIds(new Set([mf.id]));
                             }}
-                            className="rounded-md border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-[#003FC7]/50 hover:text-[#003FC7]"
+                            className="rounded-md border border-input bg-background px-3 py-1 text-xs text-foreground hover:border-[#003FC7]/50 hover:text-primary"
                           >
                             {mf.name}
-                            <span className="ml-1 tabular-nums text-black/40">{count}</span>
+                            <span className="ml-1 tabular-nums text-muted-foreground">{count}</span>
                           </button>
                         ))}
                       </div>
@@ -1571,7 +1572,7 @@ function Library() {
         {selectMode && selected.length > 0 && (
           <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
             <div className="pointer-events-auto flex items-center gap-3 rounded-md border border-white/10 bg-[#03002C] px-4 py-2 text-sm text-white shadow-2xl dark:bg-card">
-              <span className="rounded-md bg-white/15 px-2.5 py-0.5 text-xs font-medium">
+              <span className="rounded-md bg-background/15 px-2.5 py-0.5 text-xs font-medium">
                 {selected.length} selected
               </span>
               <button
@@ -1581,7 +1582,7 @@ function Library() {
               >
                 Clear
               </button>
-              <div className="h-4 w-px bg-white/20" />
+              <div className="h-4 w-px bg-background/20" />
               <button
                 type="button"
                 onClick={createDeckFromSelection}
@@ -1832,23 +1833,23 @@ const VariantCard = memo(function VariantCard({
 
   return (
     <div
-      className={`group relative ${selectable && selected ? "rounded-[24px] ring-2 ring-[#003FC7] ring-offset-2 ring-offset-white" : ""}`}
+      className={`group relative flex min-w-0 flex-col overflow-hidden rounded-md border bg-card text-card-foreground transition-colors ${selectable && selected ? "border-primary ring-2 ring-ring ring-offset-2 ring-offset-background" : "border-border hover:border-primary/40"}`}
     >
       {selectable && (
         <div
-          className="absolute left-3 top-3 z-20 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-[13px] shadow-md ring-1 ring-black/10 backdrop-blur"
+          className="absolute left-3 top-3 z-20 inline-flex h-8 w-8 items-center justify-center rounded-sm bg-background text-foreground shadow-sm ring-1 ring-border"
           aria-hidden
           title={selected ? "Selected — click card to deselect" : "Click card to select"}
         >
           {selected ? (
-            <Check size={16} className="text-[#003FC7]" />
+            <Check size={16} className="text-primary" />
           ) : (
-            <span className="h-4 w-4 rounded-sm border border-black/30" />
+            <span className="h-4 w-4 rounded-sm border border-input" />
           )}
         </div>
       )}
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={selectable ? onToggleSelect : onOpen}
         title={selectDisabled ? "Video examples can't be added to a deck" : undefined}
         data-variant-card=""
@@ -1859,14 +1860,14 @@ const VariantCard = memo(function VariantCard({
         data-variant-pinned={pinned ? "1" : "0"}
         data-variant-selected={selected ? "1" : "0"}
         data-variant-usage={usageCount}
-        className={`group/card block w-full overflow-hidden rounded-[24px] border bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)] ${selectable && selected ? "border-[#003FC7]" : "border-slate-200 hover:border-[#003FC7]/20"} ${selectDisabled ? "opacity-45" : ""}`}
+        className={`group/card block h-auto w-full flex-1 whitespace-normal rounded-none p-0 text-left hover:bg-card hover:text-card-foreground ${selectDisabled ? "opacity-45" : ""}`}
       >
         {isAB ? (
-          <div className="m-2 grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-px border-b border-border bg-border">
             {(["light", "dark"] as const).map((m) => (
               <div key={m} className="relative">
                 <LazyMount
-                  className={`relative aspect-[16/10] overflow-hidden rounded-[14px] ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
+                  className={`relative aspect-video overflow-hidden ${m === "dark" ? "bg-foreground" : "bg-muted"}`}
                   placeholder={<PreviewSkeleton dark={m === "dark"} label={variant.familyId} />}
                   onMount={bumpMount}
                 >
@@ -1940,7 +1941,7 @@ const VariantCard = memo(function VariantCard({
           </div>
         ) : (
           <LazyMount
-            className={`relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
+            className={`relative aspect-video overflow-hidden border-b border-border ${isDark ? "bg-foreground" : "bg-muted"}`}
             placeholder={<PreviewSkeleton dark={isDark} label={variant.familyId} />}
             onMount={bumpMount}
           >
@@ -1970,27 +1971,8 @@ const VariantCard = memo(function VariantCard({
                 </SlideBackdropContext.Provider>
               </ScaledSlide>
 
-              {/* Quick-action overlay */}
-              <div className="absolute inset-0 flex items-center justify-center gap-3 bg-[#03002C]/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100 dark:bg-card">
-                <span className="translate-y-2 rounded-md bg-white px-4 py-2 text-sm font-semibold text-[#03002C] shadow-lg transition-transform duration-300 group-hover:translate-y-0">
-                  Preview
-                </span>
-                <span className="translate-y-2 rounded-full border border-white/30 bg-white/20 p-2 text-white backdrop-blur-md transition-transform delay-75 duration-300 group-hover:translate-y-0">
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v16m8-8H4"
-                    />
-                  </svg>
-                </span>
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-foreground/20 opacity-0 transition-opacity group-hover/card:opacity-100 group-focus-visible/card:opacity-100 motion-reduce:transition-none">
+                <span className="flex h-9 w-9 items-center justify-center rounded-md bg-background text-foreground shadow-sm"><Eye aria-hidden size={18} /></span>
               </div>
 
               {preferred && !videoExample && (
@@ -2031,10 +2013,10 @@ const VariantCard = memo(function VariantCard({
 
         {/* Metadata footer */}
         {compact ? (
-          <div className="space-y-1 px-3 pb-3 pt-2">
+          <div className="min-h-28 space-y-1 px-3 py-3">
             <div className="flex items-center justify-between gap-2">
               <h3
-                className="truncate text-sm font-semibold tracking-tight text-[#03002C]"
+                className="line-clamp-2 text-sm font-semibold text-foreground"
                 title={
                   videoExample
                     ? videoExample.title
@@ -2045,17 +2027,17 @@ const VariantCard = memo(function VariantCard({
               >
                 {videoExample ? videoExample.title : preset ? preset.label : variant.name}
               </h3>
-              <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-slate-500">
+              <span className="shrink-0 font-mono text-[10px] text-muted-foreground">
                 {variant.familyId}
               </span>
             </div>
             <div
-              className="truncate font-mono text-[9px] uppercase tracking-[0.1em] text-[#003FC7]/80"
+              className="truncate font-mono text-[10px] text-muted-foreground"
               title={variant.id}
             >
               {variant.id}
             </div>
-            <p className="line-clamp-2 text-[11px] leading-snug text-slate-500">
+            <p className="line-clamp-2 text-[11px] leading-snug text-muted-foreground">
               {videoExample
                 ? videoExample.blurb
                 : preset
@@ -2064,34 +2046,34 @@ const VariantCard = memo(function VariantCard({
             </p>
           </div>
         ) : (
-          <div className="space-y-4 p-6 pt-4">
+          <div className="space-y-3 p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 space-y-1">
-                <div className="font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#003FC7]">
+                <div className="break-all font-mono text-[10px] text-muted-foreground">
                   {videoExample
                     ? `${variant.id} · Video demo`
                     : preset
                       ? `${variant.id} · Preset`
                       : variant.id}
                 </div>
-                <h3 className="truncate text-lg font-semibold tracking-tight text-[#03002C]">
+                <h3 className="line-clamp-2 text-base font-semibold text-foreground">
                   {videoExample ? videoExample.title : preset ? preset.label : variant.name}
                 </h3>
               </div>
-              <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              <span className="shrink-0 font-mono text-[10px] text-muted-foreground">
                 {variant.familyId}
               </span>
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-sm font-medium leading-snug text-[#03002C]/80">
+              <p className="text-sm font-medium leading-snug text-foreground">
                 {videoExample
                   ? videoExample.title
                   : preset
                     ? preset.label
                     : moduleCopy(variant).caption}
               </p>
-              <p className="line-clamp-2 text-sm leading-relaxed text-slate-500">
+              <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                 {videoExample
                   ? videoExample.blurb
                   : preset
@@ -2100,22 +2082,22 @@ const VariantCard = memo(function VariantCard({
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
               <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold uppercase tracking-tight text-slate-400">
+                  <span className="text-[10px] font-medium text-muted-foreground">
                     Family
                   </span>
-                  <span className="truncate text-xs font-medium text-[#03002C]">
+                  <span className="truncate text-xs font-medium text-foreground">
                     {familyName ?? "—"}
                   </span>
                 </div>
-                <div className="h-6 w-px bg-slate-100" />
+                <div className="h-6 w-px bg-border" />
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold uppercase tracking-tight text-slate-400">
+                  <span className="text-[10px] font-medium text-muted-foreground">
                     {videoExample ? "Variant" : "Layouts"}
                   </span>
-                  <span className="text-xs font-medium text-[#03002C]">
+                  <span className="text-xs font-medium text-foreground">
                     {videoExample
                       ? variant.name
                       : `${variant.permittedLayoutIds.length} ${variant.permittedLayoutIds.length === 1 ? "variant" : "variants"}`}
@@ -2123,19 +2105,19 @@ const VariantCard = memo(function VariantCard({
                 </div>
                 {!videoExample && variant.capacity.items && (
                   <>
-                    <div className="h-6 w-px bg-slate-100" />
+                    <div className="h-6 w-px bg-border" />
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-bold uppercase tracking-tight text-slate-400">
+                      <span className="text-[10px] font-medium text-muted-foreground">
                         Items
                       </span>
-                      <span className="text-xs font-medium text-[#03002C]">
+                      <span className="text-xs font-medium text-foreground">
                         {variant.capacity.items.min}–{variant.capacity.items.max}
                       </span>
                     </div>
                   </>
                 )}
               </div>
-              <div className="flex items-center gap-1 text-xs font-semibold text-[#003FC7]">
+              <div className="flex items-center gap-1 text-xs font-semibold text-primary">
                 <span>{videoExample ? "Zoom" : "Details"}</span>
                 <svg
                   className="h-3 w-3 transition-transform group-hover:translate-x-0.5"
@@ -2155,83 +2137,28 @@ const VariantCard = memo(function VariantCard({
             </div>
           </div>
         )}
-      </button>
-      {!videoExample ? (
-        <Link
-          to="/convert"
-          search={{ module: variant.id }}
-          className="mt-1.5 inline-flex items-center gap-1 px-2 py-1 text-[11px] font-semibold text-primary hover:underline focus-visible:outline-2 focus-visible:outline-[#003FC7]"
-        >
-          Use in marketing materials →
-        </Link>
-      ) : null}
-      {videoExample && onImportExample && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onImportExample();
-          }}
-          disabled={importBusy}
-          className="absolute inset-x-6 bottom-6 z-10 inline-flex items-center justify-center gap-2 rounded-md bg-[#03002C] px-4 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition group-hover:opacity-100 hover:bg-[#003FC7] disabled:opacity-60 dark:bg-card"
-        >
-          {importBusy ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
+      </Button>
+      <div className="flex min-h-12 flex-wrap items-center gap-1 border-t border-border px-3 py-2">
+        {!videoExample && <Button asChild variant="ghost" size="sm" className="mr-auto h-auto min-h-8 whitespace-normal px-0 text-xs">
+          <Link to="/convert" search={{ module: variant.id }}>Use in marketing materials <Plus aria-hidden /></Link>
+        </Button>}
+        {videoExample && onImportExample && <Button size="sm" onClick={onImportExample} disabled={importBusy}>
+          {importBusy ? <Loader2 className="animate-spin" /> : <Plus />}
           {importBusy ? "Importing…" : "Import as starter deck"}
-        </button>
-      )}
-      {onTogglePin && !videoExample && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onTogglePin();
-          }}
-          aria-pressed={pinned}
-          aria-label={pinned ? "Unpin variant" : "Pin variant"}
-          title={pinned ? "Pinned — click to unpin" : "Pin to Favorites"}
-          data-variant-pin=""
-          className={`absolute right-2 top-2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-md opacity-0 backdrop-blur transition focus-visible:opacity-100 group-hover/card:opacity-100 sm:h-6 sm:w-6 ${
-            pinned
-              ? "bg-amber-400 text-[#03002C] opacity-100 shadow ring-1 ring-amber-500/40"
-              : "bg-white/85 text-black/60 shadow-sm ring-1 ring-black/10 hover:bg-white hover:text-amber-600"
-          }`}
-        >
-          <Star size={11} className={pinned ? "fill-current" : ""} />
-        </button>
-      )}
-      {/* Per-slide PPTX download — exports exactly this card (content, division
-          palette, background layer) in the mode shown. */}
-      {!videoExample && (
-        <button
-          type="button"
-          data-ui-chrome=""
-          aria-label="Download this slide as PPTX"
-          title={`Download this slide as PPTX (${isDark ? "dark" : "light"})`}
-          disabled={slideDownloading}
-          onClick={(e) => {
-            e.stopPropagation();
-            void downloadThisSlide();
-          }}
-          className={`absolute right-2 bottom-2 z-10 inline-flex min-h-9 items-center gap-1 rounded-md px-2.5 py-[2px] text-[7px] sm:min-h-0 sm:px-1.5 font-semibold uppercase tracking-[0.1em] backdrop-blur transition ${
-            isDark
-              ? "bg-white/15 text-white ring-1 ring-white/25 hover:bg-white/25"
-              : "bg-black/60 text-white hover:bg-black/75"
-          } ${slideDownloading ? "opacity-60" : ""}`}
-        >
-          <Download size={9} />
-          {slideDownloading ? "…" : "PPTX"}
-        </button>
-      )}
-      {usageCount > 0 && !videoExample && (
-        <span
-          data-variant-usage-badge=""
-          data-ui-chrome=""
-          className="pointer-events-none absolute left-2 bottom-2 z-10 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#03002C]/80 text-white ring-1 ring-white/10 backdrop-blur dark:bg-card"
-          title={`Used in ${usageCount} of your slides`}
-        >
-          Used · {usageCount}
-        </span>
-      )}
+        </Button>}
+        {onTogglePin && !videoExample && <Button variant={pinned ? "secondary" : "ghost"} size="icon"
+          onClick={onTogglePin} aria-pressed={pinned} aria-label={pinned ? "Unpin variant" : "Pin variant"}
+          title={pinned ? "Unpin variant" : "Pin to Favorites"} data-variant-pin="" className="h-8 w-8">
+          <Star className={pinned ? "fill-current" : ""} />
+        </Button>}
+        {!videoExample && <Button variant="ghost" size="icon" data-ui-chrome=""
+          aria-label="Download this slide as PPTX" title={`Download this slide as PPTX (${isDark ? "dark" : "light"})`}
+          disabled={slideDownloading} onClick={() => void downloadThisSlide()} className="h-8 w-8">
+          {slideDownloading ? <Loader2 className="animate-spin" /> : <Download />}
+        </Button>}
+        {usageCount > 0 && !videoExample && <span data-variant-usage-badge="" data-ui-chrome=""
+          className="text-[10px] tabular-nums text-muted-foreground" title={`Used in ${usageCount} of your slides`}>Used · {usageCount}</span>}
+      </div>
     </div>
   );
 });
